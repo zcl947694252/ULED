@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/library/ULED-library.iml" filepath="$PROJECT_DIR$/library/ULED-library.iml" group="ULED/library" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" filepath="$PROJECT_DIR$/bannerlibrary/bannerlibrary.iml" group="ULED/bannerlibrary" />
+      <module fileurl="file://$PROJECT_DIR$/circleprogress/circleprogress.iml" filepath="$PROJECT_DIR$/circleprogress/circleprogress.iml" group="ULED/circleprogress" />
       <module fileurl="file://$PROJECT_DIR$/guide/guide.iml" filepath="$PROJECT_DIR$/guide/guide.iml" group="ULED/guide" />
       <module fileurl="file://$PROJECT_DIR$/stomplib/stomplib.iml" filepath="$PROJECT_DIR$/stomplib/stomplib.iml" group="ULED/stomplib" />
       <module fileurl="file://$PROJECT_DIR$/tbanner/tbanner.iml" filepath="$PROJECT_DIR$/tbanner/tbanner.iml" group="ULED/tbanner" />

@@ -1,1 +1,1 @@
-include ':BluetoothLightLib', ':app', ':guide', ':stomplib', 'tbanner:library', ':library', ':bannerlibrary'
+include ':BluetoothLightLib', ':app', ':guide', ':stomplib', 'tbanner:library', ':library', ':bannerlibrary', ':circleprogress'

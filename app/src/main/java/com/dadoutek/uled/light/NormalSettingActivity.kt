@@ -58,9 +58,7 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.connector_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.lang.Float
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -98,7 +96,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     @SuppressLint("StringFormatInvalid")
     private val clickListener = OnClickListener { v ->
         when (v.id) {
-            R.id.slow_rg_close -> slowOrUpClose()
             R.id.btnRename -> renameLight()
             R.id.tvOta -> if (isRenameState) saveName() else checkPermission()
             R.id.updateGroup -> updateGroup()
@@ -554,7 +551,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 light_sbBrightness.progress--
                         } else
                             if (light_sbBrightness.progress > 1)
-                            light_sbBrightness.progress--
+                                light_sbBrightness.progress--
 
                         when {
                             light_sbBrightness.progress < 1 ->
@@ -607,7 +604,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     }
                     else -> {//色温
                         if (light_sbBrightness.progress > 1)
-                        light_sbBrightness.progress--
+                            light_sbBrightness.progress--
                         when {
                             light_sbBrightness.progress < 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
 
@@ -1150,37 +1147,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (group!!.meshAddr != 0xFFFF)
             toolbarTv.text = group!!.name
 
-        /* slow_rg_close.setOnClickListener {
-             if (isChecked)  //开 关 上电 场景 1是打开 0 是关闭
-                 slowOrUpOpen()
-              else
-                 slowOrUpClose()
-         }
-       slow_rg_ly.setOnCheckedChangeListener { _, checkedId ->
-            val currentGroup = DBUtils.getGroupByID(group!!.id)
-            if (currentGroup?.slowUpSlowDownStatus == 1) {
-                when (checkedId) {
-                    R.id.slow_rg_slow -> {
-                        currentGroup?.slowUpSlowDownSpeed = 5
-                        sendSlowAndOld(currentGroup)
-                    }
-                    R.id.slow_rg_middle -> {
-                        currentGroup?.slowUpSlowDownSpeed = 3
-                        sendSlowAndOld(currentGroup)
-                    }
-                    R.id.slow_rg_fast -> {
-                        currentGroup?.slowUpSlowDownSpeed = 1
-                        sendSlowAndOld(currentGroup)
-                    }
-                    R.id.slow_rg_close -> slowOrUpClose()
-                }}
-        }*/
-
         slow_rg_slow?.setOnClickListener(this)
         slow_rg_middle?.setOnClickListener(this)
         slow_rg_fast?.setOnClickListener(this)
+        slow_rg_close?.setOnClickListener(this)
 
-        slow_rg_close?.setOnClickListener(clickListener)
         btn_remove_group?.setOnClickListener(clickListener)
         btn_rename?.setOnClickListener(clickListener)
         brightness_btn.setOnClickListener(clickListener)
@@ -1313,23 +1284,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.light_sbBrightness!!.setOnSeekBarChangeListener(this.barChangeListener)
     }
 
-    private fun sendSlowAndOld(currentGroup: DbGroup?) {
-        slowOrUpOpen()
-        for (i in 0..2)
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                    ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, (currentGroup?.slowUpSlowDownSpeed ?: 0).toByte()))
-        DBUtils.updateGroup(currentGroup!!)
-    }
-
-    private fun slowOrUpClose() {
+    private fun slowOrUpClose() {//关闭渐变指令
         val currentGroup = DBUtils.getGroupByID(group!!.id)
         currentGroup?.slowUpSlowDownStatus = 0
-        //slow_rg_view.visibility = VISIBLE  关成为四个功能中的一个 点击后不再屏蔽快中慢
         DBUtils.updateGroup(currentGroup!!)
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
-                ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, 1))
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
-                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 2, 2, 2, 2, 0, 0, 0))
+        for (i in 0..3) {
+            TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr ?: 0xffff,
+                    byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 2, 2, 0, 2, 2, 2, 2))//第四位2关闭指令 文档是0  但是0收不到
+        }
     }
 
     private fun slowOrUpOpen() {
@@ -1337,10 +1299,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         currentGroup?.slowUpSlowDownStatus = 1
         slow_rg_view.visibility = GONE
         DBUtils.updateGroup(currentGroup!!)
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr
                 ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, currentGroup?.slowUpSlowDownSpeed.toByte()))
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, group?.meshAddr ?: 0xffff,
-                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 2, 1))//1是开 2是关
+        Thread.sleep(500)
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr ?: 0xffff,
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 1, 1, 0, 0, 0))//1是开 0是关 第四位
     }
 
     private fun setLightGUIImg(iconLight: Int = R.mipmap.round, progress: Int = 0, temperatureValue: Int = 0, isClose: Boolean = false) {
@@ -1374,15 +1337,15 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
              else
                  slow_rg_view.visibility = VISIBLE*/
             slow_rg_view.visibility = GONE
-            slow_rg_close.isChecked =  group?.slowUpSlowDownStatus==1
-            if (group?.slowUpSlowDownStatus==0)
+            slow_rg_close.isChecked = group?.slowUpSlowDownStatus == 1
+            if (group?.slowUpSlowDownStatus == 0)
                 slow_rg_close.isChecked = true
             else
                 when (group?.slowUpSlowDownSpeed) {
-                        5 -> slow_rg_slow.isChecked = true
-                        3 -> slow_rg_middle.isChecked = true
-                        1 -> slow_rg_fast.isChecked = true
-                    }
+                    5 -> slow_rg_slow.isChecked = true
+                    3 -> slow_rg_middle.isChecked = true
+                    1 -> slow_rg_fast.isChecked = true
+                }
 
             slow_ly.visibility = VISIBLE
         } else
@@ -2002,24 +1965,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             R.id.slow_rg_slow -> {
                 currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 5
-                sendSlowAndOld(currentGroup)
+                slowOrUpOpen()
                 ToastUtils.showShort(getString(R.string.slow))
             }
             R.id.slow_rg_middle -> {
                 currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 3
-                sendSlowAndOld(currentGroup)
+                slowOrUpOpen()
                 ToastUtils.showShort(getString(R.string.mid))
             }
             R.id.slow_rg_fast -> {
                 currentGroup?.slowUpSlowDownStatus = 1
                 currentGroup?.slowUpSlowDownSpeed = 1
-                sendSlowAndOld(currentGroup)
+                slowOrUpOpen()
                 ToastUtils.showShort(getString(R.string.fast))
             }
             R.id.slow_rg_close -> {
                 slowOrUpClose()
-                ToastUtils.showShort(getString(R.string.close))
             }
         }
     }

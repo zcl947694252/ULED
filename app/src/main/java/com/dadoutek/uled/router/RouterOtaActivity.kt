@@ -1,9 +1,10 @@
-package com.dadoutek.uled.group
+package com.dadoutek.uled.router
 
 import android.os.Bundle
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import kotlinx.android.synthetic.main.activity_mainsss.view.*
+import kotlinx.android.synthetic.main.activity_router_ota.*
 
 
 /**
@@ -15,10 +16,27 @@ import kotlinx.android.synthetic.main.activity_mainsss.view.*
  * 更新时间   $
  * 更新描述
  */
-class RouterOtaActivity :TelinkBaseActivity(){
+class RouterOtaActivity : TelinkBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_router_ota)
+        initView()
+        initData()
+        initListener()
+    }
+
+    private fun initListener() {
+        wave_progress_bar?.setOnClickListener {
+             wave_progress_bar?.value = 40F
+        }
+    }
+
+    private fun initData() {
+
+    }
+
+    private fun initView() {
+
     }
 
 }

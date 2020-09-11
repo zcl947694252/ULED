@@ -27,6 +27,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.router.bean.RouterVersionsBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -131,7 +132,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     override fun routerUpdateVersion(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
         disposableTimer?.dispose()
-        if (routerVersion?.finish==true){
+        if (routerVersion?.finish == true) {
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                 override fun start() {}
                 override fun complete() {
@@ -142,9 +143,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     startActivity<RouterOtaActivity>("group" to dbGroup!!, "DeviceType" to deviceType)
                 }
             })
-
-        }else{
-            ToastUtils.showShort(getString(R.string.get_version_success_num,routerVersion?.succeedTotal?.size))
+        } else {
+            ToastUtils.showShort(getString(R.string.get_version_success_num, routerVersion?.succeedTotal?.size))
         }
     }
 

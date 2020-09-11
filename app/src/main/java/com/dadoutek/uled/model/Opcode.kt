@@ -35,6 +35,10 @@ object Opcode {
      */
     const val CONFIG_EXTEND_ALL_JBZL: Byte = 0x01.toByte()
     /**
+     * 渐变指令头
+     */
+    const val CONFIG_GRADIENT_OPCODE: Byte = 0xE6.toByte()
+    /**
      * 扩展指令头
      */
     const val CONFIG_EXTEND_OPCODE: Byte = 0x26.toByte()

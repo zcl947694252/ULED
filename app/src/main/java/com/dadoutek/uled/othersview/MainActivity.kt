@@ -52,6 +52,7 @@ import com.dadoutek.uled.mqtt.MqttService
 import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -165,6 +166,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
+        main_toast.setOnClickListener { startActivity(Intent(this@MainActivity,RouterOtaActivity::class.java)) }
         initBottomNavigation()
         checkVersionAvailable()
         // getScanResult()
