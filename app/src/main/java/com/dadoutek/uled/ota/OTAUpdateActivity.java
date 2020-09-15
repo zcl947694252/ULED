@@ -76,7 +76,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * 升级页面
+ * 我的升级页面
  * 思路：
  * 1.由于demo中没有对设备持久化操作，只有通过online_status 来添加和更新设备，
  * 而online_status返回的数据中只有meshAddress能判断设备唯一性
@@ -159,7 +159,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             switch (msg.what) {
                 case MSG_OTA_PROGRESS:
                     if ((Integer) msg.obj < 100) {
-                        btn_start_update.setText(R.string.updating);
+                        btn_start_update.setText(R.string.otaing);
                     }
                     otaProgress.setText(getString(R.string.progress_ota, msg.obj.toString()));
                     progress_view.setProgress((Integer) msg.obj);
@@ -630,7 +630,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         this.runOnUiThread(() -> {
             text_info.setVisibility(View.GONE);
             btn_start_update.setVisibility(View.VISIBLE);
-            btn_start_update.setText(R.string.updating);
+            btn_start_update.setText(R.string.otaing);
         });
 
         this.mode = MODE_OTA;

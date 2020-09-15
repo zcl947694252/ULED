@@ -174,7 +174,7 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
             switch (msg.what) {
                 case MSG_OTA_PROGRESS:
                     if ((Integer) msg.obj < 100) {
-                        btn_start_update.setText(R.string.updating);
+                        btn_start_update.setText(R.string.otaing);
                     }
                     otaProgress.setText(getString(R.string.progress_ota, msg.obj.toString()));
                     progress_view.setProgress((Integer) msg.obj);
@@ -886,7 +886,7 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
         this.runOnUiThread(() -> {
             text_info.setVisibility(View.GONE);
             btn_start_update.setVisibility(View.VISIBLE);
-            btn_start_update.setText(R.string.updating);
+            btn_start_update.setText(R.string.otaing);
         });
 
         this.mode = MODE_OTA;

@@ -172,8 +172,13 @@ class GwLoginActivity : TelinkBaseActivity() {
         val split = timeZone.replace("GMT+", "").split(":")
         RouterModel.routerConfigWifi(mac!!, account, pwd, split[0].toInt(), split[1].toInt(), TAG)
                 ?.subscribe({
-                    showLoadingDialog(getString(R.string.config_success))
-                    finish()
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(it.timeout.toLong(), TimeUnit.MILLISECONDS)
+                            .subscribe {
+                                showLoadingDialog(getString(R.string.config_WIFI_FAILE))
+                                hideLoadingDialog()
+                            }
                 }, {
                     ToastUtils.showShort(it.message)
                 })
@@ -401,6 +406,17 @@ class GwLoginActivity : TelinkBaseActivity() {
         super.onDestroy()
         unregisterReceiver(receiver)
         disposableTimer?.dispose()
+    }
+
+    override fun routerAccessIn(cmdBody: CmdBodyBean) {
+        LogUtils.v("zcl-----------路由配置网络成功-------${cmdBody.status == 0}")
+        hideLoadingDialog()
+        if (cmdBody.status == 0) {
+            ToastUtils.showShort(getString(R.string.config_WIFI_success))
+            finish()
+        } else {
+            ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
+        }
     }
 }
 

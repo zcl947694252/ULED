@@ -7,21 +7,37 @@
 
     <include layout="@layout/toolbar" />
 
-    <com.dadoutek.uled.widget.progress.WaveProgress
-            android:id="@+id/wave_progress_bar"
-            android:layout_width="300dp"
+    <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_marginTop="@dimen/dp_50"
-            android:layout_gravity="center_horizontal"
-            app:darkWaveAnimTime="1000"
-            app:maxValue="100"
-            app:value="10"
-            app:darkWaveColor="@color/dark"
-            app:lightWaveAnimTime="2000"
-            app:lightWaveColor="@color/light"
-            app:lightWaveDirect="R2L"
-            app:lockWave="false"
-            app:valueSize="@dimen/text_size_35"
-            app:waveHeight="30dp"
-            app:waveNum="1" />
+            android:layout_marginTop="@dimen/dp_50">
+
+        <com.dadoutek.uled.widget.progress.WaveProgress
+                android:id="@+id/router_ota_wave_progress_bar"
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:layout_centerInParent="true"
+                app:darkWaveAnimTime="1000"
+                app:darkWaveColor="@color/dark"
+                app:lightWaveAnimTime="2000"
+                app:lightWaveColor="@color/light"
+                app:lightWaveDirect="R2L"
+                app:lockWave="false"
+                app:maxValue="100"
+                app:value="10"
+                app:valueSize="@dimen/text_size_35"
+                app:waveHeight="30dp"
+                app:waveNum="1" />
+
+        <TextView
+                android:id="@+id/router_ota_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:background="@color/dark"
+                android:gravity="center"
+                android:text="准备升级中"
+                android:textColor="@color/black"
+                android:textSize="35sp" />
+    </RelativeLayout>
 </LinearLayout>

@@ -130,7 +130,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun routerUpdateVersion(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun routerUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
         disposableTimer?.dispose()
         if (routerVersion?.finish == true) {
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {

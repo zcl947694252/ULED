@@ -28,14 +28,22 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update(token: String, rid: Int, dbRegion: DbRegion, id: Long): Observable<String>? {
+    fun update( rid: Int, dbRegion: DbRegion, id: Long): Observable<String>? {
         return NetworkFactory.getApi()
-                .updateRegion(token, rid, dbRegion)
+                .updateRegion( rid, dbRegion)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
                     DBUtils.deleteDbDataChange(id)
                 }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun updateMesh( rid: Int, dbRegion: DbRegion): Observable<String>? {
+        return NetworkFactory.getApi()
+                .updateRegion( rid, dbRegion)
+                .compose(NetworkTransformer())
+                .observeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 

@@ -1039,7 +1039,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
-                        connect(light.meshAddr, true)
+                        connect(light.meshAddr, macAddress = light.macAddr,fastestMode = true)
                     }?.subscribe({
                         hideLoadingDialog()
                         startOtaAct()

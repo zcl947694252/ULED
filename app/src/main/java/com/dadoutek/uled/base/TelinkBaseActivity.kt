@@ -673,7 +673,16 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Cmd.routeUpdateDeviceVersion ->{
                     val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
-                    routerUpdateVersion(routerVersion)
+                    routerUpdateVersionRecevice(routerVersion)
+                }
+                Cmd.routeOTAing ->{
+                    val routerOTAingNumBean = Gson().fromJson(msg, RouterOTAingNumBean::class.java)
+                    routerOTAingNumRecevice(routerOTAingNumBean)
+
+                }
+                Cmd.routeOTAFinish ->{
+                    val routerOTAFinishBean = Gson().fromJson(msg, RouterOTAFinishBean::class.java)
+                    routerOTAFinishRecevice(routerOTAFinishBean)
                 }
 
             }
@@ -728,7 +737,15 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
-    open fun routerUpdateVersion(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    open fun routerOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
+
+    }
+
+    open fun routerOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {
+
+    }
+
+    open fun routerUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
 
     }
 
@@ -737,6 +754,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     open fun routerGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
+
     }
 
     open fun startRouterScan(cmdBodyBean: CmdBodyBean) {

@@ -7,6 +7,8 @@ import java.io.Serializable;
  */
 
 public class Cmd implements Serializable {
+    public static final int routeOTAFinish = 3018;
+    public static final int routeOTAing = 3023;
     public static final int routeUpdateDeviceVersion = 3007;
     public static final int routeUpdateScenes = 3008;
     public static final int routeDeleteScenes = 3006;

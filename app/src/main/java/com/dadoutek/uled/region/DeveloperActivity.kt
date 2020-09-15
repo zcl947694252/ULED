@@ -33,7 +33,8 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.model.dbModel.DbRegion
+import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
@@ -319,6 +320,8 @@ class DeveloperActivity : BaseActivity() {
             return
         }
 
+        updateLastMeshZero()
+
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe({
                 LogUtils.e("zcl-----------$it")
@@ -337,6 +340,23 @@ class DeveloperActivity : BaseActivity() {
             }, {
                 ToastUtils.showLong(R.string.clear_fail)
                 hideLoadingDialog()
+        })
+
+
+    }
+
+    @SuppressLint("CheckResult")
+    private fun updateLastMeshZero() {
+        var dbRegion = DbRegion()
+        dbRegion.installMesh = "dadousmart"
+        dbRegion.installMeshPwd = "123"
+        dbRegion.lastGenMeshAddr = 0
+        DBUtils.lastUser?.lastGenMeshAddr = 0
+        DBUtils.saveUser(DBUtils.lastUser!!)
+        RegionModel.updateMesh((DBUtils.lastUser?.last_region_id ?: "0").toInt(), dbRegion)?.subscribe({
+            LogUtils.v("zcl-----------上传最新mesh地址-------成功")
+        }, {
+            LogUtils.v("zcl-----------上传最新mesh地址-------失败")
         })
     }
 
@@ -435,6 +455,7 @@ class DeveloperActivity : BaseActivity() {
             for (k in relyList.indices)
                 meshAdre.add(relyList[k].meshAddr)
         }
+        updateLastMeshZero()
 
         Commander.resetAllDevices(meshAdre, {
             SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.DELETEING, false)

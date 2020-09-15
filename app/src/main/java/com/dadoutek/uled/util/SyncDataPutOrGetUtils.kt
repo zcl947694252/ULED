@@ -270,8 +270,7 @@ class SyncDataPutOrGetUtils {
                             // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val region = DBUtils.getRegionByID(changeId)
-                                return RegionModel.update(token,
-                                        changeId.toInt(), region, id)
+                                return RegionModel.update(changeId.toInt(), region, id)
                             }
                         }
                     }
@@ -441,18 +440,18 @@ class SyncDataPutOrGetUtils {
                         NetworkFactory.getApi()
                                 .gwList
                                 .compose(NetworkTransformer())
-                    }/*.flatMap {
+                    }.flatMap {
                         for (item in it)
                             DBUtils.saveGateWay(item, true)
 
                         NetworkFactory.getApi().routerList.compose(NetworkTransformer())
-                    }*/
+                    }
                     .flatMap {
-                     /*   for (item in it)
+                       for (item in it)
                             DBUtils.saveRouter(item, true)
-                        */
-                        for (item in it)
-                            DBUtils.saveGateWay(item, true)
+
+                       /* for (item in it)
+                            DBUtils.saveGateWay(item, true)*/
 
                         NetworkFactory.getApi()
                                 .getSwitchList(token)

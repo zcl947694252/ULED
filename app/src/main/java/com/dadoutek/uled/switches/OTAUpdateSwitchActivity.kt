@@ -115,7 +115,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
             when (msg.what) {
                 MSG_OTA_PROGRESS -> {
                     if (100 > msg.obj as Int)
-                        btn_start_update.setText(R.string.updating)
+                        btn_start_update.setText(R.string.otaing)
                     otaProgress!!.text = getString(R.string.progress_ota, msg.obj.toString())
                     progress_view.progress = msg.obj as Int
                 }
@@ -610,7 +610,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
         this.runOnUiThread {
             text_info.visibility = View.GONE
             btn_start_update.visibility = View.VISIBLE
-            btn_start_update.setText(R.string.updating)
+            btn_start_update.setText(R.string.otaing)
         }
 
         this.mode = MODE_OTA

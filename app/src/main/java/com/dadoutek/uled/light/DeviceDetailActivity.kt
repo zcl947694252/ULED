@@ -211,7 +211,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 GlobalScope.launch(Dispatchers.Main) {
                     autoConnectAll()
                 }
-                sendToGw()
+                //sendToGw()
+                sendToRouter()
             } else {
                 when (view.id) {
                     R.id.template_device_icon -> {
@@ -235,6 +236,10 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 }
             }
         }
+    }
+
+    private fun sendToRouter() {
+
     }
 
     private fun showDeleteSingleDialog(dbLight: DbLight) {

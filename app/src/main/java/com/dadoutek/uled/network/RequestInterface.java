@@ -139,10 +139,19 @@ public interface RequestInterface {
     @GET("auth/authorization/authorizer-region/list")
     Observable<Response<List<RegionAuthorizeBean>>> gotAuthorizerList();
 
-    //更新区域
+    /**
+     * 添加/更新一个区域 http://dev.dadoutek.com/smartlight/region/add/{rid}  POST 更新区域
+     * installMesh	否	string	默认mesh，目前固定dadousmart
+     * installMeshPwd	否	string	默认meshPassword,目前固定123
+     * name	否	string	区域的名称。默认”未命名区域”
+     * lastGenMeshAddr	否	int	区域mesh累加, 不传默认0, 0不会进行处理
+     *  "installMesh":"dadousmart",
+     *  "installMeshPwd":"123456",
+     *  "name":"a region",
+     *  "lastGenMeshAddr": 0
+     */
     @POST("region/add/{rid}")
-    Observable<Response<String>> updateRegion(@Header("token") String token,
-                                              @Path("rid") int rid,
+    Observable<Response<String>> updateRegion(@Path("rid") int rid,
                                               @Body DbRegion dbRegion);
 
 
@@ -192,10 +201,15 @@ public interface RequestInterface {
     @POST("group/add/{gid}")
     Observable<Response<String>> addGroup(@Header("token") String token,
                                           @Body DbGroup dbGroup,
-            //                                          @Field("meshAddr") int meshAddr,
-            //                                          @Field("name") String name,
-            //                                          @Field("brightness") int brightness,
-            //                                          @Field("colorTemperature") int
+                                          //                                          @Field
+                                          //                                          ("meshAddr") int meshAddr,
+                                          //                                          @Field
+                                          //                                          ("name")
+                                          //                                          String name,
+                                          //                                          @Field
+                                          //                                          ("brightness") int brightness,
+                                          //                                          @Field
+                                          //                                          ("colorTemperature") int
                                           //                                          colorTemperature,
                                           //@Path("region_id") int region_id,
                                           @Path("gid") int gid);
@@ -209,9 +223,9 @@ public interface RequestInterface {
     Observable<Response<String>> updateGroup(@Header("token") String token,
                                              @Path("rid") int rid,
                                              @Body DbGroup dbGroup
-            //                                             @Query("name") String name,
-            //                                             @Query("brightness") int brightness,
-            //                                             @Query("colorTemperature") int colorTemperature
+                                             //                                             @Query("name") String name,
+                                             //                                             @Query("brightness") int brightness,
+                                             //                                             @Query("colorTemperature") int colorTemperature
     );
 
     //删除组
@@ -226,15 +240,26 @@ public interface RequestInterface {
     @POST("light/add/{lid}")
     Observable<Response<String>> addLight(@Header("token") String token,
                                           @Body DbLight dbLight,
-            //                                          @Field("meshAddr") int meshAddr,
-            //                                          @Field("name") String name,
-            //                                          @Field("brightness") int brightness,
-            //                                          @Field("colorTemperature") int
+                                          //                                          @Field
+                                          //                                          ("meshAddr") int meshAddr,
+                                          //                                          @Field
+                                          //                                          ("name")
+                                          //                                          String name,
+                                          //                                          @Field
+                                          //                                          ("brightness") int brightness,
+                                          //                                          @Field
+                                          //                                          ("colorTemperature") int
                                           //                                          colorTemperature,
-            //                                          @Field("macAddr") String macAddr,
-            //                                          @Field("meshUUID") int meshUUID,
-            //                                          @Field("productUUID") int productUUID,
-            //                                          @Field("belongGroupId") int belongGroupId,
+                                          //                                          @Field
+                                          //                                          ("macAddr")
+                                          //                                          String
+                                          //                                          macAddr,
+                                          //                                          @Field
+                                          //                                          ("meshUUID") int meshUUID,
+                                          //                                          @Field
+                                          //                                          ("productUUID") int productUUID,
+                                          //                                          @Field
+                                          //                                          ("belongGroupId") int belongGroupId,
                                           @Path("lid") int lid);
 
     //获取灯列表
@@ -246,10 +271,10 @@ public interface RequestInterface {
     Observable<Response<String>> updateLight(@Header("token") String token,
                                              @Path("lid") int lid,
                                              @Body DbLight dbLight
-            //                                             @Query("name") String name,
-            //                                             @Query("brightness") int brightness,
-            //                                             @Query("colorTemperature") int colorTemperature,
-            //                                             @Query("belongGroupId") int belongGroupId
+                                             //                                             @Query("name") String name,
+                                             //                                             @Query("brightness") int brightness,
+                                             //                                             @Query("colorTemperature") int colorTemperature,
+                                             //                                             @Query("belongGroupId") int belongGroupId
     );
 
     //删除灯
@@ -585,8 +610,8 @@ public interface RequestInterface {
                                              @Field("meshAddr") int meshAddr,
                                              @Field("name") String name,
                                              @Field("macAddr") String macAddr, @Field(
-                                                     "productUUID") int productUUID, @Field(
-                                                             "index") int index,
+            "productUUID") int productUUID, @Field(
+            "index") int index,
                                              @Field("keys") String keys);
 
     /**
@@ -738,22 +763,24 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/scan-device")
-    Observable<Response<ScanDataBean>> routeScanDevcie(@Field("scanType") int scanType, @Field("scanName") String scanName, @Field("ser_id") String ser_id);
+    Observable<Response<ScanDataBean>> routeScanDevcie(@Field("scanType") int scanType, @Field(
+            "scanName") String scanName, @Field("ser_id") String ser_id);
 
     /**
      * 停止扫描
      * https://dev.dadoutek.com/xxxx/router/stop-scan POST
      * ser_id	是	string	app会话id，推送时回传
      * scanSerId	是	int	扫描关联id。可以在成功开始扫描推送和获取未确认扫描结果时获得
-     *     "ser_id": "app会话id，自己维护",
-     *     "scanSerId": -1000000
+     * "ser_id": "app会话id，自己维护",
+     * "scanSerId": -1000000
      */
     @FormUrlEncoded
     @POST("router/stop-scan")
-    Observable<Response<Long>> routeStopScanDevcie(@Field("ser_id") String ser_id,@Field("scanSerId") long scanSerId);
+    Observable<Response<Long>> routeStopScanDevcie(@Field("ser_id") String ser_id, @Field(
+            "scanSerId") long scanSerId);
 
     /**
-     *确认扫描结果，如果有未确认的扫描结果是不能再扫描的
+     * 确认扫描结果，如果有未确认的扫描结果是不能再扫描的
      * https://dev.dadoutek.com/xxxx/scan/result/confirm  DELETE
      */
     @DELETE("scan/result/confirm")
@@ -766,16 +793,18 @@ public interface RequestInterface {
      * deviceMeshAddrs	是	list	需要分组的设备meshAddr列表
      * meshType	是	int	设备类型  普通灯 = 4  彩灯 = 6 连接器 = 5 窗帘 = 16
      * ser_id	是	string	app会话id，推送时回传
-     *     "targetGroupMeshAddr" : 32769,
-     *     "deviceMeshAddrs": [1, 2, 3, 4, 5],
-     *     "meshType": 4,
-     *     "ser_id": "app会话id，自己维护"
+     * "targetGroupMeshAddr" : 32769,
+     * "deviceMeshAddrs": [1, 2, 3, 4, 5],
+     * "meshType": 4,
+     * "ser_id": "app会话id，自己维护"
      */
     @FormUrlEncoded
     @POST("router/regroup")
     Observable<Response<RouterBatchGpBean>> routerBatchGp(@Field("targetGroupMeshAddr") long targetGroupMeshAddr,
                                                           @Field("deviceMeshAddrs") List<Integer> deviceMeshAddrs,
-                                                          @Field("meshType") long meshType, @Field("ser_id") String ser_id );
+                                                          @Field("meshType") long meshType,
+                                                          @Field("ser_id") String ser_id);
+
     /**
      * 获取路由列表
      * https://dev.dadoutek.com/xxxx/router/list GET
@@ -848,8 +877,10 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/access-in")
-    Observable<Response<Integer>> routerAccessIn(@Field("macAddr") String macAddr, @Field("timeZoneHour")
-            int timeZoneHour, @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
+    Observable<Response<Integer>> routerAccessIn(@Field("macAddr") String macAddr, @Field(
+            "timeZoneHour")
+            int timeZoneHour, @Field("timeZoneMin") int timeZoneMin,
+                                                 @Field("ser_id") String ser_id);
 
     /**
      * 配置路由wifi信息。路由可以配置wifi也可以接网线
@@ -870,9 +901,10 @@ public interface RequestInterface {
 
     @FormUrlEncoded
     @POST("router/wifi-configure")
-    Observable<Response<Integer>> routerConfigWifi(@Field("macAddr") String macAddr, @Field("ssid") String ssid
-            , @Field("pwd") String pwd, @Field("timeZoneHour") int timeZoneHour,
-                                                   @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routerConfigWifi(@Field("macAddr") String macAddr, @Field("ssid") String ssid,
+                                                             @Field("pwd") String pwd, @Field("timeZoneHour") int timeZoneHour,
+                                                             @Field("timeZoneMin") int timeZoneMin, @Field("ser_id") String ser_id);
+
     /**
      * 获取模式，不同账号不同区域有不同的模式。比如300460用户区域1是蓝牙模式，区域2可能是路由模式
      * https://dev.dadoutek.com/xxxx/auth/settings GET
@@ -880,6 +912,7 @@ public interface RequestInterface {
      */
     @GET("auth/settings")
     Observable<Response<ModeStatusBean>> getAllModeStatus();
+
     /**
      * 0.保存用户喜好设置
      * https://dev.dadoutek.com/xxxx/auth/settings/save  GET
@@ -889,24 +922,25 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/smartlight_test/auth/settings/save?auxiliaryFunction=false&mode=0
      * // auxiliaryFunction和false分别设置为false和0,支持多个
      * https://dev.dadoutek.com/smartlight_test/auth/settings/save?lalala=rarara // 以后可能的用户配置
-     *     "data": null,
-     *     "errorCode": 0,
-     *     "message": "save settings succeed!"
+     * "data": null,
+     * "errorCode": 0,
+     * "message": "save settings succeed!"
      */
     @GET("auth/settings/save")
-    Observable<Response> updateAllModeStatus( @Query("auxiliaryFunction") boolean auxiliaryFunction,
-                                                           @Query("mode") int modeNum );
+    Observable<Response> updateAllModeStatus(@Query("auxiliaryFunction") boolean auxiliaryFunction,
+                                             @Query("mode") int modeNum);
+
     /**
      * 通过路由删除组
      * https://dev.dadoutek.com/xxxx/router/del-group  DELETE
      * meshAddr	是	int	目标组meshAddr
      * ser_id	是	string	app会话id，推送时回传
-     *     "targetGroupMeshAddr" : 32769,
-     *     "ser_id": "app会话id，自己维护"
+     * "targetGroupMeshAddr" : 32769,
+     * "ser_id": "app会话id，自己维护"
      */
     @FormUrlEncoded
-    @HTTP(method = "DELETE",path = "router/del-group")
-    Observable<Response<RouterTimeoutBean>> routerDeleteGroup(@Field("targetGroupMeshAddr") int targetGroupMeshAddr,@Field("ser_id") String ser_id);
+    @HTTP(method = "DELETE", path = "router/del-group")
+    Observable<Response<RouterTimeoutBean>> routerDeleteGroup(@Field("targetGroupMeshAddr") int targetGroupMeshAddr, @Field("ser_id") String ser_id);
 
     /**
      * 通过路由添加场景
@@ -916,52 +950,84 @@ public interface RequestInterface {
      * imgName	是	string	场景展示icon名
      * actions	是	List<Action>	本地生成的actions直接上传即可，已做好兼容
      * ser_id	是	string	app会话id，推送时回传
-     *     "name": "场景1",
-     *     "imgName": "icon_out",
-     *     "actions": [
-     *         // 都兼容
-     *         {"id": 1, "isOn": false, "color": 16777215, "groupAddr": 32769, "brightness": 100,
-     *         "deviceType": 4, "belongSceneId": 2, "colorTemperature": 100},
-     *         {"id": 2, "color": 0, "status": 1, "rgbType": 0, "groupAddr": 32792, "brightness":
-     *         90, "gradientId": 1, "gradientName": "七彩渐变", "gradientType": 2, "belongSceneId":
-     *         7, "gradientSpeed": 50, "colorTemperature": 50}
-     *         ],
-     *     "ser_id": "app会话id，自己维护"
+     * "name": "场景1",
+     * "imgName": "icon_out",
+     * "actions": [
+     * // 都兼容
+     * {"id": 1, "isOn": false, "color": 16777215, "groupAddr": 32769, "brightness": 100,
+     * "deviceType": 4, "belongSceneId": 2, "colorTemperature": 100},
+     * {"id": 2, "color": 0, "status": 1, "rgbType": 0, "groupAddr": 32792, "brightness":
+     * 90, "gradientId": 1, "gradientName": "七彩渐变", "gradientType": 2, "belongSceneId":
+     * 7, "gradientSpeed": 50, "colorTemperature": 50}
+     * ],
+     * "ser_id": "app会话id，自己维护"
      */
     @FormUrlEncoded
     @POST("router/del-group")
-    Observable<Response<RouterTimeoutBean>> routerAddScene(@Field("name") String sceneName,@Field("imgName") String imgName
-    ,@Field("actions") List actions,@Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routerAddScene(@Field("name") String sceneName,
+                                                           @Field("imgName") String imgName
+            , @Field("actions") List actions, @Field("ser_id") String ser_id);
 
     /**
      * 通过路由删除组
      * 请求URL
      * https://dev.dadoutek.com/xxxx/router/del-scene DELETE
      * sid	是	int	目标场景id
-     *     "sid" : 1,
-     *     "ser_id": "app会话id，自己维护"
+     * "sid" : 1,
+     * "ser_id": "app会话id，自己维护"
      */
     @FormUrlEncoded
-    @HTTP(method = "DELETE" ,path="router/del-scene")
-    Observable<Response<RouterTimeoutBean>> routerDelScene(@Field("sid") int sid, @Field("ser_id") String ser_id);
+    @HTTP(method = "DELETE", path = "router/del-scene")
+    Observable<Response<RouterTimeoutBean>> routerDelScene(@Field("sid") int sid,
+                                                           @Field("ser_id") String ser_id);
 
     /**
-     * 路由器获取版本号
-     *   https://dev.dadoutek.com/xxxx/router/device-version  POST
-     *     "meshAddrs" : [1, 2, 3],
-     *     "meshType": 4,
-     *     "ser_id": "app会话id，自己维护"
-     *     meshType
-     *     普通灯 = 4
-     *     彩灯 = 6
-     *     蓝牙连接器 = 5
-     *     窗帘 = 16
-     *     开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
-     *     传感器 = 98 或 0x23 或 0x24n
+     * 路由器获取版本号   https://dev.dadoutek.com/xxxx/router/device-version  POST
+     * "meshAddrs" : [1, 2, 3],
+     * "meshType": 4,
+     * "ser_id": "app会话id，自己维护"
+     * meshType
+     * 普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
+     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
      */
     @FormUrlEncoded
     @POST("router/device-version")
-    Observable<Response<RouterVersionsBean>> routerGetDevicesVersion(@Field("meshAddrs")  List<Integer> meshAddrs,
+    Observable<Response<RouterVersionsBean>> routerGetDevicesVersion(@Field("meshAddrs") List<Integer> meshAddrs,
                                                                      @Field("meshType") int meshType,
                                                                      @Field("ser_id") String ser_id);
+    /**
+     * 创建ota升级任务  https://dev.dadoutek.com/xxxx/router/device-ota POST
+     * meshAddrs	是	list	选择设备的meshAddr
+     * meshType	是	int	设备类型
+     * start	是	long	用于查询的时间戳，单位ms，ota结果记录的start字段会存储这个值
+     * "meshAddrs" : [1, 2, 3],
+     * "meshType": 4,
+     * "start": 1597046661669
+     * meshType
+     * 普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16
+     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25  传感器 = 98 或 0x23 或 0x24
+     */
+    @FormUrlEncoded
+    @POST("router/device-ota")
+    Observable<Response> routerToDevicesOta(@Field("meshAddrs") List<Integer> meshAddrs,
+                                                                     @Field("meshType") int meshType,
+                                                                     @Field("start") long start);
+
+    /**
+     * 获取ota升级结果
+     * 请求URL
+     * https://dev.dadoutek.com/xxxx/ota/result/list  GET
+     * page	否	int	页码，可能数量过大需要分页查询。默认1
+     * size	否	int	当前页数量。默认Integer的最大值，即0x7fffffff（有符号）
+     * start	否	long	查询条件: 开始时间戳，单位毫秒
+     * 其他查询条件可扩展
+     * https://dev.dadoutek.com/smartlight_test/ota/result/list?page=1&size=50 #查询第一页数据，每页50条
+     * https://dev.dadoutek.com/smartlight_test/ota/result/list?page=1&size=50&start
+     * =1597046991063 #查询#查询第一页数据，每页50条，创建时间为2020-07-20 11:29:20
+     */
+    @GET("ota/result/list")
+    Observable<Response<List<RouterOTAResultBean>>> routerGetOTAResult(@Field("page") int page,
+                                                                       @Field("size") int size,
+                                                                       @Field("start") long start);
+
 }

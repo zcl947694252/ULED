@@ -28,7 +28,7 @@ object RouterModel {
     /**
      * 配置路由wifi
      */
-    fun routerConfigWifi(macAddr: String,wifiAccount: String,pwd: String, hour: Int,min: Int,serid:String): Observable<Int>? {
+    fun routerConfigWifi(macAddr: String,wifiAccount: String,pwd: String, hour: Int,min: Int,serid:String): Observable<RouterTimeoutBean>? {
         return NetworkFactory.getApi()
                 .routerConfigWifi(macAddr, wifiAccount,pwd, hour,min,serid)
                 .compose(NetworkTransformer())
@@ -119,9 +119,8 @@ object RouterModel {
     /**
      * 路由开始扫描
      */
-    fun routerStartScan(scanType:Int, ser_id:String): Observable<ScanDataBean>? {
+    fun routerStartScan(scanType:Int, ser_id:String): Observable<Response<ScanDataBean>>? {
         return NetworkFactory.getApi().routeScanDevcie(scanType,Constant.DEFAULT_MESH_FACTORY_NAME,ser_id)
-                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -167,9 +166,26 @@ object RouterModel {
     /**
      *获取设备版本号
      */
-
     fun getDevicesVersion(meshAddrs:MutableList<Int>,meshType:Int): Observable<Response<RouterVersionsBean>>? {
         return NetworkFactory.getApi().routerGetDevicesVersion(meshAddrs,meshType,"getVersion")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     *获取设备版本号
+     */
+    fun toDevicesOTA(meshAddrs:MutableList<Int>,meshType:Int): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routerToDevicesOta(meshAddrs,meshType, System.currentTimeMillis())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    /**
+     *获取设备版本号
+     */
+    fun toDevicesOTA(page:Int,size:Int,time:Long): Observable<MutableList<RouterOTAResultBean>>? {
+        return NetworkFactory.getApi().routerGetOTAResult(page,size, time)
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
