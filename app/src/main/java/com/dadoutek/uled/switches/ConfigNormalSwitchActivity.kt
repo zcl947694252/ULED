@@ -1,5 +1,6 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -22,10 +23,11 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSwitch
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -39,18 +41,21 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.design.snackbar
+import java.util.concurrent.TimeUnit
 
 
 private const val CONNECT_TIMEOUT = 5
 
 class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
+    private var disposableTimer: Disposable? = null
     private var deviceConfigType: Int = 0
     private var groupName: String? = null
     private var currentGroup: DbGroup? = null
@@ -58,9 +63,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     private lateinit var mDeviceInfo: DeviceInfo
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
     private var localVersion: String = ""
-    private var mDisconnectSnackBar: Snackbar? = null
-    private var mConnectedSnackBar: Snackbar? = null
-    private var mConfigFailSnackbar: Snackbar? = null
     private var isGlassSwitch = false
     private var switchDate: DbSwitch? = null
     override fun setLayoutId(): Int {
@@ -86,7 +88,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         localVersion = intent.getStringExtra("version")
         deviceConfigType = intent.getIntExtra("deviceType", 0)
 
-        if (!localVersion.contains("BT")&&!TextUtils.isEmpty(localVersion)) {
+        if (!localVersion.contains("BT") && !TextUtils.isEmpty(localVersion)) {
             sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)
         } else {
@@ -97,7 +99,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
 
         if (TextUtils.isEmpty(localVersion))
-            localVersion = mDeviceInfo.firmwareRevision?:""
+            localVersion = mDeviceInfo.firmwareRevision ?: ""
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)
         fiVersion?.title = localVersion
@@ -181,21 +183,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         }
     }
 
-    private fun showCancelDialog() {
-        AlertDialog.Builder(this)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (TelinkLightApplication.getApp().connectDevice != null) {
-                        sw_progressBar.visibility = View.VISIBLE
-                        mIsDisconnecting = true
-                        disconnect()
-                    } else {
-                        finish()
-                    }
-                }.setTitle(R.string.do_you_really_want_to_cancel).show()
-    }
-
-
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             android.R.id.home -> {
@@ -260,39 +247,63 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 if (mConnectingSnackBar?.isShown != true) {
-                    mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()
                 }
             } else {
                 // (mAdapter.selectedPos != -1) {
                 sw_progressBar.visibility = View.VISIBLE
-                Thread(Runnable {
-                    setGroupForSwitch()
-                    Thread.sleep(800)
-                    //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
-                    val newMeshAddr = MeshAddressGenerator().meshAddress.get()
-                    Commander.updateMeshName(newMeshAddr = newMeshAddr,
-                            successCallback = {
-                                mDeviceInfo.meshAddress = newMeshAddr
-                                mIsConfiguring = true
-                                updateSwitch()
-                                disconnect()
-                                if (switchDate == null)
-                                    switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                                ToastUtils.showShort(getString(R.string.config_success))
-                                if (!isReConfig)
-                                    showRenameDialog(switchDate)
-                                else
-                                    finish()
-                            },
-                            failedCallback = {
-                                mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    sw_progressBar.visibility = View.GONE
-                                    mIsConfiguring = false
+                if (Constant.IS_ROUTE_MODE)
+                    RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr)
+                            ?.subscribe({
+                                //    "errorCode": 90021, "该开关不存在，请重新刷新数据"
+                                //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                                //    "errorCode": 90007,"该组不存在，刷新组列表"
+                                //    "errorCode": 90005,"以下路由没有上线，无法配置"
+                                when (it.errorCode) {
+                                    0 -> {
+                                        disposableTimer?.dispose()
+                                        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                                .subscribe {
+                                                    sw_progressBar.visibility = View.GONE
+                                                    ToastUtils.showShort(getString(R.string.config_fail))
+                                                }
+                                    }
+                                    90021 -> {
+                                        ToastUtils.showShort(getString(R.string.device_not_exit))
+                                        finish()
+                                    }
+                                    90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                    90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                                 }
-                            })
-                }).start()
+                            }, { ToastUtils.showShort(it.message) })
+                else
+                    Thread(Runnable {
+                        sendGroupForSwitch()
+                        Thread.sleep(800)
+                        //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
+                        val newMeshAddr = MeshAddressGenerator().meshAddress.get()
+                        Commander.updateMeshName(newMeshAddr = newMeshAddr,
+                                successCallback = {
+                                    mDeviceInfo.meshAddress = newMeshAddr
+                                    mIsConfiguring = true
+                                    updateSwitch()
+                                    disconnect()
+                                    if (switchDate == null)
+                                        switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+                                    ToastUtils.showShort(getString(R.string.config_success))
+                                    if (!isReConfig)
+                                        showRenameDialog(switchDate)
+                                    else
+                                        finish()
+                                },
+                                failedCallback = {
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        sw_progressBar.visibility = View.GONE
+                                        mIsConfiguring = false
+                                    }
+                                })
+                    }).start()
                 /*  } else {
                       snackbar(view, getString(R.string.please_select_group))
                   }*/
@@ -374,10 +385,43 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun showDisconnectSnackBar() {
-        TelinkLightService.Instance()?.idleMode(true)
-        reconnect()
-        //mDisconnectSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.device_disconnected), getString(R.string.reconnect)) {}
+        if (Constant.IS_ROUTE_MODE) {
+            TelinkLightService.Instance()?.idleMode(true)
+            reconnect()
+        } else {
+            RouterModel.routerConnectSwOrSe(switchDate?.id ?: 0, 99)?.subscribe({
+                when (it.errorCode) {
+                    0 -> {
+                        disposableTimer?.dispose()
+                        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                .subscribe {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.connect_fail))
+                                }
+                    }
+                    90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                    90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                }
+            }, {
+                ToastUtils.showShort(it.message)
+            })
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    override fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.finish) {
+            if (cmdBean.status == 0) {
+                ToastUtils.showShort(getString(R.string.connect_success))
+                image_bluetooth.setImageResource(R.drawable.icon_cloud)
+            } else {
+                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                ToastUtils.showShort(getString(R.string.connect_fail))
+            }
+        }
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
@@ -386,7 +430,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
                 mConnectingSnackBar?.dismiss()
-                mConnectedSnackBar = snackbar(configGroupRoot, R.string.connect_success)
                 sw_progressBar.visibility = View.GONE
             }
 
@@ -496,13 +539,12 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         connectParams.setTimeoutSeconds(CONNECT_TIMEOUT)
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
-        mDisconnectSnackBar?.dismiss()
         //  mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.connecting))
         ToastUtils.showShort(getString(R.string.connecting_tip))
         TelinkLightService.Instance()?.autoConnect(connectParams)
     }
 
-    private fun setGroupForSwitch() {
+    private fun sendGroupForSwitch() {
         val groupAddress = currentGroup!!.meshAddr
         val paramBytes = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
         //0x01 代表添加组
@@ -514,4 +556,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             finish()
         return super.onKeyDown(keyCode, event)
     }
+
+
 }

@@ -953,7 +953,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                           saveSensor()
                         },
                         failedCallback = {
-                            snackbar(sensor_root, getString(R.string.pace_fail))
+                            snackbar(sensor_root, getString(R.string.config_fail))
                             setLoadingVisbiltyOrGone()
                             TelinkLightService.Instance()?.idleMode(true)
                         })
@@ -1196,7 +1196,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     },
                     failedCallback = {
                         this@HumanBodySensorActivity.runOnUiThread {
-                            snackbar(sensor_root, getString(R.string.pace_fail))
+                            snackbar(sensor_root, getString(R.string.config_fail))
                             setLoadingVisbiltyOrGone()
                         }
                         TelinkLightService.Instance()?.idleMode(true)

@@ -74,7 +74,6 @@ import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
 import org.jetbrains.anko.startActivity
 import java.util.*
@@ -1072,7 +1071,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-    override fun startRouterScan(cmdBodyBean: CmdBodyBean) {//收到路由是否开始扫描的回调
+    override fun startRouterScanRecevicer(cmdBodyBean: CmdBodyBean) {//收到路由是否开始扫描的回调
         if (cmdBodyBean.ser_id == TAG) {
             disposableTimer?.dispose()
             if (cmdBodyBean.status == Constant.ALL_SUCCESS) {
@@ -1086,12 +1085,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     @SuppressLint("SetTextI18n")
-    override fun receivedRouteDeviceNum(cmdBodyBean: CmdBodyBean) {//收到扫描的设备数
+    override fun receivedRouteDeviceNumRecevicer(cmdBodyBean: CmdBodyBean) {//收到扫描的设备数
         if (cmdBodyBean.ser_id == TAG) {
             if (cmdBodyBean.status == Constant.ALL_SUCCESS) {
                 routerScanCount = cmdBodyBean.count
-                if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB || mAddDeviceType == DeviceType.SMART_RELAY ||
-                        mAddDeviceType == DeviceType.SMART_CURTAIN)
+                if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB
+                        || mAddDeviceType == DeviceType.SMART_RELAY || mAddDeviceType == DeviceType.SMART_CURTAIN)
                     scanning_num.text = getString(R.string.title_scanned_device_num, routerScanCount)
                 else
                     scanning_num.text = getString(R.string.scanning)
@@ -1102,7 +1101,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun routeTimerOut() {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(scanRouterTimeoutTime, TimeUnit.MILLISECONDS).subscribe {
+        disposableTimer = Observable.timer(scanRouterTimeoutTime, TimeUnit.SECONDS).subscribe {
             skipeType()
         }
     }
@@ -1117,6 +1116,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 when (it.errorCode) {
                     0 -> {
                         scanRouterTimeoutTime = it.t.timeout.toLong()
+                        routeTimerOut()
+                        startAnimation()
+                    }
+                    90025->{
+                        scanRouterTimeoutTime = 60
                         routeTimerOut()
                         startAnimation()
                     }
@@ -1146,7 +1150,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     }//该账号该区域下没有路由
                     90005 -> {
                         ToastUtils.showShort(getString(R.string.no_router_use))
-                        finish()
+                        scanFail()
+                        stopScanTimer()
                     }//该账号该区域下没有可用的路由，请检查路由是否上电联网
                 }
 
@@ -1219,8 +1224,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             if (lastUser?.lastGenMeshAddr ?: 0 < get)
                 lastUser?.lastGenMeshAddr = get
             else
-                lastUser?.lastGenMeshAddr?:0
-            lastUser?.lastGenMeshAddr?:0
+                lastUser?.lastGenMeshAddr ?: 0
+            lastUser?.lastGenMeshAddr ?: 0
         }
         meshAddress = isUser(meshAddress)
         LogUtils.v("zcl-----------完整流程网关新的meshAddress-------$meshAddress")
@@ -1238,31 +1243,31 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun isUser(meshAddress: Int): Int {
-        var mesh = meshAddress
-        while (meshList.contains(meshAddress)) {
-            mesh += 1
-        }
-        // 添加/更新一个区域 http://dev.dadoutek.com/smartlight/region/add/{rid}  POST 更新区域
-        //     * installMesh	否	string	默认mesh，目前固定dadousmart
-        //     * installMeshPwd	否	string	默认meshPassword,目前固定123
-        //     * name	否	string	区域的名称。默认”未命名区域”
-        //     * lastGenMeshAddr	否	int	区域mesh累加, 不传默认0, 0不会进行处理
-        //     *  "installMesh":"dadousmart",
-        //     *  "installMeshPwd":"123456",
-        //     *  "name":"a region",
-        //     *  "lastGenMeshAddr": 0
-        var dbRegion = DbRegion()
-        dbRegion.installMesh = "dadousmart"
-        dbRegion.installMeshPwd = "123"
-        dbRegion.lastGenMeshAddr = mesh
-        lastUser?.lastGenMeshAddr = 0
-        saveUser(lastUser!!)
-        RegionModel.updateMesh((lastUser?.last_region_id ?: "0").toInt(), dbRegion)?.subscribe({
-            LogUtils.v("zcl-----------上传最新mesh地址-------成功")
-        }, {
-            LogUtils.v("zcl-----------上传最新mesh地址-------失败")
-        })
-        return mesh
+            var mesh = meshAddress
+            while (meshList.contains(mesh)) {
+                mesh += 1
+            }
+            // 添加/更新一个区域 http://dev.dadoutek.com/smartlight/region/add/{rid}  POST 更新区域
+            //     * installMesh	否	string	默认mesh，目前固定dadousmart
+            //     * installMeshPwd	否	string	默认meshPassword,目前固定123
+            //     * name	否	string	区域的名称。默认”未命名区域”
+            //     * lastGenMeshAddr	否	int	区域mesh累加, 不传默认0, 0不会进行处理
+            //     *  "installMesh":"dadousmart",
+            //     *  "installMeshPwd":"123456",
+            //     *  "name":"a region",
+            //     *  "lastGenMeshAddr": 0
+            var dbRegion = DbRegion()
+            dbRegion.installMesh = "dadousmart"
+            dbRegion.installMeshPwd = "123"
+            dbRegion.lastGenMeshAddr = mesh
+            lastUser?.lastGenMeshAddr = mesh
+            saveUser(lastUser!!)
+            RegionModel.updateMesh((lastUser?.last_region_id ?: "0").toInt(), dbRegion)?.subscribe({
+                LogUtils.v("zcl-----------上传最新mesh地址-------成功")
+            }, {
+                LogUtils.v("zcl-----------上传最新mesh地址-------失败")
+            })
+            return mesh
     }
 
     private fun getGwId(): Long {
@@ -1666,7 +1671,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun skipeBatchActivity() {
         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
         if (Constant.IS_ROUTE_MODE) {//获取扫描数据
-            RouterModel.routeScanningResult()?.subscribe({ it ->
+            RouterModel.routeScanningResultGet()?.subscribe({ it ->
                 val data = it.data
                 if (data != null && data.status == 0) {
                     mAddedDevicesInfos.clear()
@@ -1694,11 +1699,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                                 deviceInfo.belongGroupId = x.belongGroupId.toLong()
                                 mAddedDevicesInfos.add(deviceInfo)
                             }
-                            tellServerClear()
+                            tellServerCanClear()
                         }
                         else -> scanFail()
                     }
                 } else {//如果还在扫描则重新计算超时时间
+
                     routeTimerOut()
                 }
             }, {
@@ -1723,7 +1729,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     @SuppressLint("CheckResult")
-    private fun tellServerClear() {
+    private fun tellServerCanClear() {
         val subscribe = RouterModel.routeStopScanClear()
                 ?.subscribe({
                     skipeActivity(intent)
@@ -1763,7 +1769,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         disposableUpMeshTimer = Observable.timer(12000, TimeUnit.MILLISECONDS)
                 .subscribe {
                     if (meshUpdateType == 0L)
-
                         runOnUiThread {
                             stopScanTimer()
                             retryScan()

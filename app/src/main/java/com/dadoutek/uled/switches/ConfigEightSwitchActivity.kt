@@ -19,6 +19,7 @@ import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.switches.bean.KeyBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
@@ -371,12 +372,14 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     private fun getKeyBean(keyId: Int, featureId: Int, name: String = "", hight8Mes: Int = 0, low8Mes: Int = 0): JSONObject {
         //return JSONObject(["keyId" = keyId, "featureId" = featureId, "reserveValue_A" = hight8Mes, "reserveValue_B" = low8Mes, "name" = name])
+        //["keyId" = 11, "featureId" =11, "reserveValue_A" = 0x11, "reserveValue_B" = 0x11, "name" = name])
         var job = JSONObject()
         job.put("keyId", keyId)
         job.put("featureId", featureId)
         job.put("reserveValue_A", hight8Mes)
         job.put("reserveValue_B", low8Mes)
         job.put("name", name)
+        val keyBean = KeyBean(keyId,featureId,name,hight8Mes,low8Mes);
         return job
     }
 
@@ -398,7 +401,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         }, failedCallback = {
             GlobalScope.launch(Dispatchers.Main) {
                 hideLoadingDialog()
-                ToastUtils.showShort(getString(R.string.pace_fail))
+                ToastUtils.showShort(getString(R.string.config_fail))
                 delay(1500)
                 finishAc()
             }
@@ -749,7 +752,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private fun changeMode() {
         configSwitchTypeNum++
         setDefaultData()
-        when (val type = configSwitchTypeNum % 3) {
+        when (configSwitchTypeNum % 3) {
             1 -> {
                 setTextColorsAndText(0)
                 configSwitchType = 0

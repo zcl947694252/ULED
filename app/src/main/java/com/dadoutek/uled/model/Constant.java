@@ -453,4 +453,5 @@ public class Constant implements Serializable {
      */
     public static final int ROUTER_OTA_ING =3;
     public static  long SCAN_SERID =0;
+    public static String OTA_TIME ="OTA_TIME";
 }

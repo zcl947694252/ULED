@@ -209,7 +209,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun getScanResult() {
         showLoadingDialog(getString(R.string.please_wait))
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
-        val subscribe = RouterModel.routeScanningResult()?.subscribe({
+        val subscribe = RouterModel.routeScanningResultGet()?.subscribe({
             //status	int	状态。0扫描结束，1仍在扫描
             if (it?.data != null && it.data.status == 1) {
                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)

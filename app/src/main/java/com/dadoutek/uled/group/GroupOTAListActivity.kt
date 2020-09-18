@@ -469,11 +469,13 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
                 val split = itv.split("-")
                 if (split.size >= 2) {
-                    val versionNum = numberCharat(split[1])
-                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
-                    if (!TextUtils.isEmpty(versionNum.toString())) {
-                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
-                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                    if (split[1] != "" && split[1] != null) {
+                        val versionNum = numberCharat(split[1])
+                        LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toInt()}")
+                        if (!TextUtils.isEmpty(versionNum)) {
+                            it.isMostNew = versionNum.toInt() >= mapBin[split[0]] ?: 0
+                            it.isSupportOta = versionNum.toInt() < mapBin[split[0]] ?: 0
+                        }
                     }
                 }
             }
@@ -503,10 +505,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     var versionNum = numberCharat(split[1])
-                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum}")
                     if (!TextUtils.isEmpty(versionNum)) {
-                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
-                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                        it.isMostNew = versionNum.toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toInt() < mapBin[split[0]] ?: 0
                     }
                 }
             }
@@ -526,10 +528,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     val versionNum = numberCharat(split[1])
-                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum}")
                     if (!TextUtils.isEmpty(versionNum)) {
-                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
-                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                        it.isMostNew = versionNum.toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toInt() < mapBin[split[0]] ?: 0
                     }
                 }
             }
@@ -549,10 +551,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     val versionNum = numberCharat(split[1])
-                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum}")
                     if (!TextUtils.isEmpty(versionNum)) {
-                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
-                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                        it.isMostNew = versionNum.toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toInt() < mapBin[split[0]] ?: 0
                     }
                 }
             }
@@ -572,10 +574,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     val versionNum = numberCharat(split[1])
-                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum}")
                     if (!TextUtils.isEmpty(versionNum)) {
-                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
-                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                        it.isMostNew = versionNum.toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toInt() < mapBin[split[0]] ?: 0
                     }
                 }
             }
@@ -594,11 +596,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     val versionNum = numberCharat(split[1])
-                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toString().toInt()}")
                     if (!TextUtils.isEmpty(versionNum)) {
-                        it.isMostNew = versionNum.toString().toInt() >= mapBin[split[0]] ?: 0
-                        it.isSupportOta = versionNum.toString().toInt() < mapBin[split[0]] ?: 0
+                        it.isMostNew = versionNum.toInt() >= mapBin[split[0]] ?: 0
+                        it.isSupportOta = versionNum.toInt() < mapBin[split[0]] ?: 0
                     }
+                    LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum}")
                 }
             }
         }

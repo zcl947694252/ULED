@@ -29,8 +29,13 @@ import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.BindRouterActivity
+import com.dadoutek.uled.router.RouterOtaActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -51,7 +56,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.singleLine
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -59,7 +64,8 @@ import java.util.concurrent.TimeUnit
 /**
  * 开关列表
  */
-class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
+class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
+    private var disposableTimer: Disposable? = null
     private var popupWindow: PopupWindow? = null
     private var popVersion: TextView? = null
     private var views: View? = null
@@ -68,7 +74,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
     private val SCENE_MAX_COUNT = 100
     private var last_start_time = 0
     private var debounce_time = 1000
-    private  var switchData: MutableList<DbSwitch> = mutableListOf()
+    private var switchData: MutableList<DbSwitch> = mutableListOf()
     private var mScanTimeoutDisposal: Disposable? = null
     private var adapter: SwitchDeviceDetailsAdapter? = null
     private var currentDevice: DbSwitch? = null
@@ -100,7 +106,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
     }
 
     override fun setToolbar(): Toolbar {
-      return toolbar
+        return toolbar
     }
 
     override fun gpAllVisible(): Boolean {
@@ -130,7 +136,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
     }
 
     override fun setDeviceDataSize(num: Int): Int {
-       return  switchData.size
+        return switchData.size
     }
 
     override fun setLayoutId(): Int {
@@ -231,19 +237,40 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun goConfig() {
         if (isRightPos()) return
         if (currentDevice != null) {
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting_tip))
-            val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
-                    ?.subscribe({
-                        onLogin(it)//判断进入那个开关设置界面
-                        LogUtils.d("login success")
-                    }, {
-                        hideLoadingDialog()
-                        LogUtils.d(it)
-                    })
+            if (IS_ROUTE_MODE) {
+                RouterModel.routerConnectSwOrSe(currentDevice?.id ?: 0, 99)?.subscribe({
+                    when (it.errorCode) {
+                        0 -> {
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.connect_fail))
+                                    }
+                        }
+                        90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+            } else {
+                val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
+                        ?.subscribe({
+                            onLogin(it)//判断进入那个开关设置界面
+                            LogUtils.d("login success")
+                        }, {
+                            hideLoadingDialog()
+                            LogUtils.d(it)
+                        })
+            }
         } else
             LogUtils.d("currentDevice = $currentDevice")
     }
@@ -287,31 +314,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
                     .subscribe(
                             { version ->
                                 if (version != null && version != "") {
-                                    when (bestRSSIDevice?.productUUID) {
-                                        DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
-                                            startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
-                                            finish()
-                                        }
-                                        DeviceType.DOUBLE_SWITCH -> {
-                                            startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
-                                            finish()
-                                        }
-                                        DeviceType.SCENE_SWITCH -> {
-                                            if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
-                                                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
-                                            else
-                                                startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
-                                            finish()
-                                        }
-                                        DeviceType.EIGHT_SWITCH -> {
-                                            startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
-                                            finish()
-                                        }
-                                        DeviceType.SMART_CURTAIN_SWITCH -> {
-                                            startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
-                                            finish()
-                                        }
-                                    }
+                                    skipeSw(bestRSSIDevice, version)
                                 } else {
                                     ToastUtils.showLong(getString(R.string.get_version_fail))
                                     initData()
@@ -321,6 +324,34 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
                                 showToast(getString(R.string.get_version_fail))
                             }
                     )
+    }
+
+    private fun skipeSw(bestRSSIDevice: DeviceInfo, version: String) {
+        when (bestRSSIDevice?.productUUID) {
+            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
+                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                finish()
+            }
+            DeviceType.DOUBLE_SWITCH -> {
+                startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                finish()
+            }
+            DeviceType.SCENE_SWITCH -> {
+                if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
+                    startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                else
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                finish()
+            }
+            DeviceType.EIGHT_SWITCH -> {
+                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                finish()
+            }
+            DeviceType.SMART_CURTAIN_SWITCH -> {
+                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                finish()
+            }
+        }
     }
 
     private fun addDevice() {
@@ -353,7 +384,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
 
-        add_device_btn.setOnClickListener{addDevice()}
+        add_device_btn.setOnClickListener { addDevice() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
@@ -372,12 +403,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
             else {
                 when (view.id) {
                     R.id.template_device_card_delete -> {
-                          val string = getString(R.string.sure_delete_device, currentDevice?.name)
+                        val string = getString(R.string.sure_delete_device, currentDevice?.name)
                         builder?.setMessage(string)
                         builder?.create()?.show()
                     }
                     R.id.template_device_setting -> goConfig()
-                    else->{}
+                    else -> {
+                    }
                 }
             }
         }
@@ -578,4 +610,64 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId, getString(R.string.Gate_way))
     }
 
+    @SuppressLint("CheckResult")
+    override fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.finish) {
+            if (cmdBean.status == 0) {
+                image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                ToastUtils.showShort(getString(R.string.connect_success))
+                RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99)?.subscribe({
+                    when (it.errorCode) {
+                        NetworkStatusCode.OK -> {
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.MILLISECONDS)
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                                    }
+                        }
+                        NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
+                        NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+            } else{
+                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                ToastUtils.showShort(getString(R.string.connect_fail))
+            }
+        }
+    }
+
+    override fun routerUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+
+        if (routerVersion?.finish == true) {
+            if (routerVersion.cmd == 0) {
+                disposableTimer?.dispose()
+                val deviceInfo = DeviceInfo()
+                deviceInfo.id = (currentDevice?.id?:0).toInt()
+                deviceInfo.macAddress = currentDevice?.macAddr
+                deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
+                deviceInfo.firmwareRevision = currentDevice?.version
+                deviceInfo.productUUID = currentDevice?.productUUID ?: 0
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() {}
+
+                    override fun complete() {
+                        val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
+                        if (switchByID?.version == "" || switchByID?.version == null)
+                            ToastUtils.showShort(getString(R.string.get_version_fail))
+                        else
+                            skipeSw(deviceInfo, switchByID?.version ?: "B-01")
+                    }
+
+                    override fun error(msg: String?) {
+                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                    }
+                })
+            } else {
+                ToastUtils.showShort(getString(R.string.get_version_fail))
+            }
+        }
+    }
 }

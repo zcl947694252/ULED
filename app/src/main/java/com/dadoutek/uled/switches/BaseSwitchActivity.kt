@@ -42,6 +42,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -176,7 +177,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         if (!TextUtils.isEmpty(switchDate?.name))
             renameEt?.setText(switchDate?.name)
         else
-            renameEt?.setText(getString(R.string.eight_switch) + "-" + DBUtils.getAllSwitch().size)
+            renameEt?.setText(eight_switch_title.text.toString() + "-" + DBUtils.getAllSwitch().size)
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {

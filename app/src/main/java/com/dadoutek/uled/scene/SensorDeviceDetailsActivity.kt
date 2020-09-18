@@ -7,10 +7,8 @@ import android.os.Bundle
 import android.support.v7.util.DiffUtil
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.Toolbar
-import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -20,30 +18,33 @@ import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.GwModel
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
+import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
 import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.BindRouterActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
@@ -327,7 +328,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         builder?.setMessage(string)
                         builder?.create()?.show()
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
             }
         }
@@ -338,80 +340,103 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         TelinkLightService.Instance()?.idleMode(true)
         Thread.sleep(200)
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
-        connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
-            relocationSensor()
-        }, {
-            hideLoadingDialog()
-            ToastUtils.showShort(getString(R.string.connect_fail))
-        })
+        if (Constant.IS_ROUTE_MODE)
+            currentDevice?.let {
+                RouterModel.routerConnectSwOrSe(it.id, currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
+                        ?.subscribe({ response ->
+                            when (response.errorCode) {
+                                0 -> {
+                                    disposableTimer?.dispose()
+                                    disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                            .subscribe {
+                                                hideLoadingDialog()
+                                                ToastUtils.showShort(getString(R.string.connect_fail))
+                                            }
+                                }
+                                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                            }
+
+                        }, { it1 ->
+                            ToastUtils.showShort(it1.message)
+                        })
+            }
+        else
+            connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
+                relocationSensor()
+            }, {
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.connect_fail))
+            })
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("CheckResult")
     private fun sendToGw() {
         GwModel.getGwList()?.subscribe({
-                TelinkLightApplication.getApp().offLine = true
-                hideLoadingDialog()
+            TelinkLightApplication.getApp().offLine = true
+            hideLoadingDialog()
             it.forEach { db ->
-                    //网关在线状态，1表示在线，0表示离线
-                    if (db.state == 1)
-                        TelinkLightApplication.getApp().offLine = false
+                //网关在线状态，1表示在线，0表示离线
+                if (db.state == 1)
+                    TelinkLightApplication.getApp().offLine = false
+            }
+
+            if (!TelinkLightApplication.getApp().offLine) {
+                disposableTimer?.dispose()
+                disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                    hideLoadingDialog()
+                    runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                 }
-
-                if (!TelinkLightApplication.getApp().offLine) {
-                    disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                        hideLoadingDialog()
-                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
-                    }
-                    showLoadingDialog(getString(R.string.please_wait))
-                    val low = currentDevice?.meshAddr ?: 0 and 0xff
-                    val hight = (currentDevice?.meshAddr ?: 0 shr 8) and 0xff
-                    val gattBody = GwGattBody()
-                    var gattPar: ByteArray
-                    if (currentDevice?.openTag == 1) {
-                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
-                                0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                        gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
-                    } else {
-                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
-                                0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
-                        gattBody.ser_id = SER_ID_SENSOR_ON
-                    }
-
-                    val s = Base64Utils.encodeToStrings(gattPar)
-                    gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                    gattBody.meshAddr = currentDevice?.meshAddr ?: 0
-                    sendToServer(gattBody)
+                showLoadingDialog(getString(R.string.please_wait))
+                val low = currentDevice?.meshAddr ?: 0 and 0xff
+                val hight = (currentDevice?.meshAddr ?: 0 shr 8) and 0xff
+                val gattBody = GwGattBody()
+                var gattPar: ByteArray
+                if (currentDevice?.openTag == 1) {
+                    gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
+                            0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
+                    gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
                 } else {
-                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                    gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
+                            0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
+                    gattBody.ser_id = SER_ID_SENSOR_ON
                 }
-            }, {
-                hideLoadingDialog()
+
+                val s = Base64Utils.encodeToStrings(gattPar)
+                gattBody.data = s
+                gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                gattBody.meshAddr = currentDevice?.meshAddr ?: 0
+                sendToServer(gattBody)
+            } else {
                 ToastUtils.showShort(getString(R.string.gw_not_online))
+            }
+        }, {
+            hideLoadingDialog()
+            ToastUtils.showShort(getString(R.string.gw_not_online))
         })
     }
 
     @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
-                disposableTimer?.dispose()
-                if (currentDevice?.openTag == 1) {
-                    sendCloseIcon(positionCurrent)
-                    byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                } else {
-                    sendOpenIcon(positionCurrent)
-                    byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
-                }
-                hideLoadingDialog()
+            disposableTimer?.dispose()
+            if (currentDevice?.openTag == 1) {
+                sendCloseIcon(positionCurrent)
+                byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
+            } else {
+                sendOpenIcon(positionCurrent)
+                byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+            }
+            hideLoadingDialog()
 
-                disposableTimer?.dispose()
-            }, {
-                disposableTimer?.dispose()
-                ToastUtils.showShort(it.message)
-                hideLoadingDialog()
-                LogUtils.v("zcl-----------远程控制-------${it.message}")
+            disposableTimer?.dispose()
+        }, {
+            disposableTimer?.dispose()
+            ToastUtils.showShort(it.message)
+            hideLoadingDialog()
+            LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 
@@ -642,20 +667,20 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             when (deviceInfo.productUUID) {
                 DeviceType.SENSOR -> {//老版本人体感应器
                     currentDevice?.version = s
-                    if (""==s)
+                    if ("" == s)
                         startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
                     else
                         startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
                     doFinish()
                 }
                 DeviceType.NIGHT_LIGHT -> {//2.0
-                    if (""==s||(s.contains("N")||s.contains("PR")||s.contains("NPR"))){
-                        if (s.contains("NPR")||""==s)
+                    if ("" == s || (s.contains("N") || s.contains("PR") || s.contains("NPR"))) {
+                        if (s.contains("NPR") || "" == s)
                             startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
                         else
                             startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
                         doFinish()
-                    }else{
+                    } else {
                         connectAndConfig()
                     }
                 }
@@ -713,6 +738,11 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun relocationSensor() {
+        makeDeviceInfo()
+        getVersion(false)
+    }
+
+    private fun makeDeviceInfo() {
         deviceInfo = DeviceInfo()
         currentDevice?.let {
             deviceInfo.meshAddress = it.meshAddr
@@ -722,7 +752,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             deviceInfo.isConfirm = 1
         }
         settingType = NORMAL_SENSOR
-        getVersion(false)
     }
 
 
@@ -822,4 +851,63 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         adapter?.notifyDataSetChanged()
     }
 
+    @SuppressLint("CheckResult")
+    override fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.finish) {
+            if (cmdBean.status == 0) {
+                ToastUtils.showShort(getString(R.string.connect_success))
+                image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99)?.subscribe({
+                    when (it.errorCode) {
+                        NetworkStatusCode.OK -> {
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.MILLISECONDS)
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                                    }
+                        }
+                        NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
+                        NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+            } else{
+                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                ToastUtils.showShort(getString(R.string.connect_fail))
+            }
+        }
+    }
+
+    override fun routerUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+
+        if (routerVersion?.finish == true) {
+            if (routerVersion.cmd == 0) {
+                disposableTimer?.dispose()
+                val deviceInfo = DeviceInfo()
+                deviceInfo.macAddress = currentDevice?.macAddr
+                deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
+                deviceInfo.firmwareRevision = currentDevice?.version
+                deviceInfo.productUUID = currentDevice?.productUUID ?: 0
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() {}
+
+                    override fun complete() {
+                        val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
+                        if (switchByID?.version == "" || switchByID?.version == null)
+                            ToastUtils.showShort(getString(R.string.get_version_fail))
+                        else
+                            skipeDevice(false, currentDevice?.version ?: "")
+                    }
+
+                    override fun error(msg: String?) {
+                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                    }
+                })
+            } else {
+                ToastUtils.showShort(getString(R.string.get_version_fail))
+            }
+        }
+    }
 }

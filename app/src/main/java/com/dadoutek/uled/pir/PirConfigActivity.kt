@@ -419,7 +419,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                     }
                                 },
                                 failedCallback = {
-                                    snackbar(sensor_root, getString(R.string.pace_fail))
+                                    snackbar(sensor_root, getString(R.string.config_fail))
                                     setLoadingVisbiltyOrGone()
                                     TelinkLightService.Instance()?.idleMode(true)
                                 })

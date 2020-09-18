@@ -21,6 +21,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
@@ -36,6 +37,7 @@ import java.util.concurrent.TimeUnit
 
 class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
+    private var deviceType: Int=DeviceType.LIGHT_RGB
     private var seeHelp: TextView? = null
     private var addGroupTv: TextView? = null
     private var lin: View? = null
@@ -95,7 +97,9 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                     firstLightAddress = lightList[0].meshAddr
                 }
             }
+            deviceType= 97
         } else {
+            deviceType= 6
             firstLightAddress = dstAddress
         }
         buildInModeList = ArrayList()
@@ -246,6 +250,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                 intent.putExtra(Constant.IS_CHANGE_COLOR, true)
                 intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![position])
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
+                intent.putExtra(Constant.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
             }
 
@@ -343,6 +348,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             val intent = Intent(this, SetDiyColorAct::class.java)
             intent.putExtra(Constant.IS_CHANGE_COLOR, false)
             intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
+            intent.putExtra(Constant.DEVICE_TYPE, deviceType)
             startActivityForResult(intent, 0)
         } else {
             ToastUtils.showLong(getString(R.string.add_gradient_limit))
@@ -353,6 +359,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         val intent = Intent(this, SetDiyColorAct::class.java)
         intent.putExtra(Constant.IS_CHANGE_COLOR, true)
         intent.putExtra(Constant.GRADIENT_KEY, dbDiyGradient)
+        intent.putExtra(Constant.DEVICE_TYPE, deviceType)
         intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
         startActivityForResult(intent, 0)
     }

@@ -31,6 +31,7 @@ import com.dadoutek.uled.model.ItemGroup
 import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.network.RouterTimeoutBean
 import com.dadoutek.uled.othersview.SelectColorAct
 import com.dadoutek.uled.router.bean.RouteSceneBean
@@ -325,7 +326,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun initChangeView() {
-        toolbarTv.setText(scene!!.name)
+        toolbarTv.text = scene!!.name
         editSceneName = scene!!.name
     }
 
@@ -727,7 +728,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
 
         if (Constant.IS_ROUTE_MODE) {
-            routeraddOrUpdate(itemGroups, dbScene!!.id, name, sceneIcon)
+            routerAddOrUpdateScene(itemGroups, dbScene!!.id, name, sceneIcon,true)
         } else GlobalScope.launch {
             DBUtils.saveScene(dbScene, false)
 
@@ -766,7 +767,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     @SuppressLint("CheckResult")
-    private fun routeraddOrUpdate(itemGroups: ArrayList<ItemGroup>, dbSceneId: Long, name: String?, sceneIcon: String) {
+    private fun routerAddOrUpdateScene(itemGroups: ArrayList<ItemGroup>, dbSceneId: Long, name: String?, sceneIcon: String, isNew: Boolean) {
         val actionsList = mutableListOf<DbSceneActions>()
         for (i in itemGroups.indices) {
             var sceneActions = DbSceneActions()
@@ -781,11 +782,34 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     actionsList.add(setSceneAc(sceneActions, dbSceneId, itemGroups[i], 0x04))
             }
         }
+        if (isNew)
         RouterModel.routeAddScene(name ?: "场景", sceneIcon, actionsList)?.subscribe({
-            startAddSceneTimeOut(it)
+            when (it.errorCode) {
+                NetworkStatusCode.OK->startAddSceneTimeOut(it.t)
+                //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
+                // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
+                NetworkStatusCode.CURRENT_GP_NOT_EXITE ->ToastUtils.showShort(getString(R.string.gp_not_exit))
+                NetworkStatusCode.ROUTER_NO_EXITE ->ToastUtils.showShort(getString(R.string.region_not_router))
+                NetworkStatusCode.ROUTER_ALL_OFFLINE ->ToastUtils.showShort(getString(R.string.router_offline))
+            }
         }, {
             ToastUtils.showShort(it.message)
         })
+        else
+            RouterModel.routeUpdateScene(dbSceneId,actionsList)?.subscribe({
+                when (it.errorCode) {
+                    NetworkStatusCode.OK->startAddSceneTimeOut(it.t)//更新超时
+                    //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
+                    // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
+                    NetworkStatusCode.ROUTER_DEL_SCENE_NOT_EXITE ->{//该场景不存在，刷新场景数据
+                        initScene()
+                    }
+                    NetworkStatusCode.ROUTER_NO_EXITE ->ToastUtils.showShort(getString(R.string.region_not_router))
+                    NetworkStatusCode.ROUTER_ALL_OFFLINE ->ToastUtils.showShort(getString(R.string.router_offline))
+                }
+            }, {
+                ToastUtils.showShort(it.message)
+            })
     }
 
     private fun startAddSceneTimeOut(it: RouterTimeoutBean?) {
@@ -912,7 +936,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             val belongSceneId = scene?.id!!
 
             if (Constant.IS_ROUTE_MODE) {
-                routeraddOrUpdate(itemGroups, belongSceneId, name, scene?.imgName ?: "icon_out")
+                routerAddOrUpdateScene(itemGroups, belongSceneId, name, scene?.imgName ?: "icon_out", true)
+
             } else {
                 DBUtils.updateScene(scene!!)
                 DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.id!!))

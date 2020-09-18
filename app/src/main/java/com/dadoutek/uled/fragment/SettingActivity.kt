@@ -33,6 +33,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
+import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.ChooseModeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -104,10 +105,10 @@ class SettingActivity : TelinkBaseActivity() {
                                 ToastUtils.showShort(it.message)
                             })
                         }
-                   /*     list.size - 1 -> {
+                        list.size - 1 -> {
                             var intent = Intent(this, BindRouterActivity::class.java)
                             startActivity(intent)
-                        }*/
+                        }
                         else->{}
                     }
                 }
@@ -126,9 +127,9 @@ class SettingActivity : TelinkBaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_reset, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_lock, getString(R.string.safe_lock)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
-        //list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
-      /*  if (DBUtils.getAllRouter().size > 1)
-            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))*/
+        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
+        if (DBUtils.getAllRouter().size > 1)
+            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
     }
 
     @SuppressLint("StringFormatMatches")

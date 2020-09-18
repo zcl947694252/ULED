@@ -33,7 +33,9 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -68,6 +70,8 @@ import kotlin.collections.ArrayList
  * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
+    private var disposableTimer: Disposable? = null
+    private var deviceType: Int = DeviceType.LIGHT_RGB
     private var addr: Int = 0
     private var lastTime: Long = 0
     private var fiChangeGp: MenuItem? = null
@@ -121,6 +125,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private var acitivityIsAlive = true
     var isReset = false
 
+    @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
                 .setMessage(getString(R.string.delete_group_confirm, group?.name))
@@ -382,11 +387,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         main_add_device?.text = getString(R.string.mode_diy)
         main_go_help?.visibility = View.VISIBLE
 
-        if (Constant.IS_OPEN_AUXFUN){
+        if (Constant.IS_OPEN_AUXFUN) {
             ll_r.visibility = View.VISIBLE
             ll_g.visibility = View.VISIBLE
             ll_b.visibility = View.VISIBLE
-        }else{
+        } else {
             ll_r.visibility = View.GONE
             ll_g.visibility = View.GONE
             ll_b.visibility = View.GONE
@@ -1279,6 +1284,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 intent.putExtra(Constant.IS_CHANGE_COLOR, true)
                 intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![position])
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
+                intent.putExtra(Constant.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
             }
 
@@ -1289,7 +1295,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     }
 
-    var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
+    private var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { _, _, _ ->
         isDelete = true
         isExitGradient = true
         rgbDiyGradientAdapter!!.changeState(isDelete)
@@ -1324,21 +1330,58 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 builder.setMessage(getString(R.string.delete_model))
                 builder.setPositiveButton(android.R.string.ok) { _, _ ->
                     showLoadingDialog(resources.getString(R.string.delete))
-                    for (i in diyGradientList!!.indices) {
-                        if (diyGradientList!![i].isSelected) {
-                            startDeleteGradientCmd(diyGradientList!![i].id)
-                            DBUtils.deleteGradient(diyGradientList!![i])
-                            DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
+                    if (Constant.IS_ROUTE_MODE) {
+                        val mutableListOf = mutableListOf<Int>()
+                        diyGradientList.forEach {
+                            mutableListOf.add(it.id.toInt())
                         }
+                        RouterModel.routerDelGradient(mutableListOf, dstAddress, deviceType)?.subscribe({
+                            //    "errorCode": 90018,"该设备不存在，请重新刷新数据"
+                            //    "errorCode": 90008, "以下路由没有上线，无法删除自定义渐变"
+                            //    "errorCode": 90004, "账号下区域下没有路由，无法操作"
+                            //    "errorCode": 90007, "该组不存在，无法操作"
+                            //    "errorCode": 90005,"以下路由没有上线，无法删除自定义渐变"
+                            when (it.errorCode) {
+                                0 -> {
+                                    disposableTimer?.dispose()
+                                    disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                            .subscribe {
+                                                ToastUtils.showShort(getString(R.string.del_gradient_fail))
+                                                hideLoadingDialog()
+                                            }
+                                }
+                                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                            }
+                        }, {
+                            ToastUtils.showShort(it.message)
+                        })
+                    } else {
+                        bleDelGradient(true)
                     }
-                    diyGradientList = DBUtils.diyGradientList
-                    rgbDiyGradientAdapter!!.setNewData(diyGradientList)
-                    hideLoadingDialog()
                 }
                 builder.setNeutralButton(R.string.cancel) { dialog, which -> }
                 builder.create().show()
             }
         }
+    }
+
+    private fun bleDelGradient(isSendCommend:Boolean) {
+        for (i in diyGradientList!!.indices) {
+            if (diyGradientList!![i].isSelected) {
+                if (isSendCommend)
+                    startDeleteGradientCmd(diyGradientList!![i].id)
+                DBUtils.deleteGradient(diyGradientList!![i])
+                DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
+            }
+        }
+        diyGradientList = DBUtils.diyGradientList
+        rgbDiyGradientAdapter!!.setNewData(diyGradientList)
+        hideLoadingDialog()
     }
 
     private fun startDeleteGradientCmd(id: Long) {
@@ -1356,6 +1399,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 val intent = Intent(this, SetDiyColorAct::class.java)
                 intent.putExtra(Constant.IS_CHANGE_COLOR, false)
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, group!!.meshAddr)
+                intent.putExtra(Constant.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
             } else {
                 ToastUtils.showLong(getString(R.string.add_gradient_limit))
@@ -1365,6 +1409,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 val intent = Intent(this, SetDiyColorAct::class.java)
                 intent.putExtra(Constant.IS_CHANGE_COLOR, false)
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, light!!.meshAddr)
+                intent.putExtra(Constant.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
             } else {
                 ToastUtils.showLong(getString(R.string.add_gradient_limit))
@@ -1869,11 +1914,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             dynamic_rgb.setTextColor(resources.getColor(R.color.blue_background))
             toolbar!!.title = getString(R.string.dynamic_gradient)
             dstAddress = group!!.meshAddr
+            deviceType = 97
             val lightList = DBUtils.getLightByGroupMesh(dstAddress)
-            if (lightList != null)
-                if (lightList.size > 0)
-                    firstLightAddress = lightList[0].meshAddr
-
+            if (lightList != null && lightList.size > 0)
+                firstLightAddress = lightList[0].meshAddr
         } else {
             toolbar.menu.setGroupVisible(0, false)
             toolbar.menu.setGroupVisible(1, false)
@@ -1885,6 +1929,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             dynamic_rgb.setTextColor(resources.getColor(R.color.blue_background))
             toolbar!!.title = getString(R.string.dynamic_gradient)
             dstAddress = light!!.meshAddr
+            deviceType = DeviceType.LIGHT_RGB
             firstLightAddress = dstAddress
         }
     }
@@ -2349,5 +2394,18 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
         v?.parent?.requestDisallowInterceptTouchEvent(true)
         return false
+    }
+
+    override fun routerAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.cmd == Cmd.routeDelGradient)
+            if (cmdBean.finish) {
+                hideLoadingDialog()
+                disposableTimer?.dispose()
+                if (cmdBean.status == 0) {
+                    bleDelGradient(false)
+                } else {
+                    ToastUtils.showShort(getString(R.string.del_gradient_fail))
+                }
+            }
     }
 }

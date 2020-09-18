@@ -1,5 +1,6 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.support.design.widget.Snackbar
@@ -19,6 +20,7 @@ import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.dbModel.DbSwitch
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -34,16 +36,20 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_scene_switch_group.*
+import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.design.indefiniteSnackbar
 import org.jetbrains.anko.design.snackbar
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 private const val CONNECT_TIMEOUT = 20
 
-class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, View.OnClickListener {
+class ConfigSceneSwitchActivity(var disposableTimer: Disposable) : BaseSwitchActivity(), EventListener<String>, View.OnClickListener {
     private val requestCodes: Int = 1000
     private var version: String = ""
     private var newMeshAddr: Int = 0
@@ -144,6 +150,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 //        mAdapter.bindToRecyclerView(recyclerView)
     }
 
+    @SuppressLint("CheckResult")
     private fun confirmSceneSw() {
         if (TelinkLightApplication.getApp().connectDevice == null) {
             if (mConnectingSnackBar?.isShown != true) {
@@ -156,6 +163,41 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 return
             }
             pb_ly.visibility = View.VISIBLE
+
+            if (Constant.IS_ROUTE_MODE) {
+                val sceneMeshAddrs = mutableListOf<Int>()
+                mapConfig.forEach { sceneMeshAddrs.add(it.value.id.toInt()) }
+                RouterModel.configSceneSw(switchDate!!.id, sceneMeshAddrs)
+                        ?.subscribe({
+                            //    "errorCode": 90021, "该开关不存在，请重新刷新数据"
+
+
+                            //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                            //    "errorCode": 90007,"该组不存在，刷新组列表"
+                            //    "errorCode": 90005,"以下路由没有上线，无法配置"
+                             //   "errorCode":90011 , "有场景不存在，刷新场景列表"
+
+
+                            when (it.errorCode) {
+                                0 -> {
+                                    disposableTimer?.dispose()
+                                    disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                            .subscribe {
+                                                sw_progressBar.visibility = View.GONE
+                                                ToastUtils.showShort(getString(R.string.config_fail))
+                                            }
+                                }
+                                90021 -> {
+                                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                                    finish()
+                                }
+                                90011 -> ToastUtils.showShort(getString(R.string.scene_exit_to_refresh))
+                                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                            }
+                        }, { ToastUtils.showShort(it.message) })
+            } else
             GlobalScope.launch {
                 //setSceneForSwitch()
                 val mesh = mApp?.mesh
@@ -211,7 +253,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 finish()
 
         }, failedCallback = {
-            mConfigFailSnackbar = snackbar(config_scene_switch, getString(R.string.pace_fail))
+            mConfigFailSnackbar = snackbar(config_scene_switch, getString(R.string.config_fail))
             GlobalScope.launch(Dispatchers.Main) {
                 pb_ly.visibility = View.GONE
                 mIsConfiguring = false

@@ -21,18 +21,23 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_switch_double_touch.*
+import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -45,6 +50,7 @@ import kotlinx.coroutines.launch
  */
 
 class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
+    private var disposableTimer: Disposable? = null
     private var switchDate: DbSwitch? = null
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
@@ -54,7 +60,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
     override fun setToolBar(): Toolbar {
-        return  toolbar
+        return toolbar
     }
 
     override fun setReConfig(): Boolean {
@@ -66,11 +72,11 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             localVersion = getString(R.string.get_version_fail)
         else
             mDeviceInfo?.firmwareRevision = localVersion
-        fiVersion?.title =localVersion
+        fiVersion?.title = localVersion
     }
 
     override fun setConnectMeshAddr(): Int {
-        return  mDeviceInfo?.meshAddress?:0
+        return mDeviceInfo?.meshAddress ?: 0
     }
 
     override fun deleteDevice() {
@@ -164,7 +170,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     GlobalScope.launch(Dispatchers.Main) {
                         ToastUtils.showShort(getString(R.string.config_success))
                         if (!isReConfig)
-                        showRenameDialog(switchDate)
+                            showRenameDialog(switchDate)
                         else
                             finish()
                     }
@@ -193,7 +199,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.index = dbSwitch.id.toInt()
-                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr ?: 1000000))
+                dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr
+                        ?: 1000000))
 
                 DBUtils.saveSwitch(dbSwitch, false)
                 DBUtils.recordingChange(dbSwitch.id,
@@ -220,11 +227,37 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     ToastUtils.showShort(getString(R.string.config_night_light_select_group))
                 } else {
                     showLoadingDialog(getString(R.string.please_wait))
-                    GlobalScope.launch {
-                        setGroupForSwitch()
-                        delay(800)
-                        upSwitchData()
-                    }
+                    if (Constant.IS_ROUTE_MODE) {
+                        RouterModel.configDoubleSw(switchDate!!.id, mutableListOf(leftGroup?.meshAddr?:0,leftGroup?.meshAddr?:0))
+                                ?.subscribe({
+                                    //    "errorCode": 90021, "该开关不存在，请重新刷新数据"
+                                    //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                                    //    "errorCode": 90007,"该组不存在，刷新组列表"
+                                    //    "errorCode": 90005,"以下路由没有上线，无法配置"
+                                    when (it.errorCode) {
+                                        0 -> {
+                                            disposableTimer?.dispose()
+                                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                                    .subscribe {
+                                                        sw_progressBar.visibility = View.GONE
+                                                        ToastUtils.showShort(getString(R.string.config_fail))
+                                                    }
+                                        }
+                                        90021 -> {
+                                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                                            finish()
+                                        }
+                                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                        90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                                    }
+                                }, { ToastUtils.showShort(it.message) })
+                    } else
+                        GlobalScope.launch {
+                            setGroupForSwitch()
+                            delay(800)
+                            upSwitchData()
+                        }
                 }
             }
             R.id.switch_double_touch_left -> {
@@ -269,7 +302,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
 
-    override  fun initListener() {
+    override fun initListener() {
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         switch_double_touch_use_button.setOnClickListener(this)
         switch_double_touch_left.setOnClickListener(this)
@@ -317,12 +350,12 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 renameDialog?.dismiss()
         }
         renameDialog?.setOnDismissListener {
-           if (!isReConfig)
-               finish()
+            if (!isReConfig)
+                finish()
         }
     }
 
-    override  fun initView() {
+    override fun initView() {
         switch_double_touch_mb.visibility = View.GONE
         switch_double_touch_set.visibility = View.VISIBLE
         switch_double_touch_i_know.paint.color = getColor(R.color.white)

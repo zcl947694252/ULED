@@ -24,18 +24,26 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.model.Cmd
+import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
+    private var disposableTimer: Disposable? = null
+    private var deviceType: Int = 0
     var colorNodeList: ArrayList<DbColorNode>? = null
     private var rgbDiyColorListAdapter: RGBDiyColorCheckAdapter? = null
     private var isChange = false
@@ -59,6 +67,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private fun initData() {
         isChange = intent.getBooleanExtra(Constant.IS_CHANGE_COLOR, false)
         dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
+        deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
         if (isChange) {
             diyGradient = intent.getParcelableExtra(Constant.GRADIENT_KEY) as? DbDiyGradient
             colorNodeList = DBUtils.getColorNodeListByDynamicModeId(diyGradient!!.id)
@@ -140,7 +149,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             toolbarTv.text = getString(R.string.update_gradient)
             editName.setText(diyGradient?.name)
             editName.setSelection(editName.text.toString().length)
-            sbSpeed.setProgress(diyGradient?.speed?.toFloat()?:0f)
+            sbSpeed.setProgress(diyGradient?.speed?.toFloat() ?: 0f)
             speed_num.text = diyGradient?.speed.toString() + "%"
             when {
                 sbSpeed.progress >= 100 -> {
@@ -193,9 +202,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     thisTime = System.currentTimeMillis()
                     if (thisTime - downTime >= 500) {
                         tvValue++
-                        val msg = less_speed_handler.obtainMessage()
+                        val msg = lessSpeedHandler.obtainMessage()
                         msg.arg1 = tvValue
-                        less_speed_handler.sendMessage(msg)
+                        lessSpeedHandler.sendMessage(msg)
                         Log.e("TAG_TOUCH", tvValue++.toString())
                         try {
                             delay(100)
@@ -209,9 +218,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
                 tvValue++
-                val msg = less_speed_handler.obtainMessage()
+                val msg = lessSpeedHandler.obtainMessage()
                 msg.arg1 = tvValue
-                less_speed_handler.sendMessage(msg)
+                lessSpeedHandler.sendMessage(msg)
             }
         } else if (event.action == MotionEvent.ACTION_CANCEL) {
             onBtnTouch = false
@@ -227,9 +236,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     thisTime = System.currentTimeMillis()
                     if (thisTime - downTime >= 500) {
                         tvValue++
-                        val msg = add_speed_handler.obtainMessage()
+                        val msg = addSpeedHandler.obtainMessage()
                         msg.arg1 = tvValue
-                        add_speed_handler.sendMessage(msg)
+                        addSpeedHandler.sendMessage(msg)
                         Log.e("TAG_TOUCH", tvValue++.toString())
                         try {
                             delay(100)
@@ -245,9 +254,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             onBtnTouch = false
             if (thisTime - downTime < 500) {
                 tvValue++
-                val msg = add_speed_handler.obtainMessage()
+                val msg = addSpeedHandler.obtainMessage()
                 msg.arg1 = tvValue
-                add_speed_handler.sendMessage(msg)
+                addSpeedHandler.sendMessage(msg)
             }
         } else if (event.action == MotionEvent.ACTION_CANCEL) {
             onBtnTouch = false
@@ -255,10 +264,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("HandlerLeak")
-    private val add_speed_handler = object : Handler() {
+    private val addSpeedHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbSpeed.setProgress(sbSpeed.progress+1f)
+            sbSpeed.setProgress(sbSpeed.progress + 1f)
             when {
                 sbSpeed.progress > 100 -> {
                     speed_add.isEnabled = false
@@ -283,10 +292,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("HandlerLeak")
-    private val less_speed_handler = object : Handler() {
+    private val lessSpeedHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbSpeed.setProgress(sbSpeed.progress-1f)
+            sbSpeed.setProgress(sbSpeed.progress - 1f)
             when {
                 sbSpeed.progress < 0 -> {
                     speed_less.isEnabled = false
@@ -345,12 +354,39 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
             deleteGradient(belongDynamicModeId)
             delay(200)
+            if (Constant.IS_ROUTE_MODE)
+                diyGradient?.let {
+                    RouterModel.routerUpdateGradient(it.id.toInt(), it.type, it.colorNodes,dstAddress, deviceType)?.subscribe({ response ->
+                        //    "errorCode": 90020, "该自定义渐变不存在，请重新刷新数据"
+                        //    "errorCode": 90018,"该设备不存在，请重新刷新数据"
+                        //    "errorCode": 90008,"该设备没有绑定路由，无法添加自定义渐变"
+                        //    "errorCode": 90007,"该组不存在，无法操作"
+                        //    "errorCode": 90005,"以下路由没有上线，无法更新自定义渐变"
+                        //    "errorCode": 90004, "账号下区域下没有路由，无法操作"
+                        when (response.errorCode) {
+                            0 -> {
+                                disposableTimer?.dispose()
+                                disposableTimer = io.reactivex.Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                        .subscribe {
+                                            ToastUtils.showShort(getString(R.string.update_gradient_fail))
+                                            hideLoadingDialog()
+                                        }
+                            }
+                            90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                            90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                            90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                            90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                        }
+                    }, { it1 ->
+                        ToastUtils.showShort(it1.message)
+                    })
+                }
+            else{
             startSendCmdToAddDiyGradient(diyGradient!!)
-            hideLoadingDialog()
-
-            setResult(Activity.RESULT_OK)
-
-            finish()
+                hidAndResultAndFinish()
+            }
         }
     }
 
@@ -378,12 +414,42 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
 
             Thread.sleep(100)
-            startSendCmdToAddDiyGradient(diyGradient!!)
-            hideLoadingDialog()
-
-            setResult(Activity.RESULT_OK)
-            finish()
+            if (Constant.IS_ROUTE_MODE)
+                diyGradient?.let {
+                    RouterModel.routerAddGradient(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType)?.subscribe({ response ->
+                        //    "errorCode": 90018,该设备不存在，请重新刷新数据"
+                        //    "errorCode": 90008,该设备没有绑定路由，无法添加自定义渐变"
+                        //    "errorCode": 90004 账号下区域下没有路由，无法操作"
+                        //    "errorCode": 90007,该组不存在，无法操作"
+                        //    "errorCode": 90005,以下路由没有上线，无法添加自定义渐变"
+                        when (response.errorCode) {
+                            0 -> {
+                                disposableTimer?.dispose()
+                                disposableTimer = io.reactivex.Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                        .subscribe {
+                                            showLoadingDialog(getString(R.string.add_gradient_fail))
+                                        }
+                            }
+                            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                            90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                            90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                        }
+                    }, { it1 ->
+                        ToastUtils.showShort(it1.message)
+                    })
+                }
+            else {
+                startSendCmdToAddDiyGradient(diyGradient!!)
+                hidAndResultAndFinish()
+            }
         }.start()
+    }
+
+    private fun hidAndResultAndFinish() {
+        hideLoadingDialog()
+        setResult(Activity.RESULT_OK)
+        finish()
     }
 
     private fun startSendCmdToAddDiyGradient(diyGradient: DbDiyGradient) {
@@ -475,7 +541,6 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             ToastUtils.showLong(getString(R.string.name_not_null_tip))
             return false
         }
-
         return true
     }
 
@@ -540,6 +605,23 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
             colorNodeList!!.add(colorNode)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposableTimer?.dispose()
+    }
+    override fun routerAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
+        hideLoadingDialog()
+        if (cmdBean.status == 0) {
+            disposableTimer?.dispose()
+            setResult(Activity.RESULT_OK)
+            finish()
+        } else when (cmdBean.cmd) {
+                Cmd.routeAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
+                Cmd.routeUpdateGradient  -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
+            }
+
     }
 
 }

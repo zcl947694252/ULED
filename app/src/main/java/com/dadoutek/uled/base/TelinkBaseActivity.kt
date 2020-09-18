@@ -660,8 +660,8 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Cmd.routeInAccount -> routerAccessIn(cmdBean)
                 Cmd.routeConfigWifi -> routerConfigWIFI(cmdBean)
-                Cmd.routeStartScann -> startRouterScan(cmdBean)
-                Cmd.routeScanDeviceInfo -> receivedRouteDeviceNum(cmdBean)
+                Cmd.routeStartScann -> startRouterScanRecevicer(cmdBean)
+                Cmd.routeScanDeviceInfo -> receivedRouteDeviceNumRecevicer(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
                     val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
@@ -671,23 +671,22 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     val routerScene = Gson().fromJson(msg, RouteSceneBean::class.java)
                     routerAddScene(routerScene)
                 }
-                Cmd.routeUpdateDeviceVersion ->{
+                Cmd.routeUpdateDeviceVersion ->{//版本号回调
                     val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
                     routerUpdateVersionRecevice(routerVersion)
                 }
                 Cmd.routeOTAing ->{
                     val routerOTAingNumBean = Gson().fromJson(msg, RouterOTAingNumBean::class.java)
                     routerOTAingNumRecevice(routerOTAingNumBean)
-
                 }
                 Cmd.routeOTAFinish ->{
                     val routerOTAFinishBean = Gson().fromJson(msg, RouterOTAFinishBean::class.java)
                     routerOTAFinishRecevice(routerOTAFinishBean)
                 }
-
+                Cmd.routeAddGradient , Cmd.routeDelGradient,Cmd.routeUpdateGradient -> routerAddOrDelOrUpdateGradientRecevice(cmdBean)
+                Cmd.routeConnectSwSe  -> routerConnectSwSeRecevice(cmdBean)
             }
-/*
-            when (intent?.action) {
+/*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
                     val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
                     LogUtils.v("zcl-----------长连接接收网关数据-------$gwStompBean")
@@ -737,6 +736,14 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+    open fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun routerAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
+
+    }
+
     open fun routerOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
 
     }
@@ -757,7 +764,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     }
 
-    open fun startRouterScan(cmdBodyBean: CmdBodyBean) {
+    open fun startRouterScanRecevicer(cmdBodyBean: CmdBodyBean) {
     }
 
     open fun routerConfigWIFI(cmdBody: CmdBodyBean) {
@@ -768,7 +775,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     }
 
-    open fun receivedRouteDeviceNum(scanResultBean: CmdBodyBean) {
+    open fun receivedRouteDeviceNumRecevicer(scanResultBean: CmdBodyBean) {
 
     }
 
@@ -1251,6 +1258,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         renameCancel?.setOnClickListener { renameDialog?.dismiss() }
         //确定回调 单独写
     }
+
 
 }
 

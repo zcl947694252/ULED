@@ -5,6 +5,7 @@ import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.DbRouter;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
+import com.dadoutek.uled.model.dbModel.DbColorNode;
 import com.dadoutek.uled.model.dbModel.DbConnector;
 import com.dadoutek.uled.model.dbModel.DbCurtain;
 import com.dadoutek.uled.model.dbModel.DbDeleteGradientBody;
@@ -31,6 +32,7 @@ import com.dadoutek.uled.router.bean.RouteScanResultBean;
 import com.dadoutek.uled.router.bean.RouterBatchGpBean;
 import com.dadoutek.uled.router.bean.RouterVersionsBean;
 import com.dadoutek.uled.router.bean.ScanDataBean;
+import com.dadoutek.uled.switches.bean.KeyBean;
 
 import java.util.List;
 import java.util.Map;
@@ -963,11 +965,25 @@ public interface RequestInterface {
      * "ser_id": "app会话id，自己维护"
      */
     @FormUrlEncoded
-    @POST("router/del-group")
+    @POST("router/add-scene")
     Observable<Response<RouterTimeoutBean>> routerAddScene(@Field("name") String sceneName,
-                                                           @Field("imgName") String imgName
-            , @Field("actions") List actions, @Field("ser_id") String ser_id);
+    @Field("imgName") String imgName, @Field("actions") List actions, @Field("ser_id") String ser_id);
 
+    /**
+     * 更新场景
+     * 请求URL
+     * https://dev.dadoutek.com/xxxx/router/update-scene PUT
+     * sid	是	int	场景id
+     * actions	是	List<Action>	新场景数据
+     * ser_id	是	string	app会话id，推送时回传
+     *     "sid" : 1,
+     *     "actions": [
+     *         {  "id": 1,"isOn": false, "color": 16777215,   "groupAddr": 32769, "brightness": 100,
+     *         "deviceType": 4,"colorTemperature": 100 }, ] "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @PUT("router/update-scene")
+    Observable<Response<RouterTimeoutBean>> routerUpdateScene(@Field("sid") Long sceneId,@Field("actions") List actions, @Field("ser_id") String ser_id);
     /**
      * 通过路由删除组
      * 请求URL
@@ -1025,9 +1041,135 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/smartlight_test/ota/result/list?page=1&size=50&start
      * =1597046991063 #查询#查询第一页数据，每页50条，创建时间为2020-07-20 11:29:20
      */
+    @FormUrlEncoded
     @GET("ota/result/list")
     Observable<Response<List<RouterOTAResultBean>>> routerGetOTAResult(@Field("page") int page,
                                                                        @Field("size") int size,
                                                                        @Field("start") long start);
+    /**
+     * 停止ota升级  https://dev.dadoutek.com/xxxx/router/stop-ota  POST
+     * ser_id	是	string	app会话id，推送时回传
+     * start	是	long	时间戳，本地存储或者获取路由模式下状态后得到。要停止就全部停止
+     *     "ser_id": "app会话id，自己维护",
+     *     "start": 1597046661669
+     */
+    @FormUrlEncoded
+    @POST("router/stop-ota")
+    Observable<Response<RouterTimeoutBean>> routerStopOTA(@Field("ser_id") String ser_id, @Field("start") long start);
 
+    /**
+     * 添加自定义渐变  https://dev.dadoutek.com/xxxx/router/add-custom-dc  POST
+     * ser_id	是	string	app会话id，推送时回传
+     * name	是	string	名称
+     * type	是	int	渐变类型
+     * speed	是	int	渐变速度
+     * colorNodes	是	List<ColorNode>	colorNodes
+     * meshAddr	是	int	关联设备或者组的meshAddr
+     * meshType	是	int	meshAddr类型
+     * {  "ser_id": "app会话id，自己维护","name": "自定义渐变", "type": 0,"speed": 5,
+     *     "colorNodes": [{"brightness": 100, "colorTemperature": 0, "rgbw": 16731983,"index": 0,"id": 1
+     *         },  { "brightness": 50, "colorTemperature": 0,"rgbw": 16728987,"index": 1, "id": 2}]
+     *     "meshAddr": 1,"meshType": 6}
+     * meshType 彩灯 = 6 组 = 9
+     */
+    @FormUrlEncoded
+    @POST("router/add-custom-dc")
+    Observable<Response<RouterTimeoutBean>> routerAddCustomGradient(@Field("name") String name,
+                                                                    @Field("type") int type,
+                                                                    @Field("speed") int speed,
+                                                                    @Field("colorNodes") List<DbColorNode> colorNodes,
+                                                                    @Field("meshAddr") int meshAddr,
+                                                                    @Field("meshType") int meshType,
+                                                                    @Field("ser_id") String ser_id);
+
+    /**
+     * 更新自定义渐变  https://dev.dadoutek.com/xxxx/router/update-custom-d PUT
+     * ser_id	是	string	app会话id，推送时回传
+     * id	是	int	自定义渐变id
+     * type	是	int	渐变类型
+     * colorNodes	是	List<ColorNode>	colorNodes
+     * meshType	是	int	meshAddr类型
+     * {"ser_id": "app会话id，自己维护",   "type": 0,"colorNodes": [ {"brightness": 100, "colorTemperature": 0,
+     * "rgbw": 16731983,"index": 0,"id": 1} ] "meshAddr": 1,"meshType": 6 }
+     * meshType 彩灯 = 6  组 = 97
+     */
+    @FormUrlEncoded
+    @POST("router/update-custom-d")
+    Observable<Response<RouterTimeoutBean>> routerUpdateCustomGradient(@Field("id") int id, @Field("type") int type,
+                                                                    @Field("colorNodes") List<DbColorNode> colorNodes,
+                                                                    @Field("meshType") int meshType,   @Field("ser_id") String ser_id);
+
+    /**
+     * 删除自定义渐变 https://dev.dadoutek.com/xxxx/router/del-custom-dc DELETE
+     * ser_id	是	string	app会话id，推送时回传
+     * idList	是	list	自定义渐变id列表
+     * meshAddr	是	int	关联设备或者组的meshAddr
+     * meshType	是	int	meshAddr类型
+     * meshType 彩灯 = 6 组 = 97
+     */
+    @FormUrlEncoded
+    @POST("router/del-custom-dc")
+    Observable<Response<RouterTimeoutBean>> routerDelCustomGradient(@Field("idList")List<Integer> idList, @Field("meshAddr") int meshAddr,
+                                                                       @Field("meshType") Integer meshType,  @Field("ser_id") String ser_id);
+
+    /**
+     * 直连开关&传感器 https://dev.dadoutek.com/xxxx/router/device-connect POST
+     * ser_id	是	string	app会话id，推送时回传
+     * id	是	int	开关or传感器id
+     * meshType	是	int	设备类型
+     * meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+     */
+    @FormUrlEncoded
+    @POST("router/device-connect")
+    Observable<Response<RouterTimeoutBean>> routerConnectSwOrSensor ( @Field("id") int id, @Field("meshType") Integer meshType,  @Field("ser_id") String ser_id);
+
+    /**
+     * 普通开关配置。触摸&太阳能的调光调色&单调光 https://dev.dadoutek.com/xxxx/router/normal-switch/configure  POST
+     * ser_id	是	string	app会话id，推送时回传
+     * id	是	int	开关id
+     * groupMeshAddr	是	int	配置组的meshAddr
+     */
+    @FormUrlEncoded
+    @POST("router/normal-switch/configure")
+    Observable<Response<RouterTimeoutBean>> configNormalSw ( @Field("id") int id, @Field("groupMeshAddr") Integer groupMeshAddr,  @Field("ser_id") String ser_id);
+
+    /**
+     * 双组开关配置。触摸双组开关  https://dev.dadoutek.com/xxxx/router/double-group-switch/configure POST
+     * ser_id	是	string	app会话id，推送时回传
+     * id	是	int	开关id
+     * groupMeshAddrs	是	list<int>	配置双组的meshAddr
+     * groupMeshAddrs 长度必须是2未配置填0
+     */
+    @FormUrlEncoded
+    @POST("router/add-custom-dc")
+    Observable<Response<RouterTimeoutBean>> configDoubleSw (@Field("id") int id, @Field("groupMeshAddrs") List<Integer> groupMeshAddrs,  @Field("ser_id") String ser_id);
+
+    /**
+     * 场景开关配置。触摸&太阳能的场景开关 https://dev.dadoutek.com/xxxx/router/scene-switch/configure  POST
+     * ser_id	是	string	app会话id，推送时回传
+     * id	是	int	开关id
+     * sceneIds	是	list	场景id
+     * sceneIds长度必须为4 不配置填0
+     *     "sceneIds": [1, 2, 3, 4],
+     */
+    @FormUrlEncoded
+    @POST("router/scene-switch/configure")
+    Observable<Response<RouterTimeoutBean>> configSceneSw (@Field("id") int id, @Field("sceneIds") List<Integer> sceneIds,  @Field("ser_id") String ser_id);
+
+    /**
+     * 八键开关配置 https://dev.dadoutek.com/xxxx/router/eight-key-switch/configure POST
+     * ser_id	是	string	app会话id，推送时回传
+     * id	是	int	开关id
+     * keys	是	List<Key>	原keys模型
+     * { "ser_id": "app会话id，自己维护","id": 1,"keys": [   {
+     *             "reserveValue_A":0,
+     *             "keyId":0,
+     *             "name":"四楼小孩房25%",
+     *             "reserveValue_B":31,
+     *             "featureId":0  }]}
+     *
+     */
+    @FormUrlEncoded
+    @POST("router/eight-key-switch/configure")
+    Observable<Response<RouterTimeoutBean>> configEightSw (@Field("id") int id, @Field("keys") List<KeyBean> keys, @Field("ser_id") String ser_id);
 }

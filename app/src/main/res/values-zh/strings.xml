@@ -409,7 +409,7 @@
     <string name="scene_set">场景分配</string>
     <string name="setting_switch">正在配置开关……</string>
     <string name="configuring_sensor">正在配置传感器……</string>
-    <string name="pace_fail">配置失败</string>
+    <string name="config_fail">配置失败</string>
     <string name="tip_switch">请先添加场景</string>
     <string name="tip_add_gp">请首先添加一个组！</string>
     <string name="developer_mode">进入开发者模式</string>
@@ -434,7 +434,7 @@
     <string name="network_error">网络异常！</string>
     <string name="network_unavailable">当前网络不可用，请检查网络设置</string>
     <string name="network_time_out">网络连接超时，请重试</string>
-    <string name="delete_group_confirm">确定删除此组吗？</string>
+    <string name="delete_group_confirm">确定删除组:%1$s吗?</string>
     <string name="phone_or_password_can_not_be_empty">手机号不能为空</string>
     <string name="group_not_change_tip">分组不变,确定退出？</string>
     <string name="require_permission_reason">App使用蓝牙需要此权限</string>
@@ -1120,4 +1120,14 @@
     <string name="otaing_to_ota_activity">OTA中不能扫描，2秒后跳转OTA界面</string>
     <string name="mesh_not_enought">meshAddr地址不够, 无法再扫描设备</string>
     <string name="no_router_use">该账号该区域下没有可用的路由，请检查路由是否上电联网</string>
+    <string name="ota_finish">OTA升级停止</string>
+    <string name="routing_update">路由升级</string>
+    <string name="router_ota_num">当前升级设备数:</string>
+    <string name="no_bind_router_cant_perform">设备没有绑定路由，无法进行此操作</string>
+    <string name="add_gradient_fail">添加自定义渐变失败</string>
+    <string name="update_gradient_fail">更新自定义渐变失败</string>
+    <string name="device_not_exit">该设备不存在，请重新刷新数据</string>
+    <string name="gradient_not_exit">该自定义渐变不存在，请重新刷新数据</string>
+    <string name="del_gradient_fail">删除渐变失败</string>
+    <string name="scene_exit_to_refresh">有场景不存在，刷新场景列表</string>
 </resources>

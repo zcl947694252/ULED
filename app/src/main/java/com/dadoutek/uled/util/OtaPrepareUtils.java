@@ -246,6 +246,8 @@ public class OtaPrepareUtils {
 
     //检查是否支持OTA 返回true支持  返回false不支持
     public Boolean checkSupportOta(String localVersion) {//LA\LAS    CC\CCS   LX\LXS
+        if (localVersion=="")
+            return false;
         if (!localVersion.contains("-"))
             return false;
         long l = Long.parseLong(StringUtils.versionResolution(localVersion, 1));
