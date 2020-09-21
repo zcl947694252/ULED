@@ -23,7 +23,7 @@ data class RouteScanResultBean(
 }
 
 data class Data(
-    var `data`: List<DataX> = listOf(),
+    var `scannedData`: List<DataX> = listOf(),
     var endTime: String = "",
     var id: Int = 0,
     var rid: Int = 0,
@@ -34,7 +34,7 @@ data class Data(
     var uid: Int = 0
 ):Serializable{
     override fun toString(): String {
-        return "Data(`data`=$`data`, endTime='$endTime', id=$id, rid=$rid, scanSerId=$scanSerId, scanType=$scanType, startTime='$startTime', status=$status, uid=$uid)"
+        return "Data(`data`=$`scannedData`, endTime='$endTime', id=$id, rid=$rid, scanSerId=$scanSerId, scanType=$scanType, startTime='$startTime', status=$status, uid=$uid)"
     }
 }
 

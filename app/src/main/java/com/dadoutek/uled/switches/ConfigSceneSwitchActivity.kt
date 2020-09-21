@@ -170,8 +170,6 @@ class ConfigSceneSwitchActivity(var disposableTimer: Disposable) : BaseSwitchAct
                 RouterModel.configSceneSw(switchDate!!.id, sceneMeshAddrs)
                         ?.subscribe({
                             //    "errorCode": 90021, "该开关不存在，请重新刷新数据"
-
-
                             //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
                             //    "errorCode": 90007,"该组不存在，刷新组列表"
                             //    "errorCode": 90005,"以下路由没有上线，无法配置"

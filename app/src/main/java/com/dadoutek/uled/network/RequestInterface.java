@@ -778,7 +778,7 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/stop-scan")
-    Observable<Response<Long>> routeStopScanDevcie(@Field("ser_id") String ser_id, @Field(
+    Observable<Response<RouterTimeoutBean>> routeStopScanDevcie(@Field("ser_id") String ser_id, @Field(
             "scanSerId") long scanSerId);
 
     /**
@@ -786,7 +786,7 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/xxxx/scan/result/confirm  DELETE
      */
     @DELETE("scan/result/confirm")
-    Observable<Response> tellServerClearScanning();
+    Observable<Response<RouterTimeoutBean>> tellServerClearScanning();
 
     /**
      * 通过路由进行设备分组

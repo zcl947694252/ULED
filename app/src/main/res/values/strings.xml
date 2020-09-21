@@ -1130,4 +1130,7 @@
     <string name="gradient_not_exit">该自定义渐变不存在，请重新刷新数据</string>
     <string name="del_gradient_fail">删除渐变失败</string>
     <string name="scene_exit_to_refresh">有场景不存在，刷新场景列表</string>
+    <string name="router_stop_scan_faile">停止路由扫描失败</string>
+    <string name="scan_result_confirm">扫描结果确认中,请稍后</string>
+    <string name="group_timeout">设备分组超时</string>
 </resources>

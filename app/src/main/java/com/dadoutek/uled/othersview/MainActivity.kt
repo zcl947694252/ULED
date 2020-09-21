@@ -174,6 +174,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         // getRouterStatus()
         getRegionList()
         getAllStatus()
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
     }
 
     @SuppressLint("CheckResult")
@@ -209,7 +210,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun getScanResult() {
         showLoadingDialog(getString(R.string.please_wait))
         val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
-        val subscribe = RouterModel.routeScanningResultGet()?.subscribe({
+        val subscribe = RouterModel.getRouteScanningResult()?.subscribe({
             //status	int	状态。0扫描结束，1仍在扫描
             if (it?.data != null && it.data.status == 1) {
                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
@@ -413,6 +414,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(mReceiver, filter)
+
+
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
     }
 

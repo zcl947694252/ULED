@@ -57,6 +57,7 @@ import kotlinx.android.synthetic.main.activity_batch_group_four.image_bluetooth
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbar
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbarTv
 import kotlinx.coroutines.*
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -69,6 +70,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
+    private var disposableTimer: Disposable? = null
     private var tipReadTimer: TextView? = null
     private var tipBottomLy: LinearLayout? = null
     private var popTip: PopupWindow? = null
@@ -242,7 +244,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.SMART_CURTAIN -> {
                 curtainAdapterm.bindToRecyclerView(batch_four_device_recycle)
                 curtainGroupedAdapterm.bindToRecyclerView(batch_four_device_recycle_grouped)//默认是隐藏的显示未分组的界面
-
                 //subCurtainData()
             }
 
@@ -809,13 +810,19 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
+                    LogUtils.v("zcl-----------收到路由开始分组-------$list")
                     RouterModel.routeBatchGp(currentGroup!!.meshAddr.toLong(), list, deviceType.toLong(), TAG)
                             ?.subscribe({ itR ->
+                                LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")
                                 nameLists.clear()
                                 when (itR.errorCode) {
-                                    NetworkStatusCode.OK -> {
+                                    NetworkStatusCode.OK -> {//等待会回调
                                         showLoadingDialog(getString(R.string.please_wait))
-                                        //等待会回调
+                                        disposableTimer?.dispose()
+                                        disposableTimer = Observable.timer(itR.t.timeout+3L, TimeUnit.MILLISECONDS)
+                                                .subscribe {
+                                            ToastUtils.showShort(getString(R.string.group_timeout))
+                                        }
                                     }
                                     NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                     NetworkStatusCode.PRODUCTUUID_NOT_MATCH_DEVICE_TYPE -> ToastUtils.showShort(getString(R.string.device_type_not_match))
@@ -839,6 +846,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                     }
                                 }
                             }, {
+                                LogUtils.v("zcl-----------收到路由开始分组http-------失败")
                                 ToastUtils.showShort(it.message)
                             })
                 }
@@ -1910,11 +1918,27 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     @SuppressLint("StringFormatMatches")
-    override fun routerGroupResult(fromJson: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterGroupResult(fromJson: RouteGroupingOrDelOrGetVerBean?) {
+        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!,object : SyncCallback {
+            override fun start() {}
+
+            override fun complete() {
+                groupTzRefresh(fromJson)
+            }
+
+            override fun error(msg: String?) {
+                groupTzRefresh(fromJson)
+            }
+        })
+        LogUtils.v("zcl-----------收到路由分组通知-------$fromJson")
+    }
+
+    @SuppressLint("StringFormatMatches")
+    private fun groupTzRefresh(fromJson: RouteGroupingOrDelOrGetVerBean?) {
         if (fromJson?.finish == true) {
             initData()
         } else {
-            ToastUtils.showShort(getString(R.string.router_grouping,fromJson?.succeedNow?.size?:0))
+            ToastUtils.showShort(getString(R.string.router_grouping, fromJson?.succeedNow?.size ?: 0))
         }
     }
 }

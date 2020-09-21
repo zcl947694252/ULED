@@ -48,5 +48,13 @@ public class Response<T> {
         this.serverTime = serverTime;
     }
 
-
+    @Override
+    public String toString() {
+        return "Response{" +
+                "t=" + t +
+                ", errorCode=" + errorCode +
+                ", message='" + message + '\'' +
+                ", serverTime=" + serverTime +
+                '}';
+    }
 }

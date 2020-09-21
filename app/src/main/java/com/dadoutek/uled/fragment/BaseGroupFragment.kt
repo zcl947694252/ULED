@@ -921,7 +921,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     override fun routerDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
         disposableTimer?.dispose()
-        if (routerGroup?.finish == true) {
+        if (routerGroup?.finish) {
             val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())
             DBUtils.deleteGroupOnly(gp!!)
             deleteComplete()

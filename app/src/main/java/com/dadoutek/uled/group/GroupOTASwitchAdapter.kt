@@ -42,10 +42,10 @@ class GroupOTASwitchAdapter(resId: Int, data: MutableList<DbSwitch>) : BaseQuick
         }
 
         if (item?.isSupportOta == true) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_switch)
                     .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
         } else {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller_off)
+            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_switch_off)
                     .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
         }
     }

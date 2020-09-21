@@ -82,7 +82,7 @@ object RouterModel {
     /**
      * 路由扫描结果
      */
-    fun routeScanningResultGet(): Observable<RouteScanResultBean>? {
+    fun getRouteScanningResult(): Observable<RouteScanResultBean>? {
         return NetworkFactory.getApi().scanResult
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -91,7 +91,7 @@ object RouterModel {
     /**
      * 路由停止扫描
      */
-    fun routeStopScan(serid: String, scanSerId: Long): Observable<Response<Long>>? {
+    fun routeStopScan(serid: String, scanSerId: Long): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routeStopScanDevcie(serid, scanSerId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -100,7 +100,7 @@ object RouterModel {
     /**
      * 路由停止扫描告诉服务器清除数据
      */
-    fun routeStopScanClear(): Observable<Response<Any>>? {
+    fun routeScanClear(): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().tellServerClearScanning()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

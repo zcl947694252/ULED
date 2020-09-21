@@ -146,6 +146,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+       Constant.IS_ROUTE_MODE =  SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
         //注册网络状态监听广播
@@ -660,12 +661,14 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Cmd.routeInAccount -> routerAccessIn(cmdBean)
                 Cmd.routeConfigWifi -> routerConfigWIFI(cmdBean)
-                Cmd.routeStartScann -> startRouterScanRecevicer(cmdBean)
-                Cmd.routeScanDeviceInfo -> receivedRouteDeviceNumRecevicer(cmdBean)
+
+                Cmd.routeStartScann -> tzStartRouterScan(cmdBean)
+                Cmd.routeScanDeviceInfo -> tzRouteDeviceNum(cmdBean)
+                Cmd.routeStopScan -> tzRouteStopScan(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
                     val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
-                    routerGroupResult(routerGroup)
+                    tzRouterGroupResult(routerGroup)
                 }
                 Cmd.routeAddScenes ->{
                     val routerScene = Gson().fromJson(msg, RouteSceneBean::class.java)
@@ -736,6 +739,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+    open fun tzRouteStopScan(cmdBean: CmdBodyBean) {
+
+    }
+
     open fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
 
     }
@@ -760,11 +767,11 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     }
 
-    open fun routerGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
+    open fun tzRouterGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
 
     }
 
-    open fun startRouterScanRecevicer(cmdBodyBean: CmdBodyBean) {
+    open fun tzStartRouterScan(cmdBodyBean: CmdBodyBean) {
     }
 
     open fun routerConfigWIFI(cmdBody: CmdBodyBean) {
@@ -775,7 +782,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     }
 
-    open fun receivedRouteDeviceNumRecevicer(scanResultBean: CmdBodyBean) {
+    open fun tzRouteDeviceNum(scanResultBean: CmdBodyBean) {
 
     }
 
