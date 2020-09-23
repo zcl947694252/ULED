@@ -65,7 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_centerInParent="true"
-                    android:background="@drawable/rect_r15_graye"
+                    android:background="@drawable/rect_r15_bottom_graye"
                     android:gravity="center"
                     android:text="@string/please_read_carefully"
                     android:textColor="@color/text_red"

@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,10 +29,14 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkStatusCode
+import com.dadoutek.uled.router.GroupBlinkBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouterBatchGpBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -57,8 +62,8 @@ import kotlinx.android.synthetic.main.activity_batch_group_four.image_bluetooth
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbar
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbarTv
 import kotlinx.coroutines.*
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
+import java.lang.StringBuilder
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -70,6 +75,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
+    private var disposableIntervalTime: Disposable? = null
     private var disposableTimer: Disposable? = null
     private var tipReadTimer: TextView? = null
     private var tipBottomLy: LinearLayout? = null
@@ -96,6 +102,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private val compositeDisposable = CompositeDisposable()
     private val SCAN_DELAY: Long = 1000       // 每次Scan之前的Delay , 1000ms比较稳妥。
     private val HUAWEI_DELAY: Long = 2000       // 华为专用Delay
+    private val blinkList = mutableListOf<Int>()
 
     private val noGroup: MutableList<DbLight> = mutableListOf()
     private val listGroup: MutableList<DbLight> = mutableListOf()
@@ -229,6 +236,18 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         swipe_refresh_ly.setDistanceToTriggerSync(200)
         setAdapterAndSubscribleData()
         autoConnect()
+        disposableIntervalTime?.dispose()
+        disposableIntervalTime = Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
+                .subscribe {
+                    if (blinkList.size > 0){
+                     //   LogUtils.v("zcl-----------收到理由闪烁-------$blinkList---------${blinkList.size}")
+                        RouterModel.routeBatchGpBlink(GroupBlinkBodyBean(blinkList, deviceType))?.subscribe({
+                           // LogUtils.v("zcl----------收到理由闪烁--------成功")
+                        }, {
+                          //  LogUtils.v("zcl----------收到理由闪烁--------失败")
+                        })
+                    }
+                }
     }
 
     @SuppressLint("StringFormatMatches")
@@ -733,6 +752,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     }
 
+    @SuppressLint("CheckResult")
     private fun initListener() {
         //先取消，这样可以确保不会重复添加监听
         this.mApplication?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
@@ -792,7 +812,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     else
                         autoConnect()
                 } else {
-                    val list = arrayListOf<Int>()
+                    val list = mutableListOf<Int>()
                     when (deviceType) {
                         DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                             deviceDataLightAll.filter { it.isSelected }.forEach {
@@ -810,45 +830,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
-                    LogUtils.v("zcl-----------收到路由开始分组-------$list")
-                    RouterModel.routeBatchGp(currentGroup!!.meshAddr.toLong(), list, deviceType.toLong(), TAG)
-                            ?.subscribe({ itR ->
-                                LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")
-                                nameLists.clear()
-                                when (itR.errorCode) {
-                                    NetworkStatusCode.OK -> {//等待会回调
-                                        showLoadingDialog(getString(R.string.please_wait))
-                                        disposableTimer?.dispose()
-                                        disposableTimer = Observable.timer(itR.t.timeout+3L, TimeUnit.MILLISECONDS)
-                                                .subscribe {
-                                            ToastUtils.showShort(getString(R.string.group_timeout))
-                                        }
-                                    }
-                                    NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                                    NetworkStatusCode.PRODUCTUUID_NOT_MATCH_DEVICE_TYPE -> ToastUtils.showShort(getString(R.string.device_type_not_match))
-                                    NetworkStatusCode.ROUTER_ALL_OFFLINE -> {
-                                        if (itR.t != null)
-                                            nameLists.addAll(itR.t.offlineRouterNames)
-                                        onlyNameAdapter.notifyDataSetChanged()
-                                    }
-                                    NetworkStatusCode.DEVICE_NOT_BINDROUTER -> {
-                                        if (itR.t != null)
-                                            itR.t.noBoundMeshAddrs.forEach { itDevice ->
-                                                var name = when (deviceType) {
-                                                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMeshAddr(itDevice)?.name
-                                                    DeviceType.SMART_CURTAIN -> DBUtils.getLightByMeshAddr(itDevice)?.name
-                                                    DeviceType.SMART_RELAY -> DBUtils.getLightByMeshAddr(itDevice)?.name
-                                                    else -> DBUtils.getLightByMeshAddr(itDevice)?.name
-                                                }
-                                                nameLists.add(name ?: "")
-                                            }
-                                        onlyNameAdapter.notifyDataSetChanged()
-                                    }
-                                }
-                            }, {
-                                LogUtils.v("zcl-----------收到路由开始分组http-------失败")
-                                ToastUtils.showShort(it.message)
-                            })
+                    routerGroupDevice(list, it)
                 }
             } else {//如果什么操作都没有点击后退出 此相关逻辑已经废弃
                 finish()
@@ -881,16 +863,93 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         curtainGroupedAdapterm.onItemLongClickListener = this
     }
 
+    @SuppressLint("CheckResult")
+    private fun routerGroupDevice(list: MutableList<Int>, it: View?) {
+        LogUtils.v("zcl-----------收到路由新传递参数-------${GroupBodyBean(list, deviceType, "213", currentGroup!!.meshAddr)}")
+        showLoadingDialog(getString(R.string.grouping))
+        val subscribe = RouterModel.routeBatchGpNew(GroupBodyBean(list, deviceType, "213", currentGroup!!.meshAddr))?.subscribe({ itR ->
+            LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")
+            nameLists.clear()
+            when (itR.errorCode) {
+                NetworkStatusCode.OK -> {//等待会回调
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.MILLISECONDS)
+                            .subscribe {
+                                ToastUtils.showShort(getString(R.string.group_timeout))
+                            }
+                }
+                NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                NetworkStatusCode.PRODUCTUUID_NOT_MATCH_DEVICE_TYPE -> ToastUtils.showShort(getString(R.string.device_type_not_match))
+                NetworkStatusCode.ROUTER_ALL_OFFLINE -> {
+                    if (itR.t != null)
+                        nameLists.addAll(itR.t.offlineRouterNames)
+                    onlyNameAdapter.notifyDataSetChanged()
+                }
+                NetworkStatusCode.DEVICE_NOT_BINDROUTER -> {
+                    hideLoadingDialog()
+                    if (itR.t != null) {
+                        showNoBound(itR)
+                    }
+                }
+            }
+            LogUtils.v("zcl-----------收到路由新成果-------$it")
+        }, {
+            LogUtils.v("zcl-----------收到路由新失败-------$it")
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    private fun showNoBound(itR: Response<RouterBatchGpBean>) {
+        var str = StringBuilder()
+        str.append(getString(R.string.device_name))
+        itR.t.noBoundMeshAddrs.forEach { itDevice ->
+            var name = when (deviceType) {
+                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMeshAddr(itDevice)?.name
+                DeviceType.SMART_CURTAIN -> DBUtils.getLightByMeshAddr(itDevice)?.name
+                DeviceType.SMART_RELAY -> DBUtils.getLightByMeshAddr(itDevice)?.name
+                else -> DBUtils.getLightByMeshAddr(itDevice)?.name
+            }
+            str.append(name).append(",")
+            nameLists.add(name ?: "")
+        }
+        ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+        onlyNameAdapter.notifyDataSetChanged()
+        popTip?.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+    }
+
+    @SuppressLint("StringFormatMatches")
+    override fun tzRouterGroupResult(bean: RouteGroupingOrDelOrGetVerBean?) {
+        disposableTimer?.dispose()
+        if (bean?.finish == true) {
+            changeDeviceAll()
+            when (bean?.status) {
+                -1 -> ToastUtils.showShort(getString(R.string.group_failed))
+                0, 1 -> {
+                    if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                        override fun start() {}
+                        override fun complete() {
+                            groupTzRefresh(bean)
+                        }
+
+                        override fun error(msg: String?) {
+                            groupTzRefresh(bean)
+                        }
+                    })
+                }
+            }
+            LogUtils.v("zcl-----------收到路由分组通知-------$bean")
+        }
+    }
+
+
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
         if (checkedNoGrouped)
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                     noGroup[position].selected = !noGroup[position].selected
-                    if (noGroup[position].isSelected) {
-                        startBlink(noGroup[position].belongGroupId, noGroup[position].meshAddr)
-                    } else {
-                        stopBlink(noGroup[position].meshAddr, noGroup[position].belongGroupId)
-                    }
+                    startOrStopBlink(noGroup[position].isSelected, noGroup[position].belongGroupId, noGroup[position].meshAddr)
                     changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size, noGroup.size)
                     lightAdapterm.notifyItemRangeChanged(0, noGroup.size)
                     LogUtils.v("zcl更新后状态${noGroup[position].selected}")
@@ -898,62 +957,46 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                 DeviceType.SMART_CURTAIN -> {
                     noGroupCutain[position].selected = !noGroupCutain[position].selected
-                    if (noGroupCutain[position].isSelected) {
-                        startBlink(noGroupCutain[position].belongGroupId, noGroupCutain[position].meshAddr)
-                    } else {
-                        stopBlink(noGroupCutain[position].meshAddr, noGroupCutain[position].belongGroupId)
-                    }
+                    startOrStopBlink(noGroupCutain[position].isSelected, noGroupCutain[position].belongGroupId, noGroupCutain[position].meshAddr)
                     changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainAdapterm.notifyItemRangeChanged(0, noGroupCutain.size)
                     LogUtils.v("zcl更新后状态${noGroupCutain[position].selected}")
                 }
                 DeviceType.SMART_RELAY -> {
-                    noGroupRelay[position].selected = !noGroupRelay[position].selected
-                    if (noGroupRelay[position].isSelected) {
-                        startBlink(noGroupRelay[position].belongGroupId, noGroupRelay[position].meshAddr)
-                    } else {
-                        stopBlink(noGroupRelay[position].meshAddr, noGroupRelay[position].belongGroupId)
-                    }
+                    val device = noGroupRelay[position]
+                    device.selected = !device.selected
+                    startOrStopBlink(device.isSelected, device.belongGroupId, device.meshAddr)
                     changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
                     relayAdapterm.notifyItemRangeChanged(0, noGroupRelay.size)
-                    LogUtils.v("zcl更新后状态${noGroupRelay[position].selected}")
+                    LogUtils.v("zcl更新后状态${device.selected}")
                 }
             }
         else
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                    listGroup[position].selected = !listGroup[position].selected
-                    if (listGroup[position].isSelected) {
-                        startBlink(listGroup[position].belongGroupId, listGroup[position].meshAddr)
-                    } else {
-                        stopBlink(listGroup[position].meshAddr, listGroup[position].belongGroupId)
-                    }
+                    val device = listGroup[position]
+                    device.selected = !device.selected
+                    startOrStopBlink(device.isSelected, device.belongGroupId, device.meshAddr)
                     changeGroupingCompleteState(deviceDataLightAll.filter { it.isSelected }.size, noGroup.size)
                     lightGroupedAdapterm.notifyItemRangeChanged(0, listGroup.size)
-                    LogUtils.v("zcl更新后状态${listGroup[position].selected}")
+                    LogUtils.v("zcl更新后状态${device.selected}")
                 }
 
                 DeviceType.SMART_CURTAIN -> {
-                    listGroupCutain[position].selected = !listGroupCutain[position].selected
-                    if (listGroupCutain[position].isSelected) {
-                        startBlink(listGroupCutain[position].belongGroupId, listGroupCutain[position].meshAddr)
-                    } else {
-                        stopBlink(listGroupCutain[position].meshAddr, listGroupCutain[position].belongGroupId)
-                    }
+                    val device = listGroupCutain[position]
+                    device.selected = !device.selected
+                    startOrStopBlink(device.isSelected, device.belongGroupId, device.meshAddr)
                     changeGroupingCompleteState(deviceDataCurtainAll.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainGroupedAdapterm.notifyItemRangeChanged(0, listGroupCutain.size)
-                    LogUtils.v("zcl更新后状态${listGroupCutain[position].selected}")
+                    LogUtils.v("zcl更新后状态${device.selected}")
                 }
                 DeviceType.SMART_RELAY -> {
-                    listGroupRelay[position].selected = !listGroupRelay[position].selected
-                    if (listGroupRelay[position].isSelected) {
-                        startBlink(listGroupRelay[position].belongGroupId, listGroupRelay[position].meshAddr)
-                    } else {
-                        stopBlink(listGroupRelay[position].meshAddr, listGroupRelay[position].belongGroupId)
-                    }
+                    val device = listGroupRelay[position]
+                    device.selected = !device.selected
+                    startOrStopBlink(device.isSelected, device.belongGroupId, device.meshAddr)
                     changeGroupingCompleteState(deviceDataRelayAll.filter { it.isSelected }.size, noGroupRelay.size)
                     relayGroupedAdapterm.notifyItemRangeChanged(0, listGroupRelay.size)
-                    LogUtils.v("zcl更新后状态${listGroupRelay[position].selected}")
+                    LogUtils.v("zcl更新后状态${device.selected}")
                 }
             }
     }
@@ -1482,12 +1525,11 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
      * 全选与取消功能相关
      */
     private fun changeDeviceAll() {
-        /*     val isSelectAll = getString(R.string.select_all) == batch_four_device_all.text.toString()
-             if (isSelectAll)
-                 batch_four_device_all.text = getString(R.string.cancel)
-             else
-                 batch_four_device_all.text = getString(R.string.select_all)*/
         isAll = !isAll
+        setChecked()
+    }
+
+    private fun setChecked() {
         if (isAll)
             batch_four_device_all.setImageResource(R.drawable.icon_all_checked)
         else
@@ -1576,7 +1618,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun setAllSelect(isSelectAll: Boolean) {
+        blinkList.clear()
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 if (checkedNoGrouped) {
@@ -1585,10 +1629,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
                                 device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
+                                startOrStopBlink(isSelectAll, device.belongGroupId, device.meshAddr)
                             }
                         }
                     }
@@ -1600,10 +1641,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
                                 device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
+                                startOrStopBlink(isSelectAll, device.belongGroupId, device.meshAddr)
                             }
                         }
                     }
@@ -1619,10 +1657,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
                                 device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
+                                startOrStopBlink(isSelectAll, device.belongGroupId, device.meshAddr)
                             }
                         }
                     }
@@ -1634,10 +1669,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
                                 device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
+                                startOrStopBlink(isSelectAll, device.belongGroupId, device.meshAddr)
                             }
                     changeGroupingCompleteState(listGroupCutain.filter { it.isSelected }.size, noGroupCutain.size)
                     curtainGroupedAdapterm.notifyDataSetChanged()
@@ -1650,10 +1682,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
                                 device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
+                                startOrStopBlink(isSelectAll, device.belongGroupId, device.meshAddr)
                             }
                         }
                     }
@@ -1665,10 +1694,11 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             if (device.id == sourceDevice.id) {
                                 sourceDevice.selected = isSelectAll
                                 device.selected = isSelectAll
-                                if (isSelectAll)
-                                    startBlink(device.belongGroupId, device.meshAddr)
-                                else
-                                    stopBlink(device.meshAddr, device.belongGroupId)
+                                startOrStopBlink(isSelectAll, device.belongGroupId, device.meshAddr)
+//                                if (isSelectAll)
+//                                    startBlink(device.belongGroupId, device.meshAddr)
+//                                else
+//                                    stopBlink(device.meshAddr, device.belongGroupId)
                             }
                         }
                     }
@@ -1676,6 +1706,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     relayGroupedAdapterm.notifyDataSetChanged()
                 }
             }
+        }
+    }
+
+    private fun startOrStopBlink(isSelectAll: Boolean, belongGroupId: Long, meshAddr: Int) {
+        if (isSelectAll) {
+            blinkList.add(meshAddr)
+            startBlink(belongGroupId, meshAddr)
+        } else {
+            blinkList.remove(meshAddr)
+            stopBlink(meshAddr, belongGroupId)
         }
     }
 
@@ -1766,6 +1806,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.dispose()
+        isAll = false
+        setChecked()
+        disposableIntervalTime?.dispose()
         this.mApplication?.removeEventListener(this)
         isAddGroupEmptyView = false
     }
@@ -1918,24 +1961,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     @SuppressLint("StringFormatMatches")
-    override fun tzRouterGroupResult(fromJson: RouteGroupingOrDelOrGetVerBean?) {
-        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!,object : SyncCallback {
-            override fun start() {}
-
-            override fun complete() {
-                groupTzRefresh(fromJson)
-            }
-
-            override fun error(msg: String?) {
-                groupTzRefresh(fromJson)
-            }
-        })
-        LogUtils.v("zcl-----------收到路由分组通知-------$fromJson")
-    }
-
-    @SuppressLint("StringFormatMatches")
     private fun groupTzRefresh(fromJson: RouteGroupingOrDelOrGetVerBean?) {
         if (fromJson?.finish == true) {
+            isAll = false
+            setChecked()
             initData()
         } else {
             ToastUtils.showShort(getString(R.string.router_grouping, fromJson?.succeedNow?.size ?: 0))

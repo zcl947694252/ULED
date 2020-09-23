@@ -15,5 +15,3 @@ data class CmdBodyBean(
         return "CmdBodyBean(cmd=$cmd, finish=$finish, msg='$msg', ser_id='$ser_id', count=$count, scanSerId=$scanSerId, status=$status)"
     }
 }
-
-

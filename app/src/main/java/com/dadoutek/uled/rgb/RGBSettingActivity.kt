@@ -2396,8 +2396,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         return false
     }
 
-    override fun routerAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
-        if (cmdBean.cmd == Cmd.routeDelGradient)
+    override fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.cmd == Cmd.tzRouteDelGradient)
             if (cmdBean.finish) {
                 hideLoadingDialog()
                 disposableTimer?.dispose()

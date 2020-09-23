@@ -42,7 +42,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
 
     public static final String EXTRA_ERROR_REPORT_INFO = "com.telink.bluetooth.light.EXTRA_ERROR_REPORT_INFO";
 
-    protected LightAdapter mAdapter;
+    public LightAdapter mAdapter;
     protected IBinder mBinder;
 
     public LightAdapter getAdapter() {

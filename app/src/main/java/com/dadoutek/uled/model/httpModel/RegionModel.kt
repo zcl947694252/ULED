@@ -7,6 +7,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
 import com.dadoutek.uled.network.bean.TransferRegionBean
+import com.dadoutek.uled.region.RegionBcBean
 import com.dadoutek.uled.region.bean.ParseCodeBean
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.region.bean.ShareCodeBean
@@ -28,7 +29,7 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun update( rid: Int, dbRegion: DbRegion, id: Long): Observable<String>? {
+    fun update( rid: Int, dbRegion: DbRegion, id: Long): Observable<RegionBcBean>? {
         return NetworkFactory.getApi()
                 .updateRegion( rid, dbRegion)
                 .compose(NetworkTransformer())
@@ -39,7 +40,7 @@ object RegionModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun updateMesh( rid: Int, dbRegion: DbRegion): Observable<String>? {
+    fun updateMesh( rid: Int, dbRegion: DbRegion): Observable<RegionBcBean>? {
         return NetworkFactory.getApi()
                 .updateRegion( rid, dbRegion)
                 .compose(NetworkTransformer())

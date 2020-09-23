@@ -1,5 +1,7 @@
 package com.dadoutek.uled.network
 
+import java.io.Serializable
+
 
 /**
  * 创建者     ZCL
@@ -19,4 +21,8 @@ class ModeStatusBean(
          * app使用模式。0蓝牙，1路由
          */
         var mode: Int = 0
-)
+):Serializable{
+        override fun toString(): String {
+                return "ModeStatusBean(auxiliaryFunction=$auxiliaryFunction, mode=$mode)"
+        }
+}

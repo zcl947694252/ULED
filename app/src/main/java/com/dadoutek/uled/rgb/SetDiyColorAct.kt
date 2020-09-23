@@ -611,15 +611,15 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         super.onDestroy()
         disposableTimer?.dispose()
     }
-    override fun routerAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
         hideLoadingDialog()
         if (cmdBean.status == 0) {
             disposableTimer?.dispose()
             setResult(Activity.RESULT_OK)
             finish()
         } else when (cmdBean.cmd) {
-                Cmd.routeAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
-                Cmd.routeUpdateGradient  -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
+                Cmd.tzRouteAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
+                Cmd.tzRouteUpdateGradient  -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
             }
 
     }

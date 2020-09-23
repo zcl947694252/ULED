@@ -48,11 +48,13 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.RouterDelGpBody
 import com.dadoutek.uled.network.RouterTimeoutBean
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -74,6 +76,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
+    private var disposableRouteTimer: Disposable? = null
     private var seehelp: TextView? = null
     private var seeHelp2: TextView? = null
     private var addGroupTv: TextView? = null
@@ -434,6 +437,54 @@ abstract class BaseGroupFragment : BaseFragment() {
         })
     }
 
+    @SuppressLint("CheckResult")
+    open fun routeOpenOrClose(meshAddr: Int, productUUID: Int, status: Int, serId: String) {//如果发送后失败则还原
+        RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
+            LogUtils.v("zcl-----------收到路由组成功-------$it")
+            //    "errorCode": 90018,该设备不存在，请重新刷新数据"
+            //    "errorCode": 90008,该设备没有绑定路由，无法操作"
+            //   "errorCode": 90007该组不存在，请重新刷新数据"
+            //    errorCode": 90005,"message": "该设备绑定的路由没在线"
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.open_faile))
+                            }
+                }
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+            }
+        }, {
+            LogUtils.v("zcl-----------收到路由开关组失败-------$it")
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    override fun tzRouterOpenOrCloseFragment(cmdBean: CmdBodyBean) {
+        disposableRouteTimer?.dispose()
+        LogUtils.v("zcl------收到路由开关组通知------------$cmdBean")
+        hideLoadingDialog()
+        if (cmdBean.ser_id == "zu"&&currentGroup!=null) {
+            if (currentGroup!!.status == 0) currentGroup?.connectionStatus = 1 else currentGroup?.connectionStatus = 0
+            when (cmdBean.status) {
+                0 -> {
+                    when (currentGroup!!.status) {
+                        0 -> groupOpenSuccess(currentPosition)
+                        else -> groupCloseSuccess(currentPosition)
+                    }
+                    DBUtils.saveGroup(currentGroup!!, true)
+                }
+                else -> ToastUtils.showShort(getString(R.string.open_faile))
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentGroup = groupList[position]
@@ -443,31 +494,57 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         when (view!!.id) {
             R.id.template_device_icon -> {
-                if (TelinkLightApplication.getApp().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                     goConnect(false)
                     sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
                 } else
                     if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
                             || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO) {
-                        if (currentGroup!!.status == 0) {
-                            Commander.openOrCloseLights(dstAddr, true)
-                            currentGroup?.connectionStatus = 1
-                            groupOpenSuccess(position)
+                        if (currentGroup!!.status == 0) {//0关1开
+                            if (Constant.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                                routeOpenOrClose(currentGroup!!.meshAddr, 97, 1, "zu")
+                            } else {
+                                Commander.openOrCloseLights(dstAddr, true)
+                                groupOpenSuccess(position)
+                            }
+                            if (Constant.IS_ROUTE_MODE)
+                                currentGroup?.connectionStatus = 1
                         } else {
-                            Commander.openOrCloseLights(dstAddr, false)
-                            groupCloseSuccess(position)
-                            currentGroup?.connectionStatus = 0
+                            if (Constant.IS_ROUTE_MODE) {
+                                routeOpenOrClose(currentGroup!!.meshAddr, 97, 0, "zu")
+                            } else {
+                                Commander.openOrCloseLights(dstAddr, false)
+                                groupCloseSuccess(position)
+                            }
+                            if (Constant.IS_ROUTE_MODE)
+                                currentGroup?.connectionStatus = 0
                         }
-                        DBUtils.saveGroup(currentGroup!!, true)
+
+                        if (Constant.IS_ROUTE_MODE)
+                            DBUtils.saveGroup(currentGroup!!, true)
+
                         LogUtils.v("zcl所有组------------------${DBUtils.allGroups[0].connectionStatus}")
                     } else {
                         if (currentGroup!!.status == 0) {
-                            Commander.openOrCloseCurtain(dstAddr, true, false)
-                            groupOpenSuccess(position)
+                            if (Constant.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                                routeOpenOrClose(currentGroup!!.meshAddr, currentGroup!!.deviceType.toInt(), 1, "zu")
+                            } else {
+                                Commander.openOrCloseCurtain(dstAddr, true, false)
+                                groupOpenSuccess(position)
+                            }
                         } else {
-                            Commander.openOrCloseCurtain(dstAddr, false, false)
-                            groupCloseSuccess(position)
+                            when {
+                                Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                                    routeOpenOrClose(currentGroup!!.meshAddr, 97, 0, "zu")
+                                }
+                                else -> {
+                                    Commander.openOrCloseCurtain(dstAddr, false, false)
+                                    groupCloseSuccess(position)
+                                }
+                            }
                         }
+                        if (Constant.IS_ROUTE_MODE)
+                            DBUtils.saveGroup(currentGroup!!, true)
                     }
             }
 
@@ -553,63 +630,92 @@ abstract class BaseGroupFragment : BaseFragment() {
                 .setMessage(getString(R.string.delete_group_confirm, dbGroup?.name))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     if (Constant.IS_ROUTE_MODE) {
-                        RouterModel.routerDelGp(dbGroup.meshAddr)?.subscribe({
-                            startDelGpTimeOut(it)
-                        },{
-                            if (it.message?.contains("本地删除")==true){
-                                DBUtils.deleteGroupOnly(dbGroup)
-                                deleteComplete()
-                            }else{
-                                ToastUtils.showShort(it.message)
-                            }
-                        })
-                    } else
-                        when (dbGroup.deviceType) {
-                            Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                                val lights = DBUtils.getLightByGroupID(dbGroup.id)
-                                showLoadingDialog(getString(R.string.please_wait))
-                                deleteGroup(lights, dbGroup,
-                                        successCallback = {
-                                            deleteComplete()
-                                        },
-                                        failedCallback = {
-                                            deleteFailToast()
-                                        })
-                            }
-                            Constant.DEVICE_TYPE_CURTAIN -> {
-                                val lights = DBUtils.getCurtainByGroupID(dbGroup.id)
-                                showLoadingDialog(getString(R.string.please_wait))
-                                deleteGroupCurtain(lights, dbGroup,
-                                        successCallback = {
-                                            deleteComplete()
-                                        },
-                                        failedCallback = {
-                                            deleteFailToast()
-                                        })
-                            }
-                            Constant.DEVICE_TYPE_CONNECTOR -> {
-                                val lights = DBUtils.getRelayByGroupID(dbGroup.id)
-                                showLoadingDialog(getString(R.string.please_wait))
-                                deleteGroupRelay(lights, dbGroup,
-                                        successCallback = {
-                                            deleteComplete()
-                                        },
-                                        failedCallback = {
-                                            deleteFailToast()
-                                        })
-                            }
+                        routeDeleteGroup(dbGroup)
+                    } else{ when (dbGroup.deviceType) {
+                        Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                            val lights = DBUtils.getLightByGroupID(dbGroup.id)
+                            showLoadingDialog(getString(R.string.please_wait))
+                            deleteGroup(lights, dbGroup,
+                                    successCallback = {
+                                        deleteComplete()
+                                    },
+                                    failedCallback = {
+                                        deleteFailToast()
+                                    })
                         }
+                        Constant.DEVICE_TYPE_CURTAIN -> {
+                            val lights = DBUtils.getCurtainByGroupID(dbGroup.id)
+                            showLoadingDialog(getString(R.string.please_wait))
+                            deleteGroupCurtain(lights, dbGroup,
+                                    successCallback = {
+                                        deleteComplete()
+                                    },
+                                    failedCallback = {
+                                        deleteFailToast()
+                                    })
+                        }
+                        Constant.DEVICE_TYPE_CONNECTOR -> {
+                            val lights = DBUtils.getRelayByGroupID(dbGroup.id)
+                            showLoadingDialog(getString(R.string.please_wait))
+                            deleteGroupRelay(lights, dbGroup,
+                                    successCallback = {
+                                        deleteComplete()
+                                    },
+                                    failedCallback = {
+                                        deleteFailToast()
+                                    })
+                        }
+                    }}
 
                     dialog.dismiss()
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
     }
 
+    @SuppressLint("CheckResult")
+    private fun routeDeleteGroup(dbGroup: DbGroup) {
+        RouterModel.routerDelGp(RouterDelGpBody("delGp",dbGroup.meshAddr))?.subscribe({
+            startDelGpTimeOut(it)
+            LogUtils.v("zcl-----------收到路由删组-------$it")
+        }, {
+            if (it.message?.contains("本地删除") == true) {
+            LogUtils.v("zcl-----------收到路由删组-------$it")
+                DBUtils.deleteGroupOnly(dbGroup)
+                deleteComplete()
+            } else {
+                ToastUtils.showShort(it.message)
+            }
+        })
+    }
+
     private fun startDelGpTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer((it?.timeout?:10).toLong(), TimeUnit.SECONDS)
+        disposableTimer = Observable.timer((it?.timeout ?: 10).toLong(), TimeUnit.SECONDS)
                 .subscribe {
-                showLoadingDialog(getString(R.string.delete_gp_fail))
+                    showLoadingDialog(getString(R.string.delete_gp_fail))
+                }
+    }
+
+
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
+        LogUtils.v("zcl-----------收到路由删组通知-------${routerGroup}")
+        disposableTimer?.dispose()
+        if (routerGroup.ser_id=="delGp"){
+            if (routerGroup?.finish) {
+                val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())
+                when (routerGroup?.status) {
+                    0 -> {
+                        DBUtils.deleteGroupOnly(gp!!)
+                        deleteComplete()
+                        ToastUtils.showShort(getString(R.string.delete_group_success))
+                    }
+                    1 -> ToastUtils.showShort(getString(R.string.delete_group_some_fail))
+                    -1 -> ToastUtils.showShort(getString(R.string.delete_gp_fail))
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.router_del_gp, routerGroup?.succeedNow?.size))
+            }
         }
     }
 
@@ -915,18 +1021,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                 hideLoadingDialog()
                 groupCloseSuccess(currentPosition)
             }
-        }
-    }
-
-    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun routerDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
-        disposableTimer?.dispose()
-        if (routerGroup?.finish) {
-            val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())
-            DBUtils.deleteGroupOnly(gp!!)
-            deleteComplete()
-        } else {
-            ToastUtils.showShort(getString(R.string.router_del_gp, routerGroup?.succeedNow?.size))
         }
     }
 }

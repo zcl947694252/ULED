@@ -150,7 +150,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         serviceConnection?.setIGetMessageCallBack(this)
         val intent = Intent(this, MqttService::class.java)
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
@@ -175,6 +174,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         getRegionList()
         getAllStatus()
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        LogUtils.v("zcl---获取状态------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
     }
 
     @SuppressLint("CheckResult")
@@ -199,6 +199,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     private fun getAllStatus() {
         UserModel.getModeStatus()?.subscribe({
+            LogUtils.v("zcl-----------获取状态服务器返回-------$it")
             Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
             Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
         }, {

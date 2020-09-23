@@ -412,7 +412,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     }
 
     @SuppressLint("CheckResult")
-    override fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
         if (cmdBean.finish) {
             if (cmdBean.status == 0) {
                 ToastUtils.showShort(getString(R.string.connect_success))

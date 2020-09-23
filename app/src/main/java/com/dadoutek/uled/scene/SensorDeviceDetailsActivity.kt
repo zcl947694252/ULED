@@ -852,7 +852,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
     @SuppressLint("CheckResult")
-    override fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
         if (cmdBean.finish) {
             if (cmdBean.status == 0) {
                 ToastUtils.showShort(getString(R.string.connect_success))
@@ -880,7 +880,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         }
     }
 
-    override fun routerUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
 
         if (routerVersion?.finish == true) {
             if (routerVersion.cmd == 0) {

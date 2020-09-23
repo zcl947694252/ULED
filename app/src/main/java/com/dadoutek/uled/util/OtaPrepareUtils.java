@@ -259,7 +259,8 @@ public class OtaPrepareUtils {
                 || localVersion.contains("CCS-") || localVersion.contains("LX-")||localVersion.contains("LXS-")
                 || localVersion.contains("LG-") || localVersion.contains("LCS-") || localVersion.contains("L36-"))
                 && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
-        boolean newSuport = localVersion.contains("PR-") || localVersion.contains("B")||localVersion.contains("E-GW")||localVersion.contains("NPR");
+        boolean newSuport = localVersion.contains("PR-") || localVersion.contains("B")||localVersion.contains("E-GW")
+                ||localVersion.contains("NPR")||localVersion.contains("LiG");
         if (oldSuportVersion||newSuport) {
             return true;
         } else {

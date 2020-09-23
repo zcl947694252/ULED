@@ -75,7 +75,6 @@ public class CommonParamsInterceptor implements Interceptor {
 
             if (token == null || "".equals(token))
                 builder.addHeader("token", oldToken);
-        builder.addHeader("token", "444444");
         RequestBody body = request.body();
         //LogUtils.e("zcl","zcl**method.equals(GET)****"+method.equals("GET")+"00000000"+(method.equals("POST") || method.equals("DELETE"))+"----"+(body != null));
         if (body != null) {

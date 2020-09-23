@@ -13,7 +13,7 @@ import io.reactivex.schedulers.Schedulers
 object UserModel {
     fun updateModeStatus(): Observable<Response<Any>> {
         var mode = if (Constant.IS_ROUTE_MODE) 1 else 0
-        LogUtils.v("zcl-----------更新模式-------${Constant.IS_ROUTE_MODE}---$mode----${Constant.IS_OPEN_AUXFUN}")
+        LogUtils.v("zcl-----------获取状态更新模式-------${Constant.IS_ROUTE_MODE}---$mode----${Constant.IS_OPEN_AUXFUN}")
         return NetworkFactory.getApi()
                 .updateAllModeStatus(Constant.IS_OPEN_AUXFUN, mode)
                 .subscribeOn(Schedulers.io())
@@ -25,6 +25,7 @@ object UserModel {
                 .allModeStatus
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
+
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }

@@ -1,8 +1,6 @@
 package com.dadoutek.uled.light
 
 import android.widget.ImageView
-import android.widget.RelativeLayout
-import com.app.hubert.guide.model.RelativeGuide
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R

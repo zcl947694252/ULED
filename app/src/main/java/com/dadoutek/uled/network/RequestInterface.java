@@ -24,10 +24,12 @@ import com.dadoutek.uled.model.httpModel.RemoveCodeBody;
 import com.dadoutek.uled.model.routerModel.RouteStasusBean;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.network.bean.TransferRegionBean;
+import com.dadoutek.uled.region.RegionBcBean;
 import com.dadoutek.uled.region.bean.ParseCodeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
+import com.dadoutek.uled.router.GroupBlinkBodyBean;
 import com.dadoutek.uled.router.bean.RouteScanResultBean;
 import com.dadoutek.uled.router.bean.RouterBatchGpBean;
 import com.dadoutek.uled.router.bean.RouterVersionsBean;
@@ -153,8 +155,8 @@ public interface RequestInterface {
      *  "lastGenMeshAddr": 0
      */
     @POST("region/add/{rid}")
-    Observable<Response<String>> updateRegion(@Path("rid") int rid,
-                                              @Body DbRegion dbRegion);
+    Observable<Response<RegionBcBean>> updateRegion(@Path("rid") int rid,
+                                                    @Body DbRegion dbRegion);
 
 
     //删除区域
@@ -802,10 +804,21 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/regroup")
-    Observable<Response<RouterBatchGpBean>> routerBatchGp(@Field("targetGroupMeshAddr") long targetGroupMeshAddr,
+    Observable<Response<RouterBatchGpBean>> routerBatchGp(@Field("targetGroupMeshAddr") int targetGroupMeshAddr,
                                                           @Field("deviceMeshAddrs") List<Integer> deviceMeshAddrs,
-                                                          @Field("meshType") long meshType,
+                                                          @Field("meshType") int meshType,
                                                           @Field("ser_id") String ser_id);
+
+    @POST("router/regroup")
+    Observable<Response<RouterBatchGpBean>> routerBatchGpN(@Body GroupBodyBean body);
+
+    /**
+     * 闪灯  https://dev.dadoutek.com/xxxx/router/device/flash POST
+     * meshAddrs	是	list	选择的设备meshAddr
+     * meshType	是	int	meshAddr类型  "meshAddrs": [1, 2, 3],"meshType": 6
+     */
+    @POST("router/device/flash")
+    Observable<Response<RouterBatchGpBean>> routerBatchGpBlink(@Body GroupBlinkBodyBean body);
 
     /**
      * 获取路由列表
@@ -940,9 +953,8 @@ public interface RequestInterface {
      * "targetGroupMeshAddr" : 32769,
      * "ser_id": "app会话id，自己维护"
      */
-    @FormUrlEncoded
-    @HTTP(method = "DELETE", path = "router/del-group")
-    Observable<Response<RouterTimeoutBean>> routerDeleteGroup(@Field("targetGroupMeshAddr") int targetGroupMeshAddr, @Field("ser_id") String ser_id);
+    @HTTP(method = "DELETE", path = "router/del-group",hasBody = true)
+    Observable<Response<RouterTimeoutBean>> routerDeleteGroup(@Body RouterDelGpBody body);
 
     /**
      * 通过路由添加场景
@@ -950,7 +962,7 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/xxxx/router/add-scene POST
      * name	是	string	场景名称
      * imgName	是	string	场景展示icon名
-     * actions	是	List<Action>	本地生成的actions直接上传即可，已做好兼容
+     * actions	是	List<Action>	本地生成的actions直接上传即可，已做好兼容`
      * ser_id	是	string	app会话id，推送时回传
      * "name": "场景1",
      * "imgName": "icon_out",
@@ -1172,4 +1184,24 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("router/eight-key-switch/configure")
     Observable<Response<RouterTimeoutBean>> configEightSw (@Field("id") int id, @Field("keys") List<KeyBean> keys, @Field("ser_id") String ser_id);
-}
+
+
+    //控制指令相关
+    /**
+     * 设备&组开关灯 https://dev.dadoutek.com/xxxx/router/control/status POST
+     * meshAddr	是	int	目标meshAddr
+     * ser_id	是	string	app会话id，推送时回传
+     * meshType	是	int	mesh地址类型
+     * status	是	int	0关1开
+     * meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+     * {"data": {   "timeout": 8,},  "errorCode": 0,"message": "发送协议成功，等待路由回复"}
+     * 字段	类型	说明
+     * timeout	int	等待推送的超时时间，服务器给，不用计算了
+     */
+    @FormUrlEncoded
+    @POST("router/control/status")
+    Observable<Response<RouterTimeoutBean>> routeOpenOrClose (@Field("meshAddr") int meshAddr,
+                                                              @Field("meshType") int meshType,
+                                                              @Field("status") int status,
+                                                              @Field("ser_id") String ser_id);
+    }

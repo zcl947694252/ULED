@@ -6,11 +6,13 @@ import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.network.*
+import com.dadoutek.uled.router.GroupBlinkBodyBean
 import com.dadoutek.uled.router.bean.*
 import com.dadoutek.uled.switches.bean.KeyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import retrofit2.http.Field
 
 
 /**
@@ -109,8 +111,19 @@ object RouterModel {
     /**
      * 路由批量分组
      */
-    fun routeBatchGp(targetGroupMeshAddr: Long, deviceMeshAddrs: List<Int>, meshType: Long, ser_id: String): Observable<Response<RouterBatchGpBean>>? {
+    fun routeBatchGp(targetGroupMeshAddr: Int, deviceMeshAddrs: List<Int>, meshType: Int, ser_id: String): Observable<Response<RouterBatchGpBean>>? {
         return NetworkFactory.getApi().routerBatchGp(targetGroupMeshAddr, deviceMeshAddrs, meshType, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun routeBatchGpNew(bodyBean: GroupBodyBean): Observable<Response<RouterBatchGpBean>>? {
+        return NetworkFactory.getApi().routerBatchGpN(bodyBean)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun routeBatchGpBlink(bodyBean: GroupBlinkBodyBean): Observable<Response<RouterBatchGpBean>>? {
+        return NetworkFactory.getApi().routerBatchGpBlink(bodyBean)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -136,8 +149,8 @@ object RouterModel {
     /**
      * 路由删除群组
      */
-    fun routerDelGp(gpMeshAddr: Int): Observable<RouterTimeoutBean>? {
-        return NetworkFactory.getApi().routerDeleteGroup(gpMeshAddr, "delGp")
+    fun routerDelGp(body: RouterDelGpBody): Observable<RouterTimeoutBean>? {
+        return NetworkFactory.getApi().routerDeleteGroup(body)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -276,6 +289,16 @@ object RouterModel {
      */
     fun configEightSw(id: Long, keys:List<KeyBean>): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().configEightSw(id.toInt(), keys, "configEightSw")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 控制相关开始
+     * 开关灯
+     */
+    fun routeOpenOrClose( meshAddr:Int , meshType:Int , status :Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeOpenOrClose(meshAddr, meshType,status, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

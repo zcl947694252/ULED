@@ -103,12 +103,17 @@ open class BaseFragment : Fragment() {
                     }
                     Cmd.routeDeleteGroup -> {
                         val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
-                        routerDelGroupResult(routerGroup)
+                        tzRouterDelGroupResult(routerGroup)
                     }
                     Cmd.routeDeleteScenes ->{
                         routerDelSceneResult(cmdBean)
                     }
                     Cmd.routeUpdateScenes ->{}
+
+                    /**
+                     * 控制指令下的通知
+                     */
+                    Cmd.tzRouteOpenOrClose  -> tzRouterOpenOrCloseFragment(cmdBean)
                 }
 
             } catch (js: JSONException) {
@@ -128,12 +133,16 @@ open class BaseFragment : Fragment() {
         }
     }
 
+    open fun tzRouterOpenOrCloseFragment(cmdBean: CmdBodyBean) {
+
+    }
+
     open fun routerDelSceneResult(cmdBean: CmdBodyBean) {//1 0 -1  部分成功 成功 失败
 
     }
 
 
-    open fun routerDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
+    open fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
 
     }
 

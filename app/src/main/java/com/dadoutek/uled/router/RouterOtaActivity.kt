@@ -154,13 +154,13 @@ class RouterOtaActivity : TelinkBaseActivity() {
         router_ota_tv.text = getString(R.string.routing_update)
     }
 
-    override fun routerOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {
+    override fun tzRouterOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {
         //升级中通知
         otaCount++
         router_ota_num.text = otaCount.toString()
     }
 
-    override fun routerOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
+    override fun tzRouterOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
         if (routerOTAFinishBean?.finish == true) {
             hideLoadingDialog()
             if (routerOTAFinishBean?.status == 0) {

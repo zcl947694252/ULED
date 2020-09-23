@@ -31,6 +31,7 @@ import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -207,39 +208,46 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         if (position < lightsData.size) {
             currentDevice = lightsData[position]
             positionCurrent = position
-            if (TelinkLightApplication.getApp().connectDevice == null) {
-                GlobalScope.launch(Dispatchers.Main) {
-                    autoConnectAll()
-                }
-                //sendToGw()
-                sendToRouter()
-            } else {
-                when (view.id) {
-                    R.id.template_device_icon -> {
-                        canBeRefresh = true
-                        openOrClose(currentDevice!!)
-                        when (type) {
-                            Constant.INSTALL_NORMAL_LIGHT -> currentDevice!!.updateIcon()
-                            Constant.INSTALL_RGB_LIGHT -> currentDevice!!.updateRgbIcon()
-                        }
-                        DBUtils.updateLight(currentDevice!!)
-                        adapter?.notifyDataSetChanged()
-
-                       // sendTimeZone(currentDevice!!)
+            if (Constant.IS_ROUTE_MODE)
+                itemClikMethod(view)
+            else {
+                if (TelinkLightApplication.getApp().connectDevice == null && view.id != R.id.template_device_card_delete) {
+                    GlobalScope.launch(Dispatchers.Main) {
+                        autoConnectAll()
                     }
-                    R.id.template_device_card_delete -> {
-                        val string = getString(R.string.sure_delete_device, currentDevice?.name)
-                        builder?.setMessage(string)
-                        builder?.create()?.show()
-                    }
-                    R.id.template_device_setting -> goSetting()
+                    sendToGw()
+                } else {
+                    itemClikMethod(view)
                 }
             }
         }
     }
 
-    private fun sendToRouter() {
+    private fun itemClikMethod(view: View) {
+        when (view.id) {
+            R.id.template_device_icon -> {
+                canBeRefresh = true
+                openOrClose(currentDevice!!)
+                if (!Constant.IS_ROUTE_MODE)//如果不是路由模式则直接更新icon
+                    sendAfterUpdate()
+                // sendTimeZone(currentDevice!!)
+            }
+            R.id.template_device_card_delete -> {
+                val string = getString(R.string.sure_delete_device, currentDevice?.name)
+                builder?.setMessage(string)
+                builder?.create()?.show()
+            }
+            R.id.template_device_setting -> goSetting()
+        }
+    }
 
+    private fun sendAfterUpdate() {
+        when (type) {
+            Constant.INSTALL_NORMAL_LIGHT -> lightsData[positionCurrent]!!.updateIcon()
+            Constant.INSTALL_RGB_LIGHT -> lightsData[positionCurrent]!!.updateRgbIcon()
+        }
+        DBUtils.updateLight(lightsData[positionCurrent])
+        listAdapter?.notifyDataSetChanged()
     }
 
     private fun showDeleteSingleDialog(dbLight: DbLight) {
@@ -260,64 +268,64 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private fun sendToGw() {
         val gateWay = DBUtils.getAllGateWay()
         if (gateWay.size > 0)
-            GwModel.getGwList()?.subscribe( {
-                    TelinkLightApplication.getApp().offLine = true
-                    hideLoadingDialog()
+            GwModel.getGwList()?.subscribe({
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
                 it.forEach { db ->
-                        //网关在线状态，1表示在线，0表示离线
-                        if (db.state == 1)
-                            TelinkLightApplication.getApp().offLine = false
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
-                    if (!TelinkLightApplication.getApp().offLine) {
-                        disposableTimer?.dispose()
-                        disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
-                            hideLoadingDialog()
-                            runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
-                        }
-                        val low = currentDevice!!.meshAddr and 0xff
-                        val hight = (currentDevice!!.meshAddr shr 8) and 0xff
-                        val gattBody = GwGattBody()
-                        var gattPar: ByteArray = byteArrayOf()
-                        when (currentDevice!!.connectionStatus) {
-                            ConnectionStatus.OFF.value -> {
-                                if (currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL || currentDevice!!.productUUID == DeviceType.LIGHT_RGB
-                                        || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
-                                    gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                            0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                                    gattBody.ser_id = Constant.SER_ID_LIGHT_ON
-                                }
-                            }
-                            else -> {
-                                if (currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL || currentDevice!!.productUUID == DeviceType.LIGHT_RGB
-                                        || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
-                                    gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                            0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                                    gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
-                                }
+                    val low = currentDevice!!.meshAddr and 0xff
+                    val hight = (currentDevice!!.meshAddr shr 8) and 0xff
+                    val gattBody = GwGattBody()
+                    var gattPar: ByteArray = byteArrayOf()
+                    when (currentDevice!!.connectionStatus) {
+                        ConnectionStatus.OFF.value -> {
+                            if (currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL || currentDevice!!.productUUID == DeviceType.LIGHT_RGB
+                                    || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
+                                gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                        0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                gattBody.ser_id = Constant.SER_ID_LIGHT_ON
                             }
                         }
+                        else -> {
+                            if (currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL || currentDevice!!.productUUID == DeviceType.LIGHT_RGB
+                                    || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
+                                gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                        0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                            }
+                        }
+                    }
 
-                        val s = Base64Utils.encodeToStrings(gattPar)
-                        gattBody.data = s
-                        gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                        gattBody.meshAddr = currentDevice!!.meshAddr
-                        sendToServer(gattBody)
-                    } else ToastUtils.showShort(getString(R.string.gw_not_online))
-                },{
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.gw_not_online))
+                    val s = Base64Utils.encodeToStrings(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = currentDevice!!.meshAddr
+                    sendToServer(gattBody)
+                } else ToastUtils.showShort(getString(R.string.gw_not_online))
+            }, {
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
             })
     }
 
     @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
-                disposableTimer?.dispose()
-                LogUtils.v("zcl-----------远程控制-------$it")
-            },{
-                disposableTimer?.dispose()
-                ToastUtils.showShort(it.message)
-                LogUtils.v("zcl-----------远程控制-------${it.message}")
+            disposableTimer?.dispose()
+            LogUtils.v("zcl-----------远程控制-------$it")
+        }, {
+            disposableTimer?.dispose()
+            ToastUtils.showShort(it.message)
+            LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 
@@ -366,18 +374,42 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         this.currentDevice = currentLight
         when (currentLight!!.connectionStatus) {
             ConnectionStatus.OFF.value -> {
-                when (currentLight!!.productUUID) {
-                    DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = true, isPause = false)//开窗
-                    else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
+                if (Constant.IS_ROUTE_MODE)// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                    routeOpenOrClose(currentLight.meshAddr, currentLight.productUUID, 1, "deng")
+                else {
+                    when (currentLight!!.productUUID) {
+                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = true, isPause = false)//开窗
+                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
+                    }
+                    this.currentDevice!!.connectionStatus = ConnectionStatus.ON.value
                 }
-                this.currentDevice!!.connectionStatus = ConnectionStatus.ON.value
             }
             else -> {
-                when (currentLight!!.productUUID) {
-                    DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = false, isPause = false)//关窗
-                    else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)//关灯
+                if (Constant.IS_ROUTE_MODE)
+                    routeOpenOrClose(currentLight.meshAddr, currentLight.productUUID, 0, "deng")
+                else {
+                    when (currentLight!!.productUUID) {
+                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = false, isPause = false)//关窗
+                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)//关灯
+                    }
+                    this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
                 }
-                this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
+            }
+        }
+    }
+
+    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
+        hideLoadingDialog()
+        disposableRouteTimer?.dispose()
+        if (cmdBean.ser_id == "deng") {
+            when (this.currentDevice!!.connectionStatus) {
+                ConnectionStatus.OFF.value -> this.currentDevice!!.connectionStatus = ConnectionStatus.ON.value
+                else -> this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
+            }
+            when (cmdBean.status) {
+                0 -> sendAfterUpdate()
+                else -> ToastUtils.showShort(getString(R.string.open_faile))
             }
         }
     }

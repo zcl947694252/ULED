@@ -30,8 +30,9 @@ public class Cmd implements Serializable {
     public static final int unbindRegion = 3;
     public static final int parseQR = 2;
     public static final int singleLogin = 1;
-    public static final int routeAddGradient =3009;
-    public static final int routeDelGradient =3010;
-    public static final int routeUpdateGradient =3011;
-    public static final int routeConnectSwSe =3012;
+    public static final int tzRouteAddGradient =3009;
+    public static final int tzRouteDelGradient =3010;
+    public static final int tzRouteUpdateGradient =3011;
+    public static final int tzRouteConnectSwSe =3012;
+    public static final int tzRouteOpenOrClose =4000;
 }

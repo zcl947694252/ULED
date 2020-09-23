@@ -611,7 +611,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     }
 
     @SuppressLint("CheckResult")
-    override fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
         if (cmdBean.finish) {
             if (cmdBean.status == 0) {
                 image_bluetooth.setImageResource(R.drawable.icon_cloud)
@@ -639,7 +639,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         }
     }
 
-    override fun routerUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
 
         if (routerVersion?.finish == true) {
             if (routerVersion.cmd == 0) {

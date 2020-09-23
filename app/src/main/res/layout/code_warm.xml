@@ -10,7 +10,7 @@
             android:id="@+id/pop_view"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/rect_r15_graye"
+            android:background="@drawable/rect_r15_bottom_graye"
             android:minHeight="150dp"
             android:orientation="vertical">
 

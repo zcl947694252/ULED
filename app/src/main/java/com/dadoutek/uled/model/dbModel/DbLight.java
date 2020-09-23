@@ -5,11 +5,11 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
-import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hejiajun on 2018/5/14.
@@ -295,14 +295,6 @@ public class DbLight implements Serializable {
         this.index = index;
     }
 
-    public int getStatus() {
-        return this.status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
     public void setSeek(boolean seek) {
         this.isSeek = seek;
     }
@@ -367,5 +359,13 @@ public class DbLight implements Serializable {
 
     public void setIsMostNew(boolean isMostNew) {
         this.isMostNew = isMostNew;
+    }
+
+    public int getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

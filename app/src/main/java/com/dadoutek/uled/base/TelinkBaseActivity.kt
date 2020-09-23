@@ -146,7 +146,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       Constant.IS_ROUTE_MODE =  SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         this.mApplication = this.application as TelinkLightApplication
         enableConnectionStatusListener()    //尽早注册监听
         //注册网络状态监听广播
@@ -335,6 +334,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
      * @param isConnected       是否是连接状态
      */
     fun changeDisplayImgOnToolbar(isConnected: Boolean) {
+        LogUtils.v("zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
         if (Constant.IS_ROUTE_MODE)
             toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
         else {
@@ -672,22 +672,27 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
                 Cmd.routeAddScenes ->{
                     val routerScene = Gson().fromJson(msg, RouteSceneBean::class.java)
-                    routerAddScene(routerScene)
+                    tzRouterAddScene(routerScene)
                 }
                 Cmd.routeUpdateDeviceVersion ->{//版本号回调
                     val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
-                    routerUpdateVersionRecevice(routerVersion)
+                    tzRouterUpdateVersionRecevice(routerVersion)
                 }
                 Cmd.routeOTAing ->{
                     val routerOTAingNumBean = Gson().fromJson(msg, RouterOTAingNumBean::class.java)
-                    routerOTAingNumRecevice(routerOTAingNumBean)
+                    tzRouterOTAingNumRecevice(routerOTAingNumBean)
                 }
                 Cmd.routeOTAFinish ->{
                     val routerOTAFinishBean = Gson().fromJson(msg, RouterOTAFinishBean::class.java)
-                    routerOTAFinishRecevice(routerOTAFinishBean)
+                    tzRouterOTAFinishRecevice(routerOTAFinishBean)
                 }
-                Cmd.routeAddGradient , Cmd.routeDelGradient,Cmd.routeUpdateGradient -> routerAddOrDelOrUpdateGradientRecevice(cmdBean)
-                Cmd.routeConnectSwSe  -> routerConnectSwSeRecevice(cmdBean)
+                Cmd.tzRouteAddGradient , Cmd.tzRouteDelGradient,Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean)
+                Cmd.tzRouteConnectSwSe  -> tzRouterConnectSwSeRecevice(cmdBean)
+
+                /**
+                 * 控制指令下的通知
+                 */
+                Cmd.tzRouteOpenOrClose  -> tzRouterOpenOrClose(cmdBean)
             }
 /*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -739,31 +744,35 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         }
     }
 
+    open fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+
+    }
+
     open fun tzRouteStopScan(cmdBean: CmdBodyBean) {
 
     }
 
-    open fun routerConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    open fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
 
     }
 
-    open fun routerAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
+    open fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
 
     }
 
-    open fun routerOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
+    open fun tzRouterOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
 
     }
 
-    open fun routerOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {
+    open fun tzRouterOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {
 
     }
 
-    open fun routerUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    open fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
 
     }
 
-    open fun routerAddScene(routerScene: RouteSceneBean?) {
+    open fun tzRouterAddScene(routerScene: RouteSceneBean?) {
 
     }
 
@@ -1265,7 +1274,4 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         renameCancel?.setOnClickListener { renameDialog?.dismiss() }
         //确定回调 单独写
     }
-
-
 }
-

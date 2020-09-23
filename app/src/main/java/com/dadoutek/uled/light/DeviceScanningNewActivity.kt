@@ -292,6 +292,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun retryScan() {
         // toolbarTv.text = getString(R.string.scanning)
+        TelinkLightService.Instance()?.mAdapter?.stop()
         if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
             mUpdateMeshRetryCount++
             Log.d("TelinkBluetoothSDK ", "完整流程更新mesh失败重新扫秒 update mesh failed , retry count = $mUpdateMeshRetryCount")
@@ -300,6 +301,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             startScan()
         } else {
             Log.d("TelinkBluetoothSDK", "update mesh failed , do not retry")
+            stopScan()
+            LogUtils.v("zcl-----------完整流程扫描重试超时-------")
         }
         updateMeshStatus = UPDATE_MESH_STATUS.FAILED
     }
@@ -734,6 +737,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         hideLoadingDialog()
                         ToastUtils.showLong(getString(R.string.connect_fail))
                         LogUtils.d(it)
+                        onLogin()
                     }
                     )
         }
@@ -777,15 +781,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             if (Constant.IS_ROUTE_MODE) {
                 routerStopScan()
             } else {
-                stopScanTimer()
-                if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备
-                    scanSuccess()
-                } else {
-                    closeAnimation()
-                    btn_stop_scan.visibility = View.GONE
-                    ToastUtils.showLong(getString(R.string.scan_end))
-                    finish()
-                }
+                stopScan()
             }
         }
 
@@ -819,6 +815,18 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
+    private fun stopScan() {
+        stopScanTimer()
+        if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备
+            scanSuccess()
+        } else {
+            closeAnimation()
+            btn_stop_scan.visibility = View.GONE
+            ToastUtils.showLong(getString(R.string.scan_end))
+            finish()
+        }
+    }
+
     @SuppressLint("CheckResult")
     private fun routerStopScan() {
         RouterModel.routeStopScan(TAG, Constant.SCAN_SERID)
@@ -828,7 +836,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         0 -> {
                             showLoadingDialog(getString(R.string.please_wait))
                             disposableTimer?.dispose()
-                            disposableTimer = Observable.timer(itr.t.timeout+3L, TimeUnit.SECONDS)
+                            disposableTimer = Observable.timer(itr.t.timeout + 3L, TimeUnit.SECONDS)
                                     .subscribe {
                                         ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
                                     }
@@ -1071,6 +1079,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         LogUtils.e("write login data 没有收到response")
                     }
                 }
+                finish()
             }
         }
     }
@@ -1282,7 +1291,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             lastUser?.lastGenMeshAddr ?: 0
         }
         meshAddress = isUser(meshAddress)
-        LogUtils.v("zcl-----------完整流程网关新的meshAddress-------$meshAddress")
+        LogUtils.v("zcl-----------完整流程网关新的meshAddress-------$meshAddress----${bestRssiDevice != null}")
         disposable = Observable.timer(200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -1290,6 +1299,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     if (bestRssiDevice != null) {
                         val mesh = mApplication!!.mesh
                         updateMesh(bestRssiDevice!!, meshAddress, mesh)
+                    } else {
+                        retryScan()
                     }
                 }
         startMeshTimeoutTimer()//更新mesh超时时间
@@ -1848,6 +1859,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     if (meshUpdateType == 0L)
                         runOnUiThread {
                             stopScanTimer()
+                            TelinkLightService.Instance()?.mAdapter?.stop()
                             retryScan()
                         }
                 }

@@ -1094,7 +1094,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
-    override fun routerAddScene(routerScene: RouteSceneBean?) {
+    override fun tzRouterAddScene(routerScene: RouteSceneBean?) {
         if (routerScene?.finish == true) {
             hideLoadingDialog()
             if (routerScene?.status == 0) {//-1 全部失败 1 部分成功

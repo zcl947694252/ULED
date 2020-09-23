@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -56,20 +57,25 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
+                    Constant.IS_ROUTE_MODE = !Constant.IS_ROUTE_MODE
         when (v?.id) {
             R.id.choose_mode_ble_iv -> {
                 UserModel.updateModeStatus().subscribe({
-                    Constant.IS_ROUTE_MODE = false
+                    LogUtils.v("zcl--------------上传云状态为蓝牙----")
                     SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, false)
                     updateUi()
-                }, {})
+                }, {
+                    Constant.IS_ROUTE_MODE = !Constant.IS_ROUTE_MODE
+                })
             }
             R.id.choose_mode_router_iv -> {
                 UserModel.updateModeStatus().subscribe({
-                    Constant.IS_ROUTE_MODE = true
                     SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, true)
                     updateUi()
-                }, {})
+                    LogUtils.v("zcl--------------上传云状态为路由----")
+                }, {
+                    Constant.IS_ROUTE_MODE = !Constant.IS_ROUTE_MODE
+                })
             }
         }
 
