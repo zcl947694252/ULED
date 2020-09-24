@@ -254,9 +254,18 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                                         ToastUtils.showShort(getString(R.string.connect_fail))
                                     }
                         }
-                        90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                        90018 -> {
+                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                            hideLoadingDialog()
+                        }
+                        90008 -> {
+                            ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            hideLoadingDialog()
+                        }
+                        90005 -> {
+                            ToastUtils.showShort(getString(R.string.router_offline))
+                            hideLoadingDialog()
+                        }
                     }
                 }, {
                     ToastUtils.showShort(it.message)
@@ -632,7 +641,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                 }, {
                     ToastUtils.showShort(it.message)
                 })
-            } else{
+            } else {
                 image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                 ToastUtils.showShort(getString(R.string.connect_fail))
             }
@@ -645,7 +654,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             if (routerVersion.cmd == 0) {
                 disposableTimer?.dispose()
                 val deviceInfo = DeviceInfo()
-                deviceInfo.id = (currentDevice?.id?:0).toInt()
+                deviceInfo.id = (currentDevice?.id ?: 0).toInt()
                 deviceInfo.macAddress = currentDevice?.macAddr
                 deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
                 deviceInfo.firmwareRevision = currentDevice?.version

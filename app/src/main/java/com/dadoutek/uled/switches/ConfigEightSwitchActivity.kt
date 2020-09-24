@@ -138,7 +138,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             //赋值旧的设置数据
                             sceneMap[keyId] = if (scene != null) scene else {
                                 var dbScene = DbScene()
-                                dbScene.id = 1000000L
+                                dbScene.id = 0L
                                 dbScene
                             }
                             sceneKey.remove(keyId)
@@ -177,21 +177,21 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                      0 -> {
                          groupKey.forEach { itKey ->
                              var dbGroup = DbGroup()
-                             dbGroup.id = 1000000L
+                             dbGroup.id = 0L
                              groupMap[itKey] = dbGroup
                          }
                      }
                      1 -> {
                          sceneKey.forEach { itKey ->
                              var dbScene = DbScene()
-                             dbScene.id = 1000000L
+                             dbScene.id = 0L
                              sceneMap[itKey] = dbScene
                          }
                      }
                      2 -> {
                          doubleGroupKey.forEach { itKey ->
                              var dbGroup = DbGroup()
-                             dbGroup.id = 1000000L
+                             dbGroup.id = 0L
                              groupMap[itKey] = dbGroup
                          }
                      }
@@ -207,11 +207,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         sceneMap.clear()
         for (i in 0 until 8) {
             var dbGroup = DbGroup()
-            dbGroup.id = 1000000L
+            dbGroup.id = 0L
             groupMap[i] = dbGroup
 
             var dbScene = DbScene()
-            dbScene.id = 1000000L
+            dbScene.id = 0L
             sceneMap[i] = dbScene
         }
     }
@@ -280,7 +280,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         groupParamList.add(3, fourParm)
 
         GlobalScope.launch {
-            var delay = 0L
+            var delay = 1000L
             for (p in groupParamList) {
                 delay(delay)
                 //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
@@ -314,7 +314,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         sceneParamList.add(sceneParmTwo)
         sceneParamList.add(sceneParmThird)
         sceneParamList.add(sceneParmFour)
-        var delay = 0L
+        var delay = 1000L
         GlobalScope.launch {
             for (p in sceneParamList) {
                 delay(delay)
@@ -357,7 +357,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         groupParamList.add(3, fourParm)
 
         GlobalScope.launch {
-            var delay = 0L
+            var delay = 1000L
             for (p in groupParamList) {
                 delay(delay)
                 //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
@@ -476,10 +476,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
         val firstNum = list[0]
         val dbSceneFirst = sceneMap[firstNum]
-        val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 1000000L) {
+        val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 0L) {
             firstOpcode = Opcode.DEFAULT_SWITCH8K
             listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes =0))
-            1000000L
+            0L
         } else {
             listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
             dbSceneFirst!!.id
@@ -489,10 +489,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             val secondNum = list[1]
             val dbSceneSecond = sceneMap[secondNum]
             //位置 功能 保留 14场景id
-            val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 1000000L) {
+            val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 0L) {
                 secondOpcode = Opcode.DEFAULT_SWITCH8K
                 listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
-                1000000L
+                0L
             } else {
                 listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = dbSceneSecond.name, hight8Mes = 0, low8Mes = dbSceneSecond.id.toInt()))
                 dbSceneSecond.id
@@ -510,7 +510,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         var fristL: Byte = 0
         var fristH: Byte = 0
 
-        if (dbGroup1 == null || dbGroup1.id == 1000000L) {
+        if (dbGroup1 == null || dbGroup1.id == 0L) {
             opcodeOne = Opcode.DEFAULT_SWITCH8K
             listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
         } else {
@@ -531,7 +531,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             var secondL: Byte = 0
             var secondH: Byte = 0
 
-            if (dbGroup2 == null || dbGroup2.id == 1000000L) {
+            if (dbGroup2 == null || dbGroup2.id == 0L) {
                 opcodeTwo = Opcode.DEFAULT_SWITCH8K
                 listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
             } else {

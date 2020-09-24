@@ -2,9 +2,10 @@ package com.dadoutek.uled.util
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.DeviceUtils.get4ByteMac
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.scan.ScanFilter
 import com.polidea.rxandroidble2.scan.ScanResult
@@ -26,7 +27,7 @@ object RecoverMeshDeviceUtil {
     val rxBleClient: RxBleClient = RxBleClient.create(TelinkLightApplication.getApp())
 
     private val createdDeviceList: MutableList<DeviceInfo> = mutableListOf()  //需要重新配置的设备的mac地址
-
+    private var macBytes: ByteArray? = null
     val SCAN_TIMEOUT_SECONDS: Long = 20
 
     data class ResultOfAddDevice(val deviceInfo: DeviceInfo, val hasConflict: Boolean)
@@ -48,11 +49,12 @@ object RecoverMeshDeviceUtil {
         return addressList
     }
 
-    fun findMeshDevice(deviceName: String?, isRecoverMeshDevice: Boolean = true): Observable<Int> {
+    fun findMeshDevice(deviceName: String?): Observable<Int> {
         createdDeviceList.clear()
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
         val scanSettings = ScanSettings.Builder()
+
                 // .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
         LogUtils.d("findMeshDevice name = $deviceName")
@@ -63,13 +65,16 @@ object RecoverMeshDeviceUtil {
                     data
                 }          //解析数据
                 .filter {
-                    val addDevicesToDb = addDevicesToDb(it, isRecoverMeshDevice)
-                    addDevicesToDb   //当保存数据库成功时，才发射onNext
+                    synchronized(this){
+                        val addDevicesToDb = addDevicesToDb(it)
+                        LogUtils.v("zcl找回判断1------------------$addDevicesToDb-----$count---------$it")
+                        addDevicesToDb   //当保存数据库成功时，才发射onNext
+                    }
                 }
                 .map { deviceInfo ->
                     createdDeviceList.add(deviceInfo)
-                    LogUtils.v("zcl找回------:${deviceInfo.meshAddress}---------$count")
-                    deviceInfo.meshAddress
+                    count = createdDeviceList.size
+                    LogUtils.v("zcl找回count2------:${deviceInfo.meshAddress}---------$count")
                     count
                 }
                 .timeout(SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
@@ -78,7 +83,6 @@ object RecoverMeshDeviceUtil {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-
 
     /**
      * 通过mesh网络添加Device，实际就是通过scan恢复设备，但返回的数据略有不同
@@ -164,11 +168,11 @@ object RecoverMeshDeviceUtil {
      * 如果该deviceInfo不存在于数据库，则创建
      * @return true 保存成功    false，无需保存
      */
-    fun addDevicesToDb(deviceInfo: DeviceInfo, isRecoverMeshDevice: Boolean = true): Boolean {
+    fun addDevicesToDb(deviceInfo: DeviceInfo): Boolean {
         val productUUID = deviceInfo.productUUID
         val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
-        LogUtils.v("zcl-----------是否找回设备版本-------${!isExist&&isRecoverMeshDevice}-------------$isRecoverMeshDevice")
-        if (!isExist&&isRecoverMeshDevice) {//不存在并且是召回是设备
+        LogUtils.v("zcl找回-----------添加设备-------${!isExist}-----$deviceInfo")
+        if (!isExist) {//mesh不存在并且是找回是设备
                 when (productUUID) {
                     DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
                         val dbLightNew = DbLight()
@@ -180,11 +184,10 @@ object RecoverMeshDeviceUtil {
                         dbLightNew.colorTemperature = 0
                         dbLightNew.meshAddr = deviceInfo.meshAddress
                         dbLightNew.name = TelinkLightApplication.getApp().getString(R.string.device_name) + dbLightNew.meshAddr
-                        dbLightNew.macAddr = deviceInfo.macAddress
+                        dbLightNew.macAddr = get4ByteMac(deviceInfo.macAddress)
                         dbLightNew.version = deviceInfo.firmwareRevision
                         DBUtils.saveLight(dbLightNew, false)
                         LogUtils.d(String.format("create meshAddress=  %x", dbLightNew.meshAddr))
-                        count++
                         LogUtils.v("zcl找回------找回----------$count----普通灯$dbLightNew---")
                     }
                     DeviceType.SMART_RELAY -> {
@@ -196,11 +199,11 @@ object RecoverMeshDeviceUtil {
                         relay.color = 0
                         relay.meshAddr = deviceInfo.meshAddress
                         relay.name = TelinkLightApplication.getApp().getString(R.string.device_name) + relay.meshAddr
-                        relay.macAddr = deviceInfo.macAddress
+                        relay.macAddr = get4ByteMac(deviceInfo.macAddress)
+
                         relay.version = deviceInfo.firmwareRevision
                         DBUtils.saveConnector(relay, false)
                         LogUtils.d("create = $relay  " + relay.meshAddr)
-                        count++
                         LogUtils.v("zcl找回-------------$count-------relay----")
                     }
 
@@ -211,12 +214,11 @@ object RecoverMeshDeviceUtil {
                         curtain.updateIcon()
                         curtain.belongGroupId = DBUtils.groupNull?.id
                         curtain.meshAddr = deviceInfo.meshAddress
-                        curtain.name = TelinkLightApplication.getApp().getString(R.string.device_name) + curtain.meshAddr
-                        curtain.macAddr = deviceInfo.macAddress
+                        curtain.name = TelinkLightApplication.getApp().getString(R.string.curtain) + curtain.meshAddr
+                        curtain.macAddr = get4ByteMac(deviceInfo.macAddress)
                         curtain.version = deviceInfo.firmwareRevision
                         DBUtils.saveCurtain(curtain, false)
                         LogUtils.d("create = $curtain  " + curtain.meshAddr)
-                        count++
                         LogUtils.v("zcl找回------------$count--------curtain---")
                     }
                     DeviceType.NIGHT_LIGHT, DeviceType.SENSOR -> {
@@ -224,45 +226,33 @@ object RecoverMeshDeviceUtil {
                         sensor.productUUID = productUUID
                         sensor.belongGroupId = DBUtils.groupNull?.id
                         sensor.meshAddr = deviceInfo.meshAddress
-                        sensor.name = TelinkLightApplication.getApp().getString(R.string.device_name) + sensor.meshAddr
-                        sensor.macAddr = deviceInfo.macAddress
+                        sensor.name = TelinkLightApplication.getApp().getString(R.string.sensor) + sensor.meshAddr
+                        sensor.macAddr = get4ByteMac(deviceInfo.macAddress)
                         sensor.version = deviceInfo.firmwareRevision
                         DBUtils.saveSensor(sensor, false)
-                        count++
                         LogUtils.v("zcl找回--------------$count------sensor---")
                     }
-                    DeviceType.DOUBLE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH
+                    DeviceType.DOUBLE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH, DeviceType.EIGHT_SWITCH
                         , DeviceType.NORMAL_SWITCH2 -> {
                         val switch = DbSwitch()
                         switch.productUUID = productUUID
                         switch.belongGroupId = DBUtils.groupNull?.id
                         switch.meshAddr = deviceInfo.meshAddress
                         switch.name = TelinkLightApplication.getApp().getString(R.string.device_name) + switch.meshAddr
-                        switch.macAddr = deviceInfo.macAddress
+                        switch.macAddr = get4ByteMac(deviceInfo.macAddress)
                         switch.version = deviceInfo.firmwareRevision
                         DBUtils.saveSwitch(switch, false)
-                        count++
+                        DBUtils.saveSwitch(switch, isFromServer = false, type = switch.type, keys = switch.keys)
                         LogUtils.v("zcl找回------------$count-------普通-switch-")
                     }
-                    DeviceType.EIGHT_SWITCH -> {
-                        val switch = DbEightSwitch()
-                        switch.productUUID = productUUID
-                        switch.meshAddr = deviceInfo.meshAddress
-                        switch.name = TelinkLightApplication.getApp().getString(R.string.device_name) + switch.meshAddr
-                        switch.macAddr = deviceInfo.macAddress
-                        switch.firmwareVersion = deviceInfo.firmwareRevision
-                        DBUtils.saveEightSwitch(switch, false)
-                        count++
-                        LogUtils.v("zcl找回-----------$count--------8k-switch--")
-                    }
                 }
-        } else {
+        } else {//存在责更新版本
             when (productUUID) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
                     val db = DBUtils.getLightByMeshAddr(deviceInfo.meshAddress)
                     db?.let {
                         it.version = deviceInfo.firmwareRevision
-                        LogUtils.v("zcl-----是否找回设备版本------${!isExist&&isRecoverMeshDevice}-------$isRecoverMeshDevice---${deviceInfo.firmwareRevision}")
+                        LogUtils.v("zcl-----是否找回设备版本------${!isExist}----------${deviceInfo.firmwareRevision}")
                         DBUtils.saveLight(it, true)
                     }
                 }
@@ -296,17 +286,10 @@ object RecoverMeshDeviceUtil {
                         DBUtils.saveSwitch(it, true)
                     }
                 }
-                DeviceType.EIGHT_SWITCH -> {
-                    val db = DBUtils.getEightSwitchByMeshAddr(deviceInfo.meshAddress)
-                    db?.let {
-                        it.firmwareVersion = deviceInfo.firmwareRevision
-                        DBUtils.saveEightSwitch(it, true)
-                    }
-                }
             }
         }
 
-        return !isExist&&isRecoverMeshDevice
+        return !isExist
 
     }
 

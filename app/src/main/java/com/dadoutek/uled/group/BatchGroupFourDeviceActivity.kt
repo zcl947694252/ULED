@@ -372,7 +372,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun setGroupData() {
         groupsByDeviceType.clear()
         groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(deviceType))
-        groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(0))
+        //groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(0))
         val element = DBUtils.getGroupByMeshAddr(0xffff)
         element.deviceType = Constant.DEVICE_TYPE_NO
         DBUtils.saveGroup(element, false)
@@ -385,7 +385,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             gp.isCheckedInGroup = currentGroup != null && currentGroup!!.id == gp.id
 
         isAddGroupEmptyView = true
-        groupAdapter.notifyItemRangeChanged(0, groupsByDeviceType.size)
+        groupAdapter.notifyDataSetChanged()
 
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {

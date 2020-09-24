@@ -88,7 +88,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         try {
             if (position < adapter.data.size) {
                 if (TelinkLightApplication.getApp().connectDevice == null) {
-                    sendToGw(scenesListData!![position])
+                    sendToGw(scenesListData[position])
                 } else {
                     setScene(scenesListData!![position].id!!)
                 }

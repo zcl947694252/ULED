@@ -312,7 +312,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             else {
                 when (view.id) {
                     R.id.template_device_setting -> {
-                        showLoadingDialog(getString(R.string.please_wait))
                         connectAndConfig()
                     }
                     R.id.template_device_icon -> {
@@ -340,7 +339,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         TelinkLightService.Instance()?.idleMode(true)
         Thread.sleep(200)
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
-        if (Constant.IS_ROUTE_MODE)
+        if (IS_ROUTE_MODE)
             currentDevice?.let {
                 RouterModel.routerConnectSwOrSe(it.id, currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
                         ?.subscribe({ response ->
@@ -349,11 +348,13 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                                     disposableTimer?.dispose()
                                     disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
                                             .subscribe {
+                                                showLoadingDialog(getString(R.string.please_wait))
                                                 hideLoadingDialog()
                                                 ToastUtils.showShort(getString(R.string.connect_fail))
                                             }
                                 }
-                                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                                90018 -> {ToastUtils.showShort(getString(R.string.device_not_exit))
+                                finish()}
                                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                             }
@@ -362,13 +363,15 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                             ToastUtils.showShort(it1.message)
                         })
             }
-        else
+        else{
+            showLoadingDialog(getString(R.string.please_wait))
             connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
                 relocationSensor()
             }, {
                 hideLoadingDialog()
                 ToastUtils.showShort(getString(R.string.connect_fail))
             })
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -202,6 +202,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             LogUtils.v("zcl-----------获取状态服务器返回-------$it")
             Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
             Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
+            SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, Constant.IS_ROUTE_MODE)
+            changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
         }, {
             Constant.IS_ROUTE_MODE = false
             Constant.IS_OPEN_AUXFUN = false

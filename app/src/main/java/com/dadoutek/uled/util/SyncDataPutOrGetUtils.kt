@@ -176,24 +176,7 @@ class SyncDataPutOrGetUtils {
                             }
                         }
                     }
-                    "DB_SWITCH" -> {
-//                            when (type) {
-//                                Constant.DB_ADD -> {
-//                                    val switch = DBUtils.getSwitchByID(changeId)
-//                                  return SwitchMdodel.add(token, switch!!, id, changeId)//判断是否是八键开关接口问题
-//                                   //return switch?.let { EightSwitchMdodel.add(it,changeId) }
-//                                }
-//                                Constant.DB_DELETE -> {
-//                                    return EightSwitchMdodel.delete(id, changeId)
-//                                }
-//                                Constant.DB_UPDATE -> {
-//                                    val switch = DBUtils.getSwitchByID(changeId)
-//                                    switch?.let {
-//                                        return EightSwitchMdodel.update(switch, changeId)
-//                                    }
-//                                }
-//                            }
-
+                    "DB_SWITCH","DB_EIGHT_SWITCH" -> {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val switch = DBUtils.getSwitchByID(changeId)
@@ -211,7 +194,7 @@ class SyncDataPutOrGetUtils {
                         }
                     }
 
-                    "DB_EIGHT_SWITCH" -> {
+               /*     "DB_EIGHT_SWITCH" -> {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val switch = DBUtils.getEightSwitchByID(changeId)
@@ -227,7 +210,7 @@ class SyncDataPutOrGetUtils {
                                 }
                             }
                         }
-                    }
+                    }*/
 
                     "DB_SENSOR" -> {
                         when (type) {

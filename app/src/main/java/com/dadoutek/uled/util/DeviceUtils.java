@@ -25,6 +25,8 @@ import java.util.Enumeration;
 import java.util.Locale;
 import java.util.UUID;
 
+import static java.lang.String.valueOf;
+
 /**
  * 创建者     zcl
  * 创建时间   2017/6/26 14:38
@@ -350,5 +352,19 @@ public class DeviceUtils {
             return result;
         }
         return null;
+    }
+
+    public static String get4ByteMac(String macString) {
+        String[] strArray = macString.split(":");
+        byte[] macBytes = new byte[4];
+        macBytes[0] = (byte) (Integer.parseInt(strArray[5], 16) & 0xFF);//78-9C-E7-08-A9-3D
+        macBytes[1] = (byte) (Integer.parseInt(strArray[4], 16) & 0xFF);
+        macBytes[2] = (byte) (Integer.parseInt(strArray[3], 16) & 0xFF);
+        macBytes[3] = (byte) (Integer.parseInt(strArray[2], 16) & 0xFF);
+
+        long mac4Byte = (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
+
+        String mac = strArray[5]+":"+strArray[4]+":"+strArray[3]+":"+strArray[2];
+        return valueOf(mac4Byte);
     }
 }

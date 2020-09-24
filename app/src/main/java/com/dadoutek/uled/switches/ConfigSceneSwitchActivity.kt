@@ -49,7 +49,8 @@ import kotlin.collections.ArrayList
 
 private const val CONNECT_TIMEOUT = 20
 
-class ConfigSceneSwitchActivity(var disposableTimer: Disposable) : BaseSwitchActivity(), EventListener<String>, View.OnClickListener {
+class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, View.OnClickListener {
+    private var disposableTimer: Disposable? = null
     private val requestCodes: Int = 1000
     private var version: String = ""
     private var newMeshAddr: Int = 0
@@ -162,8 +163,6 @@ class ConfigSceneSwitchActivity(var disposableTimer: Disposable) : BaseSwitchAct
                 ToastUtils.showShort(getString(R.string.please_config_all))
                 return
             }
-            pb_ly.visibility = View.VISIBLE
-
             if (Constant.IS_ROUTE_MODE) {
                 val sceneMeshAddrs = mutableListOf<Int>()
                 mapConfig.forEach { sceneMeshAddrs.add(it.value.id.toInt()) }
@@ -173,11 +172,12 @@ class ConfigSceneSwitchActivity(var disposableTimer: Disposable) : BaseSwitchAct
                             //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
                             //    "errorCode": 90007,"该组不存在，刷新组列表"
                             //    "errorCode": 90005,"以下路由没有上线，无法配置"
-                             //   "errorCode":90011 , "有场景不存在，刷新场景列表"
+                            //   "errorCode":90011 , "有场景不存在，刷新场景列表"
 
 
                             when (it.errorCode) {
                                 0 -> {
+                                    pb_ly.visibility = View.VISIBLE
                                     disposableTimer?.dispose()
                                     disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
                                             .subscribe {
@@ -195,41 +195,43 @@ class ConfigSceneSwitchActivity(var disposableTimer: Disposable) : BaseSwitchAct
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                             }
                         }, { ToastUtils.showShort(it.message) })
-            } else
-            GlobalScope.launch {
-                //setSceneForSwitch()
-                val mesh = mApp?.mesh
-                val params = Parameters.createUpdateParameters()
-                if (BuildConfig.DEBUG) {
-                    params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-                } else {
-                    params.setOldMeshName(mesh?.factoryName)
-                }
-                params.setOldPassword(mesh?.factoryPassword)
-                params.setNewMeshName(mesh?.name)
-
-                if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                    params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh?.name) + mesh?.name))
-                } else {
-                    params.setNewPassword(mesh?.password)
-                }
-
-                params.setUpdateDeviceList(mDeviceInfo)
-                var keyNum = 0
-                for (key in mapConfig.keys) {
-                    when (key) {
-                        0 -> keyNum = 0x05          //左上按键
-                        1 -> keyNum = 0x03          //右上按键
-                        2 -> keyNum = 0x06          //左下按键
-                        3 -> keyNum = 0x04          //右下按键
+            } else {
+                pb_ly.visibility = View.VISIBLE
+                GlobalScope.launch {
+                    //setSceneForSwitch()
+                    val mesh = mApp?.mesh
+                    val params = Parameters.createUpdateParameters()
+                    if (BuildConfig.DEBUG) {
+                        params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+                    } else {
+                        params.setOldMeshName(mesh?.factoryName)
                     }
-                    delay(key * 100L)
-                    val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, mapConfig.getValue(key).id.toByte(), 0x00)
-                    LogUtils.v("zcl-----------配置场景参数-----$keyNum---${mapConfig.getValue(key).id}")
-                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo.meshAddress, paramBytes)
+                    params.setOldPassword(mesh?.factoryPassword)
+                    params.setNewMeshName(mesh?.name)
+
+                    if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+                        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh?.name) + mesh?.name))
+                    } else {
+                        params.setNewPassword(mesh?.password)
+                    }
+
+                    params.setUpdateDeviceList(mDeviceInfo)
+                    var keyNum = 0
+                    for (key in mapConfig.keys) {
+                        when (key) {
+                            0 -> keyNum = 0x05          //左上按键
+                            1 -> keyNum = 0x03          //右上按键
+                            2 -> keyNum = 0x06          //左下按键
+                            3 -> keyNum = 0x04          //右下按键
+                        }
+                        delay(key * 100L)
+                        val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, mapConfig.getValue(key).id.toByte(), 0x00)
+                        LogUtils.v("zcl-----------配置场景参数-----$keyNum---${mapConfig.getValue(key).id}")
+                        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo.meshAddress, paramBytes)
+                    }
+                    delay(1800)
+                    updateMesh()
                 }
-                delay(1800)
-                updateMesh()
             }
         }
     }

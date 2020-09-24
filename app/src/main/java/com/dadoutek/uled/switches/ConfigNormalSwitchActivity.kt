@@ -387,7 +387,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun showDisconnectSnackBar() {
-        if (Constant.IS_ROUTE_MODE) {
+        if (!Constant.IS_ROUTE_MODE) {
             TelinkLightService.Instance()?.idleMode(true)
             reconnect()
         } else {

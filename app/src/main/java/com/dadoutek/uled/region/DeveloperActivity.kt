@@ -41,6 +41,7 @@ import com.dadoutek.uled.region.bean.SettingItemBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.polidea.rxandroidble2.scan.ScanSettings
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -147,6 +148,8 @@ class DeveloperActivity : BaseActivity() {
         }
         TelinkLightService.Instance()?.idleMode(true)
         showLoadingDialog(getString(R.string.please_wait))
+        val scanFilter = com.polidea.rxandroidble2.scan.ScanFilter.Builder().setDeviceName(DBUtils.lastUser?.controlMeshName).build()
+        val scanSettings = ScanSettings.Builder().build()
         disposableFind = RecoverMeshDeviceUtil.findMeshDevice(DBUtils.lastUser?.controlMeshName)
                 .subscribeOn(Schedulers.io())
                 .subscribe({

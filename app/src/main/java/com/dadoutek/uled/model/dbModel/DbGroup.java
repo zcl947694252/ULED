@@ -22,7 +22,7 @@ public class DbGroup implements Serializable{
     private Long id;
     @NotNull
     private int meshAddr;
-    private String name;
+    private String name ="";
     private int brightness;
     private int colorTemperature;
     private int belongRegionId;

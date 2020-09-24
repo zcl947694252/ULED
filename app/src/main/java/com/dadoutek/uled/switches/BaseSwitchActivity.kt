@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit
 private var last_start_time = 0
 private var debounce_time = 1000
 
-abstract class BaseSwitchActivity : TelinkBaseActivity() {
+abstract class BaseSwitchActivity() : TelinkBaseActivity() {
     private var sw: DbSwitch? = null
     private var deviceType: Int = DeviceType.NORMAL_SWITCH
     var isReConfig: Boolean = false

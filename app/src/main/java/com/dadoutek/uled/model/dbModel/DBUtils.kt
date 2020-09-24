@@ -610,14 +610,16 @@ object DBUtils {
      * 一个mesh地址对应一个组
      */
     fun getGroupByMeshAddr(mesh: Int): DbGroup {
-        var dbGroup: DbGroup? = null
+        var dbGroup = DbGroup()
+            dbGroup.id=0L
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
 //        Log.d("datasave", "getGroupByMeshAddr: $mesh")
         if (dbGroupLs.size > 0) {
             dbGroup = dbGroupLs[0]
         }
-        return dbGroup ?: createAllLightControllerGroup()    //如果获取不到所有灯这个组，就直接创建一个返回
+        return dbGroup  //如果获取不到所有灯这个组，就直接创建一个返回
     }
+
 
     fun getLightMeshAddr(meshAddr: Int): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).build()
