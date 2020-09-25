@@ -41,7 +41,9 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.AccountModel
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.RouterTimeoutBean
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
@@ -73,6 +75,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.singleLine
 import java.util.concurrent.TimeUnit
+
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity() {
@@ -142,6 +145,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     var renameEt: EditText? = null
     var popReNameView: View? = null
     lateinit var renameDialog: Dialog
+    public var disposableRouteTimer: Disposable? = null
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -169,6 +173,37 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         filter.addAction("STATUS_CHANGED")
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 2
 //        registerReceiver(changeRecevicer, filter)
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routeOpenOrCloseBase(meshAddr: Int, productUUID: Int, status: Int, serId: String) {//如果发送后失败则还原
+        LogUtils.v("zcl-----------收到路由开关灯指令-------deviceType-------$productUUID")
+        RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
+            LogUtils.v("zcl-----------收到路由成功-------$it")
+            //    "errorCode": 90018,该设备不存在，请重新刷新数据"
+            //    "errorCode": 90008,该设备没有绑定路由，无法操作"
+            //   "errorCode": 90007该组不存在，请重新刷新数据"
+            //    errorCode": 90005,"message": "该设备绑定的路由没在线"
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                if (productUUID == DeviceType.LIGHT_NORMAL)
+                                    ToastUtils.showShort(getString(R.string.open_faile))
+                            }
+                }
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+            }
+        }, {
+            LogUtils.v("zcl-----------收到路由失败-------$it")
+            ToastUtils.showShort(it.message)
+        })
     }
 
     private fun startTimerUpdate() {
@@ -389,7 +424,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 // RecoverMeshDeviceUtil.addDevicesToDb(deviceInfo)//  如果已连接的设备不存在数据库，则创建。 主要针对扫描的界面和会连接的界面
             }
             LightAdapter.STATUS_LOGOUT -> {
-              LogUtils.v("zcl---baseactivity收到登出广播")
+                LogUtils.v("zcl---baseactivity收到登出广播")
                 GlobalScope.launch(Dispatchers.Main) {
                     changeDisplayImgOnToolbar(false)
                     afterLoginOut()
@@ -641,6 +676,30 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         registerReceiver(stompRecevice, filter)
     }
 
+    @SuppressLint("CheckResult")
+    open fun deviceResetFactory(meshAddr: Int, productUUID: Int, ser_id: String) {
+        //    "errorCode": 20030,已生成移交码，此时不支持任何恢复操作，请删除移交码再重试"
+        RouterModel.routeResetFactory(meshAddr, productUUID, ser_id)?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                            }
+                }
+                90030 -> ToastUtils.showShort(getString(R.string.transfer_accounts_code_exit_cont_perform))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -670,29 +729,34 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
                     tzRouterGroupResult(routerGroup)
                 }
-                Cmd.routeAddScenes ->{
+                Cmd.routeAddScenes -> {
                     val routerScene = Gson().fromJson(msg, RouteSceneBean::class.java)
                     tzRouterAddScene(routerScene)
                 }
-                Cmd.routeUpdateDeviceVersion ->{//版本号回调
+                Cmd.routeUpdateDeviceVersion -> {//版本号回调
                     val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
                     tzRouterUpdateVersionRecevice(routerVersion)
                 }
-                Cmd.routeOTAing ->{
+                Cmd.routeOTAing -> {
                     val routerOTAingNumBean = Gson().fromJson(msg, RouterOTAingNumBean::class.java)
                     tzRouterOTAingNumRecevice(routerOTAingNumBean)
                 }
-                Cmd.routeOTAFinish ->{
+                Cmd.routeOTAFinish -> {
                     val routerOTAFinishBean = Gson().fromJson(msg, RouterOTAFinishBean::class.java)
                     tzRouterOTAFinishRecevice(routerOTAFinishBean)
                 }
-                Cmd.tzRouteAddGradient , Cmd.tzRouteDelGradient,Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean)
-                Cmd.tzRouteConnectSwSe  -> tzRouterConnectSwSeRecevice(cmdBean)
+                Cmd.tzRouteAddGradient, Cmd.tzRouteDelGradient, Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean)
+                Cmd.tzRouteConnectSwSe -> tzRouterConnectSwSeRecevice(cmdBean)
 
                 /**
                  * 控制指令下的通知
                  */
-                Cmd.tzRouteOpenOrClose  -> tzRouterOpenOrClose(cmdBean)
+                Cmd.tzRouteOpenOrClose -> tzRouterOpenOrClose(cmdBean)
+                Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean,true)
+                Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean,false)
+                Cmd.tzRouteSlowUPSlowDownSw -> tzRouterSSSW(cmdBean,false)
+                Cmd.tzRouteSlowUPSlowDownSpeed -> tzRouterSSSpeed(cmdBean)
+                Cmd.tzRouteResetFactory -> tzRouterResetFactory(cmdBean)
             }
 /*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -742,6 +806,23 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
             }*/
         }
+
+
+    }
+
+    open fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun tzRouterSSSpeed(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun tzRouterSSSW(cmdBean: CmdBodyBean, b: Boolean) {
+
+    }
+    open fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {
+
     }
 
     open fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
@@ -1273,5 +1354,54 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         renameDialog?.setCanceledOnTouchOutside(false)
         renameCancel?.setOnClickListener { renameDialog?.dismiss() }
         //确定回调 单独写
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
+        LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
+        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, serId)?.subscribe({
+            //    "errorCode": 90018"该设备不存在，请重新刷新数据"
+            //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //    "errorCode": 90007,"该组不存在，请重新刷新数据
+            //    "errorCode": 90005"message": "该设备绑定的路由没在线"
+            configBriOrColorTempResult(it, true)
+        }) {
+            ToastUtils.showShort(it.message)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routeConfigTempGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
+        RouterModel.routeConfigColorTemp(meshAddr, deviceType, brightness, serId)?.subscribe({
+            //    "errorCode": 90018"该设备不存在，请重新刷新数据"
+            //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //    "errorCode": 90007,"该组不存在，请重新刷新数据
+            //    "errorCode": 90005"message": "该设备绑定的路由没在线"
+            configBriOrColorTempResult(it, false)
+        }) {
+            ToastUtils.showShort(it.message)
+        }
+    }
+
+    private fun configBriOrColorTempResult(it: Response<RouterTimeoutBean>, isBri: Boolean) {
+        LogUtils.v("zcl-----------收到配置亮度-------$isBri")
+        when (it.errorCode) {
+            0 -> {
+                showLoadingDialog(getString(R.string.please_wait))
+                disposableRouteTimer?.dispose()
+                disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                        .subscribe {
+                            hideLoadingDialog()
+                            if (isBri)
+                                ToastUtils.showShort(getString(R.string.config_bri_fail))
+                            else
+                                ToastUtils.showShort(getString(R.string.config_color_temp_fail))
+                        }
+            }
+            90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+            90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+            90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+        }
     }
 }

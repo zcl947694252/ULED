@@ -55,6 +55,7 @@ import java.util.concurrent.TimeUnit
 private const val CONNECT_TIMEOUT = 5
 
 class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
+    private var isTouchSw: Boolean = false
     private var disposableTimer: Disposable? = null
     private var deviceConfigType: Int = 0
     private var groupName: String? = null
@@ -88,7 +89,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         localVersion = intent.getStringExtra("version")
         deviceConfigType = intent.getIntExtra("deviceType", 0)
 
-        if (!localVersion.contains("BT") && !TextUtils.isEmpty(localVersion)) {
+        //st bt 全部为触摸开关
+         isTouchSw = localVersion.contains("BT")
+                || localVersion.contains("ST") || localVersion.contains("SS-2.0.1")
+        if (!isTouchSw) {
             sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)
         } else {
@@ -105,8 +109,8 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         fiVersion?.title = localVersion
 
         //tvLightVersion.text = localVersion
-        if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
-            isGlassSwitch = true
+        //if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
+            isGlassSwitch = isTouchSw
 
         isReConfig = groupName != null && groupName == "true"
         fiRename?.isVisible = isReConfig

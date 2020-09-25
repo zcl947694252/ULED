@@ -32,7 +32,6 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
     var deleteDeviceAll: MenuItem? = null
     private var onlineUpdateAll: MenuItem? = null
     private var batchGpAll: MenuItem? = null
-    public var disposableRouteTimer: Disposable?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutId())
@@ -184,35 +183,6 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             setPositiveBtn()
         }
         builder?.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
-    }
-
-    @SuppressLint("CheckResult")
-    open fun routeOpenOrClose(meshAddr: Int,productUUID: Int, status: Int,serId:String) {//如果发送后失败则还原
-        RouterModel.routeOpenOrClose(meshAddr, productUUID, status,serId)?.subscribe({
-            LogUtils.v("zcl-----------收到路由成功-------$it")
-            //    "errorCode": 90018,该设备不存在，请重新刷新数据"
-            //    "errorCode": 90008,该设备没有绑定路由，无法操作"
-            //   "errorCode": 90007该组不存在，请重新刷新数据"
-            //    errorCode": 90005,"message": "该设备绑定的路由没在线"
-            when (it.errorCode) {
-                0 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.open_faile))
-                            }
-                }
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-            }
-        }, {
-            LogUtils.v("zcl-----------收到路由失败-------$it")
-            ToastUtils.showShort(it.message)
-        })
     }
 
     abstract fun setPositiveBtn()

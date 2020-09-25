@@ -302,7 +302,57 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    /**
+     * 控制相关开始
+     * 调节亮度
+     */
+    fun routeConfigBrightness( meshAddr:Int , meshType:Int , brightness :Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeConfigBrightness(meshAddr, meshType,brightness, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    /**
+     * 控制相关开始
+     * 调节色温
+     */
+    fun routeConfigColorTemp( meshAddr:Int , meshType:Int , colorTemperature :Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeConfigColorTemp(meshAddr, meshType,colorTemperature, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 控制相关开始  int	1开 2关 (特别注意2才是关)
+     * 开关缓起缓灭
+     */
+    fun routeSlowUpSlowDownSw( status:Int ,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeSlowUpSlowDownSwitch(status, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    /**
+     * 控制相关开始
+     * 调节缓起缓灭速度
+     */
+    fun routeSlowUpSlowDownSpeed( speed:Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeSlowUpSlowDownSpeed(speed,ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    /**
+     * 控制相关开始
+     * 恢复出厂设置  meshType	是	int	meshAddr类型  普通灯 = 4彩灯 = 6 蓝牙连接器 = 5
+     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部 = 100
+     * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致
+     */
+    fun routeResetFactory( meshAddr:Int , meshType:Int ,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeResetFactory(meshAddr,meshType,ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }
+
 
 
 

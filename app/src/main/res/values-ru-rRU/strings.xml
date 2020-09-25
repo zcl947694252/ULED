@@ -1026,5 +1026,13 @@
     <string name="open_faile">路由开灯失败</string>
     <string name="delete_group_success">路由删组成功,共%1$s设备移除该组</string>
     <string name="delete_group_some_fail">路由删组失败,部分设备移除组失败</string>
+    <string name="config_bri_fail">配置亮度失败</string>
+    <string name="config_color_temp_fail">路由配置色温失败</string>
+    <string name="slow_close_faile">缓起缓灭关闭失败</string>
+    <string name="slow_close_success">缓起缓灭关闭成功</string>
+    <string name="slow_open_faile">缓起缓灭开启失败</string>
+    <string name="slow_speed_success">缓起缓灭速度调节成功</string>
+    <string name="slow_speed_faile">缓起缓灭速度调节失败</string>
+    <string name="transfer_accounts_code_exit_cont_perform">已生成移交码，此时不支持此操作，请删除移交码再重试</string>
 
 </resources>

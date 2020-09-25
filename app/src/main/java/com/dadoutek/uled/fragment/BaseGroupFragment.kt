@@ -449,7 +449,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.open_faile))
@@ -468,9 +468,9 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     override fun tzRouterOpenOrCloseFragment(cmdBean: CmdBodyBean) {
         disposableRouteTimer?.dispose()
-        LogUtils.v("zcl------收到路由开关组通知------------$cmdBean")
         hideLoadingDialog()
         if (cmdBean.ser_id == "zu"&&currentGroup!=null) {
+        LogUtils.v("zcl------收到路由开关组通知------------$cmdBean")
             if (currentGroup!!.status == 0) currentGroup?.connectionStatus = 1 else currentGroup?.connectionStatus = 0
             when (cmdBean.status) {
                 0 -> {
@@ -554,7 +554,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     val isLight = groupType == Constant.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constant.DEVICE_TYPE_LIGHT_RGB
                     when {
                         isLight && position == 0 -> {
-                            if (TelinkLightApplication.getApp().connectDevice != null) {
+                            if (TelinkLightApplication.getApp().connectDevice != null||Constant.IS_ROUTE_MODE) {
                                 val intentSetting = Intent(context, NormalSettingActivity::class.java)
                                 intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                                 intentSetting.putExtra("group", DBUtils.allGroups[0])

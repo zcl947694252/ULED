@@ -198,6 +198,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                                     },
                                     {
                                         hideLoadingDialog()
+                                        ToastUtils.showShort(it.message)
                                         LogUtils.d(it)
                                     }
                             )

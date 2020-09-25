@@ -927,6 +927,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 -1 -> ToastUtils.showShort(getString(R.string.group_failed))
                 0, 1 -> {
                     if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                    hideLoadingDialog()
                     SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                         override fun start() {}
                         override fun complete() {

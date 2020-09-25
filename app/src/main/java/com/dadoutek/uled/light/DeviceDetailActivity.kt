@@ -375,7 +375,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         when (currentLight!!.connectionStatus) {
             ConnectionStatus.OFF.value -> {
                 if (Constant.IS_ROUTE_MODE)// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-                    routeOpenOrClose(currentLight.meshAddr, currentLight.productUUID, 1, "deng")
+                    routeOpenOrCloseBase(currentLight.meshAddr, currentLight.productUUID, 1, "deng")
                 else {
                     when (currentLight!!.productUUID) {
                         DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = true, isPause = false)//开窗
@@ -386,7 +386,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             }
             else -> {
                 if (Constant.IS_ROUTE_MODE)
-                    routeOpenOrClose(currentLight.meshAddr, currentLight.productUUID, 0, "deng")
+                    routeOpenOrCloseBase(currentLight.meshAddr, currentLight.productUUID, 0, "deng")
                 else {
                     when (currentLight!!.productUUID) {
                         DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = false, isPause = false)//关窗
