@@ -36,8 +36,10 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -62,6 +64,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener, OnClickListener {
+    private var sendProgress: Int = 1
     private var tempSpeed: Int = 0
     private var findItemChangeGp: MenuItem? = null
     private var findItem: MenuItem? = null
@@ -484,10 +487,41 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {
         LogUtils.v("zcl------收到路由配置亮度灯通知------------$cmdBean")
         disposableRouteTimer?.dispose()
-        if (cmdBean.status == 0)
+        if (cmdBean.status == 0) {
+            when {
+                currentShowPageGroup -> {
+                    when {
+                        isBri -> group?.brightness = sendProgress
+                        else -> group?.colorTemperature = sendProgress
+                    }
+                    if (group != null)
+                        DBUtils.saveGroup(group!!, false)
+                }
+                else -> {
+                    when {
+                        isBri -> light?.brightness = sendProgress
+                        else -> light?.colorTemperature = sendProgress
+                    }
+                    DBUtils.saveLight(light, false)
+                }
+            }
             hideLoadingDialog()
-        else {
+        } else {
             hideLoadingDialog()
+            when {
+                currentShowPageGroup -> {
+                    when {
+                        isBri -> light_sbBrightness.progress = group?.brightness ?: 1
+                        else -> light_sbBrightness.progress = group?.colorTemperature ?: 1
+                    }
+                }
+                else -> {
+                    when {
+                        isBri -> light_sbBrightness.progress = light?.brightness
+                        else -> light_sbBrightness.progress = light?.colorTemperature
+                    }
+                }
+            }
             when {
                 isBri -> ToastUtils.showShort(getString(R.string.config_bri_fail))
                 else -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
@@ -1014,20 +1048,45 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     private fun updateGroupResult(light: DbLight, group: DbGroup) {
-        Commander.addGroup(light.meshAddr, group.meshAddr, {
-            group.deviceType = light.productUUID.toLong()
-            light.hasGroup = true
-            light.belongGroupId = group.id
-            light.name = light.name
-            DBUtils.updateLight(light)
-            ToastUtils.showShort(getString(R.string.grouping_success_tip))
-            if (group != null)
-                DBUtils.updateGroup(group!!)//更新组类型
-            finish()
-        }, {
-            ToastUtils.showShort(getString(R.string.grouping_fail))
-        })
+        if (Constant.IS_ROUTE_MODE) {
+            val bodyBean = GroupBodyBean(mutableListOf(light.meshAddr), light.productUUID, "normalGp", group.meshAddr)
+            routerToGpDevice(bodyBean)
+        } else {
+            Commander.addGroup(light.meshAddr, group.meshAddr, {
+                group.deviceType = light.productUUID.toLong()
+                light.hasGroup = true
+                light.belongGroupId = group.id
+                light.name = light.name
+                DBUtils.updateLight(light)
+                ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                if (group != null)
+                    DBUtils.updateGroup(group!!)//更新组类型
+            }, {
+                ToastUtils.showShort(getString(R.string.grouping_fail))
+            })
+        }
+    }
 
+    @SuppressLint("StringFormatMatches")
+    override fun tzRouterGroupResult(bean: RouteGroupingOrDelOrGetVerBean?) {
+        if (bean?.ser_id == "normalGp") {
+            LogUtils.v("zcl-----------收到路由普通灯分组通知-------$bean")
+            disposableRouteTimer?.dispose()
+            if (bean?.finish) {
+                hideLoadingDialog()
+                when (bean?.status) {
+                    -1 -> ToastUtils.showShort(getString(R.string.group_failed))
+                    0, 1 -> {
+                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                            override fun start() {}
+                            override fun complete() {}
+                            override fun error(msg: String?) {}
+                        })
+                    }
+                }
+            }
+        }
     }
 
     private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
@@ -1710,19 +1769,20 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         isBrightness -> {//亮度
             group = DBUtils.getGroupByID(group!!.id)
             when {
-                currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, group!!.brightness, "gpBri")
-                else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, light!!.brightness, "lightBri")
+                currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, "gpBri")
+                else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, "lightBri")
             }
         }
         else -> {
             when {
-                currentShowPageGroup && group != null -> routeConfigTempGpOrLight(group!!.meshAddr, 97, group!!.brightness, "gpTem")
-                else -> routeConfigTempGpOrLight(light!!.meshAddr, light!!.productUUID, light!!.brightness, "lightTem")
+                currentShowPageGroup && group != null -> routeConfigTempGpOrLight(group!!.meshAddr, 97, sendProgress, "gpTem")
+                else -> routeConfigTempGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, "lightTem")
             }
         }
     }
 
 
+    @SuppressLint("CheckResult")
     private fun renameLight() {
         findItem?.title = localVersion
         hideLoadingDialog()
@@ -1740,11 +1800,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 light?.name = renameEt?.text.toString().trim { it <= ' ' }
-                DBUtils.updateLight(light!!)
-                toolbarTv.text = light?.name
+                if (Constant.IS_ROUTE_MODE) {
+                    RouterModel.routeUpdateLightName(light.id, light?.name)?.subscribe({
+                        renameSucess()
+                    }, {
+                        ToastUtils.showShort(it.message)
+                    })
+                } else {
+                    renameSucess()
+                }
                 renameDialog?.dismiss()
             }
         }
+    }
+
+    private fun renameSucess() {
+        DBUtils.updateLight(light!!)
+        toolbarTv.text = light?.name
     }
 
 
@@ -1830,7 +1902,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
+            sendProgress = seekBar.progress
             if (Constant.IS_ROUTE_MODE) {
+                sendProgress = seekBar.progress
                 routerConfigBrightnesssOrColorTemp()
             } else {
                 onValueChange(seekBar, seekBar.progress, true)
@@ -1838,7 +1912,17 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
-
+            if (isBrightness) {
+                when {
+                    currentShowPageGroup -> group?.brightness = seekBar.progress
+                    else -> light?.brightness = seekBar.progress
+                }
+            } else {
+                when {
+                    currentShowPageGroup -> group?.colorTemperature = seekBar.progress
+                    else -> light?.colorTemperature = seekBar.progress
+                }
+            }
             isProcessChange = 1
             preTime = System.currentTimeMillis()
             onValueChange(seekBar, seekBar!!.progress, false)
@@ -2033,12 +2117,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
 
     fun remove() {
-        if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
-            AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))
-                    .setPositiveButton(android.R.string.ok) { _, _ ->
-                        if (Constant.IS_ROUTE_MODE) {
-                            deviceResetFactory(light!!.meshAddr, light!!.productUUID, "lightFactory")
-                        } else
+        if (Constant.IS_ROUTE_MODE) {
+            deviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "lightFactory")
+        } else {
+            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
+                AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+
                             if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                                 showLoadingDialog(getString(R.string.please_wait))
                                 val disposable = Commander.resetDevice(light!!.meshAddr)
@@ -2060,14 +2145,18 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                                 finish()
                             }
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
+                        }
+                        .setNegativeButton(R.string.btn_cancel, null)
+                        .show()
+            } else {
+                autoConnectAll()
+            }
         }
     }
 
     override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id == "lightFactory") {
+            LogUtils.v("zcl-----------收到路由恢复出厂得到通知-------$cmdBean")
             hideLoadingDialog()
             if (cmdBean.status == 0)
                 deleteData()
@@ -2079,6 +2168,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     fun deleteData() {
         LogUtils.v("zcl-----恢复出厂成功")
         hideLoadingDialog()
+        ToastUtils.showShort(getString(R.string.successful_resumption))
         DBUtils.deleteLight(light!!)
         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)

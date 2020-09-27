@@ -1112,7 +1112,7 @@
     <string name="loacal_del">本地删除</string>
     <string name="region_not_router">该账号该区域下没有路由，无法操作</string>
     <string name="delete_scene_fail">删除场景失败</string>
-    <string name="no_bind_router_cant_version">全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由</string>
+    <string name="no_bind_router_cant_version">选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由</string>
     <string name="get_version_success_num">获取设备版本号中，当前有5个设备刷新了版本号</string>
     <string name="sanning_to_scan_activity">扫描中不能OTA，2秒后跳转至扫描界面</string>
     <string name="no_this_device_type">未收录的scanType:</string>
@@ -1129,7 +1129,7 @@
     <string name="device_not_exit">该设备不存在，请重新刷新数据</string>
     <string name="gradient_not_exit">该自定义渐变不存在，请重新刷新数据</string>
     <string name="del_gradient_fail">删除渐变失败</string>
-    <string name="scene_exit_to_refresh">有场景不存在，刷新场景列表</string>
+    <string name="scene_cont_exit_to_refresh">有场景不存在，刷新场景列表</string>
     <string name="router_stop_scan_faile">停止路由扫描失败</string>
     <string name="scan_result_confirm">扫描结果确认中,请稍后</string>
     <string name="group_timeout">设备分组超时</string>
@@ -1145,4 +1145,6 @@
     <string name="slow_speed_success">缓起缓灭速度调节成功</string>
     <string name="slow_speed_faile">缓起缓灭速度调节失败</string>
     <string name="transfer_accounts_code_exit_cont_perform">已生成移交码，此时不支持此操作，请删除移交码再重试</string>
+    <string name="add_group_fail">添加分组失败</string>
+    <string name="scene_apply_fail">场景应用失败</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.model.httpModel
 
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.network.NetworkFactory
@@ -18,6 +19,12 @@ object GroupMdodel {
                 .doOnNext {
                     DBUtils.deleteDbDataChange(id)
                 }
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun batchAddOrUpdateGp(list: List<DbGroup>): Observable<Response<Any>>? {
+        return NetworkFactory.getApi()
+                .batchUpGroupList(list)
+                .observeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 

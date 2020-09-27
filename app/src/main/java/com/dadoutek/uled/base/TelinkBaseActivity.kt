@@ -40,13 +40,15 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.routerModel.RouterModel
-import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.RouterTimeoutBean
+import com.dadoutek.uled.model.routerModel.RouterModel.routeApplyScene
+import com.dadoutek.uled.network.*
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.MacResetBody
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
@@ -677,11 +679,12 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     @SuppressLint("CheckResult")
-    open fun deviceResetFactory(meshAddr: Int, productUUID: Int, ser_id: String) {
+    open fun deviceResetFactory(mac: String, meshAddr: Int, productUUID: Int, ser_id: String) {
         //    "errorCode": 20030,已生成移交码，此时不支持任何恢复操作，请删除移交码再重试"
-        RouterModel.routeResetFactory(meshAddr, productUUID, ser_id)?.subscribe({
+        RouterModel.routeResetFactory(MacResetBody(macAddr = mac, meshAddr = meshAddr, meshType = productUUID, ser_id = ser_id))?.subscribe({
             when (it.errorCode) {
                 0 -> {
+                    LogUtils.v("zcl-----------收到路由的恢复出厂结果-------$it")
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
@@ -733,6 +736,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     val routerScene = Gson().fromJson(msg, RouteSceneBean::class.java)
                     tzRouterAddScene(routerScene)
                 }
+
                 Cmd.routeUpdateDeviceVersion -> {//版本号回调
                     val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
                     tzRouterUpdateVersionRecevice(routerVersion)
@@ -752,11 +756,13 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                  * 控制指令下的通知
                  */
                 Cmd.tzRouteOpenOrClose -> tzRouterOpenOrClose(cmdBean)
-                Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean,true)
-                Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean,false)
-                Cmd.tzRouteSlowUPSlowDownSw -> tzRouterSSSW(cmdBean,false)
+                Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean, true)
+                Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean, false)
+                Cmd.tzRouteSlowUPSlowDownSw -> tzRouterSSSW(cmdBean, false)
                 Cmd.tzRouteSlowUPSlowDownSpeed -> tzRouterSSSpeed(cmdBean)
                 Cmd.tzRouteResetFactory -> tzRouterResetFactory(cmdBean)
+
+
             }
 /*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -810,6 +816,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     }
 
+    open fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {
+
+    }
+
     open fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
 
     }
@@ -821,6 +831,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     open fun tzRouterSSSW(cmdBean: CmdBodyBean, b: Boolean) {
 
     }
+
     open fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {
 
     }
@@ -1372,6 +1383,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     @SuppressLint("CheckResult")
     open fun routeConfigTempGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
+        LogUtils.v("zcl----------- zcl-----------发送路由调色参数-------$brightness-------")
         RouterModel.routeConfigColorTemp(meshAddr, deviceType, brightness, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"
             //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
@@ -1403,5 +1415,30 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
         }
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerToGpDevice(bodyBean: GroupBodyBean) {
+        RouterModel.routeBatchGpNew(bodyBean)?.subscribe({ itR ->
+            LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")
+            when (itR.errorCode) {
+                NetworkStatusCode.OK -> {//等待会回调
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.SECONDS)
+                            .subscribe {
+                                ToastUtils.showShort(getString(R.string.group_timeout))
+                            }
+                }
+                NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                NetworkStatusCode.PRODUCTUUID_NOT_MATCH_DEVICE_TYPE -> ToastUtils.showShort(getString(R.string.device_type_not_match))
+                NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
+                NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
+            }
+
+        }, {
+            LogUtils.v("zcl-----------收到路由fenzu失败-------$it")
+            ToastUtils.showShort(it.message)
+        })
     }
 }

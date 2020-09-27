@@ -189,7 +189,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                                     ToastUtils.showShort(getString(R.string.device_not_exit))
                                     finish()
                                 }
-                                90011 -> ToastUtils.showShort(getString(R.string.scene_exit_to_refresh))
+                                90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -359,10 +359,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         if (groupName == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch!!.meshAddr
                 dbSwitch.controlSceneId = getControlScene()
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/ mDeviceInfo.meshAddress
+                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch!!.meshAddr
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.version = mDeviceInfo.firmwareRevision
                 DBUtils.updateSwicth(dbSwitch)

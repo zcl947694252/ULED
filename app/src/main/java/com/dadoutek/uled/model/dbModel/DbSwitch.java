@@ -35,7 +35,7 @@ public class DbSwitch implements Serializable {
     public String groupIds;
     @Nullable
     public String sceneIds;
-    public  String controlGroupAddrs;
+    public  String controlGroupAddrs = "[]";
     public String version;
     public boolean isMostNew = false;
     private String boundMac;

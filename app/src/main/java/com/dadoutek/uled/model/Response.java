@@ -1,5 +1,7 @@
 package com.dadoutek.uled.model;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -7,6 +9,7 @@ import com.google.gson.annotations.SerializedName;
  */
 
 public class Response<T> {
+    @Nullable
     @SerializedName("data")
     T t;
     @SerializedName("errorCode")

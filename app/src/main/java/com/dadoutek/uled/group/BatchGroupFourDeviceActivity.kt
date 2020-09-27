@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.Response
+import com.dadoutek.uled.model.httpModel.GroupMdodel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.network.NetworkFactory
@@ -239,12 +240,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         disposableIntervalTime?.dispose()
         disposableIntervalTime = Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
                 .subscribe {
-                    if (blinkList.size > 0){
-                     //   LogUtils.v("zcl-----------收到理由闪烁-------$blinkList---------${blinkList.size}")
+                    if (blinkList.size > 0) {
+                        //   LogUtils.v("zcl-----------收到理由闪烁-------$blinkList---------${blinkList.size}")
                         RouterModel.routeBatchGpBlink(GroupBlinkBodyBean(blinkList, deviceType))?.subscribe({
-                           // LogUtils.v("zcl----------收到理由闪烁--------成功")
+                            // LogUtils.v("zcl----------收到理由闪烁--------成功")
                         }, {
-                          //  LogUtils.v("zcl----------收到理由闪烁--------失败")
+                            //  LogUtils.v("zcl----------收到理由闪烁--------失败")
                         })
                     }
                 }
@@ -400,6 +401,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun showGroupForUpdateNameDialog(position: Int) {
         val textGp = EditText(this)
         textGp.singleLine = true
@@ -417,35 +419,50 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         groupsByDeviceType?.get(position)?.name = textGp.text.toString().trim { it <= ' ' }
                         val group = groupsByDeviceType?.get(position)
-                        if (group != null)
-                            DBUtils.updateGroup(group)
-                        groupAdapter?.notifyItemRangeChanged(position, 1)
-                        when (deviceType) {
-                            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                                for (device in listGroup) {
-                                    if (device.belongGroupId == group.id)
-                                        device.groupName = group.name
-                                }
-                                lightGroupedAdapterm.notifyDataSetChanged()
-                            }
-                            DeviceType.SMART_CURTAIN -> {
-                                for (device in listGroupCutain) {
-                                    if (device.belongGroupId == group.id)
-                                        device.groupName = group.name
-                                }
-                                curtainGroupedAdapterm.notifyDataSetChanged()
-                            }
-                            DeviceType.SMART_RELAY -> {
-                                for (device in listGroupRelay) {
-                                    if (device.belongGroupId == group.id)
-                                        device.groupName = group.name
-                                }
-                                relayGroupedAdapterm.notifyDataSetChanged()
-                            }
+                        if (Constant.IS_ROUTE_MODE) {
+                            GroupMdodel.batchAddOrUpdateGp(mutableListOf(group))?.subscribe({
+                               if (it.errorCode==0)
+                                   renameGpSuccess(group, position)
+                                else
+                                   ToastUtils.showShort(getString(R.string.rename_faile))
+                            }, {
+                                ToastUtils.showShort(it.message)
+                            })
+                        } else {
+                        renameGpSuccess(group, position)
                         }
                     }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+    }
+
+    private fun renameGpSuccess(group: DbGroup, position: Int) {
+        if (group != null)
+            DBUtils.updateGroup(group)
+        groupAdapter?.notifyItemRangeChanged(position, 1)
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                for (device in listGroup) {
+                    if (device.belongGroupId == group.id)
+                        device.groupName = group.name
+                }
+                lightGroupedAdapterm.notifyDataSetChanged()
+            }
+            DeviceType.SMART_CURTAIN -> {
+                for (device in listGroupCutain) {
+                    if (device.belongGroupId == group.id)
+                        device.groupName = group.name
+                }
+                curtainGroupedAdapterm.notifyDataSetChanged()
+            }
+            DeviceType.SMART_RELAY -> {
+                for (device in listGroupRelay) {
+                    if (device.belongGroupId == group.id)
+                        device.groupName = group.name
+                }
+                relayGroupedAdapterm.notifyDataSetChanged()
+            }
+        }
     }
 
     /**
@@ -563,11 +580,27 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 curtain!!.name = renameEt?.text.toString().trim { it <= ' ' }
-                DBUtils.updateCurtain(curtain!!)
-                changeDeviceData()
+
+                if (curtain != null) {
+                    when {
+                        Constant.IS_ROUTE_MODE -> {
+                            val subscribe = RouterModel.routeUpdateCurtainName(curtain!!.id, curtain?.name)?.subscribe({
+                                renameCurtainSuccess(curtain)
+                            }, {
+                                ToastUtils.showShort(it.message)
+                            })
+                        }
+                        else ->    renameCurtainSuccess(curtain)
+                    }
+                }
                 renameDialog.dismiss()
             }
         }
+    }
+
+    private fun renameCurtainSuccess(curtain: DbCurtain?) {
+        DBUtils.updateCurtain(curtain!!)
+        changeDeviceData()
     }
 
     private fun renameConnector(connector: DbConnector?) {
@@ -586,14 +619,31 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     ToastUtils.showLong(getString(R.string.rename_tip_check))
                 } else {
                     connector.name = renameEt?.text.toString().trim { it <= ' ' }
-                    DBUtils.updateConnector(connector)
-                    changeDeviceData()
+
+                    when {
+                        Constant.IS_ROUTE_MODE -> {
+                            val subscribe = RouterModel.routeUpdateCurtainName(connector!!.id, connector?.name)?.subscribe({
+                                renameRelaySuccess(connector)
+                            }, {
+                                ToastUtils.showShort(it.message)
+                            })
+                        }
+                        else ->   renameRelaySuccess(connector)
+                    }
+
+                    renameRelaySuccess(connector)
                     renameDialog.dismiss()
                 }
             }
         }
     }
 
+    private fun renameRelaySuccess(connector: DbConnector) {
+        DBUtils.updateConnector(connector)
+        changeDeviceData()
+    }
+
+    @SuppressLint("CheckResult")
     private fun renameLight(light: DbLight?) {
         if (!TextUtils.isEmpty(light?.name))
             renameEt?.setText(light?.name)
@@ -610,13 +660,26 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             } else {
                 light?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (light != null) {
-                    DBUtils.updateLight(light)
-                    changeSorceData(light.id)
+                    when {
+                        Constant.IS_ROUTE_MODE -> {
+                            val subscribe = RouterModel.routeUpdateLightName(light!!.id, light?.name)?.subscribe({
+                                renameLightSuccess(light)
+                            }, {
+                                ToastUtils.showShort(it.message)
+                            })
+                        }
+                        else ->  renameLightSuccess(light!!)
+                    }
                 }
                 // changeDeviceData()
                 renameDialog.dismiss()
             }
         }
+    }
+
+    private fun renameLightSuccess(light: DbLight) {
+        DBUtils.updateLight(light)
+        changeSorceData(light.id)
     }
 
     private fun changeSorceData(id: Long?) {
@@ -626,12 +689,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     val light = DBUtils.getLightByID(id)
                     deviceDataLightAll.remove(light)
                     deviceDataLightAll.add(light!!)
-                    /* for (device in deviceDataLightAll) {
-                     if (light?.id == device.id){
-                         device.name = light?.name
-                         target = device
-                     }
-                 }*/
+                    lightAdapterm.notifyDataSetChanged()
+                    lightGroupedAdapterm.notifyDataSetChanged()
 
                 }
                 DeviceType.SMART_CURTAIN -> {
@@ -639,19 +698,15 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     val curtain = DBUtils.getCurtainByID(id)
                     deviceDataCurtainAll.remove(curtain)
                     deviceDataCurtainAll.add(curtain!!)
-                    /*   for (device in deviceDataCurtainAll) {
-                           if (curtain?.id == device.id)
-                               device.name = curtain?.name
-                       }*/
+                    curtainAdapterm.notifyDataSetChanged()
+                    curtainGroupedAdapterm.notifyDataSetChanged()
                 }
                 DeviceType.SMART_RELAY -> {
                     val connector = DBUtils.getConnectorByID(id)
                     deviceDataRelayAll.remove(connector)
                     deviceDataRelayAll.add(connector!!)
-                    /*  for (device in deviceDataRelayAll) {
-                          if (connector?.id == device.id)
-                              device.name = connector?.name
-                      }*/
+                    relayAdapterm.notifyDataSetChanged()
+                    relayGroupedAdapterm.notifyDataSetChanged()
                 }
             }
     }
@@ -865,16 +920,15 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     @SuppressLint("CheckResult")
     private fun routerGroupDevice(list: MutableList<Int>, it: View?) {
-        LogUtils.v("zcl-----------收到路由新传递参数-------${GroupBodyBean(list, deviceType, "213", currentGroup!!.meshAddr)}")
-        showLoadingDialog(getString(R.string.grouping))
-        val subscribe = RouterModel.routeBatchGpNew(GroupBodyBean(list, deviceType, "213", currentGroup!!.meshAddr))?.subscribe({ itR ->
+        LogUtils.v("zcl-----------收到路由新传递参数-------${GroupBodyBean(list, deviceType, "batchGp", currentGroup!!.meshAddr)}")
+        val subscribe = RouterModel.routeBatchGpNew(GroupBodyBean(list, deviceType, "batchGp", currentGroup!!.meshAddr))?.subscribe({ itR ->
             LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")
             nameLists.clear()
             when (itR.errorCode) {
                 NetworkStatusCode.OK -> {//等待会回调
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.MILLISECONDS)
+                    disposableTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.SECONDS)
                             .subscribe {
                                 ToastUtils.showShort(getString(R.string.group_timeout))
                             }
@@ -920,27 +974,31 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     @SuppressLint("StringFormatMatches")
     override fun tzRouterGroupResult(bean: RouteGroupingOrDelOrGetVerBean?) {
-        disposableTimer?.dispose()
-        if (bean?.finish == true) {
-            changeDeviceAll()
-            when (bean?.status) {
-                -1 -> ToastUtils.showShort(getString(R.string.group_failed))
-                0, 1 -> {
-                    if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
-                    hideLoadingDialog()
-                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
-                        override fun start() {}
-                        override fun complete() {
-                            groupTzRefresh(bean)
-                        }
+        if (bean?.ser_id == "batchGp") {
+            disposableTimer?.dispose()
+            if (bean?.finish) {
+                hideLoadingDialog()
+                changeDeviceAll()
+                when (bean?.status) {
+                    -1 -> ToastUtils.showShort(getString(R.string.group_failed))
+                    0, 1 -> {
+                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        hideLoadingDialog()
+                        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                            override fun start() {}
+                            override fun complete() {
+                                LogUtils.v("zcl-----------拉取成功-------")
+                                groupTzRefresh(bean)
+                            }
 
-                        override fun error(msg: String?) {
-                            groupTzRefresh(bean)
-                        }
-                    })
+                            override fun error(msg: String?) {
+                                groupTzRefresh(bean)
+                            }
+                        })
+                    }
                 }
+                LogUtils.v("zcl-----------收到路由分组通知-------$bean")
             }
-            LogUtils.v("zcl-----------收到路由分组通知-------$bean")
         }
     }
 

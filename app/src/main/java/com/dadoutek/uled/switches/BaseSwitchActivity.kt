@@ -178,7 +178,7 @@ abstract class BaseSwitchActivity() : TelinkBaseActivity() {
         if (!TextUtils.isEmpty(switchDate?.name))
             renameEt?.setText(switchDate?.name)
         else
-            renameEt?.setText(toolbarTv.text.toString() + "-" + DBUtils.getAllSwitch().size)
+            renameEt?.setText(toolbarTv.text.toString() + "-" + switchDate?.meshAddr)
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {

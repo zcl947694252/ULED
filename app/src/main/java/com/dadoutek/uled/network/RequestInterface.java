@@ -30,6 +30,7 @@ import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
 import com.dadoutek.uled.router.GroupBlinkBodyBean;
+import com.dadoutek.uled.router.bean.MacResetBody;
 import com.dadoutek.uled.router.bean.RouteScanResultBean;
 import com.dadoutek.uled.router.bean.RouterBatchGpBean;
 import com.dadoutek.uled.router.bean.RouterVersionsBean;
@@ -217,6 +218,16 @@ public interface RequestInterface {
                                           //                                          colorTemperature,
                                           //@Path("region_id") int region_id,
                                           @Path("gid") int gid);
+
+    /**
+     * 批量添加组  http://dev.dadoutek.com/smartlight/group/add-batch POST
+     * groups	是	数组	多个组
+     * { groups:[{"id":1, "meshAddr":1,  "name":"group10","brightness":1, "colorTemperature":1,
+     *         "color":1,"index":1, "deviceType":4,"status":1, "slowUpSlowDownStatus": 0,"slowUpSlowDownSpeed": 1 } ]}
+     */
+    @FormUrlEncoded
+    @POST("group/add-batch")
+    Observable<Response> batchUpGroupList(@Field("groups") List<DbGroup> listGp);
 
     //获取组列表
     @GET("group/list")
@@ -837,9 +848,8 @@ public interface RequestInterface {
      * "macAddr": "0102030405",
      */
     @FormUrlEncoded
-    @HTTP(method = "DELETE", path = "router/router-reset")
-    Observable<Response<Long>> routerReset(@Field("macAddr") String macAddr,
-                                           @Field("ser_id") String ser_id);
+    @HTTP(method = "DELETE", path = "router/router-reset", hasBody = true)
+    Observable<Response<Long>> routerReset(@Body() MacResetBody body);
 
     /**
      * 路由更新
@@ -1011,10 +1021,8 @@ public interface RequestInterface {
      * "sid" : 1,
      * "ser_id": "app会话id，自己维护"
      */
-    @FormUrlEncoded
-    @HTTP(method = "DELETE", path = "router/del-scene")
-    Observable<Response<RouterTimeoutBean>> routerDelScene(@Field("sid") int sid,
-                                                           @Field("ser_id") String ser_id);
+    @HTTP(method = "DELETE", path = "router/del-scene",hasBody = true)
+    Observable<Response<RouterTimeoutBean>> routerDelScene(@Body() SceneBodyBean body);
 
     /**
      * 路由器获取版本号   https://dev.dadoutek.com/xxxx/router/device-version  POST
@@ -1282,10 +1290,53 @@ public interface RequestInterface {
      *      = 100
      *      * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致
      */
+    @HTTP(method = "DELETE", path = "router/control/reset", hasBody = true)
+    Observable<Response<RouterTimeoutBean>> routeResetFactory(@Body MacResetBody body);
+
+
+    /**
+     *灯更新  请求URL  https://dev.dadoutek.com/xxxx/light/update/{id} PUT
+     * 参数名	必选	类型	说明
+     * index	否	int	排序值 暂时不用
+     * name	否	string	名称
+     */
     @FormUrlEncoded
-    @HTTP(method = "DELETE", path = "router/control/reset")
-    Observable<Response<RouterTimeoutBean>> routeResetFactory(@Field("meshAddr") int meshAddr,
-                                                              @Field("meshType") int meshType,
-                                                              @Field("ser_id") String ser_id);
+    @PUT("light/update/{id}")
+    Observable<Response> routeUpdateLight(@Path("id") long id, @Field("name") String name);
+
+    /**
+     * 窗帘更新  https://dev.dadoutek.com/xxxx/curtain/update/{id}* PUT
+     * https://dev.dadoutek.com/smartlight_test/curtain/update/1
+     */
+    @FormUrlEncoded
+    @PUT("curtain/update/{id}")
+    Observable<Response> routeUpdateCurtain(@Path("id") long id, @Field("name") String name);
+    /**
+     * 连接器更新*https://dev.dadoutek.com/xxxx/relay/update/{id}
+     */
+    @FormUrlEncoded
+    @PUT("relay/update/{id}")
+    Observable<Response> routeUpdateRelay(@Path("id") long id, @Field("name") String name);
+    /**
+     * 灯更新 https://dev.dadoutek.com/xxxx/sensor/update/{id}
+     */
+    @FormUrlEncoded
+    @PUT("sensor/update/{id}")
+    Observable<Response> routeUpdateSensor(@Path("id") long id, @Field("name") String name);
+    /**
+     * 开关更新  https://dev.dadoutek.com/xxxx/switch/update/{id}
+     */
+    @FormUrlEncoded
+    @PUT("switch/update/{id}")
+    Observable<Response> routeUpdateSwitch(@Path("id") long id, @Field("name") String name);
+
+    /**
+     * 应用场景https://dev.dadoutek.com/xxxx/router/control/scene/apply  POST
+     * id	是	int	场景id
+     * ser_id	是	string	app会话id，推送时回传
+     */
+    @FormUrlEncoded
+    @POST("router/control/scene/apply")
+    Observable<Response<RouterTimeoutBean>> routeApplyScene (@Field("id") long id, @Field("ser_id") String ser_id);
 
 }

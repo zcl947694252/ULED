@@ -111,7 +111,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             toolbarTv.text = switchDate?.name
             switchDate?.let {
                 val stringToList = GsonUtil.stringToList<Double>(it.controlGroupAddrs)
-                if (stringToList == null || stringToList.size < 2) {
+                if (stringToList == null /*|| stringToList.size < 2*/) {
                     ToastUtils.showShort(getString(R.string.invalid_data))
                     finish()
                 } else {
@@ -194,9 +194,9 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             } else {
                 var dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
                 dbSwitch.macAddr = mDeviceInfo.macAddress
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
+                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
                 dbSwitch.productUUID = mDeviceInfo.productUUID
                 dbSwitch.index = dbSwitch.id.toInt()
                 dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr

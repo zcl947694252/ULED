@@ -12,7 +12,6 @@ import com.dadoutek.uled.switches.bean.KeyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import retrofit2.http.Field
 
 
 /**
@@ -60,9 +59,9 @@ object RouterModel {
     /**
      * 删除路由
      */
-    fun delete(it: DbRouter, ser_id: String): Observable<Long>? {
+    fun delete(bodyBean: MacResetBody): Observable<Long>? {
         return NetworkFactory.getApi()
-                .routerReset(it.macAddr, ser_id)
+                .routerReset(bodyBean)
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {}
@@ -116,6 +115,7 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     fun routeBatchGpNew(bodyBean: GroupBodyBean): Observable<Response<RouterBatchGpBean>>? {
         return NetworkFactory.getApi().routerBatchGpN(bodyBean)
                 .subscribeOn(Schedulers.io())
@@ -178,7 +178,7 @@ object RouterModel {
      * 路由删除场景
      */
     fun routeDelScene(sceneActionId: Int): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerDelScene(sceneActionId, "delScene")
+        return NetworkFactory.getApi().routerDelScene(SceneBodyBean("delScene",sceneActionId))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -229,10 +229,11 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     /**
      * 更新自定义渐变
      */
-    fun routerUpdateGradient( id: Int, type: Int, colorNodes: List<DbColorNode>, meshAddr: Int, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
+    fun routerUpdateGradient(id: Int, type: Int, colorNodes: List<DbColorNode>, meshAddr: Int, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routerUpdateCustomGradient(id, type, colorNodes, meshType, "addGradient")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -241,7 +242,7 @@ object RouterModel {
     /**
      * 删除自定义渐变
      */
-    fun routerDelGradient(idList:List<Int>,  meshAddr:Int, meshType:Int): Observable<Response<RouterTimeoutBean>>? {
+    fun routerDelGradient(idList: List<Int>, meshAddr: Int, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routerDelCustomGradient(idList, meshAddr, meshType, "delGradient")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -250,7 +251,7 @@ object RouterModel {
     /**
      * 直连开关或传感器
      */
-    fun routerConnectSwOrSe(id: Long, meshType:Int): Observable<Response<RouterTimeoutBean>>? {
+    fun routerConnectSwOrSe(id: Long, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routerConnectSwOrSensor(id.toInt(), meshType, "connectSwOrse")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -259,7 +260,7 @@ object RouterModel {
     /**
      * 配置普通开关
      */
-    fun configNormalSw(id: Long, groupMeshAddr:Int): Observable<Response<RouterTimeoutBean>>? {
+    fun configNormalSw(id: Long, groupMeshAddr: Int): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().configNormalSw(id.toInt(), groupMeshAddr, "configNormalSw")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -269,7 +270,7 @@ object RouterModel {
     /**
      * 配置双组开关
      */
-    fun configDoubleSw(id: Long, groupMeshAddrs:List<Int>): Observable<Response<RouterTimeoutBean>>? {
+    fun configDoubleSw(id: Long, groupMeshAddrs: List<Int>): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().configDoubleSw(id.toInt(), groupMeshAddrs, "configDoubleSw")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -278,7 +279,7 @@ object RouterModel {
     /**
      * 配置场景开关
      */
-    fun configSceneSw(id: Long, groupMeshAddrs:List<Int>): Observable<Response<RouterTimeoutBean>>? {
+    fun configSceneSw(id: Long, groupMeshAddrs: List<Int>): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().configSceneSw(id.toInt(), groupMeshAddrs, "configSceneSw")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -287,7 +288,7 @@ object RouterModel {
     /**
      * 配置场景开关
      */
-    fun configEightSw(id: Long, keys:List<KeyBean>): Observable<Response<RouterTimeoutBean>>? {
+    fun configEightSw(id: Long, keys: List<KeyBean>): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().configEightSw(id.toInt(), keys, "configEightSw")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -297,8 +298,8 @@ object RouterModel {
      * 控制相关开始
      * 开关灯
      */
-    fun routeOpenOrClose( meshAddr:Int , meshType:Int , status :Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeOpenOrClose(meshAddr, meshType,status, ser_id)
+    fun routeOpenOrClose(meshAddr: Int, meshType: Int, status: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeOpenOrClose(meshAddr, meshType, status, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -307,17 +308,18 @@ object RouterModel {
      * 控制相关开始
      * 调节亮度
      */
-    fun routeConfigBrightness( meshAddr:Int , meshType:Int , brightness :Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeConfigBrightness(meshAddr, meshType,brightness, ser_id)
+    fun routeConfigBrightness(meshAddr: Int, meshType: Int, brightness: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeConfigBrightness(meshAddr, meshType, brightness, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     /**
      * 控制相关开始
      * 调节色温
      */
-    fun routeConfigColorTemp( meshAddr:Int , meshType:Int , colorTemperature :Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeConfigColorTemp(meshAddr, meshType,colorTemperature, ser_id)
+    fun routeConfigColorTemp(meshAddr: Int, meshType: Int, colorTemperature: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeConfigColorTemp(meshAddr, meshType, colorTemperature, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -326,28 +328,61 @@ object RouterModel {
      * 控制相关开始  int	1开 2关 (特别注意2才是关)
      * 开关缓起缓灭
      */
-    fun routeSlowUpSlowDownSw( status:Int ,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+    fun routeSlowUpSlowDownSw(status: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routeSlowUpSlowDownSwitch(status, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     /**
      * 控制相关开始
      * 调节缓起缓灭速度
      */
-    fun routeSlowUpSlowDownSpeed( speed:Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeSlowUpSlowDownSpeed(speed,ser_id)
+    fun routeSlowUpSlowDownSpeed(speed: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeSlowUpSlowDownSpeed(speed, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     /**
      * 控制相关开始
      * 恢复出厂设置  meshType	是	int	meshAddr类型  普通灯 = 4彩灯 = 6 蓝牙连接器 = 5
      * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部 = 100
      * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致
      */
-    fun routeResetFactory( meshAddr:Int , meshType:Int ,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeResetFactory(meshAddr,meshType,ser_id)
+    fun routeResetFactory(bodyBean: MacResetBody): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeResetFactory(bodyBean)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 控制相关开始
+     * 恢复出厂设置  meshType	是	int	meshAddr类型  普通灯 = 4彩灯 = 6 蓝牙连接器 = 5
+     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部 = 100
+     * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致
+     */
+    fun routeUpdateLightName(id: Long, name: String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routeUpdateLight(id, name)
+               // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun routeUpdateRelayName(id: Long, name: String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routeUpdateLight(id, name)
+               // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun routeUpdateCurtainName(id: Long, name: String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routeUpdateLight(id, name)
+               // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun routeApplyScene(id: Long, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeApplyScene(id, ser_id)
+               // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

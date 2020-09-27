@@ -1,5 +1,6 @@
 package com.dadoutek.uled.scene
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -62,6 +63,7 @@ import kotlin.collections.ArrayList
  */
 
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
+    private var disposableRouteTimer: Disposable? = null
     private var currentDbScene: DbScene? = null
     private var goHelp: TextView? = null
     private var disposableTimer: Disposable? = null
@@ -87,14 +89,54 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     internal var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
         try {
             if (position < adapter.data.size) {
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    sendToGw(scenesListData[position])
-                } else {
-                    setScene(scenesListData!![position].id!!)
+                val dbScene = scenesListData[position]
+                when {
+                    Constant.IS_ROUTE_MODE -> {
+                        RouterModel.routeApplyScene(dbScene.id, "applyScene")?.subscribe({
+                            //    "errorCode": 90011,message": "场景不存在，请刷新场景数据"
+                            when (it.errorCode) {
+                                0 -> {
+                                    showLoadingDialog(getString(R.string.please_wait))
+                                    disposableRouteTimer?.dispose()
+                                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                            .subscribe {
+                                                hideLoadingDialog()
+                                                ToastUtils.showShort(getString(R.string.scene_apply_fail))
+                                            }
+                                }
+                                90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
+                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                            }
+                        }, {
+                            ToastUtils.showShort(it.message)
+                        })
+                    }
+                    else -> {
+                        when (TelinkLightApplication.getApp().connectDevice) {
+                            null -> {
+                                sendToGw(dbScene)
+                            }
+                            else -> setScene(dbScene.id!!)
+                        }
+                    }
                 }
+
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    override fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id=="applyScene"){
+            hideLoadingDialog()
+            disposableRouteTimer?.dispose()
+            if (cmdBean.status ==0){
+                ToastUtils.showShort(getString(R.string.scene_apply_success))
+            }else{
+                ToastUtils.showShort(getString(R.string.scene_apply_fail))
+            }
         }
     }
 
@@ -157,15 +199,15 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         ?.subscribe({
                             startDelSceneTimeOut(it.t)
                             when (it.errorCode) {
-                                OK, ROUTER_DEL_SCENE_NOT_EXITE,ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE,ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(list, dbScene)
+                                OK, ROUTER_DEL_SCENE_NOT_EXITE, ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE, ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(list, dbScene)
                                 //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
                                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
-                                ROUTER_NO_EXITE->ToastUtils.showShort(getString(R.string.region_not_router))
-                                ROUTER_ALL_OFFLINE->ToastUtils.showShort(getString(R.string.router_offline))
+                                ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
+                                ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
                             }
 
                         }, {
-                         ToastUtils.showShort(it.message)
+                            ToastUtils.showShort(it.message)
                         })
             } else {
                 val opcode = Opcode.SCENE_ADD_OR_DEL
@@ -183,10 +225,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer((it?.timeout?:0).toLong(), TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer((it?.timeout ?: 0).toLong(), TimeUnit.MILLISECONDS)
                 .subscribe {
-                showLoadingDialog(getString(R.string.delete_scene_fail))
-        }
+                    showLoadingDialog(getString(R.string.delete_scene_fail))
+                }
     }
 
     private fun deleteSceneSuccess(list: ArrayList<DbSceneActions>, dbScene: DbScene) {
@@ -233,6 +275,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             })
     }
 
+    @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
@@ -617,7 +660,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     R.id.add_scenes -> {
 
                         val nowSize = DBUtils.sceneList.size
-                        if (TelinkLightApplication.getApp().connectDevice == null) {
+
+                        if (TelinkLightApplication.getApp().connectDevice == null && Constant.IS_ROUTE_MODE) {
                             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                         } else {
                             if (nowSize >= SCENE_MAX_COUNT) {
@@ -727,7 +771,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
-    override fun routerDelSceneResult(cmdBean: CmdBodyBean) {
+    override fun tzRouterDelSceneResult(cmdBean: CmdBodyBean) {
         if (cmdBean.finish && cmdBean.status == 1) {////1 0 -1  部分成功 成功 失败
             currentDbScene?.let {
                 val list = DBUtils.getActionsBySceneId(it.id)
