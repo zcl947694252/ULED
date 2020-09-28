@@ -33,7 +33,6 @@ import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.BindRouterActivity
-import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.scene.NewSceneSetAct

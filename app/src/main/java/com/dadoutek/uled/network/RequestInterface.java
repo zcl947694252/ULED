@@ -5,7 +5,6 @@ import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.DbRouter;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
-import com.dadoutek.uled.model.dbModel.DbColorNode;
 import com.dadoutek.uled.model.dbModel.DbConnector;
 import com.dadoutek.uled.model.dbModel.DbCurtain;
 import com.dadoutek.uled.model.dbModel.DbDeleteGradientBody;
@@ -22,6 +21,7 @@ import com.dadoutek.uled.model.dbModel.DbUser;
 import com.dadoutek.uled.model.httpModel.BatchRemove8kBody;
 import com.dadoutek.uled.model.httpModel.RemoveCodeBody;
 import com.dadoutek.uled.model.routerModel.RouteStasusBean;
+import com.dadoutek.uled.model.routerModel.UpdateGradientBean;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
 import com.dadoutek.uled.network.bean.TransferRegionBean;
 import com.dadoutek.uled.region.RegionBcBean;
@@ -29,7 +29,10 @@ import com.dadoutek.uled.region.bean.ParseCodeBean;
 import com.dadoutek.uled.region.bean.RegionBean;
 import com.dadoutek.uled.region.bean.ShareCodeBean;
 import com.dadoutek.uled.region.bean.TransferBean;
+import com.dadoutek.uled.rgb.AddGradientBean;
+import com.dadoutek.uled.router.DelGradientBodyBean;
 import com.dadoutek.uled.router.GroupBlinkBodyBean;
+import com.dadoutek.uled.router.SceneAddBodyBean;
 import com.dadoutek.uled.router.bean.MacResetBody;
 import com.dadoutek.uled.router.bean.RouteScanResultBean;
 import com.dadoutek.uled.router.bean.RouterBatchGpBean;
@@ -989,12 +992,8 @@ public interface RequestInterface {
      * ],
      * "ser_id": "app会话id，自己维护"
      */
-    @FormUrlEncoded
     @POST("router/add-scene")
-    Observable<Response<RouterTimeoutBean>> routerAddScene(@Field("name") String sceneName,
-                                                           @Field("imgName") String imgName,
-                                                           @Field("actions") List actions,
-                                                           @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routerAddScene(@Body SceneAddBodyBean body);
 
     /**
      * 更新场景
@@ -1022,7 +1021,7 @@ public interface RequestInterface {
      * "ser_id": "app会话id，自己维护"
      */
     @HTTP(method = "DELETE", path = "router/del-scene",hasBody = true)
-    Observable<Response<RouterTimeoutBean>> routerDelScene(@Body() SceneBodyBean body);
+    Observable<Response<RouterTimeoutBean>> routerDelScene(@Body() SceneIdBodyBean body);
 
     /**
      * 路由器获取版本号   https://dev.dadoutek.com/xxxx/router/device-version  POST
@@ -1104,16 +1103,10 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/add-custom-dc")
-    Observable<Response<RouterTimeoutBean>> routerAddCustomGradient(@Field("name") String name,
-                                                                    @Field("type") int type,
-                                                                    @Field("speed") int speed,
-                                                                    @Field("colorNodes") List<DbColorNode> colorNodes,
-                                                                    @Field("meshAddr") int meshAddr,
-                                                                    @Field("meshType") int meshType,
-                                                                    @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routerAddCustomGradient(@Body AddGradientBean addGradientBean);
 
     /**
-     * 更新自定义渐变  https://dev.dadoutek.com/xxxx/router/update-custom-d PUT
+     * 更新自定义渐变  https://dev.dadoutek.com/xxxx/router/update-custom-dc PUT
      * ser_id	是	string	app会话id，推送时回传
      * id	是	int	自定义渐变id
      * type	是	int	渐变类型
@@ -1124,12 +1117,8 @@ public interface RequestInterface {
      * "rgbw": 16731983,"index": 0,"id": 1} ] "meshAddr": 1,"meshType": 6 }
      * meshType 彩灯 = 6  组 = 97
      */
-    @FormUrlEncoded
-    @POST("router/update-custom-d")
-    Observable<Response<RouterTimeoutBean>> routerUpdateCustomGradient(@Field("id") int id,
-                                                                       @Field("type") int type,
-                                                                       @Field("colorNodes") List<DbColorNode> colorNodes,
-                                                                       @Field("meshType") int meshType, @Field("ser_id") String ser_id);
+    @PUT("router/update-custom-dc")
+    Observable<Response<RouterTimeoutBean>> routerUpdateCustomGradient(@Body UpdateGradientBean bean);
 
     /**
      * 删除自定义渐变 https://dev.dadoutek.com/xxxx/router/del-custom-dc DELETE
@@ -1139,10 +1128,17 @@ public interface RequestInterface {
      * meshType	是	int	meshAddr类型
      * meshType 彩灯 = 6 组 = 97
      */
-    @FormUrlEncoded
-    @DELETE("router/del-custom-dc")
-    Observable<Response<RouterTimeoutBean>> routerDelCustomGradient(@Field("idList") List<Integer> idList, @Field("meshAddr") int meshAddr,
-                                                                    @Field("meshType") Integer meshType, @Field("ser_id") String ser_id);
+    @HTTP(method = "DELETE", path = "router/del-custom-dc", hasBody = true)
+    Observable<Response<RouterTimeoutBean>> routerDelCustomGradient(@Body DelGradientBodyBean body);
+    /**
+     * 设备&组应用自定义渐变  https://dev.dadoutek.com/xxxx/router/control/dynamic-change/custom/apply POST
+     *meshAddr	是	int	目标meshAddr
+     *ser_id	是	string	app会话id，推送时回传
+     *meshType	是	int	mesh地址类型   meshType 彩灯 = 6 组 = 97
+     *id	是	int	自定义渐变id
+     */
+    @HTTP(method = "DELETE", path = "router/control/dynamic-change/custom/apply", hasBody = true)
+    Observable<Response<RouterTimeoutBean>> routerApplyCustomGradient(@Body ApplyGradientBodyBean body);
 
     /**
      * 直连开关&传感器 https://dev.dadoutek.com/xxxx/router/device-connect POST
@@ -1175,7 +1171,7 @@ public interface RequestInterface {
      * groupMeshAddrs 长度必须是2未配置填0
      */
     @FormUrlEncoded
-    @POST("router/add-custom-dc")
+    @POST("router/double-group-switch/configure")
     Observable<Response<RouterTimeoutBean>> configDoubleSw(@Field("id") int id, @Field(
             "groupMeshAddrs") List<Integer> groupMeshAddrs, @Field("ser_id") String ser_id);
 

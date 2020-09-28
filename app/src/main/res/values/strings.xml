@@ -924,7 +924,7 @@
     <string name="only_one">Only once</string>
     <string name="please_select_scene">Please select the scene</string>
     <string name="timer_exists">The timing time already exists</string>
-    <string name="invalid_data">Invalid data </string>
+    <string name="invalid_data">Invalid data. Please try again </string>
     <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
     <string name="add_time">Add timing task</string>
     <string name="add_times">Add  task</string>

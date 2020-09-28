@@ -35,6 +35,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.DelGradientBodyBean
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -1236,7 +1237,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         clickPostion = position
         when (view!!.id) {
             R.id.diy_mode_on -> {
-                postionAndNum?.position = 100
                 //应用自定义渐变
                 GlobalScope.launch {
                     stopGradient()
@@ -1245,38 +1245,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             diyGradientList!![position].speed, firstLightAddress)
                 }
 
-                diyPosition = position
-
-                diyGradientList!![position].select = true
-
-                for (i in diyGradientList!!.indices) {
-                    if (i != position) {
-                        if (diyGradientList!![i].select) {
-                            diyGradientList!![i].select = false
-                            DBUtils.updateGradient(diyGradientList!![i])
-                        }
-                    }
-                }
-                rgbDiyGradientAdapter!!.notifyDataSetChanged()
-
-                for (i in buildInModeList!!.indices) {
-                    buildInModeList!![i].select = false
-                }
-                rgbGradientAdapter!!.notifyDataSetChanged()
+                diyOpenGradientResult(position)
             }
 
             R.id.diy_mode_off -> {
-                diyPosition = 100
                 Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
-                diyGradientList!![position].select = false
-                rgbDiyGradientAdapter!!.notifyItemChanged(position)
-                DBUtils.updateGradient(diyGradientList!![position])
-
-                for (i in buildInModeList!!.indices) {
-                    buildInModeList!![i].select = false
-                }
-                rgbGradientAdapter!!.notifyDataSetChanged()
-
+                diyGradientCloseResult(position)
             }
 
             R.id.diy_mode_set -> {
@@ -1293,6 +1267,35 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             }
         }
 
+    }
+
+    private fun diyOpenGradientResult(position: Int) {
+        postionAndNum?.position = 100
+        diyPosition = position
+        diyGradientList!![position].select = true
+        for (i in diyGradientList!!.indices) {
+            if (i != position && diyGradientList!![i].select) {
+                diyGradientList!![i].select = false
+                DBUtils.updateGradient(diyGradientList!![i])
+            }
+        }
+        rgbDiyGradientAdapter!!.notifyDataSetChanged()
+
+        for (i in buildInModeList!!.indices)
+            buildInModeList!![i].select = false
+        rgbGradientAdapter!!.notifyDataSetChanged()
+    }
+
+    private fun diyGradientCloseResult(position: Int) {
+        diyPosition = 100
+        diyGradientList!![position].select = false
+        rgbDiyGradientAdapter!!.notifyItemChanged(position)
+        DBUtils.updateGradient(diyGradientList!![position])
+
+        for (i in buildInModeList!!.indices)
+            buildInModeList!![i].select = false
+
+        rgbGradientAdapter!!.notifyDataSetChanged()
     }
 
     private var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { _, _, _ ->
@@ -1320,9 +1323,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             listSize = ArrayList()
 
             for (i in diyGradientList!!.indices) {
-                if (diyGradientList!![i].isSelected) {
+                if (diyGradientList!![i].isSelected)
                     listSize.add(diyGradientList!![i])
-                }
             }
 
             if (listSize.size > 0) {
@@ -1335,12 +1337,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         diyGradientList.forEach {
                             mutableListOf.add(it.id.toInt())
                         }
-                        RouterModel.routerDelGradient(mutableListOf, dstAddress, deviceType)?.subscribe({
-                            //    "errorCode": 90018,"该设备不存在，请重新刷新数据"
-                            //    "errorCode": 90008, "以下路由没有上线，无法删除自定义渐变"
-                            //    "errorCode": 90004, "账号下区域下没有路由，无法操作"
-                            //    "errorCode": 90007, "该组不存在，无法操作"
-                            //    "errorCode": 90005,"以下路由没有上线，无法删除自定义渐变"
+                        RouterModel.routerDelGradient(DelGradientBodyBean(mutableListOf, dstAddress, deviceType,"delGradient"))?.subscribe({
+                            //    "errorCode": 90018,"该设备不存在，请重新刷新数据"    "errorCode": 90008, "以下路由没有上线，无法删除自定义渐变"   "errorCode": 90004, "账号下区域下没有路由，无法操作"
+                            //    "errorCode": 90007, "该组不存在，无法操作"    "errorCode": 90005,"以下路由没有上线，无法删除自定义渐变"
                             when (it.errorCode) {
                                 0 -> {
                                     disposableTimer?.dispose()
@@ -1350,7 +1349,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                                                 hideLoadingDialog()
                                             }
                                 }
-                                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                                 90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))

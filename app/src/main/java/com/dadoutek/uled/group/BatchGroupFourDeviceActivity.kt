@@ -870,18 +870,18 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     val list = mutableListOf<Int>()
                     when (deviceType) {
                         DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                            deviceDataLightAll.filter { it.isSelected }.forEach {
-                                list.add(it.meshAddr)
+                            deviceDataLightAll.filter { it1 -> it1.isSelected }.forEach { it2 ->
+                                list.add(it2.meshAddr)
                             }
                         }
                         DeviceType.SMART_CURTAIN -> {
-                            deviceDataCurtainAll.filter { it.isSelected }.forEach {
-                                list.add(it.meshAddr)
+                            deviceDataCurtainAll.filter { it1 -> it1.isSelected }.forEach { it2 ->
+                                list.add(it2.meshAddr)
                             }
                         }
                         DeviceType.SMART_RELAY -> {
-                            deviceDataRelayAll.filter { it.isSelected }.forEach {
-                                list.add(it.meshAddr)
+                            deviceDataRelayAll.filter{ it1 -> it1.isSelected }.forEach { it2 ->
+                                list.add(it2.meshAddr)
                             }
                         }
                     }

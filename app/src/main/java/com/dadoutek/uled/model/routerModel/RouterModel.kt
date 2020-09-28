@@ -6,7 +6,10 @@ import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.network.*
+import com.dadoutek.uled.rgb.AddGradientBean
+import com.dadoutek.uled.router.DelGradientBodyBean
 import com.dadoutek.uled.router.GroupBlinkBodyBean
+import com.dadoutek.uled.router.SceneAddBodyBean
 import com.dadoutek.uled.router.bean.*
 import com.dadoutek.uled.switches.bean.KeyBean
 import io.reactivex.Observable
@@ -159,8 +162,8 @@ object RouterModel {
     /**
      * 路由添加场景
      */
-    fun routeAddScene(sceneName: String, sceneIcon: String, actions: List<DbSceneActions>): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerAddScene(sceneName, sceneIcon, actions, "addScene")
+    fun routeAddScene(bodyBean: SceneAddBodyBean): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerAddScene(bodyBean)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -178,7 +181,7 @@ object RouterModel {
      * 路由删除场景
      */
     fun routeDelScene(sceneActionId: Int): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerDelScene(SceneBodyBean("delScene",sceneActionId))
+        return NetworkFactory.getApi().routerDelScene(SceneIdBodyBean("delScene", sceneActionId))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -224,8 +227,8 @@ object RouterModel {
          */
     }
 
-    fun routerAddGradient(name: String, type: Int, speed: Int, colorNodes: List<DbColorNode>, meshAddr: Int, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerAddCustomGradient(name, type, speed, colorNodes, meshAddr, meshType, "addGradient")
+    fun routerAddGradient(bean: AddGradientBean): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerAddCustomGradient(bean)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -233,8 +236,8 @@ object RouterModel {
     /**
      * 更新自定义渐变
      */
-    fun routerUpdateGradient(id: Int, type: Int, colorNodes: List<DbColorNode>, meshAddr: Int, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerUpdateCustomGradient(id, type, colorNodes, meshType, "addGradient")
+    fun routerUpdateGradient(bean: UpdateGradientBean): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerUpdateCustomGradient(bean)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -242,8 +245,16 @@ object RouterModel {
     /**
      * 删除自定义渐变
      */
-    fun routerDelGradient(idList: List<Int>, meshAddr: Int, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerDelCustomGradient(idList, meshAddr, meshType, "delGradient")
+    fun routerDelGradient(customBodyBean: DelGradientBodyBean): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerDelCustomGradient(customBodyBean)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    /**
+     * 设备&组应用自定义渐变
+     */
+    fun routerApplyGradient(applyGradientBodyBean: ApplyGradientBodyBean): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerApplyCustomGradient(applyGradientBodyBean)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -364,25 +375,28 @@ object RouterModel {
      */
     fun routeUpdateLightName(id: Long, name: String): Observable<Response<Any>>? {
         return NetworkFactory.getApi().routeUpdateLight(id, name)
-               // .compose(NetworkTransformer())
+                // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     fun routeUpdateRelayName(id: Long, name: String): Observable<Response<Any>>? {
         return NetworkFactory.getApi().routeUpdateLight(id, name)
-               // .compose(NetworkTransformer())
+                // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     fun routeUpdateCurtainName(id: Long, name: String): Observable<Response<Any>>? {
         return NetworkFactory.getApi().routeUpdateLight(id, name)
-               // .compose(NetworkTransformer())
+                // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     fun routeApplyScene(id: Long, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routeApplyScene(id, ser_id)
-               // .compose(NetworkTransformer())
+                // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

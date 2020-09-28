@@ -740,7 +740,7 @@
     <string name="event_list">事件列表</string>
     <string name="tag1">标签1</string>
     <string name="timer_exists">该定时时间已存在</string>
-    <string name="invalid_data">无效数据</string>
+    <string name="invalid_data">无效数据,请重试</string>
     <string name="gate_way_time_max">网关定时已达最大创建数</string>
     <string name="add_time">添加定时任务</string>
     <string name="add_times2">添加循环任务</string>

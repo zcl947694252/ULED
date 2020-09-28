@@ -27,6 +27,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.model.routerModel.UpdateGradientBean
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
@@ -356,7 +357,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             delay(200)
             if (Constant.IS_ROUTE_MODE)
                 diyGradient?.let {
-                    RouterModel.routerUpdateGradient(it.id.toInt(), it.type, it.colorNodes,dstAddress, deviceType)?.subscribe({ response ->
+                    RouterModel.routerUpdateGradient(UpdateGradientBean(it.id.toInt(), it.type, it.colorNodes,dstAddress, deviceType,"updateGradient"))?.subscribe({ response ->
                         //    "errorCode": 90020, "该自定义渐变不存在，请重新刷新数据"
                         //    "errorCode": 90018,"该设备不存在，请重新刷新数据"
                         //    "errorCode": 90008,"该设备没有绑定路由，无法添加自定义渐变"
@@ -416,7 +417,16 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             Thread.sleep(100)
             if (Constant.IS_ROUTE_MODE)
                 diyGradient?.let {
-                    RouterModel.routerAddGradient(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType)?.subscribe({ response ->
+                    /**
+                     * @Field("name") String name,
+                    @Field("type") int type,
+                    @Field("speed") int speed,
+                    @Field("colorNodes") List<DbColorNode> colorNodes,
+                    @Field("meshAddr") int meshAddr,
+                    @Field("meshType") int meshType,
+                    @Field("ser_id") String ser_id
+                     */
+                    RouterModel.routerAddGradient(AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType,"addGra"))?.subscribe({ response ->
                         //    "errorCode": 90018,该设备不存在，请重新刷新数据"
                         //    "errorCode": 90008,该设备没有绑定路由，无法添加自定义渐变"
                         //    "errorCode": 90004 账号下区域下没有路由，无法操作"

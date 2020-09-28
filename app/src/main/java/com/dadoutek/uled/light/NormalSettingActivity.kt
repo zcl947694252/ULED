@@ -38,6 +38,7 @@ import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
@@ -59,6 +60,7 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
+import org.jetbrains.anko.startActivity
 import java.lang.Float
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -1569,11 +1571,19 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     private fun updateOTA() {
-        if (findItem?.title != null && findItem?.title != "version") {
-            checkPermission()
+        if (Constant.IS_ROUTE_MODE) {
+            routerSingleOta()
         } else {
-            Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+            if (findItem?.title != null && findItem?.title != "version") {
+                checkPermission()
+            } else {
+                Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+            }
         }
+    }
+
+    private fun routerSingleOta() {
+        this.startActivity<RouterOtaActivity>("groupOrDeviceId" to light!!.id, "DeviceType" to light.productUUID, "GroupOrTypeOrDevice" to 3)
     }
 
 

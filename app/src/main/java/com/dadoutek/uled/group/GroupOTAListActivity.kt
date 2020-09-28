@@ -136,11 +136,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                 override fun start() {}
                 override fun complete() {
-                    startActivity<RouterOtaActivity>("group" to dbGroup!!, "DeviceType" to deviceType)
+                    this@GroupOTAListActivity.startActivity<RouterOtaActivity>("groupOrDeviceId" to dbGroup!!.id, "DeviceType" to deviceType, "GroupOrTypeOrDevice" to 1)
                 }
 
                 override fun error(msg: String?) {
-                    startActivity<RouterOtaActivity>("group" to dbGroup!!, "DeviceType" to deviceType)
+                    startActivity<RouterOtaActivity>("groupOrDeviceId" to dbGroup!!.id, "DeviceType" to deviceType, "GroupOrTypeOrDevice" to 1)
                 }
             })
         } else {

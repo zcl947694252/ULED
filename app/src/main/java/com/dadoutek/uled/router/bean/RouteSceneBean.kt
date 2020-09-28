@@ -12,7 +12,7 @@ import java.io.Serializable
  * 更新时间   $
  * 更新描述
  */
-data class RouteSceneBean(
+ class RouteSceneBean(
     val cmd: Int,
     val finish: Boolean,
     val msg: String,

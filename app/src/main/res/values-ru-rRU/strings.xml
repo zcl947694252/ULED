@@ -817,7 +817,7 @@
     <string name="only_one">Только один раз</string>
     <string name="please_select_scene">Выберите сцену</string>
     <string name="timer_exists">Диапазон времени занят</string>
-    <string name="invalid_data">Недействующие данные</string>
+    <string name="invalid_data">Перезвоните, пожалуйста</string>
     <string name="gate_way_time_max">Количество таймеров в шлюзе достигло лимита</string>
     <string name="add_time">Добавить запланированное задание</string>
     <string name="add_times">Добавить задачу</string>

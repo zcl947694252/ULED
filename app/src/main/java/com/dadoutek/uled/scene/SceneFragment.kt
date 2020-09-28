@@ -94,6 +94,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     Constant.IS_ROUTE_MODE -> {
                         RouterModel.routeApplyScene(dbScene.id, "applyScene")?.subscribe({
                             //    "errorCode": 90011,message": "场景不存在，请刷新场景数据"
+                            LogUtils.v("zcl-----------收到路由场景应用请求-------$dbScene")
                             when (it.errorCode) {
                                 0 -> {
                                     showLoadingDialog(getString(R.string.please_wait))
@@ -130,12 +131,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id=="applyScene"){
+            LogUtils.v("zcl-----------收到路由场景应用通知-------$cmdBean")
             hideLoadingDialog()
             disposableRouteTimer?.dispose()
-            if (cmdBean.status ==0){
-                ToastUtils.showShort(getString(R.string.scene_apply_success))
-            }else{
-                ToastUtils.showShort(getString(R.string.scene_apply_fail))
+            when (cmdBean.status) {
+                0 ->ToastUtils.showShort(getString(R.string.scene_apply_success))
+                else -> ToastUtils.showShort(getString(R.string.scene_apply_fail))
             }
         }
     }
@@ -151,7 +152,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }//scenesListData!![position].isSelected = !scenesListData!![position].isSelected
 
                 R.id.template_device_setting -> {
-                    if (TelinkLightApplication.getApp().connectDevice == null) {
+                    if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
                         ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     } else {
                         val lastUser = DBUtils.lastUser
@@ -316,6 +317,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         return viewContent
     }
 
+
     private val onClick = View.OnClickListener {
         hidePopupMenu()
         when (it.id) {
@@ -332,7 +334,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             }
             R.id.create_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getApp().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
                     ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                 } else {
                     if (nowSize >= SCENE_MAX_COUNT) {
@@ -661,7 +663,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
                         val nowSize = DBUtils.sceneList.size
 
-                        if (TelinkLightApplication.getApp().connectDevice == null && Constant.IS_ROUTE_MODE) {
+                        if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                         } else {
                             if (nowSize >= SCENE_MAX_COUNT) {
@@ -676,7 +678,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
                     R.id.main_add_device -> {
                         val nowSize = DBUtils.sceneList.size
-                        if (TelinkLightApplication.getApp().connectDevice == null) {
+                        if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
                             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                         } else {
                             if (nowSize >= SCENE_MAX_COUNT) {

@@ -77,47 +77,68 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun initData() {
-        val serializableExtra = intent.getSerializableExtra("group")
-        if (serializableExtra != null)
-            dbGroup = serializableExtra as DbGroup
-        isGroup = dbGroup != null
-        deviceType = if (isGroup)
-            intent.getIntExtra("DeviceType", 0)
-        else
-            (dbGroup?.deviceType ?: 0).toInt()
+        val gpOrTypeOrDevice = intent.getIntExtra("GroupOrTypeOrDevice", 0)
+        if (gpOrTypeOrDevice == 0) {
+            ToastUtils.showShort(getString(R.string.invalid_data))
+            finish()
+        }
+        /*   deviceType = if (isGroup)
+               intent.getIntExtra("DeviceType", 0)
+           else
+               (dbGroup?.deviceType ?: 0).toInt()*/
 
         mesAddrsList.clear()
-        when (deviceType) {
-            DeviceType.LIGHT_NORMAL -> {
-                DBUtils.getAllNormalLight().forEach { mesAddrsList.add(it.meshAddr) }
+        when (gpOrTypeOrDevice) {
+            1 -> {
+                val id = intent.getIntExtra("groupOrDeviceId", 0)
+                when {
+                    id != 0 -> DBUtils.getLightByGroupID(id.toLong()).forEach { mesAddrsList.add(it.meshAddr) }
+                    else -> {
+                        ToastUtils.showShort(getString(R.string.invalid_data))
+                        finish()
+                    }
+                }
             }
-            DeviceType.LIGHT_RGB -> {
-                DBUtils.getAllRGBLight().forEach { mesAddrsList.add(it.meshAddr) }
+            2 -> when (intent.getIntExtra("DeviceType", 0)) {
+                DeviceType.LIGHT_NORMAL -> {
+                    DBUtils.getAllNormalLight().forEach { mesAddrsList.add(it.meshAddr) }
+                }
+                DeviceType.LIGHT_RGB -> {
+                    DBUtils.getAllRGBLight().forEach { mesAddrsList.add(it.meshAddr) }
+                }
+                DeviceType.NORMAL_SWITCH -> {
+                    DBUtils.getAllSwitch().forEach { mesAddrsList.add(it.meshAddr) }
+                }
+                DeviceType.SENSOR -> {
+                    DBUtils.getAllSensor().forEach { mesAddrsList.add(it.meshAddr) }
+                }
+                DeviceType.SMART_CURTAIN -> {
+                    DBUtils.getAllCurtains().forEach { mesAddrsList.add(it.meshAddr) }
+                }
+                DeviceType.SMART_RELAY -> {
+                    DBUtils.getAllRelay().forEach { mesAddrsList.add(it.meshAddr) }
+                }
+                DeviceType.GATE_WAY -> {
+                    DBUtils.getAllGateWay().forEach { mesAddrsList.add(it.meshAddr) }
+                }
             }
-            DeviceType.NORMAL_SWITCH -> {
-                DBUtils.getAllSwitch().forEach { mesAddrsList.add(it.meshAddr) }
-            }
-            DeviceType.SENSOR -> {
-                DBUtils.getAllSensor().forEach { mesAddrsList.add(it.meshAddr) }
-            }
-            DeviceType.SMART_CURTAIN -> {
-                DBUtils.getAllCurtains().forEach { mesAddrsList.add(it.meshAddr) }
-            }
-            DeviceType.SMART_RELAY -> {
-                DBUtils.getAllRelay().forEach { mesAddrsList.add(it.meshAddr) }
-            }
-            DeviceType.GATE_WAY -> {
-                DBUtils.getAllGateWay().forEach { mesAddrsList.add(it.meshAddr) }
+            3 -> {
+                val id = intent.getIntExtra("groupOrDeviceId", 0)
+                when {
+                    id != 0 -> mesAddrsList.add(id)
+                    else -> {
+                        ToastUtils.showShort(getString(R.string.invalid_data))
+                        finish()
+                    }
+                }
             }
         }
-
         RouterModel.routerOTAResult(1, 50, 0)?.subscribe({
             if (it != null && it.size > 0)
                 SharedPreferencesUtils.setLastOtaTime(it[0].start)
         }, {
             ToastUtils.showShort(it.message)
         })
-
     }
 
     @SuppressLint("CheckResult")

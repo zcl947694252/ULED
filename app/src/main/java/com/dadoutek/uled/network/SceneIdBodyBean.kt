@@ -12,7 +12,7 @@ import java.io.Serializable
  * 更新时间   $
  * 更新描述
  */
- class SceneBodyBean(
+ class SceneIdBodyBean(
     val ser_id: String,
     val sid: Int
 ):Serializable{

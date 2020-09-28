@@ -201,18 +201,17 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                     //setSceneForSwitch()
                     val mesh = mApp?.mesh
                     val params = Parameters.createUpdateParameters()
-                    if (BuildConfig.DEBUG) {
-                        params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
-                    } else {
-                        params.setOldMeshName(mesh?.factoryName)
+                    when {
+                        BuildConfig.DEBUG ->  params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+                        else ->  params.setOldMeshName(mesh?.factoryName)
                     }
                     params.setOldPassword(mesh?.factoryPassword)
                     params.setNewMeshName(mesh?.name)
 
-                    if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
-                        params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh?.name) + mesh?.name))
-                    } else {
-                        params.setNewPassword(mesh?.password)
+                    when (Constant.USER_TYPE_NEW) {
+                        SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) ->
+                            params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh?.name) + mesh?.name))
+                        else -> params.setNewPassword(mesh?.password)
                     }
 
                     params.setUpdateDeviceList(mDeviceInfo)
