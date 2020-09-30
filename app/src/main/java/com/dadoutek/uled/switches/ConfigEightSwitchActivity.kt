@@ -54,8 +54,8 @@ import org.json.JSONObject
 
 
 class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
-    private lateinit var listKeysBean: JSONArray
     private var newMeshAddr: Int = 0
+    private lateinit var listKeysBean: JSONArray
     private var switchData: DbSwitch? = null
     private var groupName: String? = null
     private var version: String? = null
@@ -111,7 +111,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     //int keyId;  int featureId;   int reserveValue_A;  int reserveValue_B;  String name;
                     val jOb = listKeysBean.getJSONObject(i)
                     val keyId = jOb.getInt("keyId")
-                    val name = jOb.getString("name")
+                    var name = jOb.getString("name")
                     when (type) {
                         0 -> {
                             val highMes = jOb.getInt("reserveValue_A")
@@ -124,6 +124,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             if (groupByMeshAddr != null) {
                                 groupMap[keyId] = groupByMeshAddr
                                 groupKey.remove(keyId)
+                            } else {
+                                name = getString(R.string.click_config)
                             }
                             when (keyId) {
                                 4 -> eight_switch_b5.text = name
@@ -136,7 +138,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             val sceneId = jOb.getInt("reserveValue_B")
                             var scene = DBUtils.getSceneByID(sceneId.toLong())
                             //赋值旧的设置数据
-                            sceneMap[keyId] = if (scene != null) scene else {
+                            sceneMap[keyId] = if (scene != null) {
+                                name = getString(R.string.click_config)
+                                scene
+                            } else {
                                 var dbScene = DbScene()
                                 dbScene.id = 255L
                                 dbScene
@@ -161,6 +166,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             if (groupByMeshAddr != null) {
                                 groupMap[keyId] = groupByMeshAddr
                                 doubleGroupKey.remove(keyId)
+                            } else {
+                                name = getString(R.string.click_config)
                             }
                             when (keyId) {
                                 2 -> eight_switch_b3.text = name
@@ -379,12 +386,13 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         job.put("reserveValue_A", hight8Mes)
         job.put("reserveValue_B", low8Mes)
         job.put("name", name)
-        val keyBean = KeyBean(keyId,featureId,name,hight8Mes,low8Mes);
+        val keyBean = KeyBean(keyId, featureId, name, hight8Mes, low8Mes);
         return job
     }
 
     private fun updateMeshGroup(isConfigGroup: Int) {
-        newMeshAddr = MeshAddressGenerator().meshAddress.get()
+        newMeshAddr = if (isReConfig) mDeviceInfo?.meshAddress ?: 0 else MeshAddressGenerator().meshAddress.get()
+        LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
         Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
             mDeviceInfo?.meshAddress = newMeshAddr
 
@@ -412,7 +420,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         if (groupName == "false") {
             var dbEightSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
             if (dbEightSwitch != null) {
-                dbEightSwitch.name = getString(R.string.eight_switch) + "-" + dbEightSwitch.meshAddr
+                dbEightSwitch.name = getString(R.string.eight_switch) + "-" + (mDeviceInfo?.meshAddress ?: 0)
+                dbEightSwitch.meshAddr = newMeshAddr
                 dbEightSwitch.type = configGroup
                 dbEightSwitch = setGroupIdsOrSceneIds(configGroup == 0, dbEightSwitch)
                 dbEightSwitch.keys = listKeysBean.toString()
@@ -448,6 +457,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         } else {
             switchData!!.type = configGroup
             switchData!!.keys = listKeysBean.toString()
+            switchData?.meshAddr = mDeviceInfo?.meshAddress?:0
             //解析出來他的keys 重新賦值
             DBUtils.updateSwicth(switchData!!)
         }
@@ -478,7 +488,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         val dbSceneFirst = sceneMap[firstNum]
         val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 255L) {
             firstOpcode = Opcode.DEFAULT_SWITCH8K
-            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes =0))
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
             255L
         } else {
             listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
@@ -797,7 +807,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         }
         renameDialog?.setOnDismissListener {
             if (!isReConfig)
-            finishAc()
+                finishAc()
         }
     }
 

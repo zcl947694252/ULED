@@ -1,5 +1,6 @@
 package com.dadoutek.uled.model.httpModel
 
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.dbModel.DbSwitchChild
@@ -31,7 +32,7 @@ object SwitchMdodel {
         dbChild.firmwareVersion = switch.version
         dbChild.type = switch.type
         dbChild.keys = switch.keys
-
+        LogUtils.v("zcl-----------添加H开关新mesh-------${switch?.meshAddr}")
         return NetworkFactory.getApi()
                 .addSwitch(token, dbChild, changeId!!.toInt())
                 .compose(NetworkTransformer())
@@ -62,7 +63,7 @@ object SwitchMdodel {
         dbChild.firmwareVersion = dbSwitch.version
         dbChild.type = dbSwitch.type
         dbChild.keys = dbSwitch.keys
-
+        LogUtils.v("zcl-----------更新H开关新mesh-------${dbSwitch?.meshAddr}")
         return NetworkFactory.getApi()
                 .updateSwitch(token, lid, dbChild)
                 .compose(NetworkTransformer())

@@ -239,6 +239,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
      * 自动重连
      */
     fun autoConnectAll() {
+        if (Constant.IS_ROUTE_MODE) return
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
@@ -528,7 +529,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLoadingDialog() {
         if (!this@TelinkBaseActivity.isFinishing && loadDialog != null && loadDialog!!.isShowing) {
-            loadDialog?.dismiss()
+            runOnUiThread {   loadDialog?.dismiss() }
         }
     }
 
@@ -1033,7 +1034,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
-        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false) {
+        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false&&!Constant.IS_ROUTE_MODE) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it

@@ -349,9 +349,11 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
                 //进入分组
                 startGrouping();
             } else if (mConnectTimer == null) {
+                if (Constant.IS_ROUTE_MODE) return;
                 autoConnect();
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
+                if (Constant.IS_ROUTE_MODE) return;
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 
             }

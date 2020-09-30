@@ -70,6 +70,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.OnClick;
+import cn.smssdk.gui.util.Const;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -502,6 +503,8 @@ public class OTAConnectorActivity extends TelinkMeshErrorDealActivity implements
 
 
     public void connectDevice(String mac) {
+        if (Constant.IS_ROUTE_MODE)
+            return;
         log("connectDevice :" + mac);
         btn_start_update.setText(R.string.connecting_tip);
         TelinkLightService instance = TelinkLightService.Instance();

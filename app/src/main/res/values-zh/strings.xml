@@ -146,8 +146,8 @@
     <string name="all">全部</string>
     <string name="brightness">亮度</string>
     <string name="color_temperature">色温</string>
-    <string name="open">开</string>
-    <string name="close">关</string>
+    <string name="open">打开</string>
+    <string name="close">关闭</string>
     <string name="more">更多</string>
     <string name="update_group">修改分组</string>
     <string name="device_not_connected">未连接设备！</string>
@@ -1147,4 +1147,8 @@
     <string name="transfer_accounts_code_exit_cont_perform">已生成移交码，此时不支持此操作，请删除移交码再重试</string>
     <string name="add_group_fail">添加分组失败</string>
     <string name="scene_apply_fail">场景应用失败</string>
+    <string name="speed_minus">速度-</string>
+    <string name="speed_add">速度+</string>
+    <string name="forward">正向</string>
+    <string name="reversed">反向</string>
 </resources>

@@ -15,7 +15,10 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.ImageView
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -309,6 +312,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun autoConnectSensor() {
+        if (Constant.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
@@ -489,6 +493,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 } else {
                     Thread {
                         val mode = getModeValue()
+                        if (Constant.IS_ROUTE_MODE) return@Thread
                         if (TelinkLightApplication.getApp().connectDevice == null) {
                             showLoadingDialog(getString(R.string.connecting_tip))
                             connectDispose = connect(mDeviceInfo.meshAddress, true)?.subscribe({

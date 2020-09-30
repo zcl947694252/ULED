@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
 import android.view.*
 import android.view.inputmethod.InputMethodManager
+import android.widget.Adapter
 import android.widget.EditText
 import android.widget.PopupWindow
 import com.blankj.utilcode.util.LogUtils
@@ -63,6 +64,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity() {
+    private lateinit var sceneGroupAdapter: SceneGroupAdapter
     private lateinit var sceneActions: DbSceneActions
     private lateinit var dbScene: DbScene
     private var disposableTimer: Disposable? = null
@@ -83,7 +85,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var notCheckedGroupList: ArrayList<ItemGroup>? = null
     private val showGroupList: ArrayList<ItemGroup> = arrayListOf()
     private var showCheckListData: MutableList<DbGroup>? = null
-    private val sceneGroupAdapter: SceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
     private val rgbSceneModeAdapter: RgbSceneModeAdapter = RgbSceneModeAdapter(R.layout.scene_mode, buildInModeList)
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName: String? = null
@@ -282,7 +283,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
                 showGroupList.add(itemGroup)
                 groupMeshAddrArrayList.add(item.meshAddr)
-                sceneGroupAdapter.notifyDataSetChanged()
+
+                //sceneGroupAdapter.notifyDataSetChanged()
             }
         }
 
@@ -389,9 +391,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             cb_white_light.isChecked = true
             cb_white_light.isEnabled = true
             dot_rgb.isEnabled = true
-
         }
-//        Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
         val addr = showGroupList[position].groupAddress
         Thread {
             kotlin.run {
@@ -403,7 +403,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
         }.start()
 
-        sceneGroupAdapter.notifyItemChanged(position)
+        //sceneGroupAdapter.notifyItemChanged(position)
+        sceneGroupAdapter.notifyDataSetChanged()
     }
 
     private fun switchBright(position: Int) {
@@ -531,11 +532,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 .setMessage(getString(R.string.delete_group_confirm, showGroupList!![position]?.gpName))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     this.showLoadingDialog(getString(R.string.deleting))
+                        val itemGroup = showGroupList!![position]
                     for (index in showCheckListData!!.indices) {
-                        if (showCheckListData!![index].meshAddr == showGroupList!![position].groupAddress)
+                        if (showCheckListData!![index].meshAddr == itemGroup.groupAddress){
+                            showGroupList.removeAt(position)
                             showCheckListData!![index].isChecked = false
+                        }
                     }
-                    adapter.remove(position)
+                    adapter.notifyDataSetChanged()
                     hideLoadingDialog()
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
@@ -559,11 +563,13 @@ class NewSceneSetAct : TelinkBaseActivity() {
         recyclerView_group_list_view.layoutManager = layoutmanager
         recyclerView_group_list_view?.addItemDecoration(SpacesItemDecorationScene(40))
         recyclerView_group_list_view.itemAnimator!!.changeDuration = 0
-        if (isFirst) {
-            isFirst = false
+        sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
             sceneGroupAdapter.bindToRecyclerView(recyclerView_group_list_view)
+     /*   if (isFirst) {//出现莫名其妙的隐藏
+            isFirst = false
+            sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
         } else
-            sceneGroupAdapter.notifyDataSetChanged()
+            sceneGroupAdapter.notifyDataSetChanged()*/
 
         sceneGroupAdapter.onItemChildClickListener = onItemChildClickListener
     }
@@ -697,7 +703,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         newItemGroup.temperature = 50
         newItemGroup.color = 0
         newItemGroup.checked = true
-        newItemGroup.enableCheck = true
+        newItemGroup.enableCheck = false
         newItemGroup.gpName = showCheckListData!![i].name
         newItemGroup.groupAddress = showCheckListData!![i].meshAddr
 
@@ -940,14 +946,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun updateOldScene() {
-        GlobalScope.launch {
             val name = edit_name.text.toString()
             val itemGroups = showGroupList
             val nameList = java.util.ArrayList<Int>()
             scene?.name = name
             scene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
             val belongSceneId = scene?.id!!
-
             when {
                 Constant.IS_ROUTE_MODE -> routerAddOrUpdateScene(itemGroups, belongSceneId, name, scene?.imgName ?: "icon_out", true)
                 else -> {
@@ -974,13 +978,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
                         DBUtils.saveSceneActions(sceneActions)
                     }
                     isChange = compareList(nameList, groupMeshAddrArrayList)
-                    delay(100)
+                    Thread.sleep(100)
                     updateScene(belongSceneId)
                 }
             }
-            runOnUiThread {  hideLoadingDialog() }
+            //this@NewSceneSetAct.runOnUiThread {  hideLoadingDialog() }
             finish()
-        }
     }
 
     @Throws(InterruptedException::class)

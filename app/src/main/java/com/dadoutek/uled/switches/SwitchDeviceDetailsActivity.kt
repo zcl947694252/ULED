@@ -186,6 +186,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             }
             ota.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
+                if (Constant.IS_ROUTE_MODE) return@setOnClickListener
                 if (currentDevice != null) {
                     TelinkLightService.Instance()?.idleMode(true)
                     showLoadingDialog(getString(R.string.connecting_tip))
@@ -240,6 +241,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     @SuppressLint("CheckResult")
     private fun goConfig() {
         if (isRightPos()) return
+        if (Constant.IS_ROUTE_MODE) return
         if (currentDevice != null) {
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting_tip))

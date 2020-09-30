@@ -88,14 +88,13 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         topRgLy = helper.getView(R.id.top_rg_ly)
         algLy = helper.getView(R.id.alg_ly)
 
-        val cb_total = helper.getView<CheckBox>(R.id.cb_total)
-        val cb_bright = helper.getView<CheckBox>(R.id.cb_bright)
-        val cb_white_light = helper.getView<CheckBox>(R.id.cb_white_light)
+        val cbTotal = helper.getView<CheckBox>(R.id.cb_total)
+        val cbBright = helper.getView<CheckBox>(R.id.cb_bright)
+        val cbWhiteLight = helper.getView<CheckBox>(R.id.cb_white_light)
 
-        cb_total.isChecked = item.isOn
-        cb_bright.isChecked = item.isEnableBright
-        cb_white_light.isChecked = item.isEnableWhiteLight
-
+        cbTotal.isChecked = item.isOn
+        cbBright.isChecked = item.isEnableBright
+        cbWhiteLight.isChecked = item.isEnableWhiteLight
 
         //0x4FFFE0  不在使用  使用0来判断
         docOne.setChecked(true, if (item.color == 0) {
@@ -108,23 +107,18 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             //位与是指两个二进制数按对应的位上的两个二进制数相乘，口诀是有0出0，11出1，如10 & 01=00。
             docOne.visibility = View.VISIBLE
             dotRgb.visibility = View.GONE
-
             (0x00ff0000 shl 8) or (item.color and 0xffffff)
         })
-
         helper.setText(R.id.name_gp, item.gpName)
-
 
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                val progress = if (sbBrightnessRGB!!.progress != 0) {
-                    sbBrightnessRGB!!.progress
-                } else 1
+                val progress = if (sbBrightnessRGB.progress != 0) sbBrightnessRGB.progress else 1
                 helper.setProgress(R.id.sbBrightness, item.brightness)
                         .setProgress(R.id.sb_w_bright, item.temperature)
                         //.setProgress(R.id.speed_seekbar, item.gradientSpeed)
                         .setText(R.id.sbBrightness_num, "$progress%")
-                        .setText(R.id.sb_w_bright_num, sbWhiteLightRGB!!.progress.toString() + "%")
+                        .setText(R.id.sb_w_bright_num, sbWhiteLightRGB.progress.toString() + "%")
                         .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress + 1).toString() + "%")
                 speedSeekbar?.setProgress(item.gradientSpeed.toFloat())
                 when (item.rgbType) {
@@ -132,26 +126,24 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         visiableMode(helper, true)
                         setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
 
-                        if (item.isEnableBright) {
+                        when {item.isEnableBright -> {
                             sbBrightnessRGB.isEnabled = true
                             addBrightnessRGB.isEnabled = true
                             lessBrightnessRGB.isEnabled = true
-                        } else {
+                        }else -> {
                             sbBrightnessRGB.isEnabled = false
                             addBrightnessRGB.isEnabled = false
                             lessBrightnessRGB.isEnabled = false
-                        }
-
-                        if (item.isEnableWhiteLight) {
+                        }}
+                        when {item.isEnableWhiteLight -> {
                             sbWhiteLightRGB.isEnabled = true
                             addWhiteLightRGB.isEnabled = true
                             lessWhiteLightRGB.isEnabled = true
-                        } else {
+                        }else -> {
                             sbWhiteLightRGB.isEnabled = false
                             addWhiteLightRGB.isEnabled = false
                             lessWhiteLightRGB.isEnabled = false
-                        }
-
+                        }}
                     }
                     else -> {//渐变模式
                         if (!TextUtils.isEmpty(item.gradientName))
@@ -161,15 +153,17 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     }
                 }
             }
-            else -> {
-                helper.setProgress(R.id.cw_sbBrightness, item.brightness)
-                        .setProgress(R.id.temperature, item.temperature)
+            else -> { helper.setProgress(R.id.cw_sbBrightness, item.brightness).setProgress(R.id.temperature, item.temperature)
                         .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
-                        .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
+                    .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)
                 setAlgClickAble(item, addTemperatureCW!!, lessTemperatureCW!!)
             }
         }
+
+
+
+
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.cw_scene, false)
@@ -190,6 +184,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
+                        .setGone(R.id.cw_scene, false)
                         .setGone(R.id.cw_scene, true)
                         .setGone(R.id.switch_scene, false)
                         .setGone(R.id.scene_curtain, false)
@@ -209,12 +204,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, true)
                 topRgLy?.visibility = View.GONE
-                if (item.isOn) {
-                    helper.setChecked(R.id.rg_xx, true)
-                    helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
-                } else {
-                    helper.setChecked(R.id.rg_yy, true)
-                    helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_no)
+                when {item.isOn -> {
+                        helper.setChecked(R.id.rg_xx, true)
+                        helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
+                    }
+                    else -> {
+                        helper.setChecked(R.id.rg_yy, true)
+                        helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_no)
+                    }
                 }
             }
             OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
@@ -279,14 +276,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     }
                 }
             }
-
             override fun onStartTrackingTouch(seekBar: IndicatorSeekBar?) {}
-
             override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {}
         }
-
-
-
         topRgLy!!.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.color_mode_rb -> {
@@ -370,20 +362,20 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 .setGone(R.id.rgb_scene, isVisiable)
                 .setGone(R.id.alg_ly, !isVisiable)
 
-        if (isVisiable) {
-            algLy?.visibility = View.GONE
-            helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.blue_text))
-                    .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.gray9))
-        } else {
-            algLy?.visibility = View.VISIBLE
-            helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.gray9))
-                    .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
+        when {isVisiable -> {
+                algLy?.visibility = View.GONE
+                helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.blue_text))
+                        .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.gray9))
+            }else -> {
+                algLy?.visibility = View.VISIBLE
+                helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.gray9))
+                        .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
+            }
         }
     }
 
     private fun setAlgClickAble(item: ItemGroup, addBtn: ImageView, lessBtn: ImageView, isGradient: Boolean = false) {
         var zero = if (isGradient) 1 else 0
-
         when {
             item.brightness <= zero -> {
                 addBtn.isEnabled = true
@@ -1265,11 +1257,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     override fun onStopTrackingTouch(seekBar: SeekBar) {
         val pos = seekBar.tag as Int
 
-        val address = if (pos < data.size)
-            data[pos].groupAddress
-        else
-            0
-
+        val address = if (pos < data.size)  data[pos].groupAddress else   0
         val opcode: Byte
         val itemGroup = data[pos]
         when (seekBar.id) {

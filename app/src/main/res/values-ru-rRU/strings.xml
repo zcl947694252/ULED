@@ -1036,5 +1036,9 @@
     <string name="transfer_accounts_code_exit_cont_perform">已生成移交码，此时不支持此操作，请删除移交码再重试</string>
     <string name="add_group_fail">添加分组失败</string>
     <string name="scene_apply_fail">场景应用失败</string>
+    <string name="speed_minus">速度-</string>
+    <string name="speed_add">速度+</string>
+    <string name="forward">正向</string>
+    <string name="reversed">反向</string>
 
 </resources>

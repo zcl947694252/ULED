@@ -21,6 +21,7 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -142,6 +143,7 @@ abstract class BaseSwitchActivity() : TelinkBaseActivity() {
                 R.id.toolbar_f_delete -> deleteDevice()
             }
         } else {
+            if (Constant.IS_ROUTE_MODE) return@OnMenuItemClickListener true
             showLoadingDialog(getString(R.string.connecting_tip))
             connect(setConnectMeshAddr(), true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())

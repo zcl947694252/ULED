@@ -738,6 +738,8 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     private fun goConnect(ishow: Boolean = true) {
+        if (Constant.IS_ROUTE_MODE)
+            return
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         if (ishow)
             ToastUtils.showShort(getString(R.string.connecting_tip))

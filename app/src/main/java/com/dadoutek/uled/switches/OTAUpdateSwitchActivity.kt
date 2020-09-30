@@ -24,11 +24,11 @@ import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Mesh
+import com.dadoutek.uled.model.OtaDevice
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.dbModel.DbUser
-import com.dadoutek.uled.model.Mesh
-import com.dadoutek.uled.model.OtaDevice
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.FileSelectActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -385,6 +385,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
 
 
     fun connectDevice(mac: String) {
+        if (Constant.IS_ROUTE_MODE) return
         log("connectDevice :$mac")
         btn_start_update.setText(R.string.connecting_tip)
         TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT)

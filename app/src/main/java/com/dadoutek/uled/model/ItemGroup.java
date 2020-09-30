@@ -29,7 +29,6 @@ public class ItemGroup implements Serializable {
     public String gradientName  ;//变速度
     public int icon = R.drawable.icon_group ;//图标
 
-
     @Override
     public String toString() {
         return "ItemGroup{" +

@@ -202,7 +202,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             LogUtils.v("zcl-----------获取状态服务器返回-------$it")
             Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
             Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
-            SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, Constant.IS_ROUTE_MODE)
+            SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, false)
             changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
         }, {
             Constant.IS_ROUTE_MODE = false
@@ -666,7 +666,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                                 val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
                                 if (size > 0) {
-                                    ToastUtils.showLong(R.string.connecting_tip)
+                                    //ToastUtils.showLong(R.string.connecting_tip)
                                     mConnectDisposable?.dispose()
                                     mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
                                             ?.subscribe(

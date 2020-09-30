@@ -456,6 +456,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 R.id.toolbar_on_line -> renameGroup()
             }
         } else {
+            if (Constant.IS_ROUTE_MODE) return@OnMenuItemClickListener true
             showLoadingDialog(getString(R.string.connecting_tip))
             val subscribe = connect(currentDbConnector!!.meshAddr, true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())?.subscribe({
@@ -524,7 +525,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         }
         connector_switch.isChecked = currentDbConnector?.connectionStatus==1
         connector_switch?.setOnCheckedChangeListener { _, isChecked ->
-            if (TelinkLightApplication.getApp().connectDevice == null)
+            if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE)
                 autoConnect()
             else {
                 if (isChecked)

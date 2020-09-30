@@ -341,9 +341,11 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 //进入分组
                 startGrouping();
             } else if (mConnectTimer == null) {
+                if (Constant.IS_ROUTE_MODE) return;
                 autoConnect();
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
+                if (Constant.IS_ROUTE_MODE) return;
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 
             }
@@ -803,7 +805,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
      * 此处用作设备登录
      */
     private void autoConnect() {
-        if (TelinkLightService.Instance() != null) {
+        if (TelinkLightService.Instance() != null&&!Constant.IS_ROUTE_MODE) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 //                LeBluetooth.getApp().stopScan();

@@ -748,6 +748,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
+                                if (Constant.IS_ROUTE_MODE) return@subscribe
                                 if (TelinkLightApplication.getApp().connectDevice == null) {
                                     ToastUtils.showLong(getString(R.string.connecting_tip))
                                     retryConnectCount = 0

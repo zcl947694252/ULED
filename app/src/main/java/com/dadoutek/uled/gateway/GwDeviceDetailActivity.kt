@@ -563,6 +563,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
         popupWindow.dismiss()
         if (currentGw != null) {
+            if (Constant.IS_ROUTE_MODE) return
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableConnect?.dispose()

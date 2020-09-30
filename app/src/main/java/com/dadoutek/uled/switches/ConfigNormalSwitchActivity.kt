@@ -90,13 +90,20 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         deviceConfigType = intent.getIntExtra("deviceType", 0)
 
         //st bt 全部为触摸开关
-         isTouchSw = localVersion.contains("BT")
+        isTouchSw = localVersion.contains("BT")
                 || localVersion.contains("ST") || localVersion.contains("SS-2.0.1")
+        //单调光光能开关 sl bl   触摸单调光 btl sts
         if (!isTouchSw) {
-            sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
+            if (localVersion.contains("sl") || localVersion.contains("bl"))
+
+            else
+                sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)
         } else {
             toolbarTv.text = getString(R.string.touch_sw)
+            if (localVersion.contains("btl") || localVersion.contains("sts"))
+                sw_normal_iv.setImageResource(R.drawable.touch_sw_single)
+            else
             sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
             //tLightVersion.text = localVersion
         }
@@ -110,7 +117,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
         //tvLightVersion.text = localVersion
         //if (localVersion.contains("BT") || localVersion.contains("BTL") || localVersion.contains("BTS") || localVersion.contains("STS"))
-            isGlassSwitch = isTouchSw
+        isGlassSwitch = isTouchSw
 
         isReConfig = groupName != null && groupName == "true"
         fiRename?.isVisible = isReConfig
@@ -286,7 +293,9 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                         sendGroupForSwitch()
                         Thread.sleep(800)
                         //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
-                        val newMeshAddr = MeshAddressGenerator().meshAddress.get()
+                        val newMeshAddr = if (isReConfig)
+                            mDeviceInfo?.meshAddress else MeshAddressGenerator().meshAddress.get()
+                        LogUtils.v("zcl-----------开关新mesh-------$newMeshAddr")
                         Commander.updateMeshName(newMeshAddr = newMeshAddr,
                                 successCallback = {
                                     mDeviceInfo.meshAddress = newMeshAddr
@@ -490,6 +499,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
                 dbSwitch.belongGroupId = currentGroup!!.id
+                dbSwitch?.meshAddr = mDeviceInfo?.meshAddress
                 dbSwitch.controlGroupAddr = currentGroup!!.meshAddr
                 dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
                 dbSwitch.version = mDeviceInfo.firmwareRevision
@@ -514,9 +524,9 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
                 switchDate = dbSwitch
             }
-
             switchDate = dbSwitch
         } else {
+            switchDate?.meshAddr = mDeviceInfo?.meshAddress
             switchDate!!.belongGroupId = currentGroup!!.id
             switchDate!!.controlGroupAddr = currentGroup!!.meshAddr
             DBUtils.updateSwicth(switchDate!!)
@@ -527,6 +537,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     private var mConnectingSnackBar: Snackbar? = null
 
     private fun reconnect() {
+        if (Constant.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(mDeviceInfo.meshName)

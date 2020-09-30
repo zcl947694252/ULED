@@ -1283,6 +1283,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     @SuppressLint("CheckResult")
     private fun autoConnectSensor() {
+        if (Constant.IS_ROUTE_MODE) return
         retryConnectCount++
         setLoadingVisbiltyOrGone(View.VISIBLE, getString(R.string.connecting_tip))
         //自动重连参数

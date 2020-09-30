@@ -13,17 +13,18 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSwitch
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -112,7 +113,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
-
+        sw_normal_curtain.visibility = View.VISIBLE
         // tvLightVersion?.text = version
         if (version!!.startsWith("ST") || (version!!.contains("BT") || version!!.contains("BTL") || version!!.contains("BTS"))) {
             isGlassSwitch = true
@@ -156,9 +157,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                 switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
                 DBUtils.updateSwicth(switchDate!!)
                 toolbarTv.text = switchDate?.name
-                if (this != null && !this.isFinishing) {
+                if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
-                }
             }
         }
         renameCancel?.setOnClickListener {
@@ -267,7 +267,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                     sw_progressBar.visibility = View.VISIBLE
                     setGroupForSwitch()
                     Thread.sleep(300)
-                    newMeshAddr = MeshAddressGenerator().meshAddress.get()
+                    newMeshAddr =  if (isReConfig)mDeviceInfo.meshAddress else MeshAddressGenerator().meshAddress.get()
+                LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
                     Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
                         mDeviceInfo.meshAddress = newMeshAddr
                         mIsConfiguring = true
@@ -451,7 +452,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             switchDate!!.belongGroupId = currentGroup?.id
             switchDate!!.controlGroupAddr = currentGroup!!.meshAddr
             //switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
-            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress.get()
+            switchDate!!.meshAddr = mDeviceInfo?.meshAddress
+
             DBUtils.updateSwicth(switchDate!!)
         }
     }
@@ -459,6 +461,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private var mConnectingSnackBar: Snackbar? = null
 
     private fun reconnect() {
+        if (Constant.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(mDeviceInfo.meshName)

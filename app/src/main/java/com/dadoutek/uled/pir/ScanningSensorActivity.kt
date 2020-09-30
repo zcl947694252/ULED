@@ -15,9 +15,8 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -45,9 +44,7 @@ import kotlinx.android.synthetic.main.template_scanning_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.startActivity
-import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.ArrayList
 
 /**
  * 人体感应器扫描新设备/已连接设备
@@ -454,6 +451,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
 
     private fun connect() {
+        if (Constant.IS_ROUTE_MODE) return
         mApplication.removeEventListener(this)
         mApplication.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         mApplication.addEventListener(ErrorReportEvent.ERROR_REPORT, this)

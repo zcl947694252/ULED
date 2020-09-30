@@ -85,6 +85,7 @@ class GwLoginActivity : TelinkBaseActivity() {
 
             @SuppressLint("CheckResult")
             override fun loginFail() {
+                if (Constant.IS_ROUTE_MODE) return
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                 Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
                 ToastUtils.showShort(getString(R.string.connecting_tip))

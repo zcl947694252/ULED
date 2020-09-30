@@ -10,6 +10,7 @@ import android.text.TextUtils
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
@@ -59,40 +60,14 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var rightGroup: DbGroup? = null
     private val requestCodeNum: Int = 1000
     private var isLeft: Boolean = false
-    override fun setToolBar(): Toolbar {
-        return toolbar
-    }
 
-    override fun setReConfig(): Boolean {
-        return isReConfig
-    }
-
-    override fun setVersion() {
-        if (TextUtils.isEmpty(localVersion))
-            localVersion = getString(R.string.get_version_fail)
-        else
-            mDeviceInfo?.firmwareRevision = localVersion
-        fiVersion?.title = localVersion
-    }
-
-    override fun setConnectMeshAddr(): Int {
-        return mDeviceInfo?.meshAddress ?: 0
-    }
-
-    override fun deleteDevice() {
-        deleteSwitch(mDeviceInfo.macAddress)
-    }
-
-    override fun goOta() {
-        deviceOta(mDeviceInfo)
-    }
-
-    override fun reName() {
-        showRenameDialog(switchDate)
-    }
-
-    override fun setLayoutId(): Int {
-        return R.layout.activity_switch_double_touch
+    override fun initView() {
+        switch_double_touch_mb.visibility = View.GONE
+        switch_double_touch_set.visibility = View.VISIBLE
+        switch_double_touch_i_know.paint.color = getColor(R.color.white)
+        switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
+        toolbarTv.text = getString(R.string.double_switch)
+        makePop()
     }
 
     override fun initData() {
@@ -132,6 +107,42 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         }
     }
 
+    override fun setToolBar(): Toolbar {
+        return toolbar
+    }
+
+    override fun setReConfig(): Boolean {
+        return isReConfig
+    }
+
+    override fun setVersion() {
+        if (TextUtils.isEmpty(localVersion))
+            localVersion = getString(R.string.get_version_fail)
+        else
+            mDeviceInfo?.firmwareRevision = localVersion
+        fiVersion?.title = localVersion
+    }
+
+    override fun setConnectMeshAddr(): Int {
+        return mDeviceInfo?.meshAddress ?: 0
+    }
+
+    override fun deleteDevice() {
+        deleteSwitch(mDeviceInfo.macAddress)
+    }
+
+    override fun goOta() {
+        deviceOta(mDeviceInfo)
+    }
+
+    override fun reName() {
+        showRenameDialog(switchDate)
+    }
+
+    override fun setLayoutId(): Int {
+        return R.layout.activity_switch_double_touch
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == requestCodeNum && resultCode == Activity.RESULT_OK) {
@@ -158,7 +169,9 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     private fun upSwitchData() {
         //val newMeshAddr = Constant.SWITCH_PIR_ADDRESS
-        val newMeshAddr = MeshAddressGenerator().meshAddress.get()
+        val newMeshAddr = if (isReConfig)
+            mDeviceInfo.meshAddress else MeshAddressGenerator().meshAddress.get()
+        LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
         Commander.updateMeshName(newMeshAddr = newMeshAddr,
                 successCallback = {
                     hideLoadingDialog()
@@ -210,7 +223,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             }
         } else {
             switchDate!!.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr, rightGroup?.meshAddr))
-            switchDate!!.meshAddr = MeshAddressGenerator().meshAddress.get()
+            switchDate!!.meshAddr = mDeviceInfo?.meshAddress
             DBUtils.updateSwicth(switchDate!!)
         }
     }
@@ -296,7 +309,6 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             rightH = 0
             rightL = 0
         }
-
         val bytes = byteArrayOf(leftL, leftH, rightL, rightH, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_DOUBLE_SWITCH, mDeviceInfo?.meshAddress ?: 0, bytes)
     }
@@ -353,16 +365,6 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             if (!isReConfig)
                 finish()
         }
-    }
-
-    override fun initView() {
-        switch_double_touch_mb.visibility = View.GONE
-        switch_double_touch_set.visibility = View.VISIBLE
-        switch_double_touch_i_know.paint.color = getColor(R.color.white)
-        switch_double_touch_i_know.paint.flags = Paint.UNDERLINE_TEXT_FLAG //下划线
-        toolbarTv.text = getString(R.string.double_switch)
-
-        makePop()
     }
 
     override fun onDestroy() {

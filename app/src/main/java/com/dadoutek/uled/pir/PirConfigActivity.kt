@@ -647,6 +647,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     fun autoConnect() {
+        if (Constant.IS_ROUTE_MODE) return
         val deviceTypes = mutableListOf(DeviceType.SENSOR)
             ToastUtils.showLong(getString(R.string.connecting_tip))
             connectDisposable?.dispose()

@@ -223,12 +223,12 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                             2 -> keyNum = 0x06          //左下按键
                             3 -> keyNum = 0x04          //右下按键
                         }
-                        delay(key * 100L)
+                        delay(key * 200L)
                         val paramBytes = byteArrayOf(keyNum.toByte(), 7, 0x00, mapConfig.getValue(key).id.toByte(), 0x00)
                         LogUtils.v("zcl-----------配置场景参数-----$keyNum---${mapConfig.getValue(key).id}")
                         TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo.meshAddress, paramBytes)
                     }
-                    delay(1800)
+                    delay(1500)
                     updateMesh()
                 }
             }
@@ -236,7 +236,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     private fun updateMesh() {
-        newMeshAddr = MeshAddressGenerator().meshAddress.get()
+        newMeshAddr =if (isReConfig) mDeviceInfo?.meshAddress else MeshAddressGenerator().meshAddress.get()
+        LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
         Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
             mDeviceInfo.meshAddress = newMeshAddr
             mIsConfiguring = true
@@ -383,6 +384,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 switchDate = dbSwitch
             }
         } else {
+            switchDate?.meshAddr = mDeviceInfo?.meshAddress
             switchDate!!.controlSceneId = getControlScene()
             switchDate!!.macAddr = mDeviceInfo.macAddress
             //switchDate!!.meshAddr = Constant.SWITCH_PIR_ADDRESS
@@ -501,6 +503,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     private fun reconnect() {
+        if (Constant.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(mDeviceInfo.meshName)

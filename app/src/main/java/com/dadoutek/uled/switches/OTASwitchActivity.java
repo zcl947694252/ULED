@@ -513,6 +513,8 @@ public class OTASwitchActivity extends TelinkMeshErrorDealActivity implements Ev
 
 
     public void connectDevice(String mac) {
+        if (Constant.IS_ROUTE_MODE)
+            return;
         log("connectDevice :" + mac);
         btn_start_update.setText(R.string.connecting_tip);
         TelinkLightService instance = TelinkLightService.Instance();

@@ -93,10 +93,6 @@ class SettingActivity : TelinkBaseActivity() {
                             var intent = Intent(this, SafeLockActivity::class.java)
                             startActivity(intent)
                         }
-                        3 -> {
-                            var intent = Intent(this, ChooseModeActivity::class.java)
-                            startActivity(intent)
-                        }
                         2 -> {
                             UserModel.updateModeStatus().subscribe({
                                 Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
@@ -104,6 +100,10 @@ class SettingActivity : TelinkBaseActivity() {
                             }, {
                                 ToastUtils.showShort(it.message)
                             })
+                        }
+                        3 -> {
+                            var intent = Intent(this, ChooseModeActivity::class.java)
+                            startActivity(intent)
                         }
                         list.size - 1 -> {
                             var intent = Intent(this, BindRouterActivity::class.java)
@@ -127,9 +127,9 @@ class SettingActivity : TelinkBaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_reset, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_lock, getString(R.string.safe_lock)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
-        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
+       // list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
         //if (DBUtils.getAllRouter().size > 1)
-            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
+           // list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
     }
 
     @SuppressLint("StringFormatMatches")
@@ -158,7 +158,7 @@ class SettingActivity : TelinkBaseActivity() {
                     DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
             val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
             if (size > 0) {
-                ToastUtils.showLong(R.string.connecting_tip)
+                //ToastUtils.showLong(R.string.connecting_tip)
                 mConnectDisposal?.dispose()
                 mConnectDisposal = Commander.connect(deviceTypes = deviceTypes, fastestMode = true, retryTimes = 10)
                         ?.subscribe({//找回有效设备
