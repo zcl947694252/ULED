@@ -20,17 +20,16 @@ import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog
-import kotlinx.android.synthetic.main.activity_rgb_group_setting.*
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
 import kotlinx.android.synthetic.main.activity_select_color_gradient.color_b
 import kotlinx.android.synthetic.main.activity_select_color_gradient.color_g
 import kotlinx.android.synthetic.main.activity_select_color_gradient.color_picker
 import kotlinx.android.synthetic.main.activity_select_color_gradient.color_r
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness
+import kotlinx.android.synthetic.main.activity_select_color_gradient.rgb_sbBrightness
 import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_add
 import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_less
 import kotlinx.android.synthetic.main.activity_select_color_gradient.sbBrightness_num
-import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright
+import kotlinx.android.synthetic.main.activity_select_color_gradient.rgb_white_seekbar
 import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_add
 import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_less
 import kotlinx.android.synthetic.main.activity_select_color_gradient.sb_w_bright_num
@@ -96,8 +95,8 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             true
         }
 
-        sbBrightness.setOnSeekBarChangeListener(barChangeListener)
-        sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
+        rgb_sbBrightness.setOnSeekBarChangeListener(barChangeListener)
+        rgb_white_seekbar.setOnSeekBarChangeListener(barChangeListener)
 
         if (Constant.IS_OPEN_AUXFUN){
             ll_r_r.visibility = View.VISIBLE
@@ -112,18 +111,18 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         ll_g_g.setOnClickListener(this)
         ll_b_b.setOnClickListener(this)
         if (colorNode!!.rgbw == -1) {
-            sbBrightness.progress = 100
+            rgb_sbBrightness.progress = 100
             colorNode!!.brightness = 100
-            sb_w_bright.progress = 0
+            rgb_white_seekbar.progress = 0
             sbBrightness_num.text = 100.toString() + "%"
             sb_w_bright_num.text = 0.toString() + "%"
 
             when {
-                sbBrightness!!.progress >= 100 -> {
+                rgb_sbBrightness!!.progress >= 100 -> {
                     sbBrightness_add.isEnabled = false
                     sbBrightness_less.isEnabled = true
                 }
-                sbBrightness!!.progress <= 0 -> {
+                rgb_sbBrightness!!.progress <= 0 -> {
                     sbBrightness_less.isEnabled = false
                     sbBrightness_add.isEnabled = true
                 }
@@ -135,11 +134,11 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
 
             when {
-                sb_w_bright.progress >= 100 -> {
+                rgb_white_seekbar.progress >= 100 -> {
                     sb_w_bright_add.isEnabled = false
                     sb_w_bright_less.isEnabled = true
                 }
-                sb_w_bright.progress <= 0 -> {
+                rgb_white_seekbar.progress <= 0 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_add.isEnabled = true
                 }
@@ -156,17 +155,17 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             var b = Color.blue(colorNode?.rgbw!!)
             color_picker.setInitialColor((colorNode?.rgbw ?: 0 and 0xffffff) or 0xff000000.toInt())
 
-            sbBrightness.progress = colorNode!!.brightness
-            sb_w_bright.progress = w
+            rgb_sbBrightness.progress = colorNode!!.brightness
+            rgb_white_seekbar.progress = w
             sbBrightness_num.text = colorNode!!.brightness.toString() + "%"
             sb_w_bright_num.text = "$w%"
 
             when {
-                sbBrightness!!.progress >= 100 -> {
+                rgb_sbBrightness!!.progress >= 100 -> {
                     sbBrightness_add.isEnabled = false
                     sbBrightness_less.isEnabled = true
                 }
-                sbBrightness!!.progress <= 0 -> {
+                rgb_sbBrightness!!.progress <= 0 -> {
                     sbBrightness_less.isEnabled = false
                     sbBrightness_add.isEnabled = true
                 }
@@ -178,11 +177,11 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
 
             when {
-                sb_w_bright.progress >= 100 -> {
+                rgb_white_seekbar.progress >= 100 -> {
                     sb_w_bright_add.isEnabled = false
                     sb_w_bright_less.isEnabled = true
                 }
-                sb_w_bright.progress <= 0 -> {
+                rgb_white_seekbar.progress <= 0 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_add.isEnabled = true
                 }
@@ -263,7 +262,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         color_r?.text = r.toString()
         color_g?.text = g.toString()
         color_b?.text = b.toString()
-        var w = sb_w_bright.progress
+        var w = rgb_white_seekbar.progress
         if (w <= 0) w = 1
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
 
@@ -313,7 +312,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         val r = Color.red(color)
         val g = Color.green(color)
         val b = Color.blue(color)
-        val w = sb_w_bright.progress
+        val w = rgb_white_seekbar.progress
 
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
@@ -384,9 +383,9 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
         @SuppressLint("SetTextI18n")
         private fun onValueChangeView(view: View, progress: Int) {
-            if (view === sbBrightness) {
+            if (view === rgb_sbBrightness) {
                 sbBrightness_num.text = "$progress%"
-            } else if (view === sb_w_bright) {
+            } else if (view === rgb_white_seekbar) {
                 sb_w_bright_num.text = "$progress%"
             }
         }
@@ -398,7 +397,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             val opcode: Byte
             val params: ByteArray
 
-            if (view == sbBrightness) {
+            if (view == rgb_sbBrightness) {
                 opcode = Opcode.SET_LUM
                 params = byteArrayOf(progress.toByte())
 
@@ -415,7 +414,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
                 colorNode!!.brightness = progress
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
-            } else if (view == sb_w_bright) {
+            } else if (view == rgb_white_seekbar) {
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(progress.toByte())
                 var color = colorNode!!.rgbw
@@ -593,16 +592,16 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private val handler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sb_w_bright.progress++
+            rgb_white_seekbar.progress++
             when {
-                sb_w_bright.progress > 100 -> {
+                rgb_white_seekbar.progress > 100 -> {
                     sb_w_bright_add.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sb_w_bright.progress == 100 -> {
+                rgb_white_seekbar.progress == 100 -> {
                     sb_w_bright_add.isEnabled = false
-                    sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                    sb_w_bright_num.text = rgb_white_seekbar.progress.toString() + "%"
                     stopTracking = false
                     onBtnTouch = false
                 }
@@ -618,16 +617,16 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private val handler_brightness_add = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbBrightness.progress++
+            rgb_sbBrightness.progress++
             when {
-                sbBrightness.progress > 100 -> {
+                rgb_sbBrightness.progress > 100 -> {
                     sbBrightness_add.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sbBrightness.progress == 100 -> {
+                rgb_sbBrightness.progress == 100 -> {
                     sbBrightness_add.isEnabled = false
-                    sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                    sbBrightness_num.text = rgb_sbBrightness.progress.toString() + "%"
                     stopTracking = false
                     onBtnTouch = false
                 }
@@ -643,16 +642,16 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private val handler_brightness_less = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbBrightness.progress--
+            rgb_sbBrightness.progress--
             when {
-                sbBrightness.progress < 0 -> {
+                rgb_sbBrightness.progress < 0 -> {
                     sbBrightness_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sbBrightness.progress == 0 -> {
+                rgb_sbBrightness.progress == 0 -> {
                     sbBrightness_less.isEnabled = false
-                    sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                    sbBrightness_num.text = rgb_sbBrightness.progress.toString() + "%"
                     stopTracking = false
                     onBtnTouch = false
                 }
@@ -668,16 +667,16 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private val handler_less = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sb_w_bright.progress--
+            rgb_white_seekbar.progress--
             when {
-                sb_w_bright.progress < 0 -> {
+                rgb_white_seekbar.progress < 0 -> {
                     sb_w_bright_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sb_w_bright.progress == 0 -> {
+                rgb_white_seekbar.progress == 0 -> {
                     sb_w_bright_less.isEnabled = false
-                    sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                    sb_w_bright_num.text = rgb_white_seekbar.progress.toString() + "%"
                     stopTracking = false
                     onBtnTouch = false
                 }

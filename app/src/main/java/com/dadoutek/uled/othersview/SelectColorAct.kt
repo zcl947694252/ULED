@@ -103,10 +103,10 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         wValue = w
         tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
-        sb_w_bright.progress = w
+        rgb_white_seekbar.progress = w
 
 
-        sb_w_bright.setOnSeekBarChangeListener(this.barChangeListener)
+        rgb_white_seekbar.setOnSeekBarChangeListener(this.barChangeListener)
         btn_save.setOnClickListener(this)
     }
 
@@ -172,7 +172,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         color_r?.text = r.toString()
         color_g?.text = g.toString()
         color_b?.text = b.toString()
-        var w = sb_w_bright.progress
+        var w = rgb_white_seekbar.progress
 //
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
         var ws = (color!! and 0xff000000.toInt()) shr 24
@@ -222,7 +222,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         color_r?.text = r.toString()
         color_g?.text = g.toString()
         color_b?.text = b.toString()
-        val w = sb_w_bright.progress
+        val w = rgb_white_seekbar.progress
 
         val color: Int = (r shl 16) or (g shl 8) or b
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
@@ -340,7 +340,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             val opcode: Byte
             val params: ByteArray
 
-            if (view == sb_w_bright) {
+            if (view == rgb_white_seekbar) {
                 opcode = Opcode.SET_W_LUM
                 params = byteArrayOf(progress.toByte())
                 var color = itemGroup!!.color

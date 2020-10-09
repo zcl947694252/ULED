@@ -11,6 +11,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.httpModel.UserModel
+import com.dadoutek.uled.tellink.TelinkLightService
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_choose_mode.*
@@ -71,6 +72,7 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.choose_mode_router_iv -> {
                 UserModel.updateModeStatus().subscribe({
                     SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, true)
+                    TelinkLightService.Instance()?.idleMode(true)
                     updateUi()
                     LogUtils.v("zcl--------------上传云状态为路由----")
                 }, {
@@ -78,6 +80,5 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
                 })
             }
         }
-
     }
 }

@@ -336,6 +336,16 @@ object RouterModel {
     }
 
     /**
+     * 控制相关开始
+     * 调节白色
+     */
+    fun routeConfigWhiteNum(meshAddr: Int, meshType: Int, colorTemperature: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeConfigWhiteNum(meshAddr, meshType, colorTemperature, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
      * 控制相关开始  int	1开 2关 (特别注意2才是关)
      * 开关缓起缓灭
      */

@@ -351,7 +351,7 @@
                         android:orientation="vertical">
 
                     <SeekBar
-                            android:id="@+id/sb_w_bright"
+                            android:id="@+id/rgb_white_seekbar"
                             style="@style/SeekBarStyle"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
@@ -471,7 +471,7 @@
                         android:orientation="vertical">
 
                     <SeekBar
-                            android:id="@+id/sbBrightness"
+                            android:id="@+id/rgb_sbBrightness"
                             style="@style/SeekBarStyle"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
@@ -588,7 +588,7 @@
             </LinearLayout>
 
             <SeekBar
-                    android:id="@+id/cw_sbBrightness"
+                    android:id="@+id/normal_sbBrightness"
                     style="@style/SeekBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -608,7 +608,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/cw_sbBrightness">
+                    app:layout_constraintTop_toBottomOf="@+id/normal_sbBrightness">
 
                 <ImageView
                         android:id="@+id/cw_brightness_less"
@@ -664,7 +664,7 @@
 
 
             <SeekBar
-                    android:id="@+id/temperature"
+                    android:id="@+id/normal_temperature"
                     style="@style/SeekBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -683,7 +683,7 @@
                     android:orientation="horizontal"
                     android:paddingBottom="@dimen/dp_10"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/temperature">
+                    app:layout_constraintTop_toBottomOf="@+id/normal_temperature">
 
 
                 <ImageView

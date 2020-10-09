@@ -1068,11 +1068,11 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/smartlight_test/ota/result/list?page=1&size=50&start
      * =1597046991063 #查询#查询第一页数据，每页50条，创建时间为2020-07-20 11:29:20
      */
-    @FormUrlEncoded
+
     @GET("ota/result/list")
-    Observable<Response<List<RouterOTAResultBean>>> routerGetOTAResult(@Field("page") int page,
-                                                                       @Field("size") int size,
-                                                                       @Field("start") long start);
+    Observable<Response<List<RouterOTAResultBean>>> routerGetOTAResult(@Query("page") int page,
+                                                                       @Query("size") int size,
+                                                                       @Query("start") long start);
 
     /**
      * 停止ota升级  https://dev.dadoutek.com/xxxx/router/stop-ota  POST
@@ -1088,11 +1088,8 @@ public interface RequestInterface {
 
     /**
      * 添加自定义渐变  https://dev.dadoutek.com/xxxx/router/add-custom-dc  POST
-     * ser_id	是	string	app会话id，推送时回传
-     * name	是	string	名称
-     * type	是	int	渐变类型
-     * speed	是	int	渐变速度
-     * colorNodes	是	List<ColorNode>	colorNodes
+     * ser_id	是	string	app会话id，推送时回传   name	是	string	名称
+     * type	是	int	渐变类型  speed是int渐变速度  colorNodes	是	List<ColorNode>	colorNodes
      * meshAddr	是	int	关联设备或者组的meshAddr
      * meshType	是	int	meshAddr类型
      * {  "ser_id": "app会话id，自己维护","name": "自定义渐变", "type": 0,"speed": 5,
@@ -1254,6 +1251,23 @@ public interface RequestInterface {
     Observable<Response<RouterTimeoutBean>> routeConfigColorTemp(@Field("meshAddr") int meshAddr,
                                                                  @Field("meshType") int meshType,
                                                                  @Field("colorTemperature") int brightness,
+                                                                 @Field("ser_id") String ser_id);
+    /**
+     * 设备&组w值调节
+     * https://dev.dadoutek.com/xxxx/router/control/w  POST
+     *
+     * meshAddr	是	int	目标meshAddr
+     * ser_id	是	string	app会话id，推送时回传
+     * meshType	是	int	mesh地址类型
+     * color	是	int	原来逻辑生成的color值
+     * "meshAddr" : 1, "meshType": 6,"color": 16777215 // w = 0 , "ser_id": "app会话id，自己维护"
+     * meshType彩灯 = 6组 = 97
+     */
+    @FormUrlEncoded
+    @POST("router/control/colorTemperature")
+    Observable<Response<RouterTimeoutBean>> routeConfigWhiteNum(@Field("meshAddr") int meshAddr,
+                                                                 @Field("meshType") int meshType,
+                                                                 @Field("color") int color,
                                                                  @Field("ser_id") String ser_id);
 
     /**

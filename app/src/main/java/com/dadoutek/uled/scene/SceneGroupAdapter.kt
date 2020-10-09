@@ -1,37 +1,63 @@
 package com.dadoutek.uled.scene
 
 import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import android.os.Handler
 import android.os.Message
+import android.support.annotation.RequiresApi
 import android.text.TextUtils
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
+import com.blankj.utilcode.util.Utils.runOnUiThread
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
-import com.dadoutek.uled.model.ItemGroup
-import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.RouterTimeoutBean
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.OtherUtils
+import com.google.gson.Gson
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONException
+import java.lang.Thread.sleep
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by hejiajun on 2018/5/5.
  */
 class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdapter<ItemGroup, BaseViewHolder>(layoutResId, data), SeekBar.OnSeekBarChangeListener {
 
+    private var seekBarprogress: Int = 0
+    private  var currentSeekBar: SeekBar?=null
+    private var sendNum: Int = 0
+    open  var stompRecevice: StompReceiver = StompReceiver()
+    private var loadDialog: Dialog? = null
+    private var disposableRouteTimer: Disposable? = null
+    private var clickType: Int = 0
+    private var currentPostion: Int = 0
+    private var isBrightness: Boolean = false
     private var algText: TextView? = null
     private var addAlgSpeed: ImageView? = null
     private var lessAlgSpeed: ImageView? = null
@@ -59,12 +85,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     internal var thisTime: Long = 0//while每次循环时的时间
     internal var onBtnTouch = false//Button是否被按下
     internal var tvValue = 0//TextView中的值
-
     @SuppressLint("ClickableViewAccessibility")
     override fun convert(helper: BaseViewHolder, item: ItemGroup) {
         val position = helper.adapterPosition
-        sbBrightnessCW = helper.getView(R.id.cw_sbBrightness)
-        sbtemperature = helper.getView(R.id.temperature)
+        sbBrightnessCW = helper.getView(R.id.normal_sbBrightness)
+        sbtemperature = helper.getView(R.id.normal_temperature)
         addBrightnessCW = helper.getView(R.id.cw_brightness_add)
         lessBrightnessCW = helper.getView(R.id.cw_brightness_less)
         lessTemperatureCW = helper.getView(R.id.temperature_less)
@@ -75,10 +100,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         var docOne = helper.getView<Dot>(R.id.dot_one)
         var dotRgb = helper.getView<ImageView>(R.id.dot_rgb)
 
-        sbBrightnessRGB = helper.getView(R.id.sbBrightness)
+        sbBrightnessRGB = helper.getView(R.id.rgb_sbBrightness)
         addBrightnessRGB = helper.getView(R.id.sbBrightness_add)
         lessBrightnessRGB = helper.getView(R.id.sbBrightness_less)
-        sbWhiteLightRGB = helper.getView(R.id.sb_w_bright)
+        sbWhiteLightRGB = helper.getView(R.id.rgb_white_seekbar)
         addWhiteLightRGB = helper.getView(R.id.sb_w_bright_add)
         lessWhiteLightRGB = helper.getView(R.id.sb_w_bright_less)
 
@@ -114,8 +139,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 val progress = if (sbBrightnessRGB.progress != 0) sbBrightnessRGB.progress else 1
-                helper.setProgress(R.id.sbBrightness, item.brightness)
-                        .setProgress(R.id.sb_w_bright, item.temperature)
+                helper.setProgress(R.id.rgb_sbBrightness, item.brightness)
+                        .setProgress(R.id.rgb_white_seekbar, item.temperature)
                         //.setProgress(R.id.speed_seekbar, item.gradientSpeed)
                         .setText(R.id.sbBrightness_num, "$progress%")
                         .setText(R.id.sb_w_bright_num, sbWhiteLightRGB.progress.toString() + "%")
@@ -126,24 +151,30 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         visiableMode(helper, true)
                         setAlgClickAble(item, addBrightnessRGB!!, lessBrightnessRGB!!)
 
-                        when {item.isEnableBright -> {
-                            sbBrightnessRGB.isEnabled = true
-                            addBrightnessRGB.isEnabled = true
-                            lessBrightnessRGB.isEnabled = true
-                        }else -> {
-                            sbBrightnessRGB.isEnabled = false
-                            addBrightnessRGB.isEnabled = false
-                            lessBrightnessRGB.isEnabled = false
-                        }}
-                        when {item.isEnableWhiteLight -> {
-                            sbWhiteLightRGB.isEnabled = true
-                            addWhiteLightRGB.isEnabled = true
-                            lessWhiteLightRGB.isEnabled = true
-                        }else -> {
-                            sbWhiteLightRGB.isEnabled = false
-                            addWhiteLightRGB.isEnabled = false
-                            lessWhiteLightRGB.isEnabled = false
-                        }}
+                        when {
+                            item.isEnableBright -> {
+                                sbBrightnessRGB.isEnabled = true
+                                addBrightnessRGB.isEnabled = true
+                                lessBrightnessRGB.isEnabled = true
+                            }
+                            else -> {
+                                sbBrightnessRGB.isEnabled = false
+                                addBrightnessRGB.isEnabled = false
+                                lessBrightnessRGB.isEnabled = false
+                            }
+                        }
+                        when {
+                            item.isEnableWhiteLight -> {
+                                sbWhiteLightRGB.isEnabled = true
+                                addWhiteLightRGB.isEnabled = true
+                                lessWhiteLightRGB.isEnabled = true
+                            }
+                            else -> {
+                                sbWhiteLightRGB.isEnabled = false
+                                addWhiteLightRGB.isEnabled = false
+                                lessWhiteLightRGB.isEnabled = false
+                            }
+                        }
                     }
                     else -> {//渐变模式
                         if (!TextUtils.isEmpty(item.gradientName))
@@ -153,16 +184,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     }
                 }
             }
-            else -> { helper.setProgress(R.id.cw_sbBrightness, item.brightness).setProgress(R.id.temperature, item.temperature)
+            else -> {
+                helper.setProgress(R.id.normal_sbBrightness, item.brightness).setProgress(R.id.normal_temperature, item.temperature)
                         .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
-                    .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
+                        .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)
                 setAlgClickAble(item, addTemperatureCW!!, lessTemperatureCW!!)
             }
         }
-
-
-
 
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
@@ -204,7 +233,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, true)
                 topRgLy?.visibility = View.GONE
-                when {item.isOn -> {
+                when {
+                    item.isOn -> {
                         helper.setChecked(R.id.rg_xx, true)
                         helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
                     }
@@ -276,8 +306,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     }
                 }
             }
+
             override fun onStartTrackingTouch(seekBar: IndicatorSeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {
+
+            }
         }
         topRgLy!!.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -316,44 +349,111 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 .addOnClickListener(R.id.cb_white_light)
 
         addTemperatureCW!!.setOnTouchListener { v, event ->
+            currentPostion = position
+            clickType = 1//普灯色温
             addTemperature(event, position)
             true
         }
         lessTemperatureCW!!.setOnTouchListener { v, event ->
+            currentPostion = position
+            clickType = 2//普灯色温
             lessTemperature(event, position)
             true
         }
         addBrightnessCW!!.setOnTouchListener { v, event ->
-            addBrightness(event, position)
+            currentPostion = position
+            clickType = 3//普通亮度
+            addBrightness(event, position)//亮度
             true
         }
         lessBrightnessCW!!.setOnTouchListener { v, event ->
-            lessBrightness(event, position)
+            currentPostion = position
+            clickType = 4//普通亮度
+            lessBrightness(event, position)//亮度
             true
         }
         addBrightnessRGB!!.setOnTouchListener { v, event ->
-            addRGBBrightness(event, position)
+            currentPostion = position
+            clickType = 5//彩灯亮度
+            addRGBBrightness(event, position)//亮度
             true
         }
         lessBrightnessRGB!!.setOnTouchListener { v, event ->
-            lessRGBBrightness(event, position)
+            currentPostion = position
+            clickType = 6//彩灯亮度
+            lessRGBBrightness(event, position)//亮度
             true
         }
         addWhiteLightRGB!!.setOnTouchListener { _, event ->
+            currentPostion = position
+            clickType = 7//彩灯白光
             addRGBWhiteLight(event, position)
             true
         }
         lessWhiteLightRGB!!.setOnTouchListener { v, event ->
+            currentPostion = position
+            clickType = 8//普通色温亮度 彩灯亮度白光
             lessRGBWhiteLight(event, position)
             true
         }
         addAlgSpeed?.setOnTouchListener { _, event ->
+            currentPostion = position
             addAlgSpeedNum(event, position)
             true
         }
         lessAlgSpeed?.setOnTouchListener { _, event ->
+            currentPostion = position
             lessAlgSpeedNum(event, position)
             true
+        }
+    }
+
+    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+        val currentTime = System.currentTimeMillis()
+        val position = seekBar.tag as Int
+
+         currentSeekBar = seekBar
+         seekBarprogress = progress
+        currentPostion = position
+        if (fromUser&&!Constant.IS_ROUTE_MODE)
+            changeTextView(seekBar, progress, position)
+
+        if (currentTime - this.preTime > this.delayTime) {
+            if (fromUser) {
+                val address = data[position].groupAddress
+                val opcode: Byte
+                when (seekBar.id) {
+                    R.id.normal_sbBrightness -> {
+                        opcode = Opcode.SET_LUM
+                        if (Constant.IS_ROUTE_MODE) {
+                            routerConfigBrightnesssOrColorTemp()
+                        } else GlobalScope.launch { sendCmd(opcode, address, progress) }
+                    }
+                    R.id.normal_temperature -> {
+                        if (Constant.IS_ROUTE_MODE) {
+                            routerConfigBrightnesssOrColorTemp()
+                        } else {
+                            opcode = Opcode.SET_TEMPERATURE
+                            GlobalScope.launch { sendCmd(opcode, address, progress) }
+                        }
+                    }
+                    R.id.rgb_sbBrightness -> {
+                        opcode = Opcode.SET_LUM
+                        if (Constant.IS_ROUTE_MODE) {
+                            routerConfigBrightnesssOrColorTemp()
+                        } else
+                            GlobalScope.launch { sendCmd(opcode, address, progress) }
+                    }
+                    R.id.rgb_white_seekbar -> {
+                        opcode = Opcode.SET_W_LUM
+                        if (Constant.IS_ROUTE_MODE) {
+                            routerConfigBrightnesssOrColorTemp()
+                        } else
+                            GlobalScope.launch { sendCmd(opcode, address, progress) }
+                    }
+                }
+            }
+            this.preTime = currentTime
         }
     }
 
@@ -362,11 +462,13 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 .setGone(R.id.rgb_scene, isVisiable)
                 .setGone(R.id.alg_ly, !isVisiable)
 
-        when {isVisiable -> {
+        when {
+            isVisiable -> {
                 algLy?.visibility = View.GONE
                 helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.blue_text))
                         .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.gray9))
-            }else -> {
+            }
+            else -> {
                 algLy?.visibility = View.VISIBLE
                 helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.gray9))
                         .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
@@ -389,39 +491,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 addBtn.isEnabled = true
                 lessBtn.isEnabled = true
             }
-        }
-    }
-
-    override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-        val currentTime = System.currentTimeMillis()
-        val position = seekBar.tag as Int
-        if (fromUser)
-            changeTextView(seekBar, progress, position)
-
-        if (currentTime - this.preTime > this.delayTime) {
-            if (fromUser) {
-                val address = data[position].groupAddress
-                val opcode: Byte
-                when (seekBar.id) {
-                    R.id.cw_sbBrightness -> {
-                        opcode = Opcode.SET_LUM
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                    R.id.temperature -> {
-                        opcode = Opcode.SET_TEMPERATURE
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                    R.id.sbBrightness -> {
-                        opcode = Opcode.SET_LUM
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                    R.id.sb_w_bright -> {
-                        opcode = Opcode.SET_W_LUM
-                        GlobalScope.launch { sendCmd(opcode, address, progress) }
-                    }
-                }
-            }
-            this.preTime = currentTime
         }
     }
 
@@ -492,6 +561,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     }
 
     private fun lessRGBWhiteLight(event: MotionEvent?, position: Int) {
+        isBrightness = false
         when {
             event!!.action == MotionEvent.ACTION_DOWN -> {
                 downTime = System.currentTimeMillis()
@@ -511,13 +581,17 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             event.action == MotionEvent.ACTION_UP -> {
-                onBtnTouch = false
-                if (thisTime - downTime < 500) {
-                    tvValue++
-                    val msg = whitelightLess.obtainMessage()
-                    msg.arg1 = tvValue
-                    msg.arg2 = position
-                    whitelightLess.sendMessage(msg)
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    onBtnTouch = false
+                    if (thisTime - downTime < 500) {
+                        tvValue++
+                        val msg = whitelightLess.obtainMessage()
+                        msg.arg1 = tvValue
+                        msg.arg2 = position
+                        whitelightLess.sendMessage(msg)
+                    }
                 }
             }
             event.action == MotionEvent.ACTION_CANCEL -> onBtnTouch = false
@@ -525,6 +599,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     }
 
     private fun addRGBWhiteLight(event: MotionEvent?, position: Int) {
+        isBrightness = false
         when {
             event!!.action == MotionEvent.ACTION_DOWN -> {
                 downTime = System.currentTimeMillis()
@@ -545,87 +620,282 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
             event.action == MotionEvent.ACTION_UP -> {
                 onBtnTouch = false
-                if (thisTime - downTime < 500) {
-                    tvValue++
-                    val msg = whitelightAdds.obtainMessage()
-                    msg.arg1 = tvValue
-                    msg.arg2 = position
-                    whitelightAdds.sendMessage(msg)
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    if (thisTime - downTime < 500) {
+                        tvValue++
+                        val msg = whitelightAdds.obtainMessage()
+                        msg.arg1 = tvValue
+                        msg.arg2 = position
+                        whitelightAdds.sendMessage(msg)
+                    }
                 }
             }
             event.action == MotionEvent.ACTION_CANCEL -> onBtnTouch = false
         }
     }
 
+    private fun routerConfigBrightnesssOrColorTemp() = when {
+        isBrightness -> {//亮度
+            val group = data[currentPostion]
+            //clickType 普通色温亮度 彩灯亮度白光
+            var seekBar = when (clickType) {
+                1, 2 -> getViewByPosition(currentPostion, R.id.normal_temperature) as SeekBar
+                3, 4 -> getViewByPosition(currentPostion, R.id.normal_sbBrightness) as SeekBar
+                6, 5 -> getViewByPosition(currentPostion, R.id.rgb_sbBrightness) as SeekBar
+                7, 8 -> getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
+                else -> getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
+            }
+        }
+        else -> {
+            val group = data[currentPostion]
+            var seekBar: SeekBar
+            when (group) {
+                null -> {
+                }
+                else -> {
+                    when (clickType) {//普通色温亮度 彩灯亮度白光
+                        1, 2 -> {
+                            seekBar = getViewByPosition(currentPostion, R.id.normal_temperature) as SeekBar
+                            configTempOrBri(seekBar, group, "gpTem")
+                        }
+                        3, 4 -> {
+                            seekBar = getViewByPosition(currentPostion, R.id.normal_sbBrightness) as SeekBar
+                            configTempOrBri(seekBar, group, "gpBri")
+                        }
+                        5, 6 -> {
+                            seekBar = getViewByPosition(currentPostion, R.id.rgb_sbBrightness) as SeekBar
+                            configTempOrBri(seekBar, group, "gpRgbBri")
+                        }
+                        7, 8 -> {
+                            seekBar = getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
+                            sendNum = seekBar.progress
+                            showLoadingDialog(mContext.getString(R.string.please_wait))
+                            routeConfigWhiteGpOrLight(group.groupAddress, 97, sendNum, "gpRgbWhite")
+                        }
+                        else -> {
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun configTempOrBri(seekBar: SeekBar, group: ItemGroup, serId: String) {
+        sendNum = seekBar.progress
+        showLoadingDialog(mContext.getString(R.string.please_wait))
+        routeConfigTempGpOrLight(group.groupAddress, 97, sendNum, "gpTem")
+    }
+
+
+    @SuppressLint("CheckResult")
+    open fun routeConfigTempGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
+        LogUtils.v("zcl----------- zcl-----------发送路由调色参数-------$brightness-------")
+        RouterModel.routeConfigColorTemp(meshAddr, deviceType, brightness, serId)?.subscribe({
+            //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //    "errorCode": 90007,"该组不存在，请重新刷新数据   "errorCode": 90005"message": "该设备绑定的路由没在线"
+            configBriOrColorTempResult(it)
+        }) {
+            ToastUtils.showShort(it.message)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
+        LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
+        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, serId)?.subscribe({
+            //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
+            configBriOrColorTempResult(it)
+        }) {
+            ToastUtils.showShort(it.message)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int, serId: String) {
+        LogUtils.v("zcl----------- zcl-----------发送路由调白色参数-------$white-------")
+        val group = DBUtils.getGroupByID(meshAddr.toLong())
+        var gpColor = group?.color ?: 0
+        val red = (gpColor and 0xff0000) shr 16
+        val green = (gpColor and 0x00ff00) shr 8
+        val blue = gpColor and 0x0000ff
+        var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
+        RouterModel.routeConfigColorTemp(meshAddr, deviceType, color, serId)?.subscribe({
+            //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
+            configBriOrColorTempResult(it)
+        }) {
+            ToastUtils.showShort(it.message)
+        }
+    }
+
+    private fun configBriOrColorTempResult(it: Response<RouterTimeoutBean>) {
+        when (it.errorCode) {
+            0 -> {
+                showLoadingDialog(mContext.getString(R.string.please_wait))
+                disposableRouteTimer?.dispose()
+                disposableRouteTimer = io.reactivex.Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                        .subscribe {
+                            hideLoadingDialog()
+                            when (clickType) {//普通色温亮度 彩灯亮度白光
+                                1, 2 -> ToastUtils.showShort(mContext.getString(R.string.config_color_temp_fail))
+                                3, 4 -> ToastUtils.showShort(mContext.getString(R.string.config_bri_fail))
+                                5, 6 -> ToastUtils.showShort(mContext.getString(R.string.config_bri_fail))
+                                7, 8 -> ToastUtils.showShort(mContext.getString(R.string.config_white_fail))
+                            }
+                        }
+            }
+            90018 -> ToastUtils.showShort(mContext.getString(R.string.device_not_exit))
+            90008 -> ToastUtils.showShort(mContext.getString(R.string.no_bind_router_cant_perform))
+            90007 -> ToastUtils.showShort(mContext.getString(R.string.gp_not_exit))
+            90005 -> ToastUtils.showShort(mContext.getString(R.string.router_offline))
+        }
+    }
+
+    fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由配置亮度灯通知------------$cmdBean")
+        val group = data[currentPostion]
+        disposableRouteTimer?.dispose()
+        when (cmdBean.status) {
+            0 -> {
+                when (clickType) {//普通色温亮度 彩灯亮度白光
+                    1 -> hAddCwTem(currentPostion, data)
+                    2 -> hLessCwTem(currentPostion, data)
+                    3 -> hAddCwBri(currentPostion, data)
+                    4 -> hCwLessBri(currentPostion, data)
+                    5 -> hAddRgbBri(currentPostion, data)
+                    6 -> hLessRgbBri(currentPostion, data)
+                    7 -> hAddWhite(currentPostion, data)
+                    8 -> hLesswihte(currentPostion, data)
+                }
+                if (currentSeekBar!=null)
+                changeTextView(currentSeekBar!!, seekBarprogress, currentPostion)
+                hideLoadingDialog()
+            }
+            else -> {
+                hideLoadingDialog()
+                var seekBar: SeekBar
+                when (clickType) {//普通色温亮度 彩灯亮度白光
+                    1, 2 -> {
+                        seekBar = getViewByPosition(currentPostion, R.id.normal_temperature) as SeekBar
+                        seekBar.progress = group.temperature
+                        ToastUtils.showShort(mContext.getString(R.string.config_color_temp_fail))
+                    }
+                    3, 4 -> {
+                        seekBar = getViewByPosition(currentPostion, R.id.normal_sbBrightness) as SeekBar
+                        seekBar.progress = group.brightness
+                        ToastUtils.showShort(mContext.getString(R.string.config_bri_fail))
+                    }
+                    5, 6 -> {
+                        seekBar = getViewByPosition(currentPostion, R.id.rgb_sbBrightness) as SeekBar
+                        seekBar.progress = group.brightness
+                        ToastUtils.showShort(mContext.getString(R.string.config_bri_fail))
+                    }
+                    7, 8 -> {
+                        seekBar = getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
+                        var ws = (group.color and 0xff000000.toInt()) shr 24
+                        seekBar.progress = ws
+                        ToastUtils.showShort(mContext.getString(R.string.config_white_fail))
+                    }
+                    else -> {
+                    }
+                }
+            }
+        }
+    }
+
     private fun lessRGBBrightness(event: MotionEvent?, position: Int) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
-                while (onBtnTouch) {
-                    thisTime = System.currentTimeMillis()
-                    if (thisTime - downTime >= 500) {
+        isBrightness = false
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = brightnessLess.obtainMessage()
+                            msg.arg1 = tvValue
+                            msg.arg2 = position
+                            brightnessLess.sendMessage(msg)
+                            delay(100)
+                        }
+                    }
+                }
+            }
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    if (thisTime - downTime < 500) {
                         tvValue++
                         val msg = brightnessLess.obtainMessage()
                         msg.arg1 = tvValue
                         msg.arg2 = position
                         brightnessLess.sendMessage(msg)
-                        delay(100)
                     }
                 }
             }
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = brightnessLess.obtainMessage()
-                msg.arg1 = tvValue
-                msg.arg2 = position
-                brightnessLess.sendMessage(msg)
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
         }
     }
 
     private fun addRGBBrightness(event: MotionEvent?, position: Int) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
-                while (onBtnTouch) {
-                    thisTime = System.currentTimeMillis()
-                    if (thisTime - downTime >= 500) {
+        currentPostion = position
+        isBrightness = false
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = brightnessAdd.obtainMessage()
+                            msg.arg1 = tvValue
+                            msg.arg2 = position
+                            brightnessAdd.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            delay(100)
+                        }
+                    }
+                }
+            }
+            event.action == MotionEvent.ACTION_UP -> {
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    onBtnTouch = false
+                    if (thisTime - downTime < 500) {
                         tvValue++
                         val msg = brightnessAdd.obtainMessage()
                         msg.arg1 = tvValue
                         msg.arg2 = position
                         brightnessAdd.sendMessage(msg)
-                        Log.e("TAG_TOUCH", tvValue++.toString())
-                        delay(100)
                     }
                 }
             }
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = brightnessAdd.obtainMessage()
-                msg.arg1 = tvValue
-                msg.arg2 = position
-                brightnessAdd.sendMessage(msg)
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
         }
     }
 
     private fun lessTemperature(event: MotionEvent?, position: Int) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+        currentPostion = position
+        isBrightness = true
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                Thread {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -640,32 +910,38 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
-
                         }
+                    }
+                }.start()
+            }
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    if (thisTime - downTime < 500) {
+                        tvValue++
+                        val msg = handlerTemperatureLess.obtainMessage()
+                        msg.arg1 = tvValue
+                        msg.arg2 = position
+                        handlerTemperatureLess.sendMessage(msg)
                     }
                 }
             }
-            t.start()
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handlerTemperatureLess.obtainMessage()
-                msg.arg1 = tvValue
-                msg.arg2 = position
-                handlerTemperatureLess.sendMessage(msg)
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
         }
     }
 
     private fun addTemperature(event: MotionEvent?, position: Int) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+        currentPostion = position
+        isBrightness = true
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                Thread {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -680,32 +956,46 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
-
+                        }
+                    }
+                }.start()
+            }
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    if (thisTime - downTime < 500) {
+                        tvValue++
+                        val msg = handlerTemperatureLess.obtainMessage()
+                        msg.arg1 = tvValue
+                        msg.arg2 = position
+                        handlerTemperatureLess.sendMessage(msg)
+                    } else {
+                        if (thisTime - downTime < 500) {
+                            tvValue++
+                            val msg = handlerTemperatureAdd.obtainMessage()
+                            msg.arg1 = tvValue
+                            msg.arg2 = position
+                            handlerTemperatureAdd.sendMessage(msg)
                         }
                     }
                 }
             }
-            t.start()
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handlerTemperatureAdd.obtainMessage()
-                msg.arg1 = tvValue
-                msg.arg2 = position
-                handlerTemperatureAdd.sendMessage(msg)
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
         }
     }
 
     private fun lessBrightness(event: MotionEvent?, position: Int) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+        currentPostion = position
+        isBrightness = false
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                Thread {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -720,32 +1010,59 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
+                        }
+                    }
+                }.start()
+            }
+            event.action == MotionEvent.ACTION_UP -> {
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    onBtnTouch = false
+                    when {
+                        thisTime - downTime < 500 -> {
+                            tvValue++
+                            val msg = handlerBrightnessLess.obtainMessage()
+                            msg.arg1 = tvValue
+                            msg.arg2 = position
+                            handlerBrightnessLess.sendMessage(msg)
+                        }
+                        else -> {
+                            if (thisTime - downTime < 500) {
+                                tvValue++
+                                val msg = handlerTemperatureAdd.obtainMessage()
+                                msg.arg1 = tvValue
+                                msg.arg2 = position
+                                handlerTemperatureAdd.sendMessage(msg)
+                            } else {
+                                if (thisTime - downTime < 500) {
+                                    tvValue++
+                                    val msg = handlerBrightnessLess.obtainMessage()
+                                    msg.arg1 = tvValue
+                                    msg.arg2 = position
+                                    handlerBrightnessLess.sendMessage(msg)
+                                }
 
+                            }
                         }
                     }
                 }
+
             }
-            t.start()
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handlerBrightnessLess.obtainMessage()
-                msg.arg1 = tvValue
-                msg.arg2 = position
-                handlerBrightnessLess.sendMessage(msg)
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
         }
     }
 
     private fun addBrightness(event: MotionEvent?, position: Int) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            val t = object : Thread() {
-                override fun run() {
+        currentPostion = position
+        isBrightness = false
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                Thread {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -760,23 +1077,27 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
-
                         }
+                    }
+                }.start()
+            }
+            event.action == MotionEvent.ACTION_UP -> {
+                if (Constant.IS_ROUTE_MODE) {
+                    routerConfigBrightnesssOrColorTemp()
+                } else {
+                    onBtnTouch = false
+                    if (thisTime - downTime < 500) {
+                        tvValue++
+                        val msg = handlerBrightnessAdd.obtainMessage()
+                        msg.arg1 = tvValue
+                        msg.arg2 = position
+                        handlerBrightnessAdd.sendMessage(msg)
                     }
                 }
             }
-            t.start()
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handlerBrightnessAdd.obtainMessage()
-                msg.arg1 = tvValue
-                msg.arg2 = position
-                handlerBrightnessAdd.sendMessage(msg)
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
         }
     }
 
@@ -784,46 +1105,53 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val handlerBrightnessAdd = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
+            hAddCwBri(msg.arg2, data)
+        }
+    }
 
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.cw_sbBrightness) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.cw_brightness_num) as TextView?
-            var addImage = getViewByPosition(pos, R.id.cw_brightness_add) as ImageView?
-            var lessImage = getViewByPosition(pos, R.id.cw_brightness_less) as ImageView?
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
-
+    private fun hAddCwBri(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
+        var seekBar = getViewByPosition(pos, R.id.normal_sbBrightness) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.cw_brightness_num) as TextView?
+        var addImage = getViewByPosition(pos, R.id.cw_brightness_add) as ImageView?
+        var lessImage = getViewByPosition(pos, R.id.cw_brightness_less) as ImageView?
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
+        if (!Constant.IS_ROUTE_MODE)
             seekBar!!.progress++
 
-            when {
-                seekBar!!.progress > 100 -> {
-                    addImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 100 -> {
-                    addImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.brightness = seekBar!!.progress
-                    opcode = Opcode.SET_LUM
-                    params = byteArrayOf(seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    addImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.brightness = seekBar!!.progress
+        when {
+            seekBar!!.progress > 100 -> {
+                addImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 100 -> {
+                addImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_LUM
                     params = byteArrayOf(seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
+            else -> {
+                addImage!!.isEnabled = true
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
+            }
+        }
 
-            if (seekBar!!.progress > 0) {
-                lessImage!!.isEnabled = true
-            }
+        if (seekBar!!.progress > 0) {
+            lessImage!!.isEnabled = true
         }
     }
 
@@ -832,46 +1160,53 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
 
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.cw_sbBrightness) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.cw_brightness_num) as TextView?
-            var lessImage = getViewByPosition(pos, R.id.cw_brightness_less) as ImageView?
-            var addImage = getViewByPosition(pos, R.id.cw_brightness_add) as ImageView?
+            hCwLessBri(msg.arg2, data)
+        }
+    }
 
+    private fun hCwLessBri(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
+        var seekBar = getViewByPosition(pos, R.id.normal_sbBrightness) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.cw_brightness_num) as TextView?
+        var lessImage = getViewByPosition(pos, R.id.cw_brightness_less) as ImageView?
+        var addImage = getViewByPosition(pos, R.id.cw_brightness_add) as ImageView?
             seekBar!!.progress--
 
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
 
-            when {
-                seekBar!!.progress < 1 -> {
-                    lessImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 1 -> {
-                    lessImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.brightness = seekBar!!.progress
-                    opcode = Opcode.SET_LUM
-                    params = byteArrayOf(seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    lessImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.brightness = seekBar!!.progress
+        when {
+            seekBar!!.progress < 1 -> {
+                lessImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 1 -> {
+                lessImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_LUM
                     params = byteArrayOf(seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
-
-            if (seekBar!!.progress < 100) {
-                addImage!!.isEnabled = true
+            else -> {
+                lessImage!!.isEnabled = true
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
             }
+        }
+
+        if (seekBar!!.progress < 100) {
+            addImage!!.isEnabled = true
         }
     }
 
@@ -880,46 +1215,53 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
 
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.temperature) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.temperature_num) as TextView?
-            var addImage = getViewByPosition(pos, R.id.temperature_add) as ImageView?
-            var lessImage = getViewByPosition(pos, R.id.temperature_less) as ImageView?
+            hAddCwTem(msg.arg2, data)
+        }
+    }
 
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
+    private fun hAddCwTem(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
+        var seekBar = getViewByPosition(pos, R.id.normal_temperature) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.temperature_num) as TextView?
+        var addImage = getViewByPosition(pos, R.id.temperature_add) as ImageView?
+        var lessImage = getViewByPosition(pos, R.id.temperature_less) as ImageView?
 
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
             seekBar!!.progress++
 
-            when {
-                seekBar!!.progress > 100 -> {
-                    addImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 100 -> {
-                    addImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.temperature = seekBar!!.progress
-                    opcode = Opcode.SET_TEMPERATURE
-                    params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    addImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.temperature = seekBar!!.progress
+        when {
+            seekBar!!.progress > 100 -> {
+                addImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 100 -> {
+                addImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_TEMPERATURE
                     params = byteArrayOf(0x05, seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
+            else -> {
+                addImage!!.isEnabled = true
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_TEMPERATURE
+                    params = byteArrayOf(0x05, seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
+            }
+        }
 
-            if (seekBar!!.progress > 0) {
-                lessImage!!.isEnabled = true
-            }
+        if (seekBar!!.progress > 0) {
+            lessImage!!.isEnabled = true
         }
     }
 
@@ -927,48 +1269,54 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val handlerTemperatureLess = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
+            hLessCwTem(msg.arg2, data)
+        }
+    }
 
-            var pos = msg.arg2
+    private fun hLessCwTem(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
 
-            var seekBar = getViewByPosition(pos, R.id.temperature) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.temperature_num) as TextView?
-            var addImage = getViewByPosition(pos, R.id.temperature_add) as ImageView?
-            var lessImage = getViewByPosition(pos, R.id.temperature_less) as ImageView?
+        var seekBar = getViewByPosition(pos, R.id.normal_temperature) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.temperature_num) as TextView?
+        var addImage = getViewByPosition(pos, R.id.temperature_add) as ImageView?
+        var lessImage = getViewByPosition(pos, R.id.temperature_less) as ImageView?
 
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
-
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
             seekBar!!.progress--
 
-            when {
-                seekBar!!.progress < 1 -> {
-                    lessImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 1 -> {
-                    lessImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.temperature = seekBar!!.progress
-                    opcode = Opcode.SET_TEMPERATURE
-                    params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    lessImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.temperature = seekBar!!.progress
+        when {
+            seekBar!!.progress < 1 -> {
+                lessImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 1 -> {
+                lessImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_TEMPERATURE
                     params = byteArrayOf(0x05, seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
+            else -> {
+                lessImage!!.isEnabled = true
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_TEMPERATURE
+                    params = byteArrayOf(0x05, seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
+            }
+        }
 
-            if (seekBar!!.progress > 0) {
-                addImage!!.isEnabled = true
-            }
+        if (seekBar!!.progress > 0) {
+            addImage!!.isEnabled = true
         }
     }
 
@@ -976,48 +1324,54 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val brightnessAdd = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
+            hAddRgbBri(msg.arg2, data)
+        }
+    }
 
-            var pos = msg.arg2
+    private fun hAddRgbBri(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
 
-            var seekBar = getViewByPosition(pos, R.id.sbBrightness) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.sbBrightness_num) as TextView?
-            var addImage = getViewByPosition(pos, R.id.sbBrightness_add) as ImageView?
-            var lessImage = getViewByPosition(pos, R.id.sbBrightness_less) as ImageView?
+        var seekBar = getViewByPosition(pos, R.id.rgb_sbBrightness) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.sbBrightness_num) as TextView?
+        var addImage = getViewByPosition(pos, R.id.sbBrightness_add) as ImageView?
+        var lessImage = getViewByPosition(pos, R.id.sbBrightness_less) as ImageView?
 
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
-
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
             seekBar!!.progress++
 
-            when {
-                seekBar!!.progress > 100 -> {
-                    addImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 100 -> {
-                    addImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.brightness = seekBar!!.progress
-                    opcode = Opcode.SET_LUM
-                    params = byteArrayOf(0x05, seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    addImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.brightness = seekBar!!.progress
+        when {
+            seekBar!!.progress > 100 -> {
+                addImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 100 -> {
+                addImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_LUM
                     params = byteArrayOf(0x05, seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
+            else -> {
+                addImage!!.isEnabled = true
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(0x05, seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
+            }
+        }
 
-            if (seekBar!!.progress > 1) {
-                lessImage!!.isEnabled = true
-            }
+        if (seekBar!!.progress > 1) {
+            lessImage!!.isEnabled = true
         }
     }
 
@@ -1025,50 +1379,57 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val brightnessLess = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.sbBrightness) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.sbBrightness_num) as TextView?
-            var lessImage = getViewByPosition(pos, R.id.sbBrightness_less) as ImageView?
-            var addImage = getViewByPosition(pos, R.id.sbBrightness_add) as ImageView?
+            hLessRgbBri(msg.arg2, data)
+        }
+    }
 
+    private fun hLessRgbBri(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
+        var seekBar = getViewByPosition(pos, R.id.rgb_sbBrightness) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.sbBrightness_num) as TextView?
+        var lessImage = getViewByPosition(pos, R.id.sbBrightness_less) as ImageView?
+        var addImage = getViewByPosition(pos, R.id.sbBrightness_add) as ImageView?
             seekBar!!.progress--
 
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
 
-            when {
-                seekBar!!.progress < 1 -> {
-                    seekBar!!.progress = 1
-                    lessImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 1 -> {
-                    lessImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.brightness = seekBar!!.progress
-                    opcode = Opcode.SET_LUM
-                    params = byteArrayOf(seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    lessImage!!.isEnabled = true
-                    var progress = seekBar!!.progress
-                    if (progress==0)
-                        progress=1
-                    brightnText!!.text = "$progress%"
-                    itemGroup.brightness = seekBar!!.progress
+        when {
+            seekBar!!.progress < 1 -> {
+                seekBar!!.progress = 1
+                lessImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 1 -> {
+                lessImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_LUM
                     params = byteArrayOf(seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
-
-            if (seekBar!!.progress < 100) {
-                addImage!!.isEnabled = true
+            else -> {
+                lessImage!!.isEnabled = true
+                var progress = seekBar!!.progress
+                if (progress == 0)
+                    progress = 1
+                brightnText!!.text = "$progress%"
+                itemGroup.brightness = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
             }
+        }
+
+        if (seekBar!!.progress < 100) {
+            addImage!!.isEnabled = true
         }
     }
 
@@ -1076,37 +1437,41 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val algHandlerAdd = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
-            var speedTv = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
-            var lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
-            var addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
-            //seekBar!!.progress++
+            hAddSpeed(msg.arg2, data)
+        }
+    }
+
+    private fun hAddSpeed(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
+        var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
+        var speedTv = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
+        var lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
+        var addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
+        //seekBar!!.progress++
             seekBar?.progress?.toFloat()?.plus(1f)?.let { speedSeekbar?.setProgress(it) }
 
-            val itemGroup = data[pos]
+        val itemGroup = data[pos]
 
-            when {
-                seekBar!!.progress > 5 -> {
-                    addImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 5 -> {
-                    addImage!!.isEnabled = false
-                    speedTv!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.gradientSpeed = seekBar!!.progress
-                }
-                else -> {
-                    addImage!!.isEnabled = true
-                    speedTv!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.gradientSpeed = seekBar!!.progress
-                }
+        when {
+            seekBar!!.progress > 5 -> {
+                addImage!!.isEnabled = false
+                onBtnTouch = false
             }
-
-            if (seekBar!!.progress < 5)
-                lessImage!!.isEnabled = true
+            seekBar!!.progress == 5 -> {
+                addImage!!.isEnabled = false
+                speedTv!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.gradientSpeed = seekBar!!.progress
+            }
+            else -> {
+                addImage!!.isEnabled = true
+                speedTv!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.gradientSpeed = seekBar!!.progress
+            }
         }
+
+        if (seekBar!!.progress < 5)
+            lessImage!!.isEnabled = true
     }
 
     @SuppressLint("HandlerLeak")
@@ -1159,47 +1524,53 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val whitelightLess = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
+            hLesswihte(msg.arg2, data)
+        }
+    }
 
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.sb_w_bright) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
-            var lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
-            var addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
-
+    private fun hLesswihte(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
+        var seekBar = getViewByPosition(pos, R.id.rgb_white_seekbar) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
+        var lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
+        var addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
             seekBar!!.progress--
 
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
 
-            when {
-                seekBar!!.progress < 1 -> {
-                    lessImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 1 -> {
-                    lessImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.temperature = seekBar!!.progress
-                    opcode = Opcode.SET_W_LUM
-                    params = byteArrayOf(seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    lessImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.temperature = seekBar!!.progress
+        when {
+            seekBar!!.progress < 1 -> {
+                lessImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 1 -> {
+                lessImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_W_LUM
                     params = byteArrayOf(seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
-
-            if (seekBar!!.progress < 100) {
-                addImage!!.isEnabled = true
+            else -> {
+                lessImage!!.isEnabled = true
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_W_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
             }
+        }
+
+        if (seekBar!!.progress < 100) {
+            addImage!!.isEnabled = true
         }
     }
 
@@ -1207,47 +1578,53 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val whitelightAdds = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
+            hAddWhite(msg.arg2, data)
+        }
+    }
 
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.sb_w_bright) as SeekBar?
-            var brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
-            var lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
-            var addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
-
+    private fun hAddWhite(msg: Int, data: List<ItemGroup>) {
+        var pos = msg
+        var seekBar = getViewByPosition(pos, R.id.rgb_white_seekbar) as SeekBar?
+        var brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
+        var lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
+        var addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
             seekBar!!.progress++
 
-            val address = data[pos].groupAddress
-            val opcode: Byte
-            val itemGroup = data[pos]
-            var params: ByteArray
+        val address = data[pos].groupAddress
+        val opcode: Byte
+        val itemGroup = data[pos]
+        var params: ByteArray
 
-            when {
-                seekBar!!.progress > 100 -> {
-                    addImage!!.isEnabled = false
-                    onBtnTouch = false
-                }
-                seekBar!!.progress == 100 -> {
-                    addImage!!.isEnabled = false
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    onBtnTouch = false
-                    itemGroup.temperature = seekBar!!.progress
-                    opcode = Opcode.SET_W_LUM
-                    params = byteArrayOf(seekBar!!.progress.toByte())
-                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
-                }
-                else -> {
-                    addImage!!.isEnabled = true
-                    brightnText!!.text = seekBar!!.progress.toString() + "%"
-                    itemGroup.temperature = seekBar!!.progress
+        when {
+            seekBar!!.progress > 100 -> {
+                addImage!!.isEnabled = false
+                onBtnTouch = false
+            }
+            seekBar!!.progress == 100 -> {
+                addImage!!.isEnabled = false
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                onBtnTouch = false
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
                     opcode = Opcode.SET_W_LUM
                     params = byteArrayOf(seekBar!!.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
-
-            if (seekBar!!.progress < 100)
-                lessImage!!.isEnabled = true
+            else -> {
+                addImage!!.isEnabled = true
+                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                itemGroup.temperature = seekBar!!.progress
+                if (!Constant.IS_ROUTE_MODE) {
+                    opcode = Opcode.SET_W_LUM
+                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
+                }
+            }
         }
+
+        if (seekBar!!.progress < 100)
+            lessImage!!.isEnabled = true
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -1257,11 +1634,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     override fun onStopTrackingTouch(seekBar: SeekBar) {
         val pos = seekBar.tag as Int
 
-        val address = if (pos < data.size)  data[pos].groupAddress else   0
+        val address = if (pos < data.size) data[pos].groupAddress else 0
         val opcode: Byte
         val itemGroup = data[pos]
         when (seekBar.id) {
-            R.id.cw_sbBrightness -> {
+            R.id.normal_sbBrightness -> {
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.cw_brightness_num)) as TextView).text = seekBar.progress.toString() + "%"
                 itemGroup.brightness = seekBar.progress
                 opcode = Opcode.SET_LUM
@@ -1282,7 +1659,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     }
                 }
             }
-            R.id.temperature -> {
+            R.id.normal_temperature -> {
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.temperature_num)) as TextView).text = seekBar.progress.toString() + "%"
                 itemGroup.temperature = seekBar.progress
                 opcode = Opcode.SET_TEMPERATURE
@@ -1304,7 +1681,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
 
             }
-            R.id.sbBrightness -> {
+            R.id.rgb_sbBrightness -> {
                 var progress = seekBar.progress
                 if (progress == 0) progress = 1
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sbBrightness_num)) as TextView).text = "$progress%"
@@ -1328,7 +1705,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
 
             }
-            R.id.sb_w_bright -> {
+            R.id.rgb_white_seekbar -> {
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sb_w_bright_num)) as TextView).text = seekBar.progress.toString() + "%"
                 itemGroup.temperature = seekBar.progress
                 opcode = Opcode.SET_W_LUM
@@ -1356,19 +1733,19 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     @SuppressLint("SetTextI18n")
     fun changeTextView(seekBar: SeekBar, progress: Int, position: Int) {
         when (seekBar.id) {
-            R.id.cw_sbBrightness -> {
+            R.id.normal_sbBrightness -> {
                 val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
                 if (tvBrightness != null) {
                     tvBrightness?.text = "$progress%"
                 }
             }
-            R.id.temperature -> {
+            R.id.normal_temperature -> {
                 val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
                 if (tvTemperature != null) {
                     tvTemperature?.text = "$progress%"
                 }
             }
-            R.id.sbBrightness -> {
+            R.id.rgb_sbBrightness -> {
                 val tvBrightnessRGB = getViewByPosition(position, R.id.sbBrightness_num) as TextView?
                 if (tvBrightnessRGB != null) {
                     if (progress == 0)
@@ -1378,7 +1755,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
                 }
             }
-            R.id.sb_w_bright -> {
+            R.id.rgb_white_seekbar -> {
                 val tvSbWhiteLight = getViewByPosition(position, R.id.sb_w_bright_num) as TextView?
                 if (tvSbWhiteLight != null) {
                     tvSbWhiteLight.text = "$progress%"
@@ -1401,7 +1778,56 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
     }
 
-    open fun getIsColorMode(): Boolean {
-        return isColorMode
+
+    fun showLoadingDialog(content: String) {
+        val inflater = LayoutInflater.from(mContext)
+        val v = inflater.inflate(R.layout.dialogview, null)
+
+        val layout = v.findViewById<View>(R.id.dialog_view) as LinearLayout
+        val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
+        tvContent.text = content
+
+        if (loadDialog == null)
+            loadDialog = Dialog(mContext, R.style.FullHeightDialog)
+
+        if (loadDialog!!.isShowing)
+            return
+
+        //loadDialog没显示才把它显示出来
+        if (!mContext.isRestricted && !loadDialog!!.isShowing) {
+            loadDialog!!.setCancelable(false)
+            loadDialog!!.setCanceledOnTouchOutside(false)
+            loadDialog!!.setContentView(layout)
+            if (!mContext.isRestricted) {
+                loadDialog!!.show()
+            }
+        }
+    }
+
+    fun hideLoadingDialog() {
+        if (!mContext.isRestricted && loadDialog != null && loadDialog!!.isShowing) {
+            runOnUiThread { loadDialog?.dismiss() }
+        }
+    }
+
+    inner class StompReceiver : BroadcastReceiver() {
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onReceive(context: Context?, intent: Intent?) {
+            LogUtils.v("zcl-----------收到路由广播-------${intent?.getStringExtra("111")}")
+            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
+            try {
+                when (cmdBean.cmd) {
+                    Cmd.routeUpdateScenes -> {
+                    }
+                    Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean)
+                    Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean)
+                    Cmd.tzRouteConfigWhite -> tzRouterConfigBriOrTemp(cmdBean)
+                }
+
+            } catch (js: JSONException) {
+                js.message
+            }
+        }
     }
 }

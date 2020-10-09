@@ -921,6 +921,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     @SuppressLint("CheckResult")
     private fun routerGroupDevice(list: MutableList<Int>, it: View?) {
+        disposableIntervalTime?.dispose()
         LogUtils.v("zcl-----------收到路由新传递参数-------${GroupBodyBean(list, deviceType, "batchGp", currentGroup!!.meshAddr)}")
         val subscribe = RouterModel.routeBatchGpNew(GroupBodyBean(list, deviceType, "batchGp", currentGroup!!.meshAddr))?.subscribe({ itR ->
             LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")

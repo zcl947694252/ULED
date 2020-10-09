@@ -8,7 +8,6 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.httpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper

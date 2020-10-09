@@ -231,7 +231,7 @@
                     android:orientation="horizontal">
 
                 <SeekBar
-                        android:id="@+id/sb_w_bright"
+                        android:id="@+id/rgb_white_seekbar"
                         style="@style/SeekBarStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -313,7 +313,7 @@
                     android:orientation="horizontal">
 
                 <SeekBar
-                        android:id="@+id/sbBrightness"
+                        android:id="@+id/rgb_sbBrightness"
                         style="@style/SeekBarStyle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

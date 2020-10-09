@@ -201,6 +201,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         UserModel.getModeStatus()?.subscribe({
             LogUtils.v("zcl-----------获取状态服务器返回-------$it")
             Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
+            if (Constant.IS_ROUTE_MODE)
+                TelinkLightService.Instance().idleMode(true)
             Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
             SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, false)
             changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
@@ -228,7 +230,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT)
+        if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT&&!Constant.IS_ROUTE_MODE)
             ToastUtils.showShort(getString(R.string.open_blutooth_tip))
     }
 
@@ -676,6 +678,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                     },
                                                     {
                                                         LogUtils.v("zcl-----------连接失败继续连接-------")
+                                                        if (!Constant.IS_ROUTE_MODE)
                                                         autoConnect()
                                                         LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
                                                     }

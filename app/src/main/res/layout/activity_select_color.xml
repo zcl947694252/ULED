@@ -175,7 +175,7 @@
                 android:visibility="gone" />
 
             <SeekBar
-                android:id="@+id/sb_w_bright"
+                android:id="@+id/rgb_white_seekbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="100"

@@ -95,7 +95,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         //单调光光能开关 sl bl   触摸单调光 btl sts
         if (!isTouchSw) {
             if (localVersion.contains("sl") || localVersion.contains("bl"))
-
+                sw_normal_iv.setImageResource(R.drawable.sw_normal_single)
             else
                 sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)

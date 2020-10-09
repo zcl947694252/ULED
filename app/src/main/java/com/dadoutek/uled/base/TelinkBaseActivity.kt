@@ -180,12 +180,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     @SuppressLint("CheckResult")
     open fun routeOpenOrCloseBase(meshAddr: Int, productUUID: Int, status: Int, serId: String) {//如果发送后失败则还原
         LogUtils.v("zcl-----------收到路由开关灯指令-------deviceType-------$productUUID")
-        RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
+        val subscribe = RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
             LogUtils.v("zcl-----------收到路由成功-------$it")
-            //    "errorCode": 90018,该设备不存在，请重新刷新数据"
-            //    "errorCode": 90008,该设备没有绑定路由，无法操作"
-            //   "errorCode": 90007该组不存在，请重新刷新数据"
-            //    errorCode": 90005,"message": "该设备绑定的路由没在线"
+            //    "errorCode": 90018,该设备不存在，请重新刷新数据"   "errorCode": 90008,该设备没有绑定路由，无法操作"
+            //   "errorCode": 90007该组不存在，请重新刷新数据"   errorCode": 90005,"message": "该设备绑定的路由没在线"
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))
@@ -452,7 +450,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!LeBluetooth.getInstance().enable(applicationContext))
+        if (!LeBluetooth.getInstance().enable(applicationContext)&&!Constant.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
         if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)

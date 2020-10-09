@@ -504,7 +504,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
         mRxPermission = RxPermissions(this)
 
-        sbBrightness!!.max = 100
+        rgb_sbBrightness!!.max = 100
 
         color_picker.reset()
         color_picker.subscribe(colorObserver)
@@ -544,15 +544,15 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         setDiyColorMode()
 
         val brightness = if (light!!.brightness >= 1) light!!.brightness else 1
-        sbBrightness!!.progress = brightness
+        rgb_sbBrightness!!.progress = brightness
         sbBrightness_num!!.text = "$brightness%"
 
         when {
-            sbBrightness!!.progress >= 100 -> {
+            rgb_sbBrightness!!.progress >= 100 -> {
                 sbBrightness_add.isEnabled = false
                 sbBrightness_less.isEnabled = true
             }
-            sbBrightness!!.progress <= 1 -> {
+            rgb_sbBrightness!!.progress <= 1 -> {
                 sbBrightness_less.isEnabled = false
                 sbBrightness_add.isEnabled = true
             }
@@ -575,14 +575,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         color_b.text = b.toString()
 
         sb_w_bright_num.text = "$w%"
-        sb_w_bright.progress = w
+        rgb_white_seekbar.progress = w
 
         when {
-            sb_w_bright.progress >= 100 -> {
+            rgb_white_seekbar.progress >= 100 -> {
                 sb_w_bright_add.isEnabled = false
                 sb_w_bright_less.isEnabled = true
             }
-            sb_w_bright.progress <= 1 -> {
+            rgb_white_seekbar.progress <= 1 -> {
                 sb_w_bright_less.isEnabled = false
                 sb_w_bright_add.isEnabled = true
             }
@@ -593,8 +593,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
 
         color_picker.setInitialColor((light?.color ?: 1 and 0xffffff) or 0xff000000.toInt())
-        sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
-        sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
+        rgb_sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
+        rgb_white_seekbar.setOnSeekBarChangeListener(barChangeListener)
     }
 
     private fun setDiyColorMode() {
@@ -664,12 +664,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         when (it.id) {
             R.id.cb_brightness_enable -> {
                 if (cb_brightness_enable.isChecked) {
-                    sb_w_bright.isEnabled = true
+                    rgb_white_seekbar.isEnabled = true
                     sb_w_bright_add.isEnabled = true
                     sb_w_bright_less.isEnabled = true
-                    sendBrightnessMsg(sb_w_bright.progress)
+                    sendBrightnessMsg(rgb_white_seekbar.progress)
                 } else {
-                    sb_w_bright.isEnabled = false
+                    rgb_white_seekbar.isEnabled = false
                     sb_w_bright_add.isEnabled = false
                     sb_w_bright_less.isEnabled = false
                     sendBrightnessMsg(0)
@@ -677,12 +677,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             }
             R.id.cb_brightness_rgb_enable -> {
                 if (cb_brightness_rgb_enable.isChecked) {
-                    sbBrightness.isEnabled = true
+                    rgb_sbBrightness.isEnabled = true
                     sbBrightness_add.isEnabled = true
                     sbBrightness_less.isEnabled = true
-                    sendColorMsg(sbBrightness.progress)
+                    sendColorMsg(rgb_sbBrightness.progress)
                 } else {
-                    sbBrightness.isEnabled = false
+                    rgb_sbBrightness.isEnabled = false
                     sbBrightness_add.isEnabled = false
                     sbBrightness_less.isEnabled = false
                     sendColorMsg(0)
@@ -697,11 +697,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         cb_brightness_rgb_enable.isChecked = isEnabled
         cb_brightness_enable.isChecked = isEnabled
 
-        sb_w_bright.isEnabled = isEnabled
+        rgb_white_seekbar.isEnabled = isEnabled
         sb_w_bright_add.isEnabled = isEnabled
         sb_w_bright_less.isEnabled = isEnabled
 
-        sbBrightness.isEnabled = isEnabled
+        rgb_sbBrightness.isEnabled = isEnabled
         sbBrightness_add.isEnabled = isEnabled
         sbBrightness_less.isEnabled = isEnabled
 
@@ -866,16 +866,16 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private val handler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sb_w_bright.progress++
+            rgb_white_seekbar.progress++
             when {
-                sb_w_bright.progress > 100 -> {
+                rgb_white_seekbar.progress > 100 -> {
                     sb_w_bright_add.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sb_w_bright.progress == 100 -> {
+                rgb_white_seekbar.progress == 100 -> {
                     sb_w_bright_add.isEnabled = false
-                    sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                    sb_w_bright_num.text = rgb_white_seekbar.progress.toString() + "%"
                     stopTracking = false
                     onBtnTouch = false
                 }
@@ -891,20 +891,20 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private val handler_brightness_add = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbBrightness.progress++
+            rgb_sbBrightness.progress++
             when {
-                sbBrightness.progress > 100 -> {
+                rgb_sbBrightness.progress > 100 -> {
                     sbBrightness_add.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sbBrightness.progress == 100 -> {
+                rgb_sbBrightness.progress == 100 -> {
                     sbBrightness_add.isEnabled = false
                     when {
-                        currentShowGroupSetPage -> group?.brightness = sbBrightness.progress
-                        else -> light?.brightness = sbBrightness.progress
+                        currentShowGroupSetPage -> group?.brightness = rgb_sbBrightness.progress
+                        else -> light?.brightness = rgb_sbBrightness.progress
                     }
-                    sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                    sbBrightness_num.text = rgb_sbBrightness.progress.toString() + "%"
                     stopTracking = false
                     onBtnTouch = false
                 }
@@ -920,22 +920,22 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private val handler_brightness_less = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbBrightness.progress--
+            rgb_sbBrightness.progress--
             when {
-                sbBrightness.progress < 1 -> {
+                rgb_sbBrightness.progress < 1 -> {
                     sbBrightness_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sbBrightness.progress == 1 -> {
+                rgb_sbBrightness.progress == 1 -> {
                     sbBrightness_less.isEnabled = false
 
                     when {
-                        currentShowGroupSetPage -> group?.brightness = sbBrightness.progress
-                        else -> light?.brightness = sbBrightness.progress
+                        currentShowGroupSetPage -> group?.brightness = rgb_sbBrightness.progress
+                        else -> light?.brightness = rgb_sbBrightness.progress
                     }
 
-                    sbBrightness_num.text = sbBrightness.progress.toString() + "%"
+                    sbBrightness_num.text = rgb_sbBrightness.progress.toString() + "%"
 
                     stopTracking = false
                     onBtnTouch = false
@@ -952,16 +952,16 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private val handler_less = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sb_w_bright.progress--
+            rgb_white_seekbar.progress--
             when {
-                sb_w_bright.progress < 1 -> {
+                rgb_white_seekbar.progress < 1 -> {
                     sb_w_bright_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                sb_w_bright.progress == 1 -> {
+                rgb_white_seekbar.progress == 1 -> {
                     sb_w_bright_less.isEnabled = false
-                    sb_w_bright_num.text = sb_w_bright.progress.toString() + "%"
+                    sb_w_bright_num.text = rgb_white_seekbar.progress.toString() + "%"
                     stopTracking = false
                     onBtnTouch = false
                 }
@@ -1550,14 +1550,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
         showBrightness = if (showBrightness <= 1) 1 else showBrightness
         //亮度
-        sbBrightness?.progress = showBrightness
+        rgb_sbBrightness?.progress = showBrightness
         sbBrightness_num.text = "$showBrightness%"
         if (w != -1 && w >= 1) {//白光
             sb_w_bright_num.text = "$showW%"
-            sb_w_bright.progress = showW
+            rgb_white_seekbar.progress = showW
         } else {
             sb_w_bright_num.text = "1%"
-            sb_w_bright.progress = 1
+            rgb_white_seekbar.progress = 1
         }
         color_r?.text = red.toString()
         color_g?.text = green.toString()
@@ -1730,15 +1730,15 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         colorSelectDiyRecyclerViewAdapter?.onItemChildLongClickListener = diyOnItemChildLongClickListener
         colorSelectDiyRecyclerViewAdapter?.bindToRecyclerView(diy_color_recycler_list_view)
 
-        sbBrightness!!.progress = group!!.brightness
+        rgb_sbBrightness!!.progress = group!!.brightness
         sbBrightness_num.text = group!!.brightness.toString() + "%"
 
         when {
-            sbBrightness!!.progress >= 100 -> {
+            rgb_sbBrightness!!.progress >= 100 -> {
                 sbBrightness_add.isEnabled = false
                 sbBrightness_less.isEnabled = true
             }
-            sbBrightness!!.progress <= 0 -> {
+            rgb_sbBrightness!!.progress <= 0 -> {
                 sbBrightness_less.isEnabled = false
                 sbBrightness_add.isEnabled = true
             }
@@ -1756,18 +1756,18 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             w = 1
         }
         sb_w_bright_num.text = "$w%"
-        sb_w_bright.progress = w
+        rgb_white_seekbar.progress = w
 
         color_r.text = r.toString()
         color_g.text = g.toString()
         color_b.text = b.toString()
 
         when {
-            sb_w_bright.progress >= 100 -> {
+            rgb_white_seekbar.progress >= 100 -> {
                 sb_w_bright_add.isEnabled = false
                 sb_w_bright_less.isEnabled = true
             }
-            sb_w_bright.progress <= 1 -> {
+            rgb_white_seekbar.progress <= 1 -> {
                 sb_w_bright_less.isEnabled = false
                 sb_w_bright_add.isEnabled = true
             }
@@ -1777,8 +1777,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             }
         }
 
-        sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
-        sb_w_bright.setOnSeekBarChangeListener(barChangeListener)
+        rgb_sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
+        rgb_white_seekbar.setOnSeekBarChangeListener(barChangeListener)
         color_picker.reset()
         color_picker.subscribe(colorObserver)
         color_picker.setInitialColor((group?.color ?: 0 and 0xffffff) or 0xff000000.toInt())
@@ -1859,14 +1859,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         showBrightness = if (showBrightness!! < 1) 1 else showBrightness
         showW = if (showW < 1) 1 else showW
 
-        sbBrightness?.progress = showBrightness!!
+        rgb_sbBrightness?.progress = showBrightness!!
         sb_w_bright_num.text = "$showBrightness%"
         if (w != -1 && w >= 1) {
             sb_w_bright_num.text = "$showW%"
-            sb_w_bright.progress = showW
+            rgb_white_seekbar.progress = showW
         } else {
             sb_w_bright_num.text = "1%"
-            sb_w_bright.progress = 1
+            rgb_white_seekbar.progress = 1
         }
         color_r?.text = red.toString()
         color_g?.text = green.toString()
@@ -2002,10 +2002,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         @SuppressLint("SetTextI18n")
         private fun onValueChangeView(view: View, progress: Int) {
             var progressNoZero = if (progress <= 0) 1 else progress
-            if (view === sbBrightness) {
+            if (view === rgb_sbBrightness) {
                 sbBrightness_num.text = "$progressNoZero%"
                 light?.brightness = progressNoZero
-            } else if (view === sb_w_bright) {
+            } else if (view === rgb_white_seekbar) {
                 sb_w_bright_num.text = "$progressNoZero%"
                 light?.let {
                     //保存颜色数据
@@ -2032,7 +2032,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             var brightness = 1
             var w = 1
             when (view) {
-                sbBrightness -> {
+                rgb_sbBrightness -> {
                     brightness = when {
                         progress > Constant.MAX_VALUE -> Constant.MAX_VALUE
                         else -> /*if (progress>0) */progress
@@ -2090,7 +2090,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         }
                     }
                 }
-                sb_w_bright -> {
+                rgb_white_seekbar -> {
                     opcode = Opcode.SET_W_LUM
                     w = if (progress > Constant.MAX_VALUE) {
                         Constant.MAX_VALUE
@@ -2193,12 +2193,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             light!!.meshAddr
         }
 
-        var brightness = sbBrightness.progress
+        var brightness = rgb_sbBrightness.progress
         var params = byteArrayOf(brightness.toByte())
         GlobalScope.launch {
             delay(500)
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
-            val w = sb_w_bright.progress
+            val w = rgb_white_seekbar.progress
             var paramsW = byteArrayOf(w.toByte())
             delay(500)
             TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
@@ -2209,7 +2209,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         val r = Color.red(color)
         val g = Color.green(color)
         val b = Color.blue(color)
-        val w = sb_w_bright.progress
+        val w = rgb_white_seekbar.progress
 
         val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
 
