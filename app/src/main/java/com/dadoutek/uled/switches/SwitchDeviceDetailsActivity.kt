@@ -108,7 +108,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         return toolbar
     }
 
-    override fun gpAllVisible(): Boolean {
+    override fun batchGpVisible(): Boolean {
         return false
     }
 
@@ -125,7 +125,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         return false
     }
 
-    override fun setPositiveBtn() {
+    override fun setDeletePositiveBtn() {
         currentDevice?.let {
             DBUtils.deleteSwitch(it)
             switchData.remove(it)

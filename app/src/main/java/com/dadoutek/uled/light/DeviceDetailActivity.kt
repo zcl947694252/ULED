@@ -88,11 +88,11 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         initView()
     }
 
-    override fun gpAllVisible(): Boolean {
+    override fun batchGpVisible(): Boolean {
         return true
     }
 
-    override fun setPositiveBtn() {
+    override fun setDeletePositiveBtn() {
         currentDevice?.let {
             DBUtils.deleteLight(it)
             lightsData.remove(it)
@@ -563,9 +563,9 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                     val beanOld = mOldDatas?.get(oldItemPosition)
                     val beanNew = mNewDatas?.get(newItemPosition)
-                    return if (!beanOld?.name.equals(beanNew?.name)) {
+                    return if (!beanOld?.name.equals(beanNew?.name))
                         return false//如果有内容不同，就返回false
-                    } else
+                     else
                         true
                 }
             }, true)

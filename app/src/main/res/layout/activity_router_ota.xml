@@ -10,7 +10,7 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_marginTop="@dimen/dp_50">
+            android:layout_marginTop="30dp">
 
         <com.dadoutek.uled.widget.progress.WaveProgress
                 android:id="@+id/router_ota_wave_progress_bar"

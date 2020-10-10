@@ -134,7 +134,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         return toolbar
     }
 
-    override fun gpAllVisible(): Boolean {
+    override fun batchGpVisible(): Boolean {
         return false
     }
 
@@ -159,7 +159,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         return R.layout.activity_sensor_device_details
     }
 
-    override fun setPositiveBtn() {
+    override fun setDeletePositiveBtn() {
         currentDevice?.let {
             DBUtils.deleteSensor(it)
             sensorDatas.remove(it)

@@ -10,10 +10,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 object GroupMdodel {
-    fun add(token: String, dbGroup: DbGroup, /*belongRegionId: Int,*/ id: Long, changeId: Long?):
+    fun add( dbGroup: DbGroup, /*belongRegionId: Int,*/ id: Long, changeId: Long?):
             Observable<String>? {
         return NetworkFactory.getApi()//todo 添加token lastReginID
-                .addGroup(token,dbGroup, /*belongRegionId,*/ changeId!!.toInt())
+                .addGroup(dbGroup, /*belongRegionId,*/ changeId!!.toInt())
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {

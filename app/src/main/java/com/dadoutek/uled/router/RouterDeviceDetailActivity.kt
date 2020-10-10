@@ -57,12 +57,12 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         super.onCreate(savedInstanceState)
         type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         views = LayoutInflater.from(this).inflate(R.layout.popwindown_switch, null)
+        initView()
     }
 
     override fun onResume() {
         super.onResume()
         initData()
-        initView()
         makePop()
     }
 
@@ -75,17 +75,17 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         return toolbar
     }
 
-    override fun gpAllVisible(): Boolean {
+    override fun batchGpVisible(): Boolean {
         return false
     }
 
-    override fun setPositiveBtn() {
+    override fun setDeletePositiveBtn() {
         currentDevice?.let {
             DBUtils.deleteRouter(it)
             //添加删除服务器接口
             routerData.remove(it)
         }
-        adapter?.notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
         isEmptyDevice()
     }
 
@@ -165,9 +165,8 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
 
     private fun goConfig() {
         if (isRightPos()) return
-        val intent = Intent(this@RouterDeviceDetailsActivity, GwLoginActivity::class.java)
-        intent.putExtra("is_router", true)
-        intent.putExtra("mac", currentDevice?.macAddr?.toLowerCase())
+        val intent = Intent(this@RouterDeviceDetailsActivity, RouterDetailActivity::class.java)
+        intent.putExtra("routerId", currentDevice?.id)
         startActivity(intent)
         finish()
     }

@@ -567,7 +567,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 GlobalScope.launch {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -605,7 +605,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 GlobalScope.launch {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -636,8 +636,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         }
     }
 
-    private fun routerConfigBrightnesssOrColorTemp() = when {
-        isBrightness -> {//亮度
+    private fun routerConfigBrightnesssOrColorTemp()/*= when*/ {
+      /*  isBrightness -> {//亮度
             val group = data[currentPostion]
             //clickType 普通色温亮度 彩灯亮度白光
             var seekBar = when (clickType) {
@@ -648,7 +648,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 else -> getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
             }
         }
-        else -> {
+        else -> {*/
             val group = data[currentPostion]
             var seekBar: SeekBar
             when (group) {
@@ -678,7 +678,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         }
                     }
                 }
-            }
         }
     }
 
@@ -755,7 +754,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     }
 
     fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl------收到路由配置亮度灯通知------------$cmdBean")
+        LogUtils.v("zcl------收到路由配置亮度灯通知------------$cmdBean---$clickType")
         val group = data[currentPostion]
         disposableRouteTimer?.dispose()
         when (cmdBean.status) {
@@ -813,7 +812,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 GlobalScope.launch {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -854,7 +853,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 GlobalScope.launch {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -896,7 +895,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 Thread {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -942,7 +941,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 Thread {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -996,7 +995,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 Thread {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -1063,7 +1062,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 downTime = System.currentTimeMillis()
                 onBtnTouch = true
                 Thread {
-                    while (onBtnTouch) {
+                    while (onBtnTouch&&!Constant.IS_ROUTE_MODE) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
@@ -1119,7 +1118,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         val opcode: Byte
         val itemGroup = data[pos]
         var params: ByteArray
-        if (!Constant.IS_ROUTE_MODE)
             seekBar!!.progress++
 
         when {
@@ -1813,7 +1811,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
-            LogUtils.v("zcl-----------收到路由广播-------${intent?.getStringExtra("111")}")
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
             try {

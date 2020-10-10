@@ -1197,4 +1197,7 @@
     <string name="reversed">反向</string>
     <string name="brightness_fail">亮度调节失败</string>
     <string name="config_white_fail">配置白光失败</string>
+    <string name="close_faile">关灯失败</string>
+    <string name="unlock_fail">解锁失败</string>
+    <string name="lock_fail">锁定失败</string>
 </resources>

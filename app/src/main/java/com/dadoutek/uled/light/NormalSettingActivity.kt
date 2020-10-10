@@ -1777,7 +1777,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun routerConfigBrightnesssOrColorTemp() = when {
         isBrightness -> {//亮度
-            group = DBUtils.getGroupByID(group!!.id)
             when {
                 currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, "gpBri")
                 else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, "lightBri")
@@ -2334,9 +2333,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             LogUtils.v("zcl-----------收到路由调节速度通知-------$cmdBean")
             hideLoadingDialog()
             when (cmdBean.status) {
-                0 -> {
-                    afterSendSpeed(group, tempSpeed)
-                }
+                0 -> afterSendSpeed(group, tempSpeed)
                 else -> {
                     when (group?.slowUpSlowDownSpeed ?: 1) {
                         1 -> slow_rg_fast.isChecked = true

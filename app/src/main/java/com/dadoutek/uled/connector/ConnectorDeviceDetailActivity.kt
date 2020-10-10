@@ -65,11 +65,11 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         initView()
     }
 
-    override fun gpAllVisible(): Boolean {
+    override fun batchGpVisible(): Boolean {
         return true
     }
 
-    override fun setPositiveBtn() {
+    override fun setDeletePositiveBtn() {
         currentDevice?.let {
             DBUtils.deleteConnector(it)
             relayDatas.remove(it)

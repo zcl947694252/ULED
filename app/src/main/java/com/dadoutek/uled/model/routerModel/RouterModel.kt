@@ -60,6 +60,16 @@ object RouterModel {
     }
 
     /**
+     * 解绑路由设备
+     */
+    fun unbindRouter(meshAddrsList: MutableList<Int>, meshType: Int): Observable<Response<Any>>? {
+        val groupBlinkBodyBean = GroupBlinkBodyBean(meshAddrsList, meshType)
+        return NetworkFactory.getApi()
+                .unbindRouter(groupBlinkBodyBean).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
      * 删除路由
      */
     fun delete(bodyBean: MacResetBody): Observable<Long>? {
@@ -250,6 +260,7 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
     /**
      * 设备&组应用自定义渐变
      */
@@ -306,6 +317,15 @@ object RouterModel {
     }
 
     /**
+     * 配置传感器
+     */
+    fun configSensor(id: Long, configurationBeans: List<ConfigurationBean>): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configSensor(id.toInt(), configurationBeans, "configEightSw")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
      * 控制相关开始
      * 开关灯
      */
@@ -314,6 +334,55 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    /**
+     * 停止自定义渐变
+     */
+    fun routeStopDynamic(meshAddr: Int, meshType: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerStopDynamic(meshAddr, meshType, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 路由开关传感器
+     */
+    fun routeSwitchSensor(id: Int, status: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerSwitchSensor(id, status, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 路由开关传感器
+     * @Field("meshAddr") int ,@Field("meshType") int , @Field("controlCmd") int , @Field("value") int speedValue, @Field("ser_id") String ser_id)
+     */
+    fun routerControlCurtain(meshAddr: Int, meshType: Int, controlCmd: Int, speedValue: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerControlCurtain(meshAddr, meshType, controlCmd, speedValue, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 用户复位
+     * @Field("meshAddr") int ,@Field("meshType") int , @Field("controlCmd") int , @Field("value") int speedValue, @Field("ser_id") String ser_id)
+     */
+    fun routerContro(ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerControlCurtain(RouterDelGpBody(ser_id, 0))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 安全锁
+     *
+     */
+    fun routeOpenOrCloseSafeLock(status: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeOpenOrCloseSafeLock(status, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
 
     /**
      * 控制相关开始
@@ -378,7 +447,25 @@ object RouterModel {
     }
 
     /**
-     * 控制相关开始
+     * 获取路由版本号
+     */
+    fun routeGetRouterVersion(mac: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeGetVersion(mac, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 获取路由版本号
+     */
+    fun routeOtaRouter(mac: Long, start: Long): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeOtaRouter(mac, start)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /*--------------------------------------控制相关开始---------------------------------------------------------*/
+    /**
      * 恢复出厂设置  meshType	是	int	meshAddr类型  普通灯 = 4彩灯 = 6 蓝牙连接器 = 5
      * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部 = 100
      * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致

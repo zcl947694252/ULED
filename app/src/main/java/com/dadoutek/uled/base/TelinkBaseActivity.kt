@@ -760,6 +760,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 Cmd.tzRouteSlowUPSlowDownSw -> tzRouterSSSW(cmdBean, false)
                 Cmd.tzRouteSlowUPSlowDownSpeed -> tzRouterSSSpeed(cmdBean)
                 Cmd.tzRouteResetFactory -> tzRouterResetFactory(cmdBean)
+                Cmd.tzRouteSafeLock -> tzRouterSafeLock(cmdBean)
 
 
             }
@@ -812,6 +813,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             }*/
         }
 
+
+    }
+
+    open fun tzRouterSafeLock(cmdBean: CmdBodyBean) {
 
     }
 
@@ -1109,7 +1114,6 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 LightAdapter.STATUS_LOGOUT -> {
                     changeDisplayImgOnToolbar(false)
                 }
-
             }
         }
     }

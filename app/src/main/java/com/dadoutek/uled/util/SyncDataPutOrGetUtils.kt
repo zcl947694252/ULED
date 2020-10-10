@@ -109,13 +109,13 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {// 添加token lastReginID
                                 val group = DBUtils.getGroupByID(changeId)
-                                return group?.let { GroupMdodel.add(token, it, /*group.belongRegionId, */id, changeId) }!!
+                                return group?.let { GroupMdodel.add(/*token,*/ it, /*group.belongRegionId, */id, changeId) }!!
                             }
                             Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
                             Constant.DB_UPDATE -> {
                                 val group = DBUtils.getGroupByID(changeId)
                                 return group?.let {
-                                    return GroupMdodel.add(token, group, /*group.belongRegionId, */id, changeId)!!
+                                    return GroupMdodel.add(/*token,*/ group, /*group.belongRegionId, */id, changeId)!!
                                 }
                             }
                         }

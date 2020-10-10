@@ -42,4 +42,5 @@ public class Cmd implements Serializable {
     public static final int tzRouteConfigWhite =4010;
     public static final int tzRouteSlowUPSlowDownSw =4019;
     public static final int tzRouteSlowUPSlowDownSpeed =4020;
+    public static final int tzRouteSafeLock =4022;
 }

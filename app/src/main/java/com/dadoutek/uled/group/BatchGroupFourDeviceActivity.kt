@@ -932,6 +932,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.SECONDS)
                             .subscribe {
+                                hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.group_timeout))
                             }
                 }
@@ -1627,6 +1628,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun addNewGroup() {
         StringUtils.initEditTextFilter(renameEt)
         renameEt?.setSelection(renameEt?.text.toString().length)
@@ -1648,9 +1650,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
                     DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
                 }
-                DBUtils.addNewGroupWithType(renameEt?.text.toString().trim { it <= ' ' }, groupType)
-                setGroupData()
-                renameDialog.dismiss()
+                val dbGroup = DBUtils.addNewGroupWithType(renameEt?.text.toString().trim { it <= ' ' }, groupType)
+                if (dbGroup!=null)
+                GroupMdodel.add(dbGroup, /*group.belongRegionId, */dbGroup.id, dbGroup.id)?.subscribe({
+                    setGroupData()
+                },{
+                    ToastUtils.showShort(it.message)
+                    DBUtils.deleteGroupOnly(dbGroup)
+                })
+                    renameDialog.dismiss()
+
             }
         }
     }

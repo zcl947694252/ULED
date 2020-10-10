@@ -1,7 +1,9 @@
 package com.dadoutek.uled.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -11,11 +13,15 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
+import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_save_lock.*
 import kotlinx.android.synthetic.main.toolbar.*
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -31,6 +37,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     private var mConnectDisposal: Disposable? = null
     private var allGroup: DbGroup? = null
     private var isFristUserClickCheckConnect: Boolean = true
+    private var status: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,13 +69,16 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         isFristUserClickCheckConnect = true
         val dstAddr = this.allGroup!!.meshAddr
-        if (TelinkLightApplication.getApp().connectDevice == null)
+        if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE)
             checkConnect()
         else {
             when (v?.id) {
                 R.id.safe_open -> {
                     ToastUtils.showShort(getString(R.string.open_light))
-                    Commander.openOrCloseLights(dstAddr, true)
+                    if (Constant.IS_ROUTE_MODE)
+                        routeOpenOrCloseBase(DBUtils.allGroups[0].meshAddr, 97, 0, "safeLockOpen")
+                    else
+                        Commander.openOrCloseLights(dstAddr, true)
                     //safe_open.setBackgroundResource(R.drawable.rect_blue_60)
                     //safe_open_arrow.setImageResource(R.mipmap.icon_safe_arrow_blue)
                     //safe_close.setBackgroundResourc
@@ -79,11 +89,13 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                 R.id.safe_lock -> {
                     ToastUtils.showShort(getString(R.string.lock))
                     //safe_close.setBackgroundResource(R.drawable.rect_gray_60)
-
-
                     // safe_open.setBackgroundResource(R.drawable.rect_blue_60)
                     //1打开2关闭 12位
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 1))
+                    status = 1
+                    if (Constant.IS_ROUTE_MODE)
+                        routerLockOrUnlock(status, "lock")
+                    else
+                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 1))
                 }
 
                 R.id.safe_close -> {
@@ -92,7 +104,11 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     //safe_close_arrow.setImageResource(R.mipmap.icon_safe_arrow_blue)
                     //safe_open.setBackgroundResource(R.drawable.rect_gray_60)
                     //safe_open_arrow.setImageResource(R.mipmap.icon_arrow_safe)
-                    Commander.openOrCloseLights(dstAddr, false)
+                    if (Constant.IS_ROUTE_MODE) {
+                        routeOpenOrCloseBase(DBUtils.allGroups[0].meshAddr, 97, 0, "safeLockClose")
+                    } else {
+                        Commander.openOrCloseLights(dstAddr, false)
+                    }
                 }
 
                 R.id.safe_unlock -> {
@@ -100,8 +116,73 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     //safe_open.setBackgroundResource(R.drawable.rect_gray_60)
                     //safe_close.setBackgroundResource(R.drawable.rect_blue_60)
                     //1打开2关闭 12位
-                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 2))
+                    status = 2
+                    if (Constant.IS_ROUTE_MODE)
+                        routerLockOrUnlock(status, "unlock")
+                    else
+                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 2))
                 }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerLockOrUnlock(status: Int, serid: String) {
+        RouterModel.routeOpenOrCloseSafeLock(status, serid)?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                if (status == 1)
+                                    ToastUtils.showShort(getString(R.string.lock_fail))
+                                else
+                                    ToastUtils.showShort(getString(R.string.unlock_fail))
+
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(getString(R.string.lock_fail))
+        })
+    }
+
+    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
+        hideLoadingDialog()
+        disposableRouteTimer?.dispose()
+        when (cmdBean.ser_id) {
+            "safeLockOpen" -> when (cmdBean.status) {
+                0 -> ToastUtils.showShort(getString(R.string.open_light))
+                else -> ToastUtils.showShort(getString(R.string.open_faile))
+            }
+            "safeLockClose" -> when (cmdBean.status) {
+                0 -> ToastUtils.showShort(getString(R.string.close_light))
+                else -> ToastUtils.showShort(getString(R.string.close_faile))
+            }
+        }
+    }
+
+    override fun tzRouterSafeLock(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由开关锁通知------------$cmdBean")
+        hideLoadingDialog()
+        disposableRouteTimer?.dispose()
+        when (cmdBean.ser_id) {
+            "lock" -> when (cmdBean.status) {
+                0 -> ToastUtils.showShort(getString(R.string.lock))
+                else -> ToastUtils.showShort(getString(R.string.lock_fail))
+            }
+            "unlock" -> when (cmdBean.status) {
+                0 -> ToastUtils.showShort(getString(R.string.unlock))
+                else -> ToastUtils.showShort(getString(R.string.unlock_fail))
             }
         }
     }

@@ -112,7 +112,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         initData()
     }
 
-    override fun setPositiveBtn() {
+    override fun setDeletePositiveBtn() {
         currentGw?.let {
             DBUtils.deleteGateway(it)
             gwDatas.remove(it)
@@ -121,7 +121,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         isEmptyDevice()
     }
 
-    override fun gpAllVisible(): Boolean {
+    override fun batchGpVisible(): Boolean {
         return false
     }
 

@@ -1362,7 +1362,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         bleDelGradient(true)
                     }
                 }
-                builder.setNeutralButton(R.string.cancel) { dialog, which -> }
+                builder.setNeutralButton(R.string.cancel) { _, _ -> }
                 builder.create().show()
             }
         }
