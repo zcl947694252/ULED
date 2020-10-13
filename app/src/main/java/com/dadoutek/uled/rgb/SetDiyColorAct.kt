@@ -440,6 +440,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                                             showLoadingDialog(getString(R.string.add_gradient_fail))
                                         }
                             }
+                            900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                             90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                             90004 -> ToastUtils.showShort(getString(R.string.region_not_router))

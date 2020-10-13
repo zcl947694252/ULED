@@ -755,41 +755,43 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         if (Constant.IS_ROUTE_MODE) {
             routerAddOrUpdateScene(showGroupList, dbScene!!.id, name, sceneIcon, true)
-        } else GlobalScope.launch {
+        } else {
             showLoadingDialog(getString(R.string.saving))
-            DBUtils.saveScene(dbScene, false)
+            GlobalScope.launch {
+                DBUtils.saveScene(dbScene, false)
 
-            val belongSceneId = dbScene.id!!
-            for (i in showGroupList!!.indices) {
-                var sceneActions = DbSceneActions()
-                val item = showGroupList[i]
-                when {
-                    OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                        sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x10)
-                        sceneActions.isOn = item.isOn
-                        DBUtils.saveSceneActions(sceneActions)
-                    }
-                    OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                        sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x05)
-                        sceneActions.isOn = item.isOn
-                        DBUtils.saveSceneActions(sceneActions)
-                    }
-                    OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                        sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x06, i)
-                        sceneActions.isOn = item.isOn
-                        DBUtils.saveSceneActions(sceneActions)
-                    }
-                    else -> {
-                        sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x04)
-                        DBUtils.saveSceneActions(sceneActions)
+                val belongSceneId = dbScene.id!!
+                for (i in showGroupList!!.indices) {
+                    var sceneActions = DbSceneActions()
+                    val item = showGroupList[i]
+                    when {
+                        OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x10)
+                            sceneActions.isOn = item.isOn
+                            DBUtils.saveSceneActions(sceneActions)
+                        }
+                        OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x05)
+                            sceneActions.isOn = item.isOn
+                            DBUtils.saveSceneActions(sceneActions)
+                        }
+                        OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x06, i)
+                            sceneActions.isOn = item.isOn
+                            DBUtils.saveSceneActions(sceneActions)
+                        }
+                        else -> {
+                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x04)
+                            DBUtils.saveSceneActions(sceneActions)
+                        }
                     }
                 }
-            }
 
-            delay(100)
-            addScene(belongSceneId)
-            hideLoadingDialog()
-            finish()
+                delay(100)
+                addScene(belongSceneId)
+                hideLoadingDialog()
+                finish()
+            }
         }
     }
 

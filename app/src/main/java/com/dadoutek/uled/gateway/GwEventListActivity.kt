@@ -360,7 +360,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
                             .subscribe {
                                 hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.reset_gw_faile))
+                                ToastUtils.showShort(getString(R.string.user_reset_faile))
                             }
                     GlobalScope.launch(Dispatchers.Main) {
                         showLoadingDialog(getString(R.string.please_wait))

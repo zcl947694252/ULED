@@ -110,7 +110,7 @@
     <string name="btn_rename_light">重命名</string>
     <string name="delete_device">删除设备</string>
     <string name="group_switch">群组开关</string>
-    <string name="eight_switch">八键开关</string>
+    <string name="eight_switch">多功能开关</string>
     <string name="choose_scene">选择场景</string>
     <!--   //开关，传感器 End -->
 
@@ -863,7 +863,7 @@
     <string name="user_reset_all3">如有其它问题,请查看APP使用说明.</string>
     <string name="physical_recovery_one">此操作不会复位本帐户下的灯。</string>
     <string name="physical_recovery_two">此操作会复位与APP进行上下电交互操作的设备所属区域内所有通电的设备（开关，传感器除外）</string>
-    <string name="reset_gw_faile">用户复位失败</string>
+    <string name="user_reset_faile">用户复位失败</string>
     <string name="group_mode">群组模式</string>
     <string name="scene_mode">场景模式</string>
     <string name="see_help">查看帮助</string>
@@ -1200,4 +1200,7 @@
     <string name="close_faile">关灯失败</string>
     <string name="unlock_fail">解锁失败</string>
     <string name="lock_fail">锁定失败</string>
+    <string name="router_mode_cant_perform">路由状态下无法执行此操作</string>
+    <string name="get_router_empty">路由相关数据为空</string>
+    <string name="congfig_rgb_fail">配置彩灯RGB值失败</string>
 </resources>

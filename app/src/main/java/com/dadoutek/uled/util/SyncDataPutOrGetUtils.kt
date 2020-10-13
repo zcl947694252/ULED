@@ -337,7 +337,7 @@ class SyncDataPutOrGetUtils {
 
                     "DB_USER" -> {
                         val user = DBUtils.getUserByID(changeId)
-                        if (user == null && type != Constant.DELETEING) {
+                        if (user == null) {
                             Log.d("用户数据出错", "")
                         }
 

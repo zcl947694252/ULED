@@ -134,7 +134,7 @@ class SettingActivity : TelinkBaseActivity() {
 
     @SuppressLint("StringFormatMatches")
     private fun showResetTipPop() {
-        if (TelinkLightApplication.getApp().connectDevice != null) {
+        if (TelinkLightApplication.getApp().connectDevice != null||Constant.IS_ROUTE_MODE) {
 
             disposableInterval = Observable.intervalRange(0, Constant.downTime, 0, 1, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())

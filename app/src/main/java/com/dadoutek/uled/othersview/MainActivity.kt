@@ -93,6 +93,7 @@ private const val MAX_RETRY_CONNECT_TIME = 5
 private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
+
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment, IGetMessageCallBack {
     private var mTelinkLightService: TelinkLightService? = null
     private var mConnectDisposal: Disposable? = null
@@ -149,7 +150,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         serviceConnection = MyServiceConnection()
         serviceConnection?.setIGetMessageCallBack(this)
         val intent = Intent(this, MqttService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
@@ -165,14 +166,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener { startActivity(Intent(this@MainActivity,RouterOtaActivity::class.java)) }
+        main_toast.setOnClickListener { startActivity(Intent(this@MainActivity, RouterOtaActivity::class.java)) }
         initBottomNavigation()
         checkVersionAvailable()
         // getScanResult()
 
         // getRouterStatus()
         getRegionList()
-        getAllStatus()
+        //getAllStatus()
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         LogUtils.v("zcl---获取状态------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
     }
@@ -230,7 +231,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT&&!Constant.IS_ROUTE_MODE)
+        if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT && !Constant.IS_ROUTE_MODE)
             ToastUtils.showShort(getString(R.string.open_blutooth_tip))
     }
 
@@ -501,6 +502,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         }
 
     }
+
     private fun isSwitch(uuid: Int): Boolean {
         return when (uuid) {
             DeviceType.SCENE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SENSOR, DeviceType.NIGHT_LIGHT -> {
@@ -591,23 +593,27 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             startScan()
         }
     }
+
     private fun login() {
         val account = DBUtils.lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
     }
+
     private fun onLeScanTimeout() {
         LogUtils.d("onErrorReport: onLeScanTimeout")
         retryConnectCount = 0
         connectFailedDeviceMacList.clear()
         startScan()
     }
+
     private fun addScanListeners() {
         this.mApp?.addEventListener(LeScanEvent.LE_SCAN, this)
         this.mApp?.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
         this.mApp?.addEventListener(LeScanEvent.LE_SCAN_COMPLETED, this)
     }
+
     @SuppressLint("CheckResult")
     private fun startScan() {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
@@ -627,7 +633,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         scanFilters.add(scanFilter)
 
                         val params = LeScanParameters.create()
-                        if(!com.dadoutek.uled.util.AppUtils.isExynosSoc){
+                        if (!com.dadoutek.uled.util.AppUtils.isExynosSoc) {
                             params.setScanFilters(scanFilters)
                         }
                         params.setMeshName(account)
@@ -659,35 +665,36 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         } else {
             hideLocationServiceDialog()
             if (TelinkApplication.getInstance()?.serviceStarted == true) {
-                RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            if (TelinkLightApplication.getApp().connectDevice == null) {
-                                val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
-                                        DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
-                                val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
-                                if (size > 0) {
-                                    //ToastUtils.showLong(R.string.connecting_tip)
-                                    mConnectDisposable?.dispose()
-                                    mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
-                                            ?.subscribe(
-                                                    {//找回有效设备
-                                                        //RecoverMeshDeviceUtil.addDevicesToDb(it)
-                                                        onLogin()
-                                                    },
-                                                    {
-                                                        LogUtils.v("zcl-----------连接失败继续连接-------")
-                                                        if (!Constant.IS_ROUTE_MODE)
-                                                        autoConnect()
-                                                        LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
-                                                    }
-                                            )
-                                } else {
-                                    ToastUtils.showShort(getString(R.string.no_connect_device))
+                if (!this@MainActivity.isFinishing)
+                    RxPermissions(this@MainActivity).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                if (TelinkLightApplication.getApp().connectDevice == null) {
+                                    val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
+                                            DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
+                                    val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+                                    if (size > 0) {
+                                        //ToastUtils.showLong(R.string.connecting_tip)
+                                        mConnectDisposable?.dispose()
+                                        mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
+                                                ?.subscribe(
+                                                        {//找回有效设备
+                                                            //RecoverMeshDeviceUtil.addDevicesToDb(it)
+                                                            onLogin()
+                                                        },
+                                                        {
+                                                            LogUtils.v("zcl-----------连接失败继续连接-------")
+                                                            if (!Constant.IS_ROUTE_MODE)
+                                                                autoConnect()
+                                                            LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
+                                                        }
+                                                )
+                                    } else {
+                                        ToastUtils.showShort(getString(R.string.no_connect_device))
+                                    }
                                 }
-                            }
-                        }, { LogUtils.d(it) })
+                            }, { LogUtils.d(it) })
             } else {
                 mApp?.startLightService(TelinkLightService::class.java)
                 autoConnect()

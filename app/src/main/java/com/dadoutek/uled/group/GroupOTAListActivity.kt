@@ -51,7 +51,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
-import java.util.regex.Pattern
 
 
 /**
@@ -95,7 +94,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             showLoadingDialog(getString(R.string.please_wait))
             getIntentData()
             getOtaData()
-            RouterModel.getDevicesVersion(meshAddrList, deviceType)?.subscribe({
+            RouterModel.getDevicesVersion(meshAddrList, deviceType,"gpOta")?.subscribe({
                 when (it.errorCode) {
                     NetworkStatusCode.OK -> startGetVersionTimer(it.t)
                     //全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由 DEVICE_NOT_BINDROUTER 90008
@@ -131,7 +130,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
-        disposableTimer?.dispose()
+        disposableRouteTimer?.dispose()
         if (routerVersion?.finish == true) {
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                 override fun start() {}
@@ -471,8 +470,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 if (split.size >= 2) {
                     if (split[1] != "" && split[1] != null) {
                         val versionNum = numberCharat(split[1])
-                        LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toInt()}")
                         if (!TextUtils.isEmpty(versionNum)) {
+                            LogUtils.v("zcl比较版本号-------$itv------${mapBin[split[0]] ?: 0}-----${versionNum.toInt()}")
                             it.isMostNew = versionNum.toInt() >= mapBin[split[0]] ?: 0
                             it.isSupportOta = versionNum.toInt() < mapBin[split[0]] ?: 0
                         }

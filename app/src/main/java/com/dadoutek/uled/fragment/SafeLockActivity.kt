@@ -76,7 +76,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                 R.id.safe_open -> {
                     ToastUtils.showShort(getString(R.string.open_light))
                     if (Constant.IS_ROUTE_MODE)
-                        routeOpenOrCloseBase(DBUtils.allGroups[0].meshAddr, 97, 0, "safeLockOpen")
+                        routeOpenOrCloseBase(DBUtils.allGroups[0].meshAddr, 97, 1, "safeLockOpen")
                     else
                         Commander.openOrCloseLights(dstAddr, true)
                     //safe_open.setBackgroundResource(R.drawable.rect_blue_60)

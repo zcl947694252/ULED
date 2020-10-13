@@ -33,10 +33,12 @@ import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
+import com.dadoutek.uled.network.RouterDelGpBody
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
@@ -66,6 +68,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener, OnClickListener {
+    private var disposableTimer: Disposable? = null
     private var sendProgress: Int = 1
     private var tempSpeed: Int = 0
     private var findItemChangeGp: MenuItem? = null
@@ -109,17 +112,18 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setMessage(getString(R.string.delete_group_confirm, group?.name))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
-
-                        deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
-                                successCallback = {
-                                    this.hideLoadingDialog()
-                                    this?.setResult(Constant.RESULT_OK)
-                                    this?.finish()
-                                },
-                                failedCallback = {
-                                    this.hideLoadingDialog()
-                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
-                                })
+                        if (Constant.IS_ROUTE_MODE) {
+                            routeDeleteGroup(group!!)
+                        } else {
+                            deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
+                                    successCallback = {
+                                        deleteGpSuccess()
+                                    },
+                                    failedCallback = {
+                                        this.hideLoadingDialog()
+                                        ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
+                                    })
+                        }
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
@@ -128,6 +132,58 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             R.id.brightness_btn -> setBrightness()
             R.id.temperature_btn -> setTemperature()
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routeDeleteGroup(dbGroup: DbGroup) {
+        val subscribe = RouterModel.routerDelGp(RouterDelGpBody("delCWGp", dbGroup.meshAddr))?.subscribe({
+            showLoadingDialog(getString(R.string.please_wait))
+            disposableTimer?.dispose()
+            disposableTimer = Observable.timer((it?.timeout ?: 10).toLong(), TimeUnit.SECONDS)
+                    .subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.delete_gp_fail))
+                    }
+            LogUtils.v("zcl-----------收到路由删组-------$it")
+        }, {
+            if (it.message?.contains("本地删除") == true) {
+                LogUtils.v("zcl-----------收到路由删组-------$it")
+                DBUtils.deleteGroupOnly(dbGroup)
+                deleteGpSuccess()
+            } else {
+                ToastUtils.showShort(it.message)
+            }
+        })
+    }
+
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
+        LogUtils.v("zcl-----------收到路由删组通知-------${routerGroup}")
+        disposableTimer?.dispose()
+        if (routerGroup?.ser_id == "delCWGp") {
+            hideLoadingDialog()
+            if (routerGroup?.finish) {
+                val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())
+                when (routerGroup?.status) {
+                    0 -> {
+                        deleteGpSuccess()
+                        ToastUtils.showShort(getString(R.string.delete_group_success))
+                    }
+                    1 -> ToastUtils.showShort(getString(R.string.delete_group_some_fail))
+                    -1 -> ToastUtils.showShort(getString(R.string.delete_gp_fail))
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.router_del_gp, routerGroup.succeedNow.size))
+            }
+        }
+    }
+
+
+    private fun deleteGpSuccess() {
+        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+        this.hideLoadingDialog()
+        this?.setResult(Constant.RESULT_OK)
+        this?.finish()
     }
 
     @SuppressLint("ResourceAsColor", "SetTextI18n")
@@ -274,67 +330,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
                     device_light_add.setOnTouchListener { _, event ->
                         batchedAction(event, handlerAddBtn)
-/*
-                        when (event.action) {
-                            MotionEvent.ACTION_DOWN -> {
-                                downTime = System.currentTimeMillis()
-                                onBtnTouch = true
-                                GlobalScope.launch {
-                                    while (onBtnTouch) {
-                                        thisTime = System.currentTimeMillis()
-                                        if (thisTime - downTime >= 500) {
-                                            val msg = Message()
-                                            handlerAddBtn.sendMessage(msg)
-                                            delay(100)
-                                        }
-                                    }
-                                }
-                            }
-                            MotionEvent.ACTION_UP -> {
-                                onBtnTouch = false
-                                if (thisTime - downTime < 500) {
-                                    val msg = Message()
-                                    handlerAddBtn.sendMessage(msg)
-                                }
-                            }
-                            MotionEvent.ACTION_CANCEL -> {
-                                onBtnTouch = false
-                            }
-                        }
-*/
                         true
                     }
 
                     device_light_minus.setOnTouchListener { v, event ->
                         batchedAction(event, handlerMinusBtn)
-/*
-                        when (event.action) {
-                            MotionEvent.ACTION_DOWN -> {
-                                downTime = System.currentTimeMillis()
-                                onBtnTouch = true
-                                GlobalScope.launch {
-                                    while (onBtnTouch) {
-                                        thisTime = System.currentTimeMillis()
-                                        if (thisTime - downTime >= 500) {
-                                            val msg = Message()
-                                            handlerMinusBtn.sendMessage(msg)
-                                            delay(100)
-                                        }
-                                    }
-                                }
-                            }
-                            MotionEvent.ACTION_UP -> {
-                                onBtnTouch = false
-                                if (thisTime - downTime < 500) {
-                                    val msg = Message()
-                                    handlerMinusBtn.sendMessage(msg)
-                                }
-                            }
-                            MotionEvent.ACTION_CANCEL -> {
-                                onBtnTouch = false
-                            }
-                        }
-*/
+
                         true
                     }
                 } else {
@@ -396,76 +397,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         setAddOrminsIcon(light!!.brightness, light!!.colorTemperature)
         device_light_add.setOnTouchListener { _, event ->
             batchedAction(event, handlerAddBtn)
-            /*
-                                    when (event.action) {
-                                        MotionEvent.ACTION_DOWN -> {
-                                            downTime = System.currentTimeMillis()
-                                            onBtnTouch = true
-                                            GlobalScope.launch {
-                                                while (onBtnTouch) {
-                                                    thisTime = System.currentTimeMillis()
-                                                    if (thisTime - downTime >= 500) {
-
-                                                        val msg = handlerMinusBtn.obtainMessage()
-
-                                                        handlerAddBtn.sendMessage(msg)
-
-                                                        delay(100)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        MotionEvent.ACTION_UP -> {
-                                            onBtnTouch = false
-                                            if (thisTime - downTime < 500) {
-                                                val msg = handlerMinusBtn.obtainMessage()
-
-                                                handlerAddBtn.sendMessage(msg)
-                                            }
-                                        }
-                                        MotionEvent.ACTION_CANCEL -> {
-                                            onBtnTouch = false
-                                        }
-                                    }
-            */
             true
         }
 
         device_light_minus.setOnTouchListener { v, event ->
             batchedAction(event, handlerMinusBtn)
-            /*
-                                    when (event.action) {
-                                        MotionEvent.ACTION_DOWN -> {
-                                            downTime = System.currentTimeMillis()
-                                            onBtnTouch = true
-                                            GlobalScope.launch {
-                                                while (onBtnTouch) {
-                                                    thisTime = System.currentTimeMillis()
-                                                    if (thisTime - downTime >= 500) {
-
-                                                        val msg = handlerMinusBtn.obtainMessage()
-
-                                                        handlerMinusBtn.sendMessage(msg)
-
-                                                        delay(100)
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        MotionEvent.ACTION_UP -> {
-                                            onBtnTouch = false
-                                            if (thisTime - downTime < 500) {
-
-                                                val msg = handlerMinusBtn.obtainMessage()
-
-                                                handlerMinusBtn.sendMessage(msg)
-                                            }
-                                        }
-                                        MotionEvent.ACTION_CANCEL -> {
-                                            onBtnTouch = false
-                                        }
-                                    }
-            */
             true
         }
     }
@@ -656,12 +592,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else {
             when {
                 isBrightness -> {//亮度
-                    if (isBrightness) {
-                        if (light_sbBrightness.progress > 1)
-                            light_sbBrightness.progress--
-                    } else
-                        if (light_sbBrightness.progress > 1)
-                            light_sbBrightness.progress--
+                    if (light_sbBrightness.progress > 1)
+                        light_sbBrightness.progress--
 
                     when {
                         light_sbBrightness.progress < 1 ->
@@ -672,39 +604,37 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
                             when {
                                 currentShowPageGroup -> {
-                                    val light = DBUtils.getGroupByID(group!!.id)
-                                    tv_Brightness.text = group!!.brightness.toString() + "%"
-                                    light_sbBrightness.progress = group!!.brightness
-                                    if (light != null) {
-                                        light.brightness = light_sbBrightness.progress
-                                        DBUtils.updateGroup(light)
-                                        updateLights(light.brightness, "brightness", light)
+                                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+                                    if (group != null) {
+                                        if (!Constant.IS_ROUTE_MODE) {
+                                            updateLights(group!!.brightness, "brightness", group!!)
+                                            group!!.brightness = light_sbBrightness.progress
+                                            DBUtils.updateGroup(group!!)
+                                        }
                                     }
                                 }
                                 else -> {
-                                    val light = DBUtils.getLightByID(light!!.id)
-                                    tv_Brightness.text = light?.brightness.toString() + "%"
                                     light_sbBrightness.progress = light!!.brightness
-                                    if (light != null) {
+                                    tv_Brightness.text = light?.brightness.toString() + "%"
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.brightness = light_sbBrightness.progress
                                         DBUtils.updateLight(light)
                                     }
-                                    light_sbBrightness.progress
                                 }
                             }
                         }
                         else -> {
                             tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                             if (currentShowPageGroup) {
-                                val light = DBUtils.getGroupByID(group!!.id)
-                                if (light != null) {
-                                    light.brightness = light_sbBrightness.progress
-                                    DBUtils.updateGroup(light)
-                                    updateLights(light.brightness, "brightness", light)
+                                if (group != null) {
+                                    updateLights(group!!.brightness, "brightness", group!!)
+                                    if (!Constant.IS_ROUTE_MODE) {
+                                        group!!.brightness = light_sbBrightness.progress
+                                        DBUtils.updateGroup(group!!)
+                                    }
                                 }
                             } else {
-                                val light = DBUtils.getLightByID(light!!.id)
-                                if (light != null) {
+                                if (light != null && !Constant.IS_ROUTE_MODE) {
                                     light.brightness = light_sbBrightness.progress
                                     DBUtils.updateLight(light)
                                 }
@@ -729,17 +659,20 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     light_sbBrightness.progress = group!!.colorTemperature
                                     tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                                     if (light != null) {
-                                        light.colorTemperature = light_sbBrightness.progress
-                                        DBUtils.updateGroup(light)
+                                        if (!Constant.IS_ROUTE_MODE) {
+                                            light.colorTemperature = light_sbBrightness.progress
+                                            DBUtils.updateGroup(light)
+                                        }
                                         updateLights(light.colorTemperature, "colorTemperature", light)
                                     }
                                 }
                                 else -> {
                                     var light = DBUtils.getLightByID(light!!.id)
                                     if (light != null) {
-                                        light_sbBrightness.progress = light!!.colorTemperature
-                                        light.colorTemperature = light_sbBrightness.progress
-                                        DBUtils.updateLight(light)
+                                        if (!Constant.IS_ROUTE_MODE) {
+                                            light.colorTemperature = light_sbBrightness.progress
+                                            DBUtils.updateLight(light)
+                                        }
                                     }
                                 }
                             }
@@ -748,16 +681,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                             when {
                                 currentShowPageGroup -> {
-                                    var light = DBUtils.getGroupByID(group!!.id)
-                                    if (light != null) {
-                                        light.colorTemperature = light_sbBrightness.progress
-                                        DBUtils.updateGroup(light)
-                                        updateLights(light.colorTemperature, "colorTemperature", light)
+                                    if (group != null && !Constant.IS_ROUTE_MODE) {
+                                        group!!.colorTemperature = light_sbBrightness.progress
+                                        DBUtils.updateGroup(group!!)
+                                        updateLights(group!!.colorTemperature, "colorTemperature", group!!)
                                     }
                                 }
                                 else -> {
-                                    var light = DBUtils.getLightByID(light!!.id)
-                                    if (light != null) {
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateLight(light)
                                     }
@@ -806,7 +737,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 when {
                                     currentShowPageGroup -> {
                                         val light = DBUtils.getGroupByID(group!!.id)
-                                        if (light != null) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light_sbBrightness.progress
                                             DBUtils.updateGroup(light)
                                             updateLights(light.brightness, "brightness", light)
@@ -814,7 +745,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                     else -> {
                                         val light = DBUtils.getLightByID(light!!.id)
-                                        if (light != null) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light!!.brightness
                                             DBUtils.updateLight(light)
                                         }
@@ -826,7 +757,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 when {
                                     currentShowPageGroup -> {
                                         var light = DBUtils.getGroupByID(group!!.id)
-                                        if (light != null) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light_sbBrightness.progress
                                             DBUtils.updateGroup(light)
                                             updateLights(light.brightness, "brightness", light)
@@ -834,7 +765,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                     else -> {
                                         var light = DBUtils.getLightByID(light!!.id)
-                                        if (light != null) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light!!.brightness
                                             DBUtils.updateLight(light)
                                         }
@@ -856,14 +787,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                                 if (currentShowPageGroup) {
                                     var light = DBUtils.getGroupByID(group!!.id)
-                                    if (light != null) {
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateGroup(light)
                                         updateLights(light.colorTemperature, "colorTemperature", light)
                                     }
                                 } else {
                                     var light = DBUtils.getLightByID(light!!.id)
-                                    if (light != null) {
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateLight(light)
                                     }
@@ -874,7 +805,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 when {
                                     currentShowPageGroup -> {
                                         var light = DBUtils.getGroupByID(group!!.id)
-                                        if (light != null) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.colorTemperature = light_sbBrightness.progress
                                             DBUtils.updateGroup(light)
                                             updateLights(light.colorTemperature, "colorTemperature", light)
@@ -882,7 +813,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                     else -> {
                                         var light = DBUtils.getLightByID(light!!.id)
-                                        if (light != null) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.colorTemperature = light_sbBrightness.progress
                                             DBUtils.updateLight(light)
                                         }
@@ -1028,6 +959,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         super.onDestroy()
         downloadDispoable?.dispose()
         mConnectTimer?.dispose()
+        disposableTimer?.dispose()
         mDisposable.dispose()
     }
 
@@ -1199,30 +1131,39 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     @SuppressLint("CheckResult")
     private fun getVersion() {
         val connectDevice = TelinkApplication.getInstance().connectDevice
-        if (connectDevice != null/*&&connectDevice.meshAddress==light!!.meshAddr*/) {
-            val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
-                    .subscribe(
-                            { s ->
-                                localVersion = s
-                                findItem?.title = localVersion
-                                if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                    // textTitle!!.visibility = VISIBLE
-                                    light!!.version = localVersion
-                                } else {
-                                    // textTitle!!.visibility = VISIBLE
-                                    light!!.version = localVersion
-                                    tvOta!!.visibility = GONE
-                                }
-                                DBUtils.saveLight(light, false)
-                            },
-                            {
-                                /*   if (textTitle != null) {
-                                      // /textTitle!!.visibility = GONE
-                                       tvOta!!.visibility = GONE
-                                   }*/
-                                LogUtils.d(it)
-                            })
+        if (connectDevice != null/*&&connectDevice.meshAddress==light!!.meshAddr*/ || Constant.IS_ROUTE_MODE) {
+            if (Constant.IS_ROUTE_MODE) {
+                val mesAddress = mutableListOf(light.meshAddr)
+                getRouterVersion(mesAddress, light.productUUID, "cwVersion")
+            } else {
+                val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
+                        .subscribe(
+                                { s ->
+                                    updateVersion(s)
+                                },
+                                {
+                                    /*   if (textTitle != null) {
+                                          // /textTitle!!.visibility = GONE
+                                           tvOta!!.visibility = GONE
+                                       }*/
+                                    LogUtils.d(it)
+                                })
+            }
         }
+    }
+
+    private fun updateVersion(s: String?) {
+        localVersion = s
+        findItem?.title = localVersion
+        if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+            // textTitle!!.visibility = VISIBLE
+            light!!.version = localVersion
+        } else {
+            // textTitle!!.visibility = VISIBLE
+            light!!.version = localVersion
+            tvOta!!.visibility = GONE
+        }
+        DBUtils.saveLight(light, false)
     }
 
 
@@ -1403,11 +1344,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             while (onBtnTouch) {
                                 thisTime = System.currentTimeMillis()
                                 if (thisTime - downTime >= 500) {
-                                 
+
                                     val msg = handlerMinusBtn.obtainMessage()
-                                  
+
                                     handlerMinusBtn.sendMessage(msg)
-                                   
+
                                     delay(100)
                                 }
                             }
@@ -1416,9 +1357,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     MotionEvent.ACTION_UP -> {
                         onBtnTouch = false
                         if (thisTime - downTime < 500) {
-                            
+
                             val msg = handlerMinusBtn.obtainMessage()
-                          
+
                             handlerMinusBtn.sendMessage(msg)
                         }
                     }
@@ -1500,8 +1441,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else
             slow_ly.visibility = GONE
 
-        setLightBrightnessNum(group?.brightness ?: 1, group?.meshAddr!!)
-        setLightTemperatureValue(group?.colorTemperature ?: 1, group?.meshAddr ?: 0)
+        if (Constant.IS_ROUTE_MODE) {
+            routerConfigBrightnesssOrColorTemp(true)
+            routerConfigBrightnesssOrColorTemp(false)
+        } else {
+            setLightBrightnessNum(group?.brightness ?: 1, group?.meshAddr!!)
+            setLightTemperatureValue(group?.colorTemperature ?: 1, group?.meshAddr ?: 0)
+        }
     }
 
     private fun setLightTemperatureValue(colorNum: Int, meshAddr: Int) {
@@ -1634,7 +1580,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val brightnes = if (light!!.brightness < 1) 1 else light!!.brightness
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
-            setLightBrightnessNum(brightnes, light?.meshAddr)
+            when {
+                Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(true)
+                else -> setLightBrightnessNum(brightnes, light?.meshAddr)
+            }
             isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
@@ -1646,7 +1595,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val brightnes = if (light!!.colorTemperature < 1) 1 else light!!.colorTemperature
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
-            setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)
+            when {
+                Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(false)
+                else -> setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)
+            }
             isBrightness = false
         }
 
@@ -1672,32 +1624,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             setAddAndMinusIcon(light!!.brightness)
             device_light_add.setOnTouchListener { _, event ->
                 batchedAction(event, handlerAddBtn)
-/* when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        downTime = System.currentTimeMillis()
-                        onBtnTouch = true
-                        GlobalScope.launch {
-                            while (onBtnTouch) {
-                                thisTime = System.currentTimeMillis()
-                                if (thisTime - downTime >= 500) {
-                                    val msg = handlerMinusBtn.obtainMessage()
-                                    handlerAddBtn.sendMessage(msg)
-                                    delay(100)
-                                }
-                            }
-                        }
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        onBtnTouch = false
-                        if (thisTime - downTime < 500) {
-                            val msg = handlerMinusBtn.obtainMessage()
-                            handlerAddBtn.sendMessage(msg)
-                        }
-                    }
-                    MotionEvent.ACTION_CANCEL -> onBtnTouch = false
-
-                }
-*/
                 true
             }
             device_light_minus.setOnTouchListener { _, event ->
@@ -1712,31 +1638,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 light_sbBrightness.progress = progress
                 if (progress > 1)
                     batchedAction(event, handlerMinusBtn)
-/* when (event.action) {
-                        MotionEvent.ACTION_DOWN -> {
-                            downTime = System.currentTimeMillis()
-                            onBtnTouch = true
-                            GlobalScope.launch {
-                                while (onBtnTouch) {
-                                    thisTime = System.currentTimeMillis()
-                                    if (thisTime - downTime >= 500) {
-                                        val msg = handlerMinusBtn.obtainMessage()
-                                        handlerMinusBtn.sendMessage(msg)
-                                        delay(100)
-                                    }
-                                }
-                            }
-                        }
-                        MotionEvent.ACTION_UP -> {
-                            onBtnTouch = false
-                            if (thisTime - downTime < 500) {
-                                val msg = handlerMinusBtn.obtainMessage()
-                                handlerMinusBtn.sendMessage(msg)
-                            }
-                        }
-                        MotionEvent.ACTION_CANCEL -> onBtnTouch = false
-                    }
-*/
                 true
             }
         }
@@ -1755,6 +1656,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
+                            if (Constant.IS_ROUTE_MODE)
+                                routerConfigBrightnesssOrColorTemp(isBrightness)
                             handlerMinusOrAddBtn.sendMessage(Message())
                             delay(100)
                         }
@@ -1763,20 +1666,18 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
             MotionEvent.ACTION_UP -> {
                 onBtnTouch = false
-                if (Constant.IS_ROUTE_MODE) {
-                    routerConfigBrightnesssOrColorTemp()
-                } else {
-                    if (thisTime - downTime < 500) {
-                        handlerMinusOrAddBtn.sendMessage(Message())
-                    }
+                if (Constant.IS_ROUTE_MODE)
+                    routerConfigBrightnesssOrColorTemp(isBrightness)
+                if (thisTime - downTime < 500) {
+                    handlerMinusOrAddBtn.sendMessage(Message())
                 }
             }
             MotionEvent.ACTION_CANCEL -> onBtnTouch = false
         }
     }
 
-    private fun routerConfigBrightnesssOrColorTemp() = when {
-        isBrightness -> {//亮度
+    private fun routerConfigBrightnesssOrColorTemp(brightness: Boolean) = when {
+        brightness -> {//亮度
             when {
                 currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, "gpBri")
                 else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, "lightBri")
@@ -1914,7 +1815,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             sendProgress = seekBar.progress
             if (Constant.IS_ROUTE_MODE) {
                 sendProgress = seekBar.progress
-                routerConfigBrightnesssOrColorTemp()
+                routerConfigBrightnesssOrColorTemp(isBrightness)
             } else {
                 onValueChange(seekBar, seekBar.progress, true)
             }
@@ -1996,6 +1897,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             group?.brightness = progress
                             setAddAndMinusIcon(progress)
                         } else {
+                            if (!Constant.IS_ROUTE_MODE)
                             light?.brightness = progress
                             setAddAndMinusIcon(progress)
                         }
@@ -2004,24 +1906,21 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
                         if (isStopTracking) {
                             if (currentShowPageGroup) {
-                                var groupCurrent = DBUtils.getGroupByID(group!!.id)
-                                if (groupCurrent != null) {
-                                    //禁止为0
-                                    groupCurrent.brightness = if (group!!.brightness < 1)
-                                        1 else group!!.brightness
-                                    tv_Brightness.text = groupCurrent.brightness.toString() + "%"
-                                    DBUtils.updateGroup(groupCurrent)
-                                    updateLights(progress, "brightness", groupCurrent!!)
+                                if (group != null) {//禁止为0
+                                    tv_Brightness.text = group!!.brightness.toString() + "%"
+                                    if (!Constant.IS_ROUTE_MODE) {
+                                        group!!.brightness = if (group!!.brightness < 1) 1 else this@NormalSettingActivity.group!!.brightness
+                                        DBUtils.updateGroup(group!!)
+                                    }
+                                    updateLights(progress, "brightness", group!!)
                                     isProcessChange = 0
                                 }
                             } else {
-                                var light = DBUtils.getLightByID(light!!.id)
-                                if (light != null) {
-                                    //禁止为0
-                                    light.brightness = if (light!!.brightness < 1)
-                                        1 else light!!.brightness
-
-                                    DBUtils.updateLight(light)
+                                if (light != null) {  //禁止为0
+                                    if (!Constant.IS_ROUTE_MODE) {
+                                        light.brightness = if (light!!.brightness < 1) 1 else light!!.brightness
+                                        DBUtils.updateLight(light)
+                                    }
                                     tv_Brightness.text = light.brightness.toString() + "%"
                                     isProcessChange = 0
                                 }
@@ -2068,11 +1967,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     isProcessChange = 0
                                 }
                             } else {
-                                var light = DBUtils.getLightByID(light!!.id)
-                                if (light != null) {
-                                    light.colorTemperature = light!!.colorTemperature
-                                    tv_Brightness.text = light.colorTemperature.toString() + "%"
-                                    DBUtils.updateLight(light)
+                                var dbLight = DBUtils.getLightByID(light!!.id)
+                                if (dbLight != null) {
+                                    if (!Constant.IS_ROUTE_MODE) {
+                                        light.colorTemperature = dbLight!!.colorTemperature
+                                        DBUtils.updateLight(dbLight)
+                                    }
+                                    tv_Brightness.text = dbLight.colorTemperature.toString() + "%"
                                     isProcessChange = 0
                                 }
                             }
@@ -2167,6 +2068,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (cmdBean.ser_id == "lightFactory") {
             LogUtils.v("zcl-----------收到路由恢复出厂得到通知-------$cmdBean")
             hideLoadingDialog()
+            disposableRouteTimer?.dispose()
             if (cmdBean.status == 0)
                 deleteData()
             else
@@ -2341,6 +2243,24 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         5 -> slow_rg_slow.isChecked = true
                     }
                     ToastUtils.showShort(getString(R.string.slow_speed_faile))
+                }
+            }
+        }
+    }
+
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+        if (routerVersion?.ser_id == "cwVersion") {
+            LogUtils.v("zcl-----------收到路由版本通知-------$routerVersion")
+            hideLoadingDialog()
+            disposableRouteTimer?.dispose()
+            when (routerVersion.status) {
+                0 -> {
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    val light = DBUtils.getLightByMeshAddr(light.meshAddr)
+                    updateVersion(light?.version)
+                }
+                else -> {
+                    ToastUtils.showShort(getString(R.string.get_version_fail))
                 }
             }
         }

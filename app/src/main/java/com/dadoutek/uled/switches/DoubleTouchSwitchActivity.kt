@@ -260,6 +260,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                             ToastUtils.showShort(getString(R.string.device_not_exit))
                                             finish()
                                         }
+                                        900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                                         90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                         90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                         90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -315,6 +316,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
 
     override fun initListener() {
+        toolbar.setNavigationOnClickListener { finish() }
         toolbar.setOnMenuItemClickListener(menuItemClickListener)
         switch_double_touch_use_button.setOnClickListener(this)
         switch_double_touch_left.setOnClickListener(this)

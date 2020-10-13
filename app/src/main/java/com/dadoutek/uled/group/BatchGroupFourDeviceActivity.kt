@@ -421,15 +421,15 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         val group = groupsByDeviceType?.get(position)
                         if (Constant.IS_ROUTE_MODE) {
                             GroupMdodel.batchAddOrUpdateGp(mutableListOf(group))?.subscribe({
-                               if (it.errorCode==0)
-                                   renameGpSuccess(group, position)
+                                if (it.errorCode == 0)
+                                    renameGpSuccess(group, position)
                                 else
-                                   ToastUtils.showShort(getString(R.string.rename_faile))
+                                    ToastUtils.showShort(getString(R.string.rename_faile))
                             }, {
                                 ToastUtils.showShort(it.message)
                             })
                         } else {
-                        renameGpSuccess(group, position)
+                            renameGpSuccess(group, position)
                         }
                     }
                 }
@@ -482,13 +482,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         }
                 } else {
                     for (item in scanningList!!) {
-                        val light = DbLight()
+                        val lightByMeshAddr = DBUtils.getLightByMeshAddr(item.meshAddress)
+                        val light: DbLight = lightByMeshAddr ?: DbLight()
+
                         light.macAddr = item.macAddress
                         light.sixMac = item.sixByteMacAddress
                         light.meshAddr = item.meshAddress
                         light.productUUID = item.productUUID
                         light.meshUUID = item.meshUUID
-                        light.belongGroupId = allLightId
+                        if (lightByMeshAddr == null)
+                            light.belongGroupId = allLightId
                         light.name = getString(R.string.device_name) + light.meshAddr
                         light.rssi = item.rssi
                         deviceDataLightAll.add(light)
@@ -506,12 +509,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             deviceDataLightAll.addAll(it)
                         }
                     else -> for (item in scanningList!!) {
-                        val light = DbLight()
+                        val lightByMeshAddr = DBUtils.getLightByMeshAddr(item.meshAddress)
+                        val light: DbLight = lightByMeshAddr ?: DbLight()
                         light.macAddr = item.macAddress
                         light.meshAddr = item.meshAddress
                         light.productUUID = item.productUUID
                         light.meshUUID = item.meshUUID
-                        light.belongGroupId = allLightId
+                        if (lightByMeshAddr == null)
+                            light.belongGroupId = allLightId
                         light.name = getString(R.string.device_name) + light.meshAddr
                         light.rssi = item.rssi
                         deviceDataLightAll.add(light)
@@ -529,11 +534,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             deviceDataCurtainAll.addAll(it)
                         }
                 else for (item in scanningList!!) {
-                    val device = DbCurtain()
+                    val curtainByMeshAddr = DBUtils.getCurtainByMeshAddr(item.meshAddress)
+                    val device = curtainByMeshAddr ?: DbCurtain()
                     device.macAddr = item.macAddress
                     device.meshAddr = item.meshAddress
                     device.productUUID = item.productUUID
-                    device.belongGroupId = allLightId
+                    if (curtainByMeshAddr == null)
+                        device.belongGroupId = allLightId
                     device.name = getString(R.string.device_name) + device.meshAddr
                     device.rssi = item.rssi
                     deviceDataCurtainAll.add(device)
@@ -551,11 +558,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         }
                 else
                     for (item in scanningList!!) {
-                        val device = DbConnector()
+                        val relyByMeshAddr = DBUtils.getRelyByMeshAddr(item.meshAddress)
+                        val device = relyByMeshAddr ?: DbConnector()
                         device.macAddr = item.macAddress
                         device.meshAddr = item.meshAddress
                         device.productUUID = item.productUUID
-                        device.belongGroupId = allLightId
+                        if (relyByMeshAddr == null)
+                            device.belongGroupId = allLightId
                         device.name = getString(R.string.device_name) + device.meshAddr
                         device.rssi = item.rssi
                         deviceDataRelayAll.add(device)
@@ -590,7 +599,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                 ToastUtils.showShort(it.message)
                             })
                         }
-                        else ->    renameCurtainSuccess(curtain)
+                        else -> renameCurtainSuccess(curtain)
                     }
                 }
                 renameDialog.dismiss()
@@ -628,7 +637,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                 ToastUtils.showShort(it.message)
                             })
                         }
-                        else ->   renameRelaySuccess(connector)
+                        else -> renameRelaySuccess(connector)
                     }
 
                     renameRelaySuccess(connector)
@@ -668,7 +677,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                                 ToastUtils.showShort(it.message)
                             })
                         }
-                        else ->  renameLightSuccess(light!!)
+                        else -> renameLightSuccess(light!!)
                     }
                 }
                 // changeDeviceData()
@@ -881,7 +890,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                         DeviceType.SMART_RELAY -> {
-                            deviceDataRelayAll.filter{ it1 -> it1.isSelected }.forEach { it2 ->
+                            deviceDataRelayAll.filter { it1 -> it1.isSelected }.forEach { it2 ->
                                 list.add(it2.meshAddr)
                             }
                         }
@@ -1651,14 +1660,14 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
                 }
                 val dbGroup = DBUtils.addNewGroupWithType(renameEt?.text.toString().trim { it <= ' ' }, groupType)
-                if (dbGroup!=null)
-                GroupMdodel.add(dbGroup, /*group.belongRegionId, */dbGroup.id, dbGroup.id)?.subscribe({
-                    setGroupData()
-                },{
-                    ToastUtils.showShort(it.message)
-                    DBUtils.deleteGroupOnly(dbGroup)
-                })
-                    renameDialog.dismiss()
+                if (dbGroup != null)
+                    GroupMdodel.add(dbGroup, /*group.belongRegionId, */dbGroup.id, dbGroup.id)?.subscribe({
+                        setGroupData()
+                    }, {
+                        ToastUtils.showShort(it.message)
+                        DBUtils.deleteGroupOnly(dbGroup)
+                    })
+                renameDialog.dismiss()
 
             }
         }

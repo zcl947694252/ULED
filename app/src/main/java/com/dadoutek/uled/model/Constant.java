@@ -162,8 +162,6 @@ public class Constant implements Serializable {
     public static String USER_TYPE_NEW = "NEW_USER";
     //用户类型新用户
 
-    //是否在一键恢复出厂设置
-    public static String DELETEING = "DELETEING";
 
     //管理权限本地保存key
     public static String ME_FUNCTION = "ME_FUNCTION";

@@ -1122,23 +1122,23 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             routerStartScan()
         } else {
             isScanning = true
-            //添加进disposable，防止内存溢出.
-            mRxPermission?.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN)?.subscribe { granted ->
-                if (granted!!) {
-                    oldStartScan()
-                } else {
-                    DialogUtils.showNoBlePermissionDialog(this, {
-                        startScan()
-                        null
-                    }, {
-                        doFinish()
-                        null
-                    })
+            if (mRxPermission != null)
+                mRxPermission!!.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                        Manifest.permission.BLUETOOTH_ADMIN)?.subscribe { granted ->
+                    if (granted!!) {
+                        oldStartScan()
+                    } else {
+                        DialogUtils.showNoBlePermissionDialog(this, {
+                            startScan()
+                            null
+                        }, {
+                            doFinish()
+                            null
+                        })
+                    }
+                }?.let {
+                    mDisposable.add(it)
                 }
-            }?.let {
-                mDisposable.add(it)
-            }
         }
     }
 

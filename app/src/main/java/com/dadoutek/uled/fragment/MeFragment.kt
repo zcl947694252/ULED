@@ -488,7 +488,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     private fun resetAllLight() {
         showLoadingDialog(getString(R.string.reset_all_now))
-        SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, true)
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
@@ -513,12 +512,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
         if (meshAdre.size > 0) {
             Commander.resetAllDevices(meshAdre, {
-                SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 syncData()
                 activity?.bnve?.currentItem = 0
                 null
             }, {
-                SharedPreferencesHelper.putBoolean(activity, Constant.DELETEING, false)
                 null
             })
         }

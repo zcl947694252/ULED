@@ -94,17 +94,17 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 || localVersion.contains("ST") || localVersion.contains("SS-2.0.1")
         //单调光光能开关 sl bl   触摸单调光 btl sts
         if (!isTouchSw) {
-            if (localVersion.contains("sl") || localVersion.contains("bl"))
+            if (localVersion.contains("SL") || localVersion.contains("BL"))
                 sw_normal_iv.setImageResource(R.drawable.sw_normal_single)
             else
                 sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)
         } else {
             toolbarTv.text = getString(R.string.touch_sw)
-            if (localVersion.contains("btl") || localVersion.contains("sts"))
+            if (localVersion.contains("BTL") || localVersion.contains("STS"))
                 sw_normal_iv.setImageResource(R.drawable.touch_sw_single)
             else
-            sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
+                sw_normal_iv.setImageResource(R.drawable.sw_touch_normal)
             //tLightVersion.text = localVersion
         }
 
@@ -283,6 +283,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                                         ToastUtils.showShort(getString(R.string.device_not_exit))
                                         finish()
                                     }
+                                    900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                                     90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                     90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))

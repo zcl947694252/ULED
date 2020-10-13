@@ -16,7 +16,9 @@ class CWLightFragmentList : BaseGroupFragment() {
 
     override fun getGroupData(): Collection<DbGroup> {
         val list = mutableListOf<DbGroup>()
-        list.add(0,DBUtils.allGroups[0])
+        val allGroups = DBUtils.allGroups
+        if (allGroups.size>0)
+        list.add(0, allGroups[0])
         list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL))
         list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL_OLD))
         return list

@@ -19,6 +19,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
+import cn.smssdk.gui.util.Const
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -35,9 +36,12 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DbRegion
 import com.dadoutek.uled.model.httpModel.RegionModel
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
+import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.MacResetBody
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -73,6 +77,7 @@ class DeveloperActivity : BaseActivity() {
         return R.layout.activity_setting
     }
 
+    private var disposableRouteTimer: Disposable? = null
     private var disposable: Disposable? = null
     private var disposableTimer: Disposable? = null
     private var disposableFind: Disposable? = null
@@ -115,8 +120,8 @@ class DeveloperActivity : BaseActivity() {
                     when (position) {
                         0 -> startToRecoverDevices()
                         1 -> emptyTheCache()            //清除数据
-                        2 -> showSureResetDialogByApp()      //qingzhi物理恢复
-                        3 -> physicalRecovery()    //物理恢复
+                        2 -> showSureResetDialogByApp()      //恢复出厂设置
+                        3 -> physicalRecovery()    //物理恢复(非本账户下的灯)
                         //3 -> userReset()
                         //1 -> checkNetworkAndSyncs(this)
                     }
@@ -133,13 +138,22 @@ class DeveloperActivity : BaseActivity() {
         }
     }
 
-    private fun physicalRecovery() {  //物理恢复
+    private fun physicalRecovery() {  //恢复非本账户的灯
+        if (Constant.IS_ROUTE_MODE){
+            ToastUtils.showShort(getString(R.string.router_mode_cant_perform))
+            return
+        }
         isResetFactory = 3
         setFirstePopAndShow(R.string.physical_recovery_one, R.string.physical_recovery_two,
                 R.string.user_reset_all3, isResetFactory)
     }
 
     private fun startToRecoverDevices() {
+        if (Constant.IS_ROUTE_MODE) {
+            ToastUtils.showShort(getString(R.string.router_mode_cant_perform))
+            return
+        }
+
         LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
         disposableTimer = Observable.timer(13, TimeUnit.SECONDS).subscribe {
             hideLoadingDialog()
@@ -176,10 +190,10 @@ class DeveloperActivity : BaseActivity() {
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
         builder.setPositiveButton(getString(R.string.confirm)) { _, _ ->
             clearData()//删除本地数据
-            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe( {
-                    ToastUtils.showShort(getString(R.string.reset_user_success))
-                }, {
-                    ToastUtils.showShort(it.message)
+            UserModel.clearUserData(DBUtils.lastRegion.id.toInt())?.subscribe({
+                ToastUtils.showShort(getString(R.string.reset_user_success))
+            }, {
+                ToastUtils.showShort(it.message)
             })
         }
         builder.setNegativeButton(getString(R.string.cancel)) { _, _ ->
@@ -197,7 +211,7 @@ class DeveloperActivity : BaseActivity() {
     }
 
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
-    private fun showSureResetDialogByApp() {//物理复位
+    private fun showSureResetDialogByApp() {//
         isResetFactory = 2;
         setFirstePopAndShow(R.string.please_sure_all_device_power_on, R.string.reset_factory_all_device
                 , R.string.have_question_look_notice, isResetFactory)
@@ -327,22 +341,22 @@ class DeveloperActivity : BaseActivity() {
 
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe({
-                LogUtils.e("zcl-----------$it")
-                SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.IS_LOGIN, false)
-                DBUtils.deleteAllData()
-                CleanUtils.cleanInternalSp()
-                CleanUtils.cleanExternalCache()
-                CleanUtils.cleanInternalFiles()
-                CleanUtils.cleanInternalCache()
-                ToastUtils.showLong(R.string.clean_tip)
-                hideLoadingDialog()
-                GlobalScope.launch(Dispatchers.Main) {
-                    delay(300)
-                    restartApplication()
-                }
-            }, {
-                ToastUtils.showLong(R.string.clear_fail)
-                hideLoadingDialog()
+            LogUtils.e("zcl-----------$it")
+            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.IS_LOGIN, false)
+            DBUtils.deleteAllData()
+            CleanUtils.cleanInternalSp()
+            CleanUtils.cleanExternalCache()
+            CleanUtils.cleanInternalFiles()
+            CleanUtils.cleanInternalCache()
+            ToastUtils.showLong(R.string.clean_tip)
+            hideLoadingDialog()
+            GlobalScope.launch(Dispatchers.Main) {
+                delay(300)
+                restartApplication()
+            }
+        }, {
+            ToastUtils.showLong(R.string.clear_fail)
+            hideLoadingDialog()
         })
 
 
@@ -351,7 +365,7 @@ class DeveloperActivity : BaseActivity() {
     @SuppressLint("CheckResult")
     private fun updateLastMeshZero() {
         var dbRegion = DbRegion()
-        dbRegion.installMesh = "dadousmart"
+        dbRegion.installMesh = /*"dadousmart"*/Constant.DEFAULT_MESH_FACTORY_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.lastGenMeshAddr = 0
         DBUtils.lastUser?.lastGenMeshAddr = 0
@@ -435,9 +449,9 @@ class DeveloperActivity : BaseActivity() {
     /**
      * 所有灯恢复出厂设置
      */
+    @SuppressLint("CheckResult")
     private fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
-        SharedPreferencesHelper.putBoolean(this, Constant.DELETEING, true)
 
         val lightList = allLights
         val curtainList = allCutain
@@ -458,22 +472,53 @@ class DeveloperActivity : BaseActivity() {
             for (k in relyList.indices)
                 meshAdre.add(relyList[k].meshAddr)
         }
-        updateLastMeshZero()
 
-        Commander.resetAllDevices(meshAdre, {
-            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.DELETEING, false)
-            syncData()
-            this@DeveloperActivity.bnve?.currentItem = 0
-            null
-        }, {
-            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.DELETEING, false)
-            null
-        })
-        if (meshAdre.isEmpty()) {
-            hideLoadingDialog()
+        if (Constant.IS_ROUTE_MODE) {//todo 暂时没有一键恢复的接口看看怎么用 是否用单个的
+            RouterModel.routeResetFactory(MacResetBody("",0,100,"allFactory"))?.subscribe({
+                LogUtils.v("zcl-----------发送路由一键物理恢复-------")
+                when (it.errorCode) {
+                    0 -> {
+                        showLoadingDialog(getString(R.string.please_wait))
+                        disposableRouteTimer?.dispose()
+                        disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                .subscribe {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.user_reset_faile))
+                                }
+                    }
+                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                }
+            }, {
+                ToastUtils.showShort(it.message)
+            })
+        } else {
+            updateLastMeshZero()
+            Commander.resetAllDevices(meshAdre, {
+                syncData()
+                this@DeveloperActivity.bnve?.currentItem = 0
+                null
+            }, {
+                null
+            })
+            if (meshAdre.isEmpty()) {
+                hideLoadingDialog()
+            }
         }
     }
 
+    override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id=="allFactory"){
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            when (cmdBean.status) {
+                0 -> {
+                    updateLastMeshZero()
+                    syncData()
+                }
+                else ->ToastUtils.showShort(getString(R.string.user_reset_faile))
+            }
+        }
+    }
 
     private fun syncData() {
         SyncDataPutOrGetUtils.syncPutDataStart(this@DeveloperActivity!!, object : SyncCallback {
@@ -486,12 +531,10 @@ class DeveloperActivity : BaseActivity() {
                     compositeDisposable.add(disposable!!)
                 }
             }
-
             override fun error(msg: String) {
                 hideLoadingDialog()
                 ToastUtils.showLong(R.string.backup_failed)
             }
-
             override fun start() {}
         })
     }

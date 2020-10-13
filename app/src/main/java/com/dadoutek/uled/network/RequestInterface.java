@@ -1296,7 +1296,7 @@ public interface RequestInterface {
      * meshType 窗帘 = 16 组 = 97
      */
     @FormUrlEncoded
-    @POST("router/control/sensor/status")
+    @POST("router/control/curtain")
     Observable<Response<RouterTimeoutBean>> routerControlCurtain(@Field("meshAddr") int meshAddr,
                                                                  @Field("meshType") int meshType,
                                                                  @Field("controlCmd") int controlCmd,
@@ -1309,7 +1309,7 @@ public interface RequestInterface {
      * "ser_id": "app会话id，自己维护"
      */
     @HTTP(method = "DELETE", path = "router/control/user-reset", hasBody = true)
-    Observable<Response<RouterTimeoutBean>> routerControlCurtain(@Body RouterDelGpBody  body);
+    Observable<Response<RouterTimeoutBean>> routerUserReset(@Body RouterDelGpBody  body);
 
 
     /**
@@ -1383,8 +1383,26 @@ public interface RequestInterface {
      * meshType彩灯 = 6组 = 97
      */
     @FormUrlEncoded
-    @POST("router/control/colorTemperature")
+    @POST("router/control/w")
     Observable<Response<RouterTimeoutBean>> routeConfigWhiteNum(@Field("meshAddr") int meshAddr,
+                                                                @Field("meshType") int meshType,
+                                                                @Field("color") int color,
+                                                                @Field("ser_id") String ser_id);
+
+    /**
+     * 设备&组rgb值调节  https://dev.dadoutek.com/xxxx/router/control/rgb POST
+     * meshAddr	是	int	目标meshAddr
+     * ser_id	是	string	app会话id，推送时回传
+     * meshType	是	int	mesh地址类型  彩灯 = 6组 = 97
+     * color	是	int	原来逻辑生成的color值
+     *     "meshAddr" : 1,
+     *     "meshType": 6,
+     *     "color": 16777215 // r = 255, g = 255, b = 255
+     *     "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @POST("router/control/rgb")
+    Observable<Response<RouterTimeoutBean>> routeConfigRGBNum(@Field("meshAddr") int meshAddr,
                                                                 @Field("meshType") int meshType,
                                                                 @Field("color") int color,
                                                                 @Field("ser_id") String ser_id);
@@ -1415,12 +1433,21 @@ public interface RequestInterface {
      * meshAddr	是	int	目标meshAddr
      * ser_id	是	string	app会话id，推送时回传
      * meshType	是	int	meshAddr类型  普通灯 = 4彩灯 = 6 蓝牙连接器 = 5
-     * * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部
-     * = 100
+     * * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部 = 100
      * * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致
      */
-    @POST("router/control/reset")
+    @HTTP(method ="DELETE" ,path = "router/control/reset",hasBody = true)
     Observable<Response<RouterTimeoutBean>> routeResetFactory(@Body MacResetBody body);
+
+    /**
+     * 路由软件恢复出厂 https://dev.dadoutek.com/xxxx/router/router-reset  DELETE
+     * ser_id	是	string	app会话id，推送时回传
+     * macAddr	是	string	需要恢复出厂的路由mac地址
+     * { "ser_id": "app会话id，自己维护",
+     *     "macAddr": "0102030405",}
+     */
+    @POST("router/router-reset")
+    Observable<Response<RouterTimeoutBean>> routeResetFactoryBySelf(@Body MacResetBody body);
 
     /**
      * 获取路由版本号，路由升级时先获取路由版本号，成功后再进行升级
@@ -1432,7 +1459,7 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/router-version")
-    Observable<Response<RouterTimeoutBean>> routeGetVersion(@Field("macAddr") int macAddr,
+    Observable<Response<RouterTimeoutBean>> routeGetVersion(@Field("macAddr") long macAddr,
                                                             @Field("ser_id") String ser_id);
 
     /**

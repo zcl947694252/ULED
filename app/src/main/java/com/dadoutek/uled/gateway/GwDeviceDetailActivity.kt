@@ -29,9 +29,7 @@ import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.router.bean.RouteScanResultBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -380,7 +378,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
                                 .subscribe {
                                     hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.reset_gw_faile))
+                                    ToastUtils.showShort(getString(R.string.user_reset_faile))
                                 }
                         GlobalScope.launch(Dispatchers.Main) {
                             showLoadingDialog(getString(R.string.please_wait))

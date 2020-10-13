@@ -3,7 +3,6 @@ package com.dadoutek.uled.model.routerModel
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Response
-import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.rgb.AddGradientBean
@@ -199,8 +198,8 @@ object RouterModel {
     /**
      *获取设备版本号
      */
-    fun getDevicesVersion(meshAddrs: MutableList<Int>, meshType: Int): Observable<Response<RouterVersionsBean>>? {
-        return NetworkFactory.getApi().routerGetDevicesVersion(meshAddrs, meshType, "getVersion")
+    fun getDevicesVersion(meshAddrs: MutableList<Int>, meshType: Int, ser_id: String): Observable<Response<RouterVersionsBean>>? {
+        return NetworkFactory.getApi().routerGetDevicesVersion(meshAddrs, meshType, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -367,8 +366,8 @@ object RouterModel {
      * 用户复位
      * @Field("meshAddr") int ,@Field("meshType") int , @Field("controlCmd") int , @Field("value") int speedValue, @Field("ser_id") String ser_id)
      */
-    fun routerContro(ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerControlCurtain(RouterDelGpBody(ser_id, 0))
+    fun routerUserReset(ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerUserReset(RouterDelGpBody(ser_id, 0))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -408,8 +407,18 @@ object RouterModel {
      * 控制相关开始
      * 调节白色
      */
-    fun routeConfigWhiteNum(meshAddr: Int, meshType: Int, colorTemperature: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeConfigWhiteNum(meshAddr, meshType, colorTemperature, ser_id)
+    fun routeConfigWhiteNum(meshAddr: Int, meshType: Int, color: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeConfigWhiteNum(meshAddr, meshType, color, ser_id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 控制相关开始
+     * 调节rgb值
+     */
+    fun routeConfigRGBNum(meshAddr: Int, meshType: Int, color: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeConfigRGBNum(meshAddr, meshType, color, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -447,9 +456,18 @@ object RouterModel {
     }
 
     /**
+     * 路由恢复自身 物理恢复
+     */
+    fun routeResetFactoryBySelf(bodyBean: MacResetBody): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeResetFactoryBySelf(bodyBean)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
      * 获取路由版本号
      */
-    fun routeGetRouterVersion(mac: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+    fun routeGetRouterVersion(mac: Long, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routeGetVersion(mac, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -20,7 +20,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import org.jetbrains.anko.startActivity
 
 abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
-    private var bindRouter: MenuItem? = null
+    var bindRouter: MenuItem? = null
     lateinit var dialogTv: TextView
     var builder: AlertDialog.Builder? = null
     var dialogDelete: AlertDialog? = null

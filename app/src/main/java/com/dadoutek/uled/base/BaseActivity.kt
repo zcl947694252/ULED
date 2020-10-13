@@ -32,6 +32,7 @@ import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -344,7 +345,7 @@ abstract class BaseActivity : AppCompatActivity() {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             var jsonObject = JSONObject(msg)
             when (val cmd = jsonObject.getInt("cmd")) {
-                Cmd.singleLogin, Cmd.parseQR,Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
                     val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
                     when (cmd) {
                         Cmd.singleLogin -> singleDialog(codeBean)//单点登录
@@ -353,6 +354,14 @@ abstract class BaseActivity : AppCompatActivity() {
                         Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
                         Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
                         Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                        Cmd.tzRouteUserReset -> {
+                            val cmdBean: CmdBodyBean = getCmdBean(intent)
+                            tzRouteUserReset(cmdBean)//用户复位
+                        }
+                        Cmd.tzRouteResetFactory -> {
+                            val cmdBean: CmdBodyBean = getCmdBean(intent)
+                            tzRouterResetFactory(cmdBean)
+                        }
                     }
                 }
 
@@ -404,6 +413,21 @@ abstract class BaseActivity : AppCompatActivity() {
                         }
                     }*/
         }
+    }
+
+    private fun getCmdBean(intent: Intent?): CmdBodyBean {
+        val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+        val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
+        return cmdBean
+    }
+
+
+    open fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun tzRouteUserReset(cmdBean: CmdBodyBean) {
+
     }
 
     private fun singleDialog(codeBean: MqttBodyBean) {

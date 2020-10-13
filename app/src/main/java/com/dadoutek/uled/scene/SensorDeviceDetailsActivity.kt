@@ -353,8 +353,10 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                                                 ToastUtils.showShort(getString(R.string.connect_fail))
                                             }
                                 }
-                                90018 -> {ToastUtils.showShort(getString(R.string.device_not_exit))
-                                finish()}
+                                90018 -> {
+                                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                                    finish()
+                                }
                                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                             }
@@ -363,7 +365,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                             ToastUtils.showShort(it1.message)
                         })
             }
-        else{
+        else {
             showLoadingDialog(getString(R.string.please_wait))
             connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
                 relocationSensor()
@@ -860,23 +862,9 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             if (cmdBean.status == 0) {
                 ToastUtils.showShort(getString(R.string.connect_success))
                 image_bluetooth.setImageResource(R.drawable.icon_cloud)
-                RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99)?.subscribe({
-                    when (it.errorCode) {
-                        NetworkStatusCode.OK -> {
-                            disposableTimer?.dispose()
-                            disposableTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.MILLISECONDS)
-                                    .subscribe {
-                                        hideLoadingDialog()
-                                        ToastUtils.showShort(getString(R.string.get_version_fail))
-                                    }
-                        }
-                        NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
-                        NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                    }
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
-            } else{
+                getRouterVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
+
+            } else {
                 image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                 ToastUtils.showShort(getString(R.string.connect_fail))
             }
@@ -886,31 +874,32 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
 
         if (routerVersion?.finish == true) {
-            if (routerVersion.cmd == 0) {
-                disposableTimer?.dispose()
-                val deviceInfo = DeviceInfo()
-                deviceInfo.macAddress = currentDevice?.macAddr
-                deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
-                deviceInfo.firmwareRevision = currentDevice?.version
-                deviceInfo.productUUID = currentDevice?.productUUID ?: 0
-                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
-                    override fun start() {}
+            if (routerVersion.ser_id == "sensorVersion")
+                if (routerVersion.cmd == 0) {
+                    disposableRouteTimer?.dispose()
+                    val deviceInfo = DeviceInfo()
+                    deviceInfo.macAddress = currentDevice?.macAddr
+                    deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
+                    deviceInfo.firmwareRevision = currentDevice?.version
+                    deviceInfo.productUUID = currentDevice?.productUUID ?: 0
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                        override fun start() {}
 
-                    override fun complete() {
-                        val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
-                        if (switchByID?.version == "" || switchByID?.version == null)
+                        override fun complete() {
+                            val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
+                            if (switchByID?.version == "" || switchByID?.version == null)
+                                ToastUtils.showShort(getString(R.string.get_version_fail))
+                            else
+                                skipeDevice(false, currentDevice?.version ?: "")
+                        }
+
+                        override fun error(msg: String?) {
                             ToastUtils.showShort(getString(R.string.get_version_fail))
-                        else
-                            skipeDevice(false, currentDevice?.version ?: "")
-                    }
-
-                    override fun error(msg: String?) {
-                        ToastUtils.showShort(getString(R.string.get_version_fail))
-                    }
-                })
-            } else {
-                ToastUtils.showShort(getString(R.string.get_version_fail))
-            }
+                        }
+                    })
+                } else {
+                    ToastUtils.showShort(getString(R.string.get_version_fail))
+                }
         }
     }
 }

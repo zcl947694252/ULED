@@ -51,8 +51,6 @@ import org.json.JSONObject
  * 更新时间   $
  * 更新描述
  */
-
-
 class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var newMeshAddr: Int = 0
     private lateinit var listKeysBean: JSONArray
@@ -119,10 +117,17 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
                             var mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            val groupByMeshAddr = DBUtils.getGroupByMeshAddr(mesAddress)
+                            val groupByMeshAddr = if (highMes == 255 && lowMes == 255)
+                                null
+                            else
+                                DBUtils.getGroupByMeshAddr(mesAddress)
 
                             if (groupByMeshAddr != null) {
                                 groupMap[keyId] = groupByMeshAddr
+                                name = if (groupByMeshAddr.name == "")
+                                    getString(R.string.click_config)
+                                else
+                                    groupByMeshAddr.name
                                 groupKey.remove(keyId)
                             } else {
                                 name = getString(R.string.click_config)
@@ -133,17 +138,23 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                 6 -> eight_switch_b7.text = name
                                 7 -> eight_switch_b8.text = name
                             }
+                            eight_switch_title.text = getString(R.string.group_switch)
                         }
                         1 -> {
                             val sceneId = jOb.getInt("reserveValue_B")
                             var scene = DBUtils.getSceneByID(sceneId.toLong())
+                            eight_switch_title.text = getString(R.string.scene_switch)
                             //赋值旧的设置数据
                             sceneMap[keyId] = if (scene != null) {
-                                name = getString(R.string.click_config)
+                                name = if (scene.name == "")
+                                    getString(R.string.click_config)
+                                else
+                                    scene.name
                                 scene
                             } else {
                                 var dbScene = DbScene()
                                 dbScene.id = 255L
+                                name = getString(R.string.click_config)
                                 dbScene
                             }
                             sceneKey.remove(keyId)
@@ -160,11 +171,19 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                         2 -> {
                             val highMes = jOb.getInt("reserveValue_A")
                             val lowMes = jOb.getInt("reserveValue_B")
+                            eight_switch_title.text = getString(R.string.single_brighress_group_switch)
                             var mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            val groupByMeshAddr = DBUtils.getGroupByMeshAddr(mesAddress)
+                            val groupByMeshAddr = if (highMes == 255 && lowMes == 255)
+                                null
+                            else
+                                DBUtils.getGroupByMeshAddr(mesAddress)
                             if (groupByMeshAddr != null) {
                                 groupMap[keyId] = groupByMeshAddr
+                                name = if (groupByMeshAddr.name == "")
+                                    getString(R.string.click_config)
+                                else
+                                    groupByMeshAddr.name
                                 doubleGroupKey.remove(keyId)
                             } else {
                                 name = getString(R.string.click_config)
@@ -457,7 +476,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         } else {
             switchData!!.type = configGroup
             switchData!!.keys = listKeysBean.toString()
-            switchData?.meshAddr = mDeviceInfo?.meshAddress?:0
+            switchData?.meshAddr = mDeviceInfo?.meshAddress ?: 0
             //解析出來他的keys 重新賦值
             DBUtils.updateSwicth(switchData!!)
         }

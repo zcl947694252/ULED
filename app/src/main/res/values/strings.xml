@@ -1008,7 +1008,7 @@
     <string name="lock">Lock</string>
     <string name="safe_lock2">Unlock :(click "off" to unlock, and the unlock light will open)</string>
     <string name="unlock">Unlock</string>
-    <string name="reset_gw_faile">Gateway user reset failed</string>
+    <string name="user_reset_faile">Gateway user reset failed</string>
     <string name="choose_scene_dot">Choose scene :</string>
     <string name="open_light">Open light</string>
     <string name="close_light">Close light</string>
@@ -1156,4 +1156,7 @@
     <string name="close_faile">关灯失败</string>
     <string name="unlock_fail">解锁失败</string>
     <string name="lock_fail">锁定失败</string>
+    <string name="router_mode_cant_perform">路由状态下无法执行此操作</string>
+    <string name="get_router_empty">路由相关数据为空</string>
+    <string name="congfig_rgb_fail">配置彩灯RGB值失败</string>
 </resources>

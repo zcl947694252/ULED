@@ -55,7 +55,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -627,7 +626,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             if (cmdBean.status == 0) {
                 image_bluetooth.setImageResource(R.drawable.icon_cloud)
                 ToastUtils.showShort(getString(R.string.connect_success))
-                RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99)?.subscribe({
+                RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99,"switchVersion")?.subscribe({
                     when (it.errorCode) {
                         NetworkStatusCode.OK -> {
                             disposableTimer?.dispose()
@@ -653,8 +652,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
 
         if (routerVersion?.finish == true) {
+            if (routerVersion?.ser_id=="switchVersion")
             if (routerVersion.cmd == 0) {
-                disposableTimer?.dispose()
+                disposableRouteTimer?.dispose()
                 val deviceInfo = DeviceInfo()
                 deviceInfo.id = (currentDevice?.id ?: 0).toInt()
                 deviceInfo.macAddress = currentDevice?.macAddr

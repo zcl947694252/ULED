@@ -134,8 +134,8 @@ class MqttService : Service() {
 
 
     override fun onDestroy() {
-        client?.unregisterResources()
         client?.disconnect()
+        client?.unregisterResources()
         stopSelf()
 
         super.onDestroy()

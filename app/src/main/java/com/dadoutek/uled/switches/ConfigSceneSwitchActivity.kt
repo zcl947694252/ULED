@@ -78,7 +78,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
         else {
-            if (version.contains("BTS")) {
+            if (version.contains("BTS")||version.contains("SS-2.1.0")) {
                 scene_switch_cw.visibility = View.GONE
                 scene_switch_touch.visibility = View.VISIBLE
                 toolbarTv.text = getString(R.string.touch_sw)
@@ -189,6 +189,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                                     ToastUtils.showShort(getString(R.string.device_not_exit))
                                     finish()
                                 }
+                                900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                                 90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))

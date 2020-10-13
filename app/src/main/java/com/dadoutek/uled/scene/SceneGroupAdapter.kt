@@ -721,7 +721,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         val green = (gpColor and 0x00ff00) shr 8
         val blue = gpColor and 0x0000ff
         var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
-        RouterModel.routeConfigColorTemp(meshAddr, deviceType, color, serId)?.subscribe({
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it)
