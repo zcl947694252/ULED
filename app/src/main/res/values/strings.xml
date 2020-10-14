@@ -1159,4 +1159,6 @@
     <string name="router_mode_cant_perform">路由状态下无法执行此操作</string>
     <string name="get_router_empty">路由相关数据为空</string>
     <string name="congfig_rgb_fail">配置彩灯RGB值失败</string>
+    <string name="gradient_apply_fail">渐变应用失败</string>
+    <string name="gradient_stop_fail">渐变停止失败</string>
 </resources>

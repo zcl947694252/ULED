@@ -1114,7 +1114,6 @@ public interface RequestInterface {
      * "meshAddr": 1,"meshType": 6}
      * meshType 彩灯 = 6 组 = 9
      */
-    @FormUrlEncoded
     @POST("router/add-custom-dc")
     Observable<Response<RouterTimeoutBean>> routerAddCustomGradient(@Body AddGradientBean addGradientBean);
 
@@ -1147,12 +1146,51 @@ public interface RequestInterface {
     /**
      * 设备&组应用自定义渐变  https://dev.dadoutek.com/xxxx/router/control/dynamic-change/custom/apply POST
      * meshAddr	是	int	目标meshAddr
-     * ser_id	是	string	app会话id，推送时回传
-     * meshType	是	int	mesh地址类型   meshType 彩灯 = 6 组 = 97
-     * id	是	int	自定义渐变id
+     *      * ser_id	是	string	app会话id，推送时回传
+     *      * meshType	是	int	mesh地址类型   meshType 彩灯 = 6 组 = 97
+     *      * id	是	int	自定义渐变id
      */
-    @HTTP(method = "DELETE", path = "router/control/dynamic-change/custom/apply", hasBody = true)
-    Observable<Response<RouterTimeoutBean>> routerApplyCustomGradient(@Body ApplyGradientBodyBean body);
+    @FormUrlEncoded
+    @POST("router/control/dynamic-change/custom/apply")
+    Observable<Response<RouterTimeoutBean>> routerApplyDiyGradient(@Field("id") int id,
+                                                                   @Field("meshAddr") Integer meshAddr,
+                                                                   @Field("meshType") Integer meshType,
+                                                                   @Field("ser_id") String ser_id);
+
+    /**
+     * 设备&组应用内置渐变
+     * https://dev.dadoutek.com/xxxx/router/control/dynamic-change/built-in/apply  POST
+     * ser_id	是	string	app会话id，推送时回传
+     * meshAddr	是	int	目标meshAddr
+     * meshType	是	int	mesh地址类型  彩灯 = 6 组 = 97
+     * id	是	int	内置渐变id
+     * speed	是	int	速度
+     *
+     *"meshAddr" : 1,  "meshType": 6, "meshAddr": 1,   "id": 1, "ser_id": "app会话id，自己维护"
+     */
+    @FormUrlEncoded
+    @POST("router/control/dynamic-change/built-in/apply")
+    Observable<Response<RouterTimeoutBean>> routerApplySystemGradient(@Field("id") int id,
+                                                                      @Field("meshAddr") Integer meshAddr,
+                                                                      @Field("meshType") Integer meshType,
+                                                                      @Field("speed") Integer speed,
+                                                                      @Field("ser_id") String ser_id);
+
+    /**
+     * 渐变停止 https://dev.dadoutek.com/xxxx/router/control/dynamic-change/stop  POST
+     * meshAddr	是	int	目标设备或者组的meshAddr
+     * meshType	是	int	meshAddr类型
+     * ser_id	是	string	app会话id，推送时回传
+     * "meshAddr" : 1,
+     * "meshType": 6,
+     * "ser_id": "app会话id，自己维护"
+     * meshType 彩灯 = 6 组 = 97
+     */
+    @FormUrlEncoded
+    @POST("router/control/dynamic-change/stop")
+    Observable<Response<RouterTimeoutBean>> routerStopDynamic(@Field("meshAddr") int meshAddr,
+                                                              @Field("meshType") int meshType,
+                                                              @Field("ser_id") String ser_id);
 
     /**
      * 直连开关&传感器 https://dev.dadoutek.com/xxxx/router/device-connect POST
@@ -1253,21 +1291,7 @@ public interface RequestInterface {
     /*
     -------------------------------------控制指令相关-------------------------------------------------------*/
 
-    /**
-     * 渐变停止 https://dev.dadoutek.com/xxxx/router/control/dynamic-change/stop  POST
-     * meshAddr	是	int	目标设备或者组的meshAddr
-     * meshType	是	int	meshAddr类型
-     * ser_id	是	string	app会话id，推送时回传
-     * "meshAddr" : 1,
-     * "meshType": 6,
-     * "ser_id": "app会话id，自己维护"
-     * meshType 彩灯 = 6 组 = 97
-     */
-    @FormUrlEncoded
-    @POST("router/control/dynamic-change/stop")
-    Observable<Response<RouterTimeoutBean>> routerStopDynamic(@Field("meshAddr") int meshAddr,
-                                                              @Field("meshType") int meshType,
-                                                              @Field("ser_id") String ser_id);
+
 
     /**
      * 传感器开关  https://dev.dadoutek.com/xxxx/router/control/sensor/status POST

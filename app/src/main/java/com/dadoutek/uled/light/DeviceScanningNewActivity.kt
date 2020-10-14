@@ -1541,8 +1541,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-    private fun skipeType() {
-        //开关传感器不能批量也就不能使用找回
+    private fun skipeType() { //开关传感器不能批量也就不能使用找回
         when (mAddDeviceType) {
             DeviceType.NORMAL_SWITCH -> when (bestRssiDevice?.productUUID) {//传感器开关单独扫描界面
                 DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "deviceType" to bestRssiDevice?.productUUID)

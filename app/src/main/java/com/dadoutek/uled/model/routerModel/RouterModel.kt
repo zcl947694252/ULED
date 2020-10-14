@@ -263,8 +263,16 @@ object RouterModel {
     /**
      * 设备&组应用自定义渐变
      */
-    fun routerApplyGradient(applyGradientBodyBean: ApplyGradientBodyBean): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerApplyCustomGradient(applyGradientBodyBean)
+    fun routerApplyDiyGradient(id: Int, dstAddress: Int, devicetype: Int, serId: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerApplyDiyGradient(id, dstAddress, devicetype, serId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    /**
+     * 设备&组应用自定义渐变
+     */
+    fun routerApplySystemGradient(id: Int, dstAddress: Int, devicetype: Int, speed: Int,serId: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerApplySystemGradient(id, dstAddress, devicetype, speed,serId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

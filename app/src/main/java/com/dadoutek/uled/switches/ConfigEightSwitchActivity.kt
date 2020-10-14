@@ -109,6 +109,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     //int keyId;  int featureId;   int reserveValue_A;  int reserveValue_B;  String name;
                     val jOb = listKeysBean.getJSONObject(i)
                     val keyId = jOb.getInt("keyId")
+                    val featureId = jOb.getInt("featureId")
                     var name = jOb.getString("name")
                     when (type) {
                         0 -> {
@@ -117,7 +118,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
                             var mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            val groupByMeshAddr = if (highMes == 255 && lowMes == 255)
+                            val groupByMeshAddr = if (featureId == 0xff)
                                 null
                             else
                                 DBUtils.getGroupByMeshAddr(mesAddress)
@@ -153,7 +154,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                 scene
                             } else {
                                 var dbScene = DbScene()
-                                dbScene.id = 255L
+                                dbScene.id = 65536L
                                 name = getString(R.string.click_config)
                                 dbScene
                             }
@@ -174,7 +175,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             eight_switch_title.text = getString(R.string.single_brighress_group_switch)
                             var mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            val groupByMeshAddr = if (highMes == 255 && lowMes == 255)
+                            val groupByMeshAddr = if (featureId == 0xff)
                                 null
                             else
                                 DBUtils.getGroupByMeshAddr(mesAddress)
@@ -203,21 +204,21 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                      0 -> {
                          groupKey.forEach { itKey ->
                              var dbGroup = DbGroup()
-                             dbGroup.id = 255L
+                             dbGroup.id = 65536L
                              groupMap[itKey] = dbGroup
                          }
                      }
                      1 -> {
                          sceneKey.forEach { itKey ->
                              var dbScene = DbScene()
-                             dbScene.id = 255L
+                             dbScene.id = 65536L
                              sceneMap[itKey] = dbScene
                          }
                      }
                      2 -> {
                          doubleGroupKey.forEach { itKey ->
                              var dbGroup = DbGroup()
-                             dbGroup.id = 255L
+                             dbGroup.id = 65536L
                              groupMap[itKey] = dbGroup
                          }
                      }
@@ -233,11 +234,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         sceneMap.clear()
         for (i in 0 until 8) {
             var dbGroup = DbGroup()
-            dbGroup.id = 255L
+            dbGroup.id = 65536L
             groupMap[i] = dbGroup
 
             var dbScene = DbScene()
-            dbScene.id = 255L
+            dbScene.id = 65536L
             sceneMap[i] = dbScene
         }
     }
@@ -328,8 +329,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         val second = mutableListOf(2, 3)
         val third = mutableListOf(4, 5)
         //val four = mutableListOf(6, 7)
-        val four: MutableList<Int> = if (sceneParamList.size > 7)
-            mutableListOf(6/*, 7*/)
+
+        val four: MutableList<Int> = if (sceneMap[7]?.id != 65536L)
+            mutableListOf(6, 7)
         else
             mutableListOf(6)
         val sceneParmOne = getSceneParm(first)
@@ -503,32 +505,33 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         var firstOpcode = Opcode.SCENE_SWITCH8K
         var secondOpcode = Opcode.SCENE_SWITCH8K
 
-        val firstNum = list[0]
+        val firstNum = list[0]//4
         val dbSceneFirst = sceneMap[firstNum]
-        val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 255L) {
+        val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 65536L) {
             firstOpcode = Opcode.DEFAULT_SWITCH8K
-            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
-            255L
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            65536L
         } else {
-            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt(), name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
+            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt() and 0xff, name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
             dbSceneFirst!!.id
         }
 
-        return if (list.size > 1) {
+        return if (list.size > 1) {//配置双场景数据
             val secondNum = list[1]
             val dbSceneSecond = sceneMap[secondNum]
             //位置 功能 保留 14场景id
-            val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 255L) {
+            val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 65536L) {
                 secondOpcode = Opcode.DEFAULT_SWITCH8K
-                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
-                255L
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+                65536L
             } else {
-                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt(), name = dbSceneSecond.name, hight8Mes = 0, low8Mes = dbSceneSecond.id.toInt()))
+                listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt() and 0xff, name = dbSceneSecond.name, hight8Mes = 0, low8Mes = dbSceneSecond.id.toInt()))
                 dbSceneSecond.id
             }
             byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), secondOpcode, 0x00, secondDbSceneId.toByte())
         } else {//如果第八键没有配置默认为关  0-1-2 3id 4 5 6 7id
-            byteArrayOf(firstNum.toByte(), Opcode.SCENE_SWITCH8K, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
+            listKeysBean.put(getKeyBean(7, Opcode.DEFAULT_SWITCH8K.toInt() and 0xff, name = getString(R.string.close), hight8Mes = 0, low8Mes = 0xff))
+            byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }
 
@@ -539,9 +542,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         var fristL: Byte = 0
         var fristH: Byte = 0
 
-        if (dbGroup1 == null || dbGroup1.id == 255L) {
+        if (dbGroup1 == null || dbGroup1.id == 65536L) {
             opcodeOne = Opcode.DEFAULT_SWITCH8K
-            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
         } else {
             val fristMesAddr = dbGroup1.meshAddr
             val mesL = fristMesAddr and 0xff
@@ -549,7 +552,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             fristL = mesL.toByte()
             fristH = mesH.toByte()
             opcodeOne = getAllGroupOpcode(fristMesAddr)
-            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = groupMap[firstNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt() and 0xff, name = groupMap[firstNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
         }
 
         return if (list.size > 1) {
@@ -560,9 +563,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             var secondL: Byte = 0
             var secondH: Byte = 0
 
-            if (dbGroup2 == null || dbGroup2.id == 255L) {
+            if (dbGroup2 == null || dbGroup2.id == 65536L) {
                 opcodeTwo = Opcode.DEFAULT_SWITCH8K
-                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
             } else {
                 val secondMesAddr = dbGroup2.meshAddr
                 val mesL = secondMesAddr and 0xff
@@ -570,13 +573,13 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 secondL = mesL.toByte()
                 secondH = mesH.toByte()
                 opcodeTwo = getAllGroupOpcode(secondMesAddr)
-                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = groupMap[secondNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
+                listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt() and 0xff, name = groupMap[secondNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
             }
 
             byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, secondNum.toByte(), opcodeTwo, secondH, secondL)
         } else {
             //如果第八键没有配置默认为关
-            listKeysBean.put(getKeyBean(0x08, Opcode.CLOSE.toInt()))
+            listKeysBean.put(getKeyBean(0x08, Opcode.CLOSE.toInt() and 0xff,name = getString(R.string.close), hight8Mes = 0, low8Mes = 255))
             byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }

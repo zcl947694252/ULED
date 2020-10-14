@@ -146,7 +146,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     var renameEt: EditText? = null
     var popReNameView: View? = null
     lateinit var renameDialog: Dialog
-     var disposableRouteTimer: Disposable? = null
+    var disposableRouteTimer: Disposable? = null
 
     @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -206,10 +206,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
     }
 
     @SuppressLint("CheckResult")
-    open fun getRouterVersion(mesAddress: MutableList<Int>, deviceType: Int, serId: String){
+    open fun getRouterVersion(mesAddress: MutableList<Int>, deviceType: Int, serId: String) {
         //普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
         // 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
-        val subscribe = RouterModel.getDevicesVersion(mesAddress, deviceType,serId)?.subscribe({
+        val subscribe = RouterModel.getDevicesVersion(mesAddress, deviceType, serId)?.subscribe({
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))
@@ -476,7 +476,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (!LeBluetooth.getInstance().enable(applicationContext)&&!Constant.IS_ROUTE_MODE)
+        if (!LeBluetooth.getInstance().enable(applicationContext) && !Constant.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
         if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
@@ -553,7 +553,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
     fun hideLoadingDialog() {
         if (!this@TelinkBaseActivity.isFinishing && loadDialog != null && loadDialog!!.isShowing) {
-            runOnUiThread {   loadDialog?.dismiss() }
+            runOnUiThread { loadDialog?.dismiss() }
         }
     }
 
@@ -719,7 +719,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                             }
                 }
                 90030 -> ToastUtils.showShort(getString(R.string.transfer_accounts_code_exit_cont_perform))
-                900018 ->{
+                900018 -> {
                     ToastUtils.showShort(getString(R.string.device_not_exit))
                     finish()
                 }
@@ -793,6 +793,10 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 Cmd.tzRouteConfigRgb -> tzRouterConfigRGB(cmdBean)
                 Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean, true)
                 Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean, false)
+                Cmd.tzRouteSysGradientApply -> tzRouterSysGradientApply(cmdBean)
+                Cmd.tzRouteGradientApply -> tzRouterGradientApply(cmdBean)
+                Cmd.tzRouteGradientStop -> tzRouterGradientStop(cmdBean)
+
                 Cmd.tzRouteSlowUPSlowDownSw -> tzRouterSSSW(cmdBean, false)
                 Cmd.tzRouteSlowUPSlowDownSpeed -> tzRouterSSSpeed(cmdBean)
                 Cmd.tzRouteResetFactory -> tzRouterResetFactory(cmdBean)
@@ -849,6 +853,20 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             }*/
         }
 
+
+    }
+
+    open fun tzRouterSysGradientApply(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun tzRouterGradientStop(cmdBean: CmdBodyBean) {
+
+
+    }
+
+
+    open fun tzRouterGradientApply(cmdBean: CmdBodyBean) {
 
     }
 
@@ -1092,7 +1110,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
 
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
-        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false&&!Constant.IS_ROUTE_MODE) {
+        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
@@ -1348,18 +1366,25 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
 
                         }
                         INSTALL_SWITCH -> {
-                            startActivity(Intent(this, ScanningSwitchActivity::class.java))
-                            //intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            // intent.putExtra(Constant.DEVICE_TYPE, DeviceType.NORMAL_SWITCH)       //connector也叫relay
-                            // startActivityForResult(intent, 0)
+                            if (!Constant.IS_ROUTE_MODE) {
+                                startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                            } else {
+                                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, 99)       //connector也叫relay
+                                startActivityForResult(intent, 0)
+                            }
+
                             installDialog?.show()
                             finish()
                         }
                         INSTALL_SENSOR -> {
-                            startActivity(Intent(this, ScanningSensorActivity::class.java))
-                            // intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            //intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SENSOR)       //connector也叫relay
-                            // startActivityForResult(intent, 0)
+                            if (!Constant.IS_ROUTE_MODE) {
+                                startActivity(Intent(this, ScanningSensorActivity::class.java))
+                            } else {
+                                intent = Intent(this, DeviceScanningNewActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, 98)       //connector也叫relay
+                                startActivityForResult(intent, 0)
+                            }
                             installDialog?.show()
                             finish()
                         }

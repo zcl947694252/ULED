@@ -74,6 +74,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
+    private var clickDiy: Boolean = false
     private var color: Int = 0
     private var sendProgress: Int = 1
     private var disposableTimer: Disposable? = null
@@ -1220,65 +1221,87 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
+        clickPostion = position
+        clickDiy = false
         when (view!!.id) {
             R.id.gradient_mode_on -> {
                 //应用内置渐变
-                applyDisposable?.dispose()
-                applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
-                        .subscribe {
-                            GlobalScope.launch {
-                                for (i in 0..2) {
-                                    stopGradient()
-                                    delay(50)
+                if (!Constant.IS_ROUTE_MODE) {
+                    applyDisposable?.dispose()
+                    applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
+                            .subscribe {
+                                GlobalScope.launch {
+                                    for (i in 0..2) {
+                                        stopGradient()
+                                        delay(50)
+                                    }
                                 }
+                                positionState = position + 1
+                                Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                             }
-                            positionState = position + 1
-                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
-                        }
-
-                postionAndNum?.position = position
-                for (i in buildInModeList!!.indices) {
-                    buildInModeList!![i].select = i == position
+                    postionAndNum?.position = position
+                    systemGradientApply(clickPostion)
+                } else {
+                    routerSystemGradientApply(buildInModeList[clickPostion].id+1, speed, "systemApply")
                 }
 
-                rgbGradientAdapter!!.notifyDataSetChanged()
 
-                for (i in diyGradientList!!.indices) {
-                    diyGradientList!![i].select = false
-                    DBUtils.updateGradient(diyGradientList!![i])
-                }
-                rgbDiyGradientAdapter!!.notifyDataSetChanged()
             }
 
             R.id.gradient_mode_off -> {
-                for (i in buildInModeList!!.indices) {
-                    buildInModeList!![i].select = false
+                if (!Constant.IS_ROUTE_MODE) {
+                    stopGradient()
+                    systemGradientStop()
+                } else {
+                    routerGradientStop("stopGradient")
                 }
-                rgbGradientAdapter!!.notifyDataSetChanged()
-                stopGradient()
-
-                for (i in diyGradientList!!.indices) {
-                    diyGradientList!![i].select = false
-                    DBUtils.updateGradient(diyGradientList!![i])
-                }
-                rgbDiyGradientAdapter!!.notifyDataSetChanged()
             }
 
             R.id.gradient_mode_set -> {
                 speed = postionAndNum?.speed ?: 0
                 var dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
-                    GlobalScope.launch {
-                        speed = it
-                        stopGradient()
-                        delay(200)
-                        postionAndNum?.speed = speed
-                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
+                    if (!Constant.IS_ROUTE_MODE)
+                        GlobalScope.launch {
+                            speed = it
+                            stopGradient()
+                            delay(200)
+                            postionAndNum?.speed = speed
+                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
+                        } else {
+
                     }
                 })
                 dialog.show()
             }
         }
 
+    }
+
+    private fun systemGradientStop() {
+        for (i in buildInModeList!!.indices) {
+            buildInModeList!![i].select = false
+        }
+        rgbGradientAdapter!!.notifyDataSetChanged()
+
+        for (i in diyGradientList!!.indices) {
+            diyGradientList!![i].select = false
+            DBUtils.updateGradient(diyGradientList!![i])
+        }
+        rgbDiyGradientAdapter!!.notifyDataSetChanged()
+    }
+
+    private fun systemGradientApply(position: Int) {
+        for (i in buildInModeList!!.indices) {
+            buildInModeList!![i].select = i == position
+        }
+
+        rgbGradientAdapter!!.notifyDataSetChanged()
+
+        for (i in diyGradientList!!.indices) {
+            diyGradientList!![i].select = false
+            DBUtils.updateGradient(diyGradientList!![i])
+        }
+        rgbDiyGradientAdapter!!.notifyDataSetChanged()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -1357,35 +1380,42 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private var onItemChildClickListenerDiy = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         clickPostion = position
+        clickDiy = true
         when (view!!.id) {
             R.id.diy_mode_on -> {
                 //应用自定义渐变
-                GlobalScope.launch {
-                    stopGradient()
-                    delay(200)
-                    Commander.applyDiyGradient(dstAddress, diyGradientList!![position].id.toInt(),
-                            diyGradientList!![position].speed, firstLightAddress)
+                if (!Constant.IS_ROUTE_MODE) {
+                    GlobalScope.launch {
+                        stopGradient()
+                        delay(200)
+                        Commander.applyDiyGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(),
+                                diyGradientList!![position].speed, firstLightAddress)
+                    }
+                    diyOpenGradientResult(clickPostion)
+                } else {
+                    routerDiyGradientApply(diyGradientList[clickPostion].id.toInt(), "diyModeApply")
                 }
-
-                diyOpenGradientResult(position)
             }
 
             R.id.diy_mode_off -> {
-                Commander.closeGradient(dstAddress, diyGradientList!![position].id.toInt(), diyGradientList!![position].speed)
-                diyGradientCloseResult(position)
+                if (!Constant.IS_ROUTE_MODE) {
+                    Commander.closeGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(), diyGradientList!![clickPostion].speed)
+                    diyGradientCloseResult(clickPostion)
+                } else
+                    routerGradientStop("stopGradient")
             }
 
             R.id.diy_mode_set -> {
                 val intent = Intent(this, SetDiyColorAct::class.java)
                 intent.putExtra(Constant.IS_CHANGE_COLOR, true)
-                intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![position])
+                intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![clickPostion])
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
                 intent.putExtra(Constant.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
             }
 
             R.id.diy_selected -> {
-                diyGradientList!![position].isSelected = !diyGradientList!![position].isSelected
+                diyGradientList!![clickPostion].isSelected = !diyGradientList!![clickPostion].isSelected
             }
         }
 
@@ -2107,7 +2137,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         } else {
             return super.onKeyDown(keyCode, event)
         }
-
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
@@ -2260,6 +2289,152 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
         }) {
             ToastUtils.showShort(it.message)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerSystemGradientApply(id: Int, speed: Int, serId: String) {
+        /**
+         * id	是	int	自定义渐变id
+         * ser_id	是	string	app会话id，推送时回传
+         * meshAddr	是	int	目标meshAddr
+         * meshType	是	int	mesh地址类型   meshType 彩灯 = 6 组 = 97
+         */
+        val subscribe = RouterModel.routerApplySystemGradient(id, dstAddress, 6, speed, serId)?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.gradient_apply_fail))
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerDiyGradientApply(id: Int, serId: String) {
+        /**
+         * id	是	int	自定义渐变id
+         * ser_id	是	string	app会话id，推送时回传
+         * meshAddr	是	int	目标meshAddr
+         * meshType	是	int	mesh地址类型   meshType 彩灯 = 6 组 = 97
+         */
+        val subscribe = RouterModel.routerApplyDiyGradient(id, dstAddress, 6, serId)?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.gradient_apply_fail))
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerGradientStop(serId: String) {
+        /**
+         * id	是	int	自定义渐变id
+         * ser_id	是	string	app会话id，推送时回传
+         * meshAddr	是	int	目标meshAddr
+         * meshType	是	int	mesh地址类型   meshType 彩灯 = 6 组 = 97
+         */
+        val subscribe = RouterModel.routeStopDynamic(dstAddress, 6, serId)?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.gradient_stop_fail))
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    override fun tzRouterSysGradientApply(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由应用系统渐变通知------------$cmdBean--")
+        if (cmdBean.ser_id == "systemApply") {
+            disposableRouteTimer?.dispose()
+            when (cmdBean.status) {
+                0 -> {
+                    systemGradientApply(clickPostion)
+                    hideLoadingDialog()
+                }
+                else -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.gradient_apply_fail))
+                }
+            }
+        }
+    }
+    override fun tzRouterGradientStop(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由应用渐变通知------------$cmdBean--")
+        if (cmdBean.ser_id == "stopGradient") {
+            disposableRouteTimer?.dispose()
+            when (cmdBean.status) {
+                0 -> {
+                    if (!clickDiy)
+                        systemGradientStop()
+                    else
+                        diyGradientCloseResult(clickPostion)
+                    hideLoadingDialog()
+                }
+                else -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.gradient_stop_fail))
+                }
+            }
+        }
+    }
+
+    override fun tzRouterGradientApply(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由应用渐变通知------------$cmdBean--")
+        if (cmdBean.ser_id == "diyModeApply") {
+            disposableRouteTimer?.dispose()
+            when (cmdBean.status) {
+                0 -> {
+                    diyOpenGradientResult(clickPostion)
+                    hideLoadingDialog()
+                }
+                else -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.gradient_apply_fail))
+                }
+            }
         }
     }
 
@@ -2637,18 +2812,25 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     override fun tzRouterConfigRGB(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl------收到路由调节色盘通知------------$cmdBean")
+
         hideLoadingDialog()
         disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "setRGB") {
             if (cmdBean.status == 0)
                 color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-            else {
-                if (currentShowGroupSetPage)
-                    color_picker.setInitialColor((group!!.color and 0xffffff) or 0xff000000.toInt())
-                else
-                    color_picker.setInitialColor((light!!.color and 0xffffff) or 0xff000000.toInt())
-                ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
+            if (currentShowGroupSetPage) {
+                group?.color = color
+                DBUtils.saveGroup(group!!, false)
+            } else {
+                light?.color = color
+                DBUtils.saveLight(light!!, false)
             }
+        } else {
+            if (currentShowGroupSetPage)
+                color_picker.setInitialColor((group!!.color and 0xffffff) or 0xff000000.toInt())
+            else
+                color_picker.setInitialColor((light!!.color and 0xffffff) or 0xff000000.toInt())
+            ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
         }
     }
 
@@ -2656,7 +2838,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         LogUtils.v("zcl------收到路由配置亮度灯通知------------$cmdBean")
         disposableRouteTimer?.dispose()
         if (cmdBean.status == 0) {
-            if (typeStr == Constant.TYPE_GROUP) {
+            if (currentShowGroupSetPage) {
                 when {
                     isBri -> group?.brightness = sendProgress
                     else -> group?.colorTemperature = sendProgress
@@ -2768,6 +2950,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 }
             }
         }
+    }
+
+    override fun toString(): String {
+        return "RGBSettingActivity(color=$color, sendProgress=$sendProgress, disposableTimer=$disposableTimer, deviceType=$deviceType, addr=$addr, lastTime=$lastTime, fiChangeGp=$fiChangeGp, findItem=$findItem, requestCodeNum=$requestCodeNum, mConnectDeviceDisposable=$mConnectDeviceDisposable, clickPostion=$clickPostion, postionAndNum=$postionAndNum, mApplication=$mApplication, stopTracking=$stopTracking, presetColors=$presetColors, colorSelectDiyRecyclerViewAdapter=$colorSelectDiyRecyclerViewAdapter, group=$group, mConnectTimer=$mConnectTimer, localVersion=$localVersion, light=$light, gpAddress=$gpAddress, fromWhere=$fromWhere, dataManager=$dataManager, mDisposable=$mDisposable, mRxPermission=$mRxPermission, mConnectDevice=$mConnectDevice, POSIONANDNUM='$POSIONANDNUM', currentShowGroupSetPage=$currentShowGroupSetPage, isExitGradient=$isExitGradient, isDiyMode=$isDiyMode, isPresetMode=$isPresetMode, diyPosition=$diyPosition, isDelete=$isDelete, dstAddress=$dstAddress, firstLightAddress=$firstLightAddress, typeStr='$typeStr', speed=$speed, positionState=$positionState, buildInModeList=$buildInModeList, diyGradientList=$diyGradientList, rgbGradientAdapter=$rgbGradientAdapter, rgbDiyGradientAdapter=$rgbDiyGradientAdapter, applyDisposable=$applyDisposable, downTime=$downTime, thisTime=$thisTime, onBtnTouch=$onBtnTouch, tvValue=$tvValue, redColor=$redColor, greenColor=$greenColor, blueColor=$blueColor, mConnectDisposal=$mConnectDisposal, mScanDisposal=$mScanDisposal, mScanTimeoutDisposal=$mScanTimeoutDisposal, mCheckRssiDisposal=$mCheckRssiDisposal, acitivityIsAlive=$acitivityIsAlive, isReset=$isReset, otaPrepareListner=$otaPrepareListner, cbOnClickListener=$cbOnClickListener, handler=$handler, handler_brightness_add=$handler_brightness_add, handler_brightness_less=$handler_brightness_less, handler_less=$handler_less, clickListener=$clickListener, onItemChildClickListener=$onItemChildClickListener, onItemChildClickListenerDiy=$onItemChildClickListenerDiy, onItemChildLongClickListenerDiy=$onItemChildLongClickListenerDiy, menuItemClickListener=$menuItemClickListener, diyOnItemChildClickListener=$diyOnItemChildClickListener, diyOnItemChildLongClickListener=$diyOnItemChildLongClickListener, barChangeListener=$barChangeListener, colorObserver=$colorObserver)"
     }
 
 }
