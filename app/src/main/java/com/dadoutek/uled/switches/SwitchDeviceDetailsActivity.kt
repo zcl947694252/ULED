@@ -240,16 +240,16 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     @SuppressLint("CheckResult")
     private fun goConfig() {
         if (isRightPos()) return
-        if (Constant.IS_ROUTE_MODE) return
         if (currentDevice != null) {
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting_tip))
             if (IS_ROUTE_MODE) {
-                RouterModel.routerConnectSwOrSe(currentDevice?.id ?: 0, 99)?.subscribe({
+                RouterModel.routerConnectSwOrSe(currentDevice?.id ?: 0, 99, "connectSw")?.subscribe({
+                    LogUtils.v("zcl-----------收到路由请求连接成功-------$it")
                     when (it.errorCode) {
                         0 -> {
-                            disposableTimer?.dispose()
-                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                                     .subscribe {
                                         hideLoadingDialog()
                                         ToastUtils.showShort(getString(R.string.connect_fail))
@@ -573,6 +573,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     override fun onDestroy() {
         super.onDestroy()
         downloadDispoable?.dispose()
+        disposableRouteTimer?.dispose()
         mConnectDeviceDisposable?.toString()
         acitivityIsAlive = false
         //移除事件
@@ -622,62 +623,68 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     @SuppressLint("CheckResult")
     override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
-        if (cmdBean.finish) {
-            if (cmdBean.status == 0) {
-                image_bluetooth.setImageResource(R.drawable.icon_cloud)
-                ToastUtils.showShort(getString(R.string.connect_success))
-                RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99,"switchVersion")?.subscribe({
-                    when (it.errorCode) {
-                        NetworkStatusCode.OK -> {
-                            disposableTimer?.dispose()
-                            disposableTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.MILLISECONDS)
-                                    .subscribe {
-                                        hideLoadingDialog()
-                                        ToastUtils.showShort(getString(R.string.get_version_fail))
-                                    }
+        LogUtils.v("zcl-----------收到连接开关通知-------$cmdBean")
+        if (cmdBean.ser_id == "connectSw") {
+            disposableRouteTimer?.dispose()
+            if (cmdBean.finish) {
+                if (cmdBean.status == 0) {
+                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                    ToastUtils.showShort(getString(R.string.connect_success))
+                    RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99, "switchVersion")?.subscribe({
+                        when (it.errorCode) {
+                            NetworkStatusCode.OK -> {
+                                disposableRouteTimer?.dispose()
+                                disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.MILLISECONDS)
+                                        .subscribe {
+                                            hideLoadingDialog()
+                                            //ToastUtils.showShort(getString(R.string.get_version_fail))
+                                        }
+                            }
+                            NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
+                            NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
                         }
-                        NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
-                        NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                    }
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
-            } else {
-                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
-                ToastUtils.showShort(getString(R.string.connect_fail))
+                    }, {
+                        ToastUtils.showShort(it.message)
+                    })
+                } else {
+                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                }
             }
         }
     }
 
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+        LogUtils.v("zcl-----------收到路由获取开关版本号通知-------$routerVersion")
+        if (routerVersion?.ser_id == "switchVersion") {
+            disposableRouteTimer?.dispose()
+            if (routerVersion.finish) {
+                if (routerVersion.status == 0) {
+                    disposableRouteTimer?.dispose()
+                    val deviceInfo = DeviceInfo()
+                    deviceInfo.id = (currentDevice?.id ?: 0).toInt()
+                    deviceInfo.macAddress = currentDevice?.macAddr
+                    deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
+                    deviceInfo.firmwareRevision = currentDevice?.version
+                    deviceInfo.productUUID = currentDevice?.productUUID ?: 0
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                        override fun start() {}
 
-        if (routerVersion?.finish == true) {
-            if (routerVersion?.ser_id=="switchVersion")
-            if (routerVersion.cmd == 0) {
-                disposableRouteTimer?.dispose()
-                val deviceInfo = DeviceInfo()
-                deviceInfo.id = (currentDevice?.id ?: 0).toInt()
-                deviceInfo.macAddress = currentDevice?.macAddr
-                deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
-                deviceInfo.firmwareRevision = currentDevice?.version
-                deviceInfo.productUUID = currentDevice?.productUUID ?: 0
-                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
-                    override fun start() {}
+                        override fun complete() {
+                            val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
+                            if (switchByID?.version == "" || switchByID?.version == null)
+                                ToastUtils.showShort(getString(R.string.get_version_fail))
+                            else
+                                skipeSw(deviceInfo, switchByID?.version ?: "B-01")
+                        }
 
-                    override fun complete() {
-                        val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
-                        if (switchByID?.version == "" || switchByID?.version == null)
+                        override fun error(msg: String?) {
                             ToastUtils.showShort(getString(R.string.get_version_fail))
-                        else
-                            skipeSw(deviceInfo, switchByID?.version ?: "B-01")
-                    }
-
-                    override fun error(msg: String?) {
-                        ToastUtils.showShort(getString(R.string.get_version_fail))
-                    }
-                })
-            } else {
-                ToastUtils.showShort(getString(R.string.get_version_fail))
+                        }
+                    })
+                } else {
+                    ToastUtils.showShort(getString(R.string.get_version_fail))
+                }
             }
         }
     }

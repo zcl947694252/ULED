@@ -252,9 +252,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun setAdapters() {
-        recyclerView_select_group_list_view.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerView_select_group_list_view.adapter = nightLightEditGroupAdapter
-        nightLightEditGroupAdapter.bindToRecyclerView(recyclerView_select_group_list_view)
+        scene_gp_bottom_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        scene_gp_bottom_list.adapter = nightLightEditGroupAdapter
+        nightLightEditGroupAdapter.bindToRecyclerView(scene_gp_bottom_list)
 
         nightLightEditGroupAdapter.setOnItemClickListener { adapter, view, position ->
             val item = showCheckListData[position]
@@ -423,7 +423,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         toolbar.setNavigationOnClickListener {
             if (isFinish) {
                 sensor_three.visibility = View.VISIBLE
-                recyclerView_select_group_list_view.visibility = View.GONE
+                scene_gp_bottom_list.visibility = View.GONE
                 toolbarTv.text = getString(R.string.sensor)
                 tv_function1.visibility = View.GONE
                 isFinish = false
@@ -834,7 +834,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
                 tv_function1.visibility = View.VISIBLE
                 sensor_three.visibility = View.GONE
-                recyclerView_select_group_list_view.visibility = View.VISIBLE
+                scene_gp_bottom_list.visibility = View.VISIBLE
 
                 showCheckListData.let {
                     if (showGroupList!!.size != 0) {
@@ -1235,7 +1235,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         isFinish = false
         toolbarTv.text = getString(R.string.sensor)
         sensor_three.visibility = View.VISIBLE
-        recyclerView_select_group_list_view.visibility = View.GONE
+        scene_gp_bottom_list.visibility = View.GONE
         tv_function1.visibility = View.GONE
 
         recyclerGroup.layoutManager = GridLayoutManager(this, 3)

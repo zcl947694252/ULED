@@ -1,5 +1,6 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
@@ -25,8 +26,10 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.recordingChange
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSwitch
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -41,6 +44,7 @@ import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
 import com.telink.util.Event
 import com.telink.util.EventListener
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +52,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
+import java.util.concurrent.TimeUnit
 
 
 private const val CONNECT_TIMEOUT = 5
@@ -154,9 +159,12 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-                DBUtils.updateSwicth(switchDate!!)
-                toolbarTv.text = switchDate?.name
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+                if (!Constant.IS_ROUTE_MODE)
+                    renameSw(trim)
+                else
+                    routerRenameSw(switchDate!!, trim)
+
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
             }
@@ -177,6 +185,16 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                 DBUtils.updateSwicth(switchDate!!)
             showConfigSuccessDialog()
         }
+    }
+
+    private fun renameSw(trim: String) {
+        switchDate?.name = trim
+        DBUtils.updateSwicth(switchDate!!)
+        toolbarTv.text = switchDate?.name
+    }
+
+    override fun routerRenameSwSuccess(trim: String) {
+        renameSw(trim)
     }
 
     private fun showCancelDialog() {
@@ -263,34 +281,11 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                     ToastUtils.showShort(getString(R.string.please_select_group))
                     return@setOnClickListener
                 }
-                //if (mAdapter.selectedPos != -1) {
-                    sw_progressBar.visibility = View.VISIBLE
-                    setGroupForSwitch()
-                    Thread.sleep(300)
-                    newMeshAddr =  if (isReConfig)mDeviceInfo.meshAddress else MeshAddressGenerator().meshAddress.get()
-                LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
-                    Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
-                        mDeviceInfo.meshAddress = newMeshAddr
-                        mIsConfiguring = true
-                        updateSwitch()
-                        ToastUtils.showShort(getString(R.string.config_success))
-                        if (switchDate == null)
-                            switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
-                        if (!isReConfig)
-                            showRenameDialog(switchDate)
-                        else
-                            finish()
-                    },
-                            failedCallback = {
-                                mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
-                                GlobalScope.launch(Dispatchers.Main) {
-                                    sw_progressBar.visibility = View.GONE
-                                    mIsConfiguring = false
-                                }
-                            })
-               /* } else {
-                    snackbar(view, getString(R.string.please_select_group))
-                }*/
+                if (!Constant.IS_ROUTE_MODE)
+                configSw()
+                    else
+                    routerConfigSw()
+
             }
         }
 
@@ -314,6 +309,80 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
               }
           }*/
 
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerConfigSw() {
+        RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr,"configNormalSw")
+                ?.subscribe({
+                    //    "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                    //    "errorCode": 90007,"该组不存在，刷新组列表"   "errorCode": 90005,"以下路由没有上线，无法配置"
+                    when (it.errorCode) {
+                        0 -> {
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                    .subscribe {
+                                        sw_progressBar.visibility = View.GONE
+                                        ToastUtils.showShort(getString(R.string.config_fail))
+                                    }
+                        }
+                        90021 -> {
+                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                            finish()
+                        }
+                        900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+                }, { ToastUtils.showShort(it.message) })
+    }
+
+    override fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由配置普通开关通知-------$cmdBean")
+        if (cmdBean.ser_id=="configNormalSw"){
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status==0){
+                GlobalScope.launch(Dispatchers.Main) {
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    if (!isReConfig)
+                        showRenameDialog(switchDate)
+                    else
+                        finish()
+                }
+            }else{
+                ToastUtils.showShort(getString(R.string.config_fail))
+            }
+        }
+    }
+
+    private fun configSw() {
+        sw_progressBar.visibility = View.VISIBLE
+        setGroupForSwitch()
+        Thread.sleep(300)
+        newMeshAddr = if (isReConfig) mDeviceInfo.meshAddress else MeshAddressGenerator().meshAddress.get()
+        LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
+        Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
+            mDeviceInfo.meshAddress = newMeshAddr
+            mIsConfiguring = true
+            sw_progressBar.visibility = View.GONE
+            updateSwitch()
+            ToastUtils.showShort(getString(R.string.config_success))
+            if (switchDate == null)
+                switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
+            if (!isReConfig)
+                showRenameDialog(switchDate)
+            else
+                finish()
+        },
+                failedCallback = {
+                    mConfigFailSnackbar = snackbar(configGroupRoot, getString(R.string.group_failed))
+                    GlobalScope.launch(Dispatchers.Main) {
+                        sw_progressBar.visibility = View.GONE
+                        mIsConfiguring = false
+                    }
+                })
     }
 
     override fun initData() {

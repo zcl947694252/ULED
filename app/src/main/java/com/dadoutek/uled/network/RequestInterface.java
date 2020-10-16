@@ -13,6 +13,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup;
 import com.dadoutek.uled.model.dbModel.DbLight;
 import com.dadoutek.uled.model.dbModel.DbRegion;
 import com.dadoutek.uled.model.dbModel.DbScene;
+import com.dadoutek.uled.model.dbModel.DbSceneActions;
 import com.dadoutek.uled.model.dbModel.DbSensor;
 import com.dadoutek.uled.model.dbModel.DbSensorChild;
 import com.dadoutek.uled.model.dbModel.DbSwitch;
@@ -38,6 +39,7 @@ import com.dadoutek.uled.router.bean.RouteScanResultBean;
 import com.dadoutek.uled.router.bean.RouterBatchGpBean;
 import com.dadoutek.uled.router.bean.RouterVersionsBean;
 import com.dadoutek.uled.router.bean.ScanDataBean;
+import com.dadoutek.uled.switches.RouterListBody;
 import com.dadoutek.uled.switches.bean.KeyBean;
 
 import java.util.List;
@@ -229,9 +231,9 @@ public interface RequestInterface {
      * "color":1,"index":1, "deviceType":4,"status":1, "slowUpSlowDownStatus": 0,
      * "slowUpSlowDownSpeed": 1 } ]}
      */
-    @FormUrlEncoded
+    //@FormUrlEncoded
     @POST("group/add-batch")
-    Observable<Response> batchUpGroupList(@Field("groups") List<DbGroup> listGp);
+    Observable<Response> batchUpGroupList(@Body GroupListBodyBean  bean/*@Field("groups") List<DbGroup> listGp*/);
 
     //获取组列表
     @GET("group/list")
@@ -1025,8 +1027,9 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @PUT("router/update-scene")
-    Observable<Response<RouterTimeoutBean>> routerUpdateScene(@Field("sid") Long sceneId, @Field(
-            "actions") List actions, @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routerUpdateScene(@Field("sid") Long sceneId,
+                                                              @Field("actions")List<DbSceneActions> actions,
+                                                              @Field("ser_id") String ser_id);
 
     /**
      * 通过路由删除组
@@ -1195,7 +1198,7 @@ public interface RequestInterface {
     /**
      * 直连开关&传感器 https://dev.dadoutek.com/xxxx/router/device-connect POST
      * ser_id	是	string	app会话id，推送时回传
-     * id	是	int	开关or传感器id
+     * id	是	int 	开关or传感器id
      * meshType	是	int	设备类型
      * meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
      */
@@ -1222,10 +1225,9 @@ public interface RequestInterface {
      * groupMeshAddrs	是	list<int>	配置双组的meshAddr
      * groupMeshAddrs 长度必须是2未配置填0
      */
-    @FormUrlEncoded
     @POST("router/double-group-switch/configure")
-    Observable<Response<RouterTimeoutBean>> configDoubleSw(@Field("id") int id, @Field(
-            "groupMeshAddrs") List<Integer> groupMeshAddrs, @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> configDoubleSw(@Body RouterListBody body/*@Field("id") int id, @Field(
+            "groupMeshAddrs") List<Integer> groupMeshAddrs, @Field("ser_id") String ser_id*/);
 
     /**
      * 场景开关配置。触摸&太阳能的场景开关 https://dev.dadoutek.com/xxxx/router/scene-switch/configure  POST
@@ -1547,5 +1549,6 @@ public interface RequestInterface {
     @POST("router/control/scene/apply")
     Observable<Response<RouterTimeoutBean>> routeApplyScene(@Field("id") long id,
                                                             @Field("ser_id") String ser_id);
+
 
 }

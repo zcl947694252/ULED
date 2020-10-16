@@ -23,6 +23,7 @@ import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
@@ -166,36 +167,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             if (Constant.IS_ROUTE_MODE) {
                 val sceneMeshAddrs = mutableListOf<Int>()
                 mapConfig.forEach { sceneMeshAddrs.add(it.value.id.toInt()) }
-                RouterModel.configSceneSw(switchDate!!.id, sceneMeshAddrs)
-                        ?.subscribe({
-                            //    "errorCode": 90021, "该开关不存在，请重新刷新数据"
-                            //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
-                            //    "errorCode": 90007,"该组不存在，刷新组列表"
-                            //    "errorCode": 90005,"以下路由没有上线，无法配置"
-                            //   "errorCode":90011 , "有场景不存在，刷新场景列表"
-
-
-                            when (it.errorCode) {
-                                0 -> {
-                                    pb_ly.visibility = View.VISIBLE
-                                    disposableTimer?.dispose()
-                                    disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                                            .subscribe {
-                                                sw_progressBar.visibility = View.GONE
-                                                ToastUtils.showShort(getString(R.string.config_fail))
-                                            }
-                                }
-                                90021 -> {
-                                    ToastUtils.showShort(getString(R.string.device_not_exit))
-                                    finish()
-                                }
-                                900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                                90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
-                                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                            }
-                        }, { ToastUtils.showShort(it.message) })
+                routerConfigScene(sceneMeshAddrs)
             } else {
                 pb_ly.visibility = View.VISIBLE
                 GlobalScope.launch {
@@ -234,6 +206,54 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 }
             }
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerConfigScene(sceneMeshAddrs: MutableList<Int>) {
+        RouterModel.configSceneSw(switchDate!!.id, sceneMeshAddrs, "configSceneSw")
+                ?.subscribe({
+                    // "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                    // "errorCode": 90007,"该组不存在，刷新组列表"    "errorCode": 90005,"以下路由没有上线，无法配置"   "errorCode":90011 , "有场景不存在，刷新场景列表"
+                    when (it.errorCode) {
+                        0 -> {
+                            pb_ly.visibility = View.VISIBLE
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                    .subscribe {
+                                        sw_progressBar.visibility = View.GONE
+                                        ToastUtils.showShort(getString(R.string.config_fail))
+                                    }
+                        }
+                        90021 -> {
+                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                            finish()
+                        }
+                        900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                        90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+                }, { ToastUtils.showShort(it.message) })
+    }
+
+    override fun tzRouterConfigSceneSwRecevice(cmdBean: CmdBodyBean) {
+              LogUtils.v("zcl-----------收到路由配置场景开关通知-------$cmdBean")
+                      if (cmdBean.ser_id=="configSceneSw"){
+                          disposableRouteTimer?.dispose()
+                          hideLoadingDialog()
+                          if (cmdBean.status==0){
+                              GlobalScope.launch(Dispatchers.Main) {
+                                  ToastUtils.showShort(getString(R.string.config_success))
+                                  if (!isReConfig)
+                                      showRenameDialog(switchDate)
+                                  else
+                                      finish()
+                              }
+                          }else{
+                              ToastUtils.showShort(getString(R.string.config_fail))
+                          }
+                      }
     }
 
     private fun updateMesh() {

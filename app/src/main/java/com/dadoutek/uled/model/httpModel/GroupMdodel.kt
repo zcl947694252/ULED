@@ -3,6 +3,7 @@ package com.dadoutek.uled.model.httpModel
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.network.GroupListBodyBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
@@ -23,8 +24,8 @@ object GroupMdodel {
     }
     fun batchAddOrUpdateGp(list: List<DbGroup>): Observable<Response<Any>>? {
         return NetworkFactory.getApi()
-                .batchUpGroupList(list)
-                .observeOn(Schedulers.io())
+                .batchUpGroupList(GroupListBodyBean(list))
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 

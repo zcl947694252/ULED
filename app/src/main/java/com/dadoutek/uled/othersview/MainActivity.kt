@@ -101,7 +101,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var bestRSSIDevice: DeviceInfo? = null
 
-    private lateinit var serviceConnection: MyServiceConnection
     private val REQUEST_ENABLE_BT: Int = 1200
     private var mBluetoothAdapter: BluetoothAdapter? = null
     private var mApp: TelinkLightApplication? = null
@@ -147,10 +146,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
         //MqttManger.initMqtt()
-        serviceConnection = MyServiceConnection()
-        serviceConnection?.setIGetMessageCallBack(this)
-        val intent = Intent(this, MqttService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService()
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
@@ -732,9 +728,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mConnectDisposable?.dispose()
         AllenVersionChecker.getInstance().cancelAllMission(this)
         //解绑服务
-        serviceConnection?.let {
-            unbindService(it)
-        }
+       unbindSe()
     }
 
     private fun onServiceConnected(event: ServiceEvent) {}

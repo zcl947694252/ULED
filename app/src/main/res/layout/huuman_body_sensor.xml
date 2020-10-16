@@ -591,7 +591,7 @@
 
 
         <android.support.v7.widget.RecyclerView
-                android:id="@+id/recyclerView_select_group_list_view"
+                android:id="@+id/scene_gp_bottom_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone"

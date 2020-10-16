@@ -13,13 +13,20 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.SeekBar
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.InputRGBColorDialog
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.activity_select_color_gradient.*
 import kotlinx.android.synthetic.main.activity_select_color_gradient.color_b
 import kotlinx.android.synthetic.main.activity_select_color_gradient.color_g
@@ -38,8 +45,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import top.defaults.colorpicker.ColorObserver
+import java.util.concurrent.TimeUnit
 
 class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
+    private var colorNow: Int = 0
+    private var sendProgress: Int = 0
     private var colorNode: DbColorNode? = null
     private var stopTracking = false
 
@@ -98,11 +108,11 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         rgb_sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         rgb_white_seekbar.setOnSeekBarChangeListener(barChangeListener)
 
-        if (Constant.IS_OPEN_AUXFUN){
+        if (Constant.IS_OPEN_AUXFUN) {
             ll_r_r.visibility = View.VISIBLE
             ll_g_g.visibility = View.VISIBLE
             ll_b_b.visibility = View.VISIBLE
-        }else{
+        } else {
             ll_r_r.visibility = View.GONE
             ll_g_g.visibility = View.GONE
             ll_b_b.visibility = View.GONE
@@ -287,7 +297,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                 }
 
                 delay(80)
-                changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
+                changeColor(red.toByte(), green.toByte(), blue.toByte(), color, true)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
@@ -314,12 +324,13 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         val b = Color.blue(color)
         val w = rgb_white_seekbar.progress
 
-        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
-        Log.d("", "onColorSelected: " + Integer.toHexString(color))
+        colorNow = (w shl 24) or (r shl 16) or (g shl 8) or b
+        Log.d("", "onColorSelected: " + Integer.toHexString(colorNow))
         if (fromUser) {
-            if (r == 0 && g == 0 && b == 0) {
-            } else {
-                changeColor(r.toByte(), g.toByte(), b.toByte(), false)
+            when {
+                r == 0 && g == 0 && b == 0 -> {
+                }
+                else -> changeColor(r.toByte(), g.toByte(), b.toByte(), colorNow, false)
             }
         }
 
@@ -327,31 +338,60 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         color_g?.text = g.toString()
         color_b?.text = b.toString()
 
-        colorNode!!.rgbw = color
+        colorNode!!.rgbw = colorNow
     }
 
-    private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
-        GlobalScope.launch {
-            var red = R
-            var green = G
-            var blue = B
+    private fun changeColor(R: Byte, G: Byte, B: Byte, color: Int, isOnceSet: Boolean) {
+        if (Constant.IS_ROUTE_MODE)//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
+            routerConfigRGBNum(colorNode!!.dstAddress, 6, color)
+        else
+            GlobalScope.launch {
+                var red = R
+                var green = G
+                var blue = B
 
-            val opcode = Opcode.SET_TEMPERATURE
+                val opcode = Opcode.SET_TEMPERATURE
 
-            val params = byteArrayOf(0x04, red, green, blue)
+                val params = byteArrayOf(0x04, red, green, blue)
 
-            val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-            Log.d("RGBCOLOR", logStr)
+                val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
+                Log.d("RGBCOLOR", logStr)
 
-            if (isOnceSet) {
-                for (i in 0..3) {
-                    delay(50)
+                if (isOnceSet) {
+                    for (i in 0..3) {
+                        delay(50)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
+                    }
+                } else {
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
                 }
-            } else {
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, colorNode!!.dstAddress, params)
             }
-        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerConfigRGBNum(meshAddr: Int, deviceType: Int, color: Int) {
+        RouterModel.routeConfigRGBNum(meshAddr, deviceType, color, "setDiyRGB")?.subscribe({
+            LogUtils.v("zcl-----------收到路由调节色盘成功-------")
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
@@ -391,69 +431,187 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         }
 
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
-
             var addr = colorNode!!.dstAddress
+            sendProgress = progress
+            when (view) {
+                rgb_sbBrightness -> {
+                    when {
+                        progress >= 100 -> {
+                            sbBrightness_add.isEnabled = false
+                            sbBrightness_less.isEnabled = true
+                        }
+                        progress <= 0 -> {
+                            sbBrightness_less.isEnabled = false
+                            sbBrightness_add.isEnabled = true
+                        }
+                        else -> {
+                            sbBrightness_less.isEnabled = true
+                            sbBrightness_add.isEnabled = true
+                        }
+                    }
+                    if (!Constant.IS_ROUTE_MODE)
+                        sendBri(progress, addr, immediate)
+                    else
+                        routerConfigBriOrWhite(true)
 
-            val opcode: Byte
-            val params: ByteArray
-
-            if (view == rgb_sbBrightness) {
-                opcode = Opcode.SET_LUM
-                params = byteArrayOf(progress.toByte())
-
-                if (progress >= 100) {
-                    sbBrightness_add.isEnabled = false
-                    sbBrightness_less.isEnabled = true
-                } else if (progress <= 0) {
-                    sbBrightness_less.isEnabled = false
-                    sbBrightness_add.isEnabled = true
-                } else {
-                    sbBrightness_less.isEnabled = true
-                    sbBrightness_add.isEnabled = true
                 }
+                rgb_white_seekbar -> {
 
-                colorNode!!.brightness = progress
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
-            } else if (view == rgb_white_seekbar) {
-                opcode = Opcode.SET_W_LUM
-                params = byteArrayOf(progress.toByte())
-                var color = colorNode!!.rgbw
-
-                if (progress >= 100) {
-                    sb_w_bright_add.isEnabled = false
-                    sb_w_bright_less.isEnabled = true
-                } else if (progress <= 0) {
-                    sb_w_bright_less.isEnabled = false
-                    sb_w_bright_add.isEnabled = true
-                } else {
-                    sb_w_bright_add.isEnabled = true
-                    sb_w_bright_less.isEnabled = true
+                    when {
+                        progress >= 100 -> {
+                            sb_w_bright_add.isEnabled = false
+                            sb_w_bright_less.isEnabled = true
+                        }
+                        progress <= 0 -> {
+                            sb_w_bright_less.isEnabled = false
+                            sb_w_bright_add.isEnabled = true
+                        }
+                        else -> {
+                            sb_w_bright_add.isEnabled = true
+                            sb_w_bright_less.isEnabled = true
+                        }
+                    }
+                    if (!Constant.IS_ROUTE_MODE)
+                        sendWhiteCommend(progress, addr, immediate)
+                    else
+                        routerConfigBriOrWhite(false)
                 }
-
-                val red = (color!! and 0xff0000) shr 16
-                val green = (color and 0x00ff00) shr 8
-                val blue = color and 0x0000ff
-                val w = progress
-
-                colorNode?.rgbw = (w shl 24) or (red shl 16) or (green shl 8) or blue
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
             }
         }
     }
 
+    private fun sendWhiteCommend(progress: Int, addr: Int, immediate: Boolean) {
+        var opcode = Opcode.SET_W_LUM
+        var params = byteArrayOf(progress.toByte())
+        afterSendWhite()
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+    }
+
+    private fun afterSendWhite() {
+        var color = colorNode!!.rgbw
+
+        val red = (color!! and 0xff0000) shr 16
+        val green = (color and 0x00ff00) shr 8
+        val blue = color and 0x0000ff
+        val w = sendProgress
+
+        colorNode?.rgbw = (w shl 24) or (red shl 16) or (green shl 8) or blue
+    }
+
+    private fun sendBri(progress: Int, addr: Int, immediate: Boolean) {
+        val opcode: Byte = Opcode.SET_LUM
+        val params: ByteArray = byteArrayOf(progress.toByte())
+        colorNode!!.brightness = progress
+        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
+    }
+
+    private fun routerConfigBriOrWhite(isBrightness: Boolean) = when {
+        isBrightness -> {//亮度
+            routeConfigBriGpOrLight(colorNode!!.dstAddress, 6, rgb_sbBrightness.progress, "diyBri")
+        }
+        else -> {
+            routeConfigWhiteGpOrLight(colorNode!!.dstAddress, 6, rgb_white_seekbar.progress, "diywhite")
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int, serId: String) {
+        LogUtils.v("zcl----------- zcl-----------发送路由调白色参数-------$white-------")
+        var gpColor = colorNode!!.rgbw
+
+        val red = (gpColor and 0xff0000) shr 16
+        val green = (gpColor and 0x00ff00) shr 8
+        val blue = gpColor and 0x0000ff
+        var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
+        //var ws = (color and 0xff000000.toInt()) shr 24//白色
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, serId)?.subscribe({
+            //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.config_white_fail))
+                            }
+                }
+                90018 -> {
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+                }
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+            }
+        }) {
+            ToastUtils.showShort(it.message)
+        }
+    }
+
+    override fun tzRouterConfigRGB(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由调节色盘通知------------$cmdBean")
+        hideLoadingDialog()
+        if (cmdBean.ser_id == "setDiyRGB") {
+            disposableRouteTimer?.dispose()
+            if (cmdBean.status == 0) {
+                color_picker.setInitialColor((colorNow and 0xffffff) or 0xff000000.toInt())
+                colorNode?.rgbw = colorNow
+            } else {
+                color_picker.setInitialColor((colorNode!!.rgbw and 0xffffff) or 0xff000000.toInt())
+            }
+        }
+    }
+
+    override fun tzRouterConfigWhite(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由配置白光灯通知------------$cmdBean----$sendProgress")
+        disposableRouteTimer?.dispose()
+        when (cmdBean.status) {
+            0 -> {
+                afterSendWhite()
+                hideLoadingDialog()
+            }
+            else -> {
+                hideLoadingDialog()
+                var ws = (colorNode!!.rgbw and 0xff000000.toInt()) shr 24
+                rgb_white_seekbar.progress = ws
+                ToastUtils.showShort(getString(R.string.config_white_fail))
+            }
+        }
+    }
+
+    override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {
+        LogUtils.v("zcl------收到路由配置白光灯通知------------$cmdBean------$sendProgress")
+        disposableRouteTimer?.dispose()
+        when (cmdBean.status) {
+            0 -> {
+                colorNode!!.brightness = sendProgress
+                hideLoadingDialog()
+            }
+            else -> {
+                hideLoadingDialog()
+                rgb_sbBrightness.progress = colorNode!!.brightness
+                //sb_w_bright_num.text="$ws%"
+                ToastUtils.showShort(getString(R.string.config_white_fail))
+            }
+        }
+    }
+
+
     private fun lessBrightness(event: MotionEvent?) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
-                            val msg = handler_brightness_less.obtainMessage()
+                            val msg = handlerBrightnessLess.obtainMessage()
                             msg.arg1 = tvValue
-                            handler_brightness_less.sendMessage(msg)
+                            handlerBrightnessLess.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
                                 delay(100)
@@ -463,34 +621,37 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
                         }
                     }
-            }
+                }
 
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handler_brightness_less.obtainMessage()
-                msg.arg1 = tvValue
-                handler_brightness_less.sendMessage(msg)
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (thisTime - downTime < 500) {
+                    tvValue++
+                    val msg = handlerBrightnessLess.obtainMessage()
+                    msg.arg1 = tvValue
+                    handlerBrightnessLess.sendMessage(msg)
+                }
+            }
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
+            }
         }
     }
 
     private fun addBrightness(event: MotionEvent?) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
-                            val msg = handler_brightness_add.obtainMessage()
+                            val msg = handlerBrightnessAdd.obtainMessage()
                             msg.arg1 = tvValue
-                            handler_brightness_add.sendMessage(msg)
+                            handlerBrightnessAdd.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
                                 delay(100)
@@ -500,64 +661,68 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
                         }
                     }
-            }
+                }
 
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handler_brightness_add.obtainMessage()
-                msg.arg1 = tvValue
-                handler_brightness_add.sendMessage(msg)
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (thisTime - downTime < 500) {
+                    tvValue++
+                    val msg = handlerBrightnessAdd.obtainMessage()
+                    msg.arg1 = tvValue
+                    handlerBrightnessAdd.sendMessage(msg)
+                }
+            }
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
+            }
         }
     }
 
     private fun lessWhiteBright(event: MotionEvent?) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
-                            val msg = handler_less.obtainMessage()
+                            val msg = handlerLess.obtainMessage()
                             msg.arg1 = tvValue
-                            handler_less.sendMessage(msg)
+                            handlerLess.sendMessage(msg)
                             Log.e("TAG_TOUCH", tvValue++.toString())
                             try {
                                 delay(100)
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
-
                         }
                     }
+                }
             }
-
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handler_less.obtainMessage()
-                msg.arg1 = tvValue
-                handler_less.sendMessage(msg)
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (thisTime - downTime < 500) {
+                    tvValue++
+                    val msg = handlerLess.obtainMessage()
+                    msg.arg1 = tvValue
+                    handlerLess.sendMessage(msg)
+                }
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
+            }
         }
     }
 
     private fun addWhiteBright(event: MotionEvent?) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            //                    tvValue = Integer.parseInt(textView.getText().toString());
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
@@ -571,20 +736,22 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                             } catch (e: InterruptedException) {
                                 e.printStackTrace()
                             }
-
                         }
                     }
+                }
             }
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = handler.obtainMessage()
-                msg.arg1 = tvValue
-                handler.sendMessage(msg)
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (thisTime - downTime < 500) {
+                    tvValue++
+                    val msg = handler.obtainMessage()
+                    msg.arg1 = tvValue
+                    handler.sendMessage(msg)
+                }
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
+            }
         }
     }
 
@@ -614,7 +781,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("HandlerLeak")
-    private val handler_brightness_add = object : Handler() {
+    private val handlerBrightnessAdd = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             rgb_sbBrightness.progress++
@@ -639,7 +806,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("HandlerLeak")
-    private val handler_brightness_less = object : Handler() {
+    private val handlerBrightnessLess = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             rgb_sbBrightness.progress--
@@ -664,7 +831,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("HandlerLeak")
-    private val handler_less = object : Handler() {
+    private val handlerLess = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             rgb_white_seekbar.progress--

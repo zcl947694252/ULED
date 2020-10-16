@@ -341,29 +341,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
         if (IS_ROUTE_MODE)
             currentDevice?.let {
-                RouterModel.routerConnectSwOrSe(it.id, currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
-                        ?.subscribe({ response ->
-                            when (response.errorCode) {
-                                0 -> {
-                                    disposableTimer?.dispose()
-                                    disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                                            .subscribe {
-                                                showLoadingDialog(getString(R.string.please_wait))
-                                                hideLoadingDialog()
-                                                ToastUtils.showShort(getString(R.string.connect_fail))
-                                            }
-                                }
-                                90018 -> {
-                                    ToastUtils.showShort(getString(R.string.device_not_exit))
-                                    finish()
-                                }
-                                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                            }
-
-                        }, { it1 ->
-                            ToastUtils.showShort(it1.message)
-                        })
+                routerConnectSensor(it)
             }
         else {
             showLoadingDialog(getString(R.string.please_wait))
@@ -375,6 +353,33 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             })
         }
     }
+
+    private fun routerConnectSensor(it: DbSensor): Disposable? {
+        return RouterModel.routerConnectSwOrSe(it.id, currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT, "connectSensor")
+                ?.subscribe({ response ->
+                    when (response.errorCode) {
+                        0 -> {
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                    .subscribe {
+                                        showLoadingDialog(getString(R.string.please_wait))
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.connect_fail))
+                                    }
+                        }
+                        90018 -> {
+                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                            finish()
+                        }
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+
+                }, { it1 ->
+                    ToastUtils.showShort(it1.message)
+                })
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("CheckResult")
@@ -858,12 +863,12 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id=="connectSensor")
         if (cmdBean.finish) {
             if (cmdBean.status == 0) {
                 ToastUtils.showShort(getString(R.string.connect_success))
                 image_bluetooth.setImageResource(R.drawable.icon_cloud)
                 getRouterVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
-
             } else {
                 image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                 ToastUtils.showShort(getString(R.string.connect_fail))

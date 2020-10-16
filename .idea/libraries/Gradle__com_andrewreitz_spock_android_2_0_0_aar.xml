@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.andrewreitz:spock-android:2.0.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7111a96975a06bb9c58a19fffdfb1a8c/spock-android-2.0.0/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7111a96975a06bb9c58a19fffdfb1a8c/spock-android-2.0.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/48e0b4fc445cea887f666e207d38b77f/spock-android-2.0.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/48e0b4fc445cea887f666e207d38b77f/spock-android-2.0.0/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.andrewreitz/spock-android/2.0.0/419791a3b2b0e7d646911f4434395cc94fea2a6a/spock-android-2.0.0-javadoc.jar!/" />

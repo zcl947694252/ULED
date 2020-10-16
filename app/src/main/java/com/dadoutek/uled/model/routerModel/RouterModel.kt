@@ -10,6 +10,7 @@ import com.dadoutek.uled.router.DelGradientBodyBean
 import com.dadoutek.uled.router.GroupBlinkBodyBean
 import com.dadoutek.uled.router.SceneAddBodyBean
 import com.dadoutek.uled.router.bean.*
+import com.dadoutek.uled.switches.RouterListBody
 import com.dadoutek.uled.switches.bean.KeyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -161,9 +162,8 @@ object RouterModel {
     /**
      * 路由删除群组
      */
-    fun routerDelGp(body: RouterDelGpBody): Observable<RouterTimeoutBean>? {
+    fun routerDelGp(body: RouterDelGpBody): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routerDeleteGroup(body)
-                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -278,10 +278,10 @@ object RouterModel {
     }
 
     /**
-     * 直连开关或传感器
+     * 直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
      */
-    fun routerConnectSwOrSe(id: Long, meshType: Int): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerConnectSwOrSensor(id.toInt(), meshType, "connectSwOrse")
+    fun routerConnectSwOrSe(id: Long, meshType: Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerConnectSwOrSensor(id.toInt(), meshType, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -289,8 +289,8 @@ object RouterModel {
     /**
      * 配置普通开关
      */
-    fun configNormalSw(id: Long, groupMeshAddr: Int): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configNormalSw(id.toInt(), groupMeshAddr, "configNormalSw")
+    fun configNormalSw(id: Long, groupMeshAddr: Int,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configNormalSw(id.toInt(), groupMeshAddr,ser_id )
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -299,8 +299,8 @@ object RouterModel {
     /**
      * 配置双组开关
      */
-    fun configDoubleSw(id: Long, groupMeshAddrs: List<Int>): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configDoubleSw(id.toInt(), groupMeshAddrs, "configDoubleSw")
+    fun configDoubleSw(body: RouterListBody): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configDoubleSw(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -308,8 +308,8 @@ object RouterModel {
     /**
      * 配置场景开关
      */
-    fun configSceneSw(id: Long, groupMeshAddrs: List<Int>): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configSceneSw(id.toInt(), groupMeshAddrs, "configSceneSw")
+    fun configSceneSw(id: Long, groupMeshAddrs: List<Int>,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configSceneSw(id.toInt(), groupMeshAddrs, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -317,8 +317,8 @@ object RouterModel {
     /**
      * 配置场景开关
      */
-    fun configEightSw(id: Long, keys: List<KeyBean>): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configEightSw(id.toInt(), keys, "configEightSw")
+    fun configEightSw(id: Long, keys: List<KeyBean>,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configEightSw(id.toInt(), keys, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -519,6 +519,13 @@ object RouterModel {
 
     fun routeApplyScene(id: Long, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routeApplyScene(id, ser_id)
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun routeUpdateSw(id: Long, name: String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routeUpdateSwitch(id, name)
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

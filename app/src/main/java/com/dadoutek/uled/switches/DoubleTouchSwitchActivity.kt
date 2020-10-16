@@ -1,5 +1,6 @@
 package com.dadoutek.uled.switches
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Paint
@@ -24,9 +25,11 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -239,20 +242,20 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 if (leftGroup == null && rightGroup == null) {
                     ToastUtils.showShort(getString(R.string.config_night_light_select_group))
                 } else {
-                    showLoadingDialog(getString(R.string.please_wait))
                     if (Constant.IS_ROUTE_MODE) {
-                        RouterModel.configDoubleSw(switchDate!!.id, mutableListOf(leftGroup?.meshAddr?:0,leftGroup?.meshAddr?:0))
+                        RouterModel.configDoubleSw(RouterListBody(switchDate!!.id, mutableListOf(leftGroup?.meshAddr ?: 0, rightGroup?.meshAddr
+                                ?: 0), "configDoubleSw"))
                                 ?.subscribe({
-                                    //    "errorCode": 90021, "该开关不存在，请重新刷新数据"
-                                    //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
-                                    //    "errorCode": 90007,"该组不存在，刷新组列表"
-                                    //    "errorCode": 90005,"以下路由没有上线，无法配置"
+                                    //    "errorCode": 90021, "该开关不存在，请重新刷新数据"  "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                                    //    "errorCode": 90007,"该组不存在，刷新组列表"   "errorCode": 90005,"以下路由没有上线，无法配置"
+                                    LogUtils.v("zcl-----------收到路由配置请求成功-------$it")
                                     when (it.errorCode) {
                                         0 -> {
+                                            showLoadingDialog(getString(R.string.please_wait))
                                             disposableTimer?.dispose()
-                                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                            disposableTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                                                     .subscribe {
-                                                        sw_progressBar.visibility = View.GONE
+                                                        hideLoadingDialog()
                                                         ToastUtils.showShort(getString(R.string.config_fail))
                                                     }
                                         }
@@ -266,12 +269,14 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                         90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                                     }
                                 }, { ToastUtils.showShort(it.message) })
-                    } else
+                    } else{
+                        showLoadingDialog(getString(R.string.please_wait))
                         GlobalScope.launch {
                             setGroupForSwitch()
                             delay(800)
                             upSwitchData()
                         }
+                    }
                 }
             }
             R.id.switch_double_touch_left -> {
@@ -346,15 +351,19 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     }
 
+    @SuppressLint("CheckResult")
     private fun makePop() {
         renameConfirm?.setOnClickListener {
             // 获取输入框的内容
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-                DBUtils.updateSwicth(switchDate!!)
-                toolbarTv.text = switchDate?.name
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+                if (!Constant.IS_ROUTE_MODE) {
+                    renameSw(trim)
+                } else {
+                    routerRenameSw(switchDate!!, trim)
+                }
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
             }
@@ -369,8 +378,52 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         }
     }
 
+    override fun routerRenameSwSuccess(trim: String) {
+        renameSw(trim = trim)
+    }
+
+    private fun renameSw(trim: String) {
+        switchDate?.name = trim
+        DBUtils.updateSwicth(switchDate!!)
+        toolbarTv.text = switchDate?.name
+    }
+
+    @SuppressLint("CheckResult")
+    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id=="retryConnectSw")
+            if (cmdBean.finish) {
+                if (cmdBean.status == 0) {
+                    ToastUtils.showShort(getString(R.string.connect_success))
+                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                } else {
+                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                }
+            }
+    }
+
+    override fun tzRouterConfigDoubleSwRecevice(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由配置双组开关通知-------$cmdBean")
+        if (cmdBean.ser_id == "configDoubleSw") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    if (!isReConfig)
+                        showRenameDialog(switchDate)
+                    else
+                        finish()
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.config_fail))
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        disposableRouteTimer?.dispose()
         TelinkLightService.Instance()?.idleMode(true)
     }
 }

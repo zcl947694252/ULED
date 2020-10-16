@@ -424,12 +424,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 val opcode: Byte
                 when (seekBar.id) {
                     R.id.normal_sbBrightness -> {
+                        clickType = 3
                         opcode = Opcode.SET_LUM
                         if (Constant.IS_ROUTE_MODE) {
                             routerConfigBrightnesssOrColorTemp()
                         } else GlobalScope.launch { sendCmd(opcode, address, progress) }
                     }
                     R.id.normal_temperature -> {
+                        clickType = 1
                         if (Constant.IS_ROUTE_MODE) {
                             routerConfigBrightnesssOrColorTemp()
                         } else {
@@ -438,6 +440,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         }
                     }
                     R.id.rgb_sbBrightness -> {
+                        clickType = 5
                         opcode = Opcode.SET_LUM
                         if (Constant.IS_ROUTE_MODE) {
                             routerConfigBrightnesssOrColorTemp()
@@ -445,6 +448,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             GlobalScope.launch { sendCmd(opcode, address, progress) }
                     }
                     R.id.rgb_white_seekbar -> {
+                        clickType = 7
                         opcode = Opcode.SET_W_LUM
                         if (Constant.IS_ROUTE_MODE) {
                             routerConfigBrightnesssOrColorTemp()

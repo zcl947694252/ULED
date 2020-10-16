@@ -157,25 +157,35 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     @SuppressLint("CheckResult")
     private fun routeDeleteGroup(dbGroup: DbGroup) {
-        val subscribe = RouterModel.routerDelGp(RouterDelGpBody("delRGBGp", dbGroup.meshAddr))?.subscribe({
-            showLoadingDialog(getString(R.string.please_wait))
-            disposableTimer?.dispose()
-            disposableTimer = Observable.timer((it?.timeout ?: 10).toLong(), TimeUnit.SECONDS)
-                    .subscribe {
-                        hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.delete_gp_fail))
+            RouterModel.routerDelGp(RouterDelGpBody("delRGBGp", dbGroup.meshAddr))?.subscribe({
+                /**
+                90007,"该组不存在，本地删除即可 "  90015,"空组直接本地删除，后台数据库也会同步删除(无需app调用删除接口)"
+                90008,该组里的全部设备都未绑定路由，无法删除" 90005,"以下路由全部没有上线，无法开始分组" 90009,"默认组无法删除"
+                 */
+                when (it.errorCode) {
+                    0, 90015,90007 -> {
+                        showLoadingDialog(getString(R.string.please_wait))
+                        if (it.errorCode==0){
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.delete_gp_fail))
+                                    }
+                        }else{
+                            DBUtils.deleteGroupOnly(dbGroup)
+                            deleteGpSuccess()
+                        }
                     }
-            LogUtils.v("zcl-----------收到路由删组-------$it")
-        }, {
-            if (it.message?.contains("本地删除") == true) {
+                    90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
+                }
                 LogUtils.v("zcl-----------收到路由删组-------$it")
-                DBUtils.deleteGroupOnly(dbGroup)
-                deleteGpSuccess()
-            } else {
+            }, {
                 ToastUtils.showShort(it.message)
-            }
-        })
-    }
+            })
+        }
 
     private fun deleteGpSuccess() {
         SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
@@ -1242,7 +1252,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     postionAndNum?.position = position
                     systemGradientApply(clickPostion)
                 } else {
-                    routerSystemGradientApply(buildInModeList[clickPostion].id+1, speed, "systemApply")
+                    routerSystemGradientApply(buildInModeList[clickPostion].id + 1, speed, "systemApply")
                 }
 
 
@@ -2401,6 +2411,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             }
         }
     }
+
     override fun tzRouterGradientStop(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl------收到路由应用渐变通知------------$cmdBean--")
         if (cmdBean.ser_id == "stopGradient") {
@@ -2814,23 +2825,24 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         LogUtils.v("zcl------收到路由调节色盘通知------------$cmdBean")
 
         hideLoadingDialog()
-        disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "setRGB") {
-            if (cmdBean.status == 0)
+            disposableRouteTimer?.dispose()
+            if (cmdBean.status == 0) {
                 color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-            if (currentShowGroupSetPage) {
-                group?.color = color
-                DBUtils.saveGroup(group!!, false)
+                if (currentShowGroupSetPage) {
+                    group?.color = color
+                    DBUtils.saveGroup(group!!, false)
+                } else {
+                    light?.color = color
+                    DBUtils.saveLight(light!!, false)
+                }
             } else {
-                light?.color = color
-                DBUtils.saveLight(light!!, false)
+                if (currentShowGroupSetPage)
+                    color_picker.setInitialColor((group!!.color and 0xffffff) or 0xff000000.toInt())
+                else
+                    color_picker.setInitialColor((light!!.color and 0xffffff) or 0xff000000.toInt())
+                ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
             }
-        } else {
-            if (currentShowGroupSetPage)
-                color_picker.setInitialColor((group!!.color and 0xffffff) or 0xff000000.toInt())
-            else
-                color_picker.setInitialColor((light!!.color and 0xffffff) or 0xff000000.toInt())
-            ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
         }
     }
 

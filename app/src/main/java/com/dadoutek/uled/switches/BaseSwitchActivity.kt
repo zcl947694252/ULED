@@ -21,7 +21,6 @@ import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -32,19 +31,21 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.eight_switch.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -54,7 +55,7 @@ import java.util.concurrent.TimeUnit
 private var last_start_time = 0
 private var debounce_time = 1000
 
-abstract class BaseSwitchActivity() : TelinkBaseActivity() {
+abstract class BaseSwitchActivity : TelinkBaseActivity() {
     private var sw: DbSwitch? = null
     private var deviceType: Int = DeviceType.NORMAL_SWITCH
     var isReConfig: Boolean = false
@@ -134,7 +135,7 @@ abstract class BaseSwitchActivity() : TelinkBaseActivity() {
 
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-        if (TelinkLightApplication.getApp().connectDevice != null) {
+        if (TelinkLightApplication.getApp().connectDevice != null||Constant.IS_ROUTE_MODE) {
             when (item?.itemId) {
                 R.id.toolbar_f_rename -> reName()
                 R.id.toolbar_fv_change_group -> changeGroup()
@@ -186,6 +187,7 @@ abstract class BaseSwitchActivity() : TelinkBaseActivity() {
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
             renameDialog?.show()
+            SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
         }
     }
 
@@ -313,6 +315,42 @@ abstract class BaseSwitchActivity() : TelinkBaseActivity() {
                     .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
         else
             finish()
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerRenameSw(sw: DbSwitch, trim: String) {
+        RouterModel.routeUpdateSw(sw.id, trim)?.subscribe({
+           routerRenameSwSuccess(trim)
+            SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+        }, {
+            ToastUtils.showShort(it.message)
+            SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerRetrySw(id: Long) {
+        RouterModel.routerConnectSwOrSe(id, 99, "retryConnectSw")?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.connect_fail))
+                            }
+                }
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    open fun routerRenameSwSuccess(trim: String) {
+
     }
 
 }

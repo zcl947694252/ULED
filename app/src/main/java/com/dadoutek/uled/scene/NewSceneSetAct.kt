@@ -78,7 +78,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var isOpen: Boolean = true
     private var currentPageIsEdit = false
     private var scene: DbScene? = null
-    private var isChangeScene = false
+    private var isReconfig = false
     private var isChange = true
     private var isResult = false
     private var isToolbar = false
@@ -111,7 +111,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         initChangeState()
         initScene()//获取传递过来的场景数据
-        if (!isChangeScene) {
+        if (!isReconfig) {
             edit_name.setText(DBUtils.getDefaultNewSceneName())
             edit_name.setSelection(DBUtils.getDefaultNewSceneName().length)
             initOnLayoutListener()
@@ -256,8 +256,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun initScene() {
         val intent = intent
-        isChangeScene = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
-        if (isChangeScene && !isResult) {
+        isReconfig = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
+        if (isReconfig && !isResult) {
             scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
             edit_name.setText(scene?.name)
             //获取场景具体信息
@@ -289,14 +289,15 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
 
         when {
-            isChangeScene -> {
-                initChangeView()
-                showDataListView()
+            isReconfig -> {
+                toolbarTv.text = scene!!.name
+                editSceneName = scene!!.name
+                showGpDetailList()
             }
             else -> {
-                initCreateView()
+                toolbarTv.setText(R.string.create_scene)
                 when {
-                    isResult -> showDataListView()
+                    isResult -> showGpDetailList()
                     else -> showEditListVew()
                 }
             }
@@ -331,15 +332,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
         exitDialogBuilder.create().show()
     }
 
-    private fun initCreateView() {
-        toolbarTv.setText(R.string.create_scene)
-    }
-
-    private fun initChangeView() {
-        toolbarTv.text = scene!!.name
-        editSceneName = scene!!.name
-    }
-
     internal var onItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentPosition = position
         if (DebouncedClickPredictor.shouldDoClick(view)) {
@@ -372,7 +364,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
         var brightness = showGroupList[position].brightness
         var temperature = showGroupList[position].temperature
         if (showGroupList[position].isOn) {
-            showGroupList[position].isOn = false
+            isOpen = false
+            if (!Constant.IS_ROUTE_MODE)
+                showGroupList[position].isOn = false
             showGroupList[position].isEnableBright = false
             showGroupList[position].isEnableWhiteLight = false
             cb_bright.isChecked = false
@@ -383,7 +377,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
             brightness = 0
             temperature = 0
         } else {
-            showGroupList[position].isOn = true
+            if (!Constant.IS_ROUTE_MODE)
+                showGroupList[position].isOn = true
+            isOpen = true
             showGroupList[position].isEnableBright = true
             showGroupList[position].isEnableWhiteLight = true
             cb_bright.isChecked = true
@@ -393,14 +389,18 @@ class NewSceneSetAct : TelinkBaseActivity() {
             dot_rgb.isEnabled = true
         }
         val addr = showGroupList[position].groupAddress
-        Thread {
-            Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
-            Thread.sleep(300)
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, byteArrayOf(brightness.toByte()), true)
-            Thread.sleep(300)
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, byteArrayOf(temperature.toByte()), true)
-        }.start()
-
+        if (!Constant.IS_ROUTE_MODE)
+            Thread {
+                Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
+                Thread.sleep(300)
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, byteArrayOf(brightness.toByte()), true)
+                Thread.sleep(300)
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, byteArrayOf(temperature.toByte()), true)
+            }.start()
+        else {
+            var status = if (isOpen) 1 else 0
+            routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, status, "openOrCloseGp")
+        }
         //sceneGroupAdapter?.notifyItemChanged(position)
         sceneGroupAdapter?.notifyDataSetChanged()
     }
@@ -535,26 +535,27 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     @SuppressLint("StringFormatInvalid")
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
-        android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
-                .setMessage(getString(R.string.delete_group_confirm, showGroupList!![position]?.gpName))
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    this.showLoadingDialog(getString(R.string.deleting))
-                    val itemGroup = showGroupList!![position]
-                    for (index in showCheckListData!!.indices) {
-                        if (showCheckListData!![index].meshAddr == itemGroup.groupAddress) {
-                            showGroupList.removeAt(position)
-                            showCheckListData!![index].isChecked = false
+        if (position <= showGroupList!!.size - 1)
+            android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+                    .setMessage(getString(R.string.delete_group_confirm, showGroupList!![position]?.gpName))
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        this.showLoadingDialog(getString(R.string.deleting))
+                        val itemGroup = showGroupList!![position]
+                        for (index in showCheckListData!!.indices) {
+                            if (showCheckListData!![index].meshAddr == itemGroup.groupAddress) {
+                                showGroupList.removeAt(position)
+                                showCheckListData!![index].isChecked = false
+                            }
                         }
+                        adapter.notifyDataSetChanged()
+                        hideLoadingDialog()
                     }
-                    adapter.notifyDataSetChanged()
-                    hideLoadingDialog()
-                }
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show()
+                    .setNegativeButton(R.string.btn_cancel, null)
+                    .show()
     }
 
     //显示数据列表页面
-    private fun showDataListView() {
+    private fun showGpDetailList() {
         currentPageIsEdit = false
 
         data_view_layout.visibility = View.VISIBLE
@@ -568,13 +569,13 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
-        recyclerView_group_list_view.layoutManager = layoutmanager
-        recyclerView_group_list_view?.addItemDecoration(SpacesItemDecorationScene(40))
-        recyclerView_group_list_view.itemAnimator!!.changeDuration = 0
+        scene_gp_detail_list.layoutManager = layoutmanager
+        scene_gp_detail_list?.addItemDecoration(SpacesItemDecorationScene(40))
+        scene_gp_detail_list.itemAnimator!!.changeDuration = 0
         if (sceneGroupAdapter?.stompRecevice != null)
             unregisterReceiver(sceneGroupAdapter?.stompRecevice)
         sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
-        sceneGroupAdapter?.bindToRecyclerView(recyclerView_group_list_view)
+        sceneGroupAdapter?.bindToRecyclerView(scene_gp_detail_list)
         registBrocaster()
         //sceneGroupAdapter?.initStompReceiver()
 
@@ -616,16 +617,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         // recyclerView_select_group_list_view.layoutManager = layoutmanager
-        recyclerView_select_group_list_view.layoutManager = GridLayoutManager(this, 4)
+        scene_gp_bottom_list.layoutManager = GridLayoutManager(this, 4)
 
         var list = ArrayList<DbGroup>()
         showCheckListData?.forEach {
-            if (!OtherUtils.isCurtain(it) || !OtherUtils.isConnector(it))
                 list.add(it)
         }
-        //this.sceneEditListAdapter = SceneEditListAdapter(R.layout.scene_group_edit_item, list)
         this.sceneEditListAdapter = SceneEditListAdapter(R.layout.template_batch_small_item, list)
-        sceneEditListAdapter?.bindToRecyclerView(recyclerView_select_group_list_view)
+        sceneEditListAdapter?.bindToRecyclerView(scene_gp_bottom_list)
         sceneEditListAdapter?.onItemClickListener = onItemClickListenerCheck
     }
 
@@ -675,7 +674,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 if (!currentPageIsEdit)
                     saveScene()
                 else {//添加场景选择分组
-                    showDataListView()
+                    showGpDetailList()
                 }
             }
         }
@@ -731,7 +730,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun saveAndFinish() {
         when {
-            isChangeScene -> updateOldScene()
+            isReconfig -> updateOldScene()
             else -> saveNewScene()
         }
         setResult(Constant.RESULT_OK)
@@ -795,7 +794,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
     }
 
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult")//更新问题
     private fun routerAddOrUpdateScene(itemGroups: ArrayList<ItemGroup>, dbSceneId: Long, name: String?, sceneIcon: String, isNew: Boolean) {
         val actionsList = mutableListOf<DbSceneActions>()
         for (i in itemGroups.indices) {
@@ -830,7 +829,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 ToastUtils.showShort(it.message)
             })
         else
-            RouterModel.routeUpdateScene(dbSceneId, actionsList)?.subscribe({
+            RouterModel.routeUpdateScene(dbSceneId, actionsList)?.subscribe({//todo 更新内容未变
                 when (it.errorCode) {
                     NetworkStatusCode.OK -> {
                         startAddSceneTimeOut(it.t)
@@ -838,6 +837,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
                     // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
                     NetworkStatusCode.ROUTER_DEL_SCENE_NOT_EXITE -> {//该场景不存在，刷新场景数据
+                       SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                         initScene()
                     }
                     NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
@@ -969,7 +969,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         scene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
         val belongSceneId = scene?.id!!
         when {
-            Constant.IS_ROUTE_MODE -> routerAddOrUpdateScene(itemGroups, belongSceneId, name, scene?.imgName ?: "icon_out", true)
+            Constant.IS_ROUTE_MODE -> routerAddOrUpdateScene(itemGroups, belongSceneId, name, scene?.imgName ?: "icon_out", false)
             else -> {
                 showLoadingDialog(getString(R.string.saving))
                 DBUtils.updateScene(scene!!)
@@ -1160,14 +1160,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
         LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
         hideLoadingDialog()
         disposableRouteTimer?.dispose()
-        if (cmdBean.ser_id == "newScene") {
+        if (cmdBean.ser_id == "openOrCloseGp") {
             when (cmdBean.status) {
                 0 -> {
-                    this.showGroupList[currentPosition].isOn = isOpen
-                    sceneGroupAdapter?.notifyItemChanged(currentPosition)
+                    this.showGroupList[currentPosition].isOn = isOpen//更新状态更新ui
                 }
-                else -> ToastUtils.showShort(getString(R.string.open_faile))
+                else -> ToastUtils.showShort(getString(R.string.open_faile))//恢复原本状态
             }
+            sceneGroupAdapter?.notifyItemChanged(currentPosition)
         }
     }
 }

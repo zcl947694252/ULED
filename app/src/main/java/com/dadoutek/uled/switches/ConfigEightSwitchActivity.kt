@@ -19,11 +19,14 @@ import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.switches.bean.KeyBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
+import io.reactivex.Observable
 import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -32,6 +35,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -75,7 +79,6 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         val doubleGroupKey = mutableListOf(2, 3, 4, 5, 6, 7)
         //先进行填充默认数据
         setDefaultData()
-
         toolbarTv.text = getString(R.string.eight_switch)
 
         //重新赋值新数据
@@ -200,31 +203,6 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                         }
                     }
                 }
-                /* when (type) {
-                     0 -> {
-                         groupKey.forEach { itKey ->
-                             var dbGroup = DbGroup()
-                             dbGroup.id = 65536L
-                             groupMap[itKey] = dbGroup
-                         }
-                     }
-                     1 -> {
-                         sceneKey.forEach { itKey ->
-                             var dbScene = DbScene()
-                             dbScene.id = 65536L
-                             sceneMap[itKey] = dbScene
-                         }
-                     }
-                     2 -> {
-                         doubleGroupKey.forEach { itKey ->
-                             var dbGroup = DbGroup()
-                             dbGroup.id = 65536L
-                             groupMap[itKey] = dbGroup
-                         }
-                     }
-                     else -> {
-                     }
-                 }*/
             }
         }
     }
@@ -247,33 +225,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private fun confimCongfig() {
         //成功后clickType = 0
         when (configSwitchType) {
-            0 -> {
-                // if (groupMap.size >= 4 && groupMap.containsKey(5) && groupMap.containsKey(6) && groupMap.containsKey(7) && groupMap.containsKey(4)) {
-                sendParms()
-                /*  } else{
-                      clickType = 1
-                      ToastUtils.showLong(getString(R.string.click_config_tip))
-                  }*/
-            }
-            1 -> {
-                /*if (sceneMap.size >= 7 && sceneMap.containsKey(1) && sceneMap.containsKey(2) &&
-                        sceneMap.containsKey(3) && sceneMap.containsKey(4) && sceneMap.containsKey(5)
-                        && sceneMap.containsKey(6) && sceneMap.containsKey(0)) {*/
-                sendSceneParms()
-                /* } else{
-                     clickType = 1
-                     ToastUtils.showLong(getString(R.string.click_config_tip))
-                 }*/
-            }
-            2 -> {
-                /* if (groupMap.size >= 6 && groupMap.containsKey(2) && groupMap.containsKey(3) && groupMap.containsKey(4) && groupMap.containsKey(5)
-                         && groupMap.containsKey(6) && groupMap.containsKey(7)) {*/
-                sendSingleGroupParms()
-                /* } else {
-                     clickType = 1
-                     ToastUtils.showLong(getString(R.string.click_config_tip))
-                 }*/
-            }
+            0 -> sendParms()
+            1 -> sendSceneParms()
+            2 -> sendSingleGroupParms()
         }
     }
 
@@ -355,7 +309,6 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     private fun sendParms() {
-        showLoadingDialog(getString(R.string.setting_switch))
         groupParamList.clear()
         listKeysBean = JSONArray()
 
@@ -383,20 +336,26 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         groupParamList.add(1, secondParm)
         groupParamList.add(2, thirParm)
         groupParamList.add(3, fourParm)
-
-        GlobalScope.launch {
-            var delay = 1000.toLong()
-            for (p in groupParamList) {
-                delay(delay)
-                //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
-                //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
-                delay += 300
+        if (!Constant.IS_ROUTE_MODE) {
+            showLoadingDialog(getString(R.string.setting_switch))
+            GlobalScope.launch {
+                var delay = 1000.toLong()
+                for (p in groupParamList) {
+                    delay(delay)
+                    //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
+                    //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
+                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
+                    delay += 300
+                }
+                delay(1500)
+                updateMeshGroup(0)
             }
-            delay(1500)
-            updateMeshGroup(0)
+        } else {
+            routerConfigEightSw(mDeviceInfo?.id?.toLong() ?: 0L)
         }
+
     }
+
 
     private fun getKeyBean(keyId: Int, featureId: Int, name: String = "", hight8Mes: Int = 0, low8Mes: Int = 0): JSONObject {
         //return JSONObject(["keyId" = keyId, "featureId" = featureId, "reserveValue_A" = hight8Mes, "reserveValue_B" = low8Mes, "name" = name])
@@ -530,7 +489,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             }
             byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), secondOpcode, 0x00, secondDbSceneId.toByte())
         } else {//如果第八键没有配置默认为关  0-1-2 3id 4 5 6 7id
-            listKeysBean.put(getKeyBean(7, Opcode.DEFAULT_SWITCH8K.toInt() and 0xff, name = getString(R.string.close), hight8Mes = 0, low8Mes = 0xff))
+            listKeysBean.put(getKeyBean(7, Opcode.CLOSE.toInt() and 0xff, name = getString(R.string.close), hight8Mes = 0, low8Mes = 0xff))
             byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }
@@ -579,7 +538,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, secondNum.toByte(), opcodeTwo, secondH, secondL)
         } else {
             //如果第八键没有配置默认为关
-            listKeysBean.put(getKeyBean(0x08, Opcode.CLOSE.toInt() and 0xff,name = getString(R.string.close), hight8Mes = 0, low8Mes = 255))
+            listKeysBean.put(getKeyBean(0x08, Opcode.CLOSE.toInt() and 0xff, name = getString(R.string.close), hight8Mes = 0, low8Mes = 255))
             byteArrayOf(firstNum.toByte(), opcodeOne, fristH, fristL, 0x07, Opcode.CLOSE, 0x00, 0x00)
         }
     }
@@ -809,14 +768,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchData?.name = renameEt?.text.toString().trim { it <= ' ' }
-                if (switchData == null)
-                    switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
-                toolbarTv.text = switchData?.name
-                if (switchData != null)
-                    DBUtils.updateSwicth(switchData!!)
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+                if (!Constant.IS_ROUTE_MODE)
+                    renameSw(trim)
                 else
-                    ToastUtils.showLong(getString(R.string.rename_faile))
+                    routerRenameSw(switchData!!, trim)
 
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
@@ -833,6 +789,62 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         }
     }
 
+    private fun renameSw(trim: String) {
+        switchData?.name = trim
+        if (switchData == null)
+            switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
+        toolbarTv.text = switchData?.name
+        if (switchData != null)
+            DBUtils.updateSwicth(switchData!!)
+        else
+            ToastUtils.showLong(getString(R.string.rename_faile))
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerConfigEightSw(id: Long) {
+        showLoadingDialog(getString(R.string.setting_switch))
+        val keys = listKeysBean as List<KeyBean>
+        RouterModel.configEightSw(id, keys, "configEightSw")?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.config_fail))
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    override fun tzRouterConfigEightSwRecevice(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由配置八键通知-------$cmdBean")
+        if (cmdBean.ser_id == "configEightSw") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    if (!isReConfig)
+                        showRenameDialog(switchData!!)
+                    else
+                        finish()
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.config_fail))
+            }
+        }
+    }
 
     private fun finishAc() {
         TelinkLightService.Instance()?.idleMode(true)

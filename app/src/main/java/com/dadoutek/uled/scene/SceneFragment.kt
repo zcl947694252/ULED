@@ -50,9 +50,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -132,12 +130,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     override fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id=="applyScene"){
             LogUtils.v("zcl-----------收到路由场景应用通知-------$cmdBean")
-            hideLoadingDialog()
             disposableRouteTimer?.dispose()
-            when (cmdBean.status) {
-                0 ->ToastUtils.showShort(getString(R.string.scene_apply_success))
-                else -> ToastUtils.showShort(getString(R.string.scene_apply_fail))
-            }
+          CoroutineScope(Dispatchers.Main).launch {
+              hideLoadingDialog()
+              when (cmdBean.status) {
+                  0 ->ToastUtils.showShort(getString(R.string.scene_apply_success))
+                  else -> ToastUtils.showShort(getString(R.string.scene_apply_fail))
+              }
+          }
         }
     }
 

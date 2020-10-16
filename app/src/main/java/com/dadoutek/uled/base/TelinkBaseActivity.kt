@@ -43,6 +43,9 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.mqtt.IGetMessageCallBack
+import com.dadoutek.uled.mqtt.MqttService
+import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
@@ -79,7 +82,8 @@ import java.util.concurrent.TimeUnit
 
 ///TelinkLog 打印
 
-abstract class TelinkBaseActivity : AppCompatActivity() {
+abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    private var serviceConnection: MyServiceConnection? = null
     private var viewInstall: View? = null
     private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
@@ -166,7 +170,9 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
+        serviceConnection?.mqttService?.init()
     }
+
 
     private fun initChangeRecevicer() {
         changeRecevicer = ChangeRecevicer()
@@ -511,6 +517,18 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         unregisterReceiver(netWorkChangReceiver)
         SMSSDK.unregisterAllEventHandler()
         stopTimerUpdate()
+
+    }
+    fun bindService() {
+        serviceConnection = MyServiceConnection()
+        serviceConnection?.setIGetMessageCallBack(this)
+        val intent = Intent(this, MqttService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+    open fun unbindSe() { //解绑服务
+        serviceConnection?.let {
+            unbindService(it)
+        }
     }
 
     open fun initOnLayoutListener() {
@@ -737,6 +755,7 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
+            //LogUtils.v("zcl-----------收到路由通知-------$msg")
             //var jsonObject = JSONObject(msg)
             when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
@@ -772,6 +791,22 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                     val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
                     tzRouterUpdateVersionRecevice(routerVersion)
                 }
+
+                Cmd.tzRouteConfigDoubleSw -> {//配置双组开关
+                    tzRouterConfigDoubleSwRecevice(cmdBean)
+                }
+
+                Cmd.tzRouteConfigSceneSw -> {//配置场景开关
+                    tzRouterConfigSceneSwRecevice(cmdBean)
+                }
+
+                Cmd.tzRouteConfigNormalSw -> {//配置普通开关
+                    tzRouterConfigNormalSwRecevice(cmdBean)
+                }
+                Cmd.tzRouteConfigEightSw -> {//配置普通开关
+                    tzRouterConfigEightSwRecevice(cmdBean)
+                }
+
                 Cmd.routeOTAing -> {
                     val routerOTAingNumBean = Gson().fromJson(msg, RouterOTAingNumBean::class.java)
                     tzRouterOTAingNumRecevice(routerOTAingNumBean)
@@ -852,7 +887,21 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
                 }
             }*/
         }
+    }
 
+    open fun tzRouterConfigEightSwRecevice(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun tzRouterConfigSceneSwRecevice(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {
+
+    }
+
+    open fun tzRouterConfigDoubleSwRecevice(cmdBean: CmdBodyBean) {
 
     }
 
@@ -1526,5 +1575,9 @@ abstract class TelinkBaseActivity : AppCompatActivity() {
             LogUtils.v("zcl-----------收到路由fenzu失败-------$it")
             ToastUtils.showShort(it.message)
         })
+    }
+
+    override fun setMessage(cmd: Int, extCmd: Int, message: String) {
+
     }
 }

@@ -49,6 +49,7 @@ import com.dadoutek.uled.othersview.SplashActivity
 import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.Data
+import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.switches.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -1216,8 +1217,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         } else {
             LogUtils.v("zcl-----------收到路由设备数-------$cmdBodyBean")
             routerScanCount = cmdBodyBean.count
-            if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB
-                    || mAddDeviceType == DeviceType.SMART_RELAY || mAddDeviceType == DeviceType.SMART_CURTAIN)
+            if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB || mAddDeviceType == DeviceType.SMART_RELAY ||
+                    mAddDeviceType == DeviceType.SMART_CURTAIN || mAddDeviceType == 98 || mAddDeviceType == 99)
                 scanning_num.text = getString(R.string.title_scanned_device_num, routerScanCount)
             else
                 scanning_num.text = getString(R.string.scanning)
@@ -1733,10 +1734,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun skipeBatchActivity() {
-        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
         if (Constant.IS_ROUTE_MODE) {//获取扫描数据
             getRouterScanResult()
         } else {
+            val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
             DBUtils.saveRegion(lastMyRegion, true)
             var meshAddress = 0
             for (item in mAddedDevices) {
@@ -1817,8 +1818,23 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 ?.subscribe({
                     LogUtils.v("zcl-----------收到路由告诉服务器确认结果可以清除-------$it")
                     if (isScanSucess) {
-                        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-                        skipeActivity(intent)
+                        val intent: Intent
+                        when (mAddDeviceType) {
+                            98 -> {
+                                intent = Intent(this, SensorDeviceDetailsActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
+                                finish()
+                            }
+                            99 -> {
+                                intent = Intent(this, SwitchDeviceDetailsActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
+                                finish()
+                            }
+                            else -> {
+                                intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+                                skipeActivity(intent)
+                            }
+                        }
                     } else scanFail()
                 }) {
                     ToastUtils.showShort(it.message)

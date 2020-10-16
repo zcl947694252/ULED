@@ -195,72 +195,80 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun lessSpeed(event: MotionEvent?) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
-                while (onBtnTouch) {
-                    thisTime = System.currentTimeMillis()
-                    if (thisTime - downTime >= 500) {
-                        tvValue++
-                        val msg = lessSpeedHandler.obtainMessage()
-                        msg.arg1 = tvValue
-                        lessSpeedHandler.sendMessage(msg)
-                        Log.e("TAG_TOUCH", tvValue++.toString())
-                        try {
-                            delay(100)
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = lessSpeedHandler.obtainMessage()
+                            msg.arg1 = tvValue
+                            lessSpeedHandler.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                delay(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
                         }
                     }
                 }
             }
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = lessSpeedHandler.obtainMessage()
-                msg.arg1 = tvValue
-                lessSpeedHandler.sendMessage(msg)
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (thisTime - downTime < 500) {
+                    tvValue++
+                    val msg = lessSpeedHandler.obtainMessage()
+                    msg.arg1 = tvValue
+                    lessSpeedHandler.sendMessage(msg)
+                }
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
+            }
         }
     }
 
     private fun addSpeed(event: MotionEvent?) {
-        if (event!!.action == MotionEvent.ACTION_DOWN) {
-            downTime = System.currentTimeMillis()
-            onBtnTouch = true
-            GlobalScope.launch {
-                while (onBtnTouch) {
-                    thisTime = System.currentTimeMillis()
-                    if (thisTime - downTime >= 500) {
-                        tvValue++
-                        val msg = addSpeedHandler.obtainMessage()
-                        msg.arg1 = tvValue
-                        addSpeedHandler.sendMessage(msg)
-                        Log.e("TAG_TOUCH", tvValue++.toString())
-                        try {
-                            delay(100)
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        }
+        when {
+            event!!.action == MotionEvent.ACTION_DOWN -> {
+                downTime = System.currentTimeMillis()
+                onBtnTouch = true
+                GlobalScope.launch {
+                    while (onBtnTouch) {
+                        thisTime = System.currentTimeMillis()
+                        if (thisTime - downTime >= 500) {
+                            tvValue++
+                            val msg = addSpeedHandler.obtainMessage()
+                            msg.arg1 = tvValue
+                            addSpeedHandler.sendMessage(msg)
+                            Log.e("TAG_TOUCH", tvValue++.toString())
+                            try {
+                                delay(100)
+                            } catch (e: InterruptedException) {
+                                e.printStackTrace()
+                            }
 
+                        }
                     }
                 }
-            }
 
-        } else if (event.action == MotionEvent.ACTION_UP) {
-            onBtnTouch = false
-            if (thisTime - downTime < 500) {
-                tvValue++
-                val msg = addSpeedHandler.obtainMessage()
-                msg.arg1 = tvValue
-                addSpeedHandler.sendMessage(msg)
             }
-        } else if (event.action == MotionEvent.ACTION_CANCEL) {
-            onBtnTouch = false
+            event.action == MotionEvent.ACTION_UP -> {
+                onBtnTouch = false
+                if (thisTime - downTime < 500) {
+                    tvValue++
+                    val msg = addSpeedHandler.obtainMessage()
+                    msg.arg1 = tvValue
+                    addSpeedHandler.sendMessage(msg)
+                }
+            }
+            event.action == MotionEvent.ACTION_CANCEL -> {
+                onBtnTouch = false
+            }
         }
     }
 

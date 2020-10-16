@@ -172,12 +172,11 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
-                if (switchDate != null) {
-                    toolbarTv.text = switchDate?.name
-                    DBUtils.updateSwicth(switchDate!!)
-                } else
-                    ToastUtils.showLong(getString(R.string.rename_faile))
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+                if (!Constant.IS_ROUTE_MODE)
+                    renameSw(trim)
+                else
+                    routerRenameSw(switchDate!!, trim)
 
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
@@ -192,6 +191,15 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             if (!isReConfig)
                 finish()
         }
+    }
+
+    private fun renameSw(trim: String) {
+        switchDate?.name = trim
+        if (switchDate != null) {
+            toolbarTv.text = switchDate?.name
+            DBUtils.updateSwicth(switchDate!!)
+        } else
+            ToastUtils.showLong(getString(R.string.rename_faile))
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -256,7 +264,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 return@setOnClickListener
             }
 
-            if (TelinkLightApplication.getApp().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
                 if (mConnectingSnackBar?.isShown != true) {
                     showDisconnectSnackBar()
                 }
@@ -264,16 +272,14 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 // (mAdapter.selectedPos != -1) {
                 sw_progressBar.visibility = View.VISIBLE
                 if (Constant.IS_ROUTE_MODE)
-                    RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr)
+                    RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr,"configNormalSw")
                             ?.subscribe({
-                                //    "errorCode": 90021, "该开关不存在，请重新刷新数据"
-                                //    "errorCode": 90008,"该开关没有绑定路由，无法配置"
-                                //    "errorCode": 90007,"该组不存在，刷新组列表"
-                                //    "errorCode": 90005,"以下路由没有上线，无法配置"
+                                //    "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                                //    "errorCode": 90007,"该组不存在，刷新组列表"   "errorCode": 90005,"以下路由没有上线，无法配置"
                                 when (it.errorCode) {
                                     0 -> {
-                                        disposableTimer?.dispose()
-                                        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                        disposableRouteTimer?.dispose()
+                                        disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                                                 .subscribe {
                                                     sw_progressBar.visibility = View.GONE
                                                     ToastUtils.showShort(getString(R.string.config_fail))
@@ -405,28 +411,14 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             TelinkLightService.Instance()?.idleMode(true)
             reconnect()
         } else {
-            RouterModel.routerConnectSwOrSe(switchDate?.id ?: 0, 99)?.subscribe({
-                when (it.errorCode) {
-                    0 -> {
-                        disposableTimer?.dispose()
-                        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                                .subscribe {
-                                    hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.connect_fail))
-                                }
-                    }
-                    90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                    90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                }
-            }, {
-                ToastUtils.showShort(it.message)
-            })
+            routerRetrySw(switchDate?.id ?: 0)
         }
     }
 
+
     @SuppressLint("CheckResult")
     override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id=="retryConnectSw")
         if (cmdBean.finish) {
             if (cmdBean.status == 0) {
                 ToastUtils.showShort(getString(R.string.connect_success))
@@ -436,6 +428,25 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 ToastUtils.showShort(getString(R.string.connect_fail))
             }
         }
+    }
+
+    override fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {
+              LogUtils.v("zcl-----------收到路由配置普通开关通知-------$cmdBean")
+                      if (cmdBean.ser_id=="configNormalSw"){
+                          disposableRouteTimer?.dispose()
+                          hideLoadingDialog()
+                          if (cmdBean.status==0){
+                              GlobalScope.launch(Dispatchers.Main) {
+                                  ToastUtils.showShort(getString(R.string.config_success))
+                                  if (!isReConfig)
+                                      showRenameDialog(switchDate)
+                                  else
+                                      finish()
+                              }
+                          }else{
+                              ToastUtils.showShort(getString(R.string.config_fail))
+                          }
+                      }
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {

@@ -49,6 +49,11 @@ class MqttService : Service() {
         }
     }
 
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+      //0  var flag = flags
+       // flag = START_STICKY
+        return super.onStartCommand(intent, flags, startId)
+    }
 
     // MQTT监听并且接受消息
     private val mqttCallback = object : MqttCallback {
@@ -90,7 +95,7 @@ class MqttService : Service() {
         init()
     }
 
-    private fun init() {
+    open fun init() {
         // 服务器地址（协议+地址+端口号）
         val uri = host
         client = MqttAndroidClient(this, uri, clientId)
