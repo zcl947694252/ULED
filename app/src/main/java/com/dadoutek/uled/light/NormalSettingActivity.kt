@@ -27,6 +27,7 @@ import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -42,7 +43,7 @@ import com.dadoutek.uled.network.RouterDelGpBody
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -167,7 +168,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
         LogUtils.v("zcl-----------收到路由删组通知-------${routerGroup}")
         disposableTimer?.dispose()
         if (routerGroup?.ser_id == "delCWGp") {
@@ -1012,7 +1013,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     @SuppressLint("StringFormatMatches")
-    override fun tzRouterGroupResult(bean: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterGroupResult(bean: RouteGroupingOrDelBean?) {
         if (bean?.ser_id == "normalGp") {
             LogUtils.v("zcl-----------收到路由普通灯分组通知-------$bean")
             disposableRouteTimer?.dispose()
@@ -2258,7 +2259,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
         if (routerVersion?.ser_id == "cwVersion") {
             LogUtils.v("zcl-----------收到路由版本通知-------$routerVersion")
             hideLoadingDialog()

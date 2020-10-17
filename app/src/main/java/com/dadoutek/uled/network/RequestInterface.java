@@ -13,7 +13,6 @@ import com.dadoutek.uled.model.dbModel.DbGroup;
 import com.dadoutek.uled.model.dbModel.DbLight;
 import com.dadoutek.uled.model.dbModel.DbRegion;
 import com.dadoutek.uled.model.dbModel.DbScene;
-import com.dadoutek.uled.model.dbModel.DbSceneActions;
 import com.dadoutek.uled.model.dbModel.DbSensor;
 import com.dadoutek.uled.model.dbModel.DbSensorChild;
 import com.dadoutek.uled.model.dbModel.DbSwitch;
@@ -40,7 +39,6 @@ import com.dadoutek.uled.router.bean.RouterBatchGpBean;
 import com.dadoutek.uled.router.bean.RouterVersionsBean;
 import com.dadoutek.uled.router.bean.ScanDataBean;
 import com.dadoutek.uled.switches.RouterListBody;
-import com.dadoutek.uled.switches.bean.KeyBean;
 
 import java.util.List;
 import java.util.Map;
@@ -1025,11 +1023,8 @@ public interface RequestInterface {
      * {  "id": 1,"isOn": false, "color": 16777215,   "groupAddr": 32769, "brightness": 100,
      * "deviceType": 4,"colorTemperature": 100 }, ] "ser_id": "app会话id，自己维护"
      */
-    @FormUrlEncoded
     @PUT("router/update-scene")
-    Observable<Response<RouterTimeoutBean>> routerUpdateScene(@Field("sid") Long sceneId,
-                                                              @Field("actions")List<DbSceneActions> actions,
-                                                              @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routerUpdateScene(@Body RouterUpDateSceneBody body);
 
     /**
      * 通过路由删除组
@@ -1237,10 +1232,9 @@ public interface RequestInterface {
      * sceneIds长度必须为4 不配置填0
      * "sceneIds": [1, 2, 3, 4],
      */
-    @FormUrlEncoded
     @POST("router/scene-switch/configure")
-    Observable<Response<RouterTimeoutBean>> configSceneSw(@Field("id") int id,
-                                                          @Field("sceneIds") List<Integer> sceneIds, @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> configSceneSw(@Body SwSceneListBody body/*@Field("id") int id,
+                                                          @Field("sceneIds") List<Integer> sceneIds, @Field("ser_id") String ser_id*/);
 
     /**
      * 八键开关配置 https://dev.dadoutek.com/xxxx/router/eight-key-switch/configure POST
@@ -1254,11 +1248,10 @@ public interface RequestInterface {
      * "reserveValue_B":31,
      * "featureId":0  }]}
      */
-    @FormUrlEncoded
     @POST("router/eight-key-switch/configure")
-    Observable<Response<RouterTimeoutBean>> configEightSw(@Field("id") int id,
+    Observable<Response<RouterTimeoutBean>> configEightSw(@Body SwEightBody body/*@Field("id") int id,
                                                           @Field("keys") List<KeyBean> keys,
-                                                          @Field("ser_id") String ser_id);
+                                                          @Field("ser_id") String ser_id*/);
 
     /**
      * 传感器配置

@@ -24,6 +24,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -39,7 +40,7 @@ import com.dadoutek.uled.network.RouterDelGpBody
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.DelGradientBodyBean
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -211,7 +212,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
         LogUtils.v("zcl-----------收到路由删组通知-------${routerGroup}")
         disposableTimer?.dispose()
         if (routerGroup?.ser_id == "delRGBGp") {
@@ -2946,7 +2947,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
     }
 
-    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
         if (routerVersion?.ser_id == "rgbVersion") {
             LogUtils.v("zcl-----------收到路由调节速度通知-------$routerVersion")
             hideLoadingDialog()

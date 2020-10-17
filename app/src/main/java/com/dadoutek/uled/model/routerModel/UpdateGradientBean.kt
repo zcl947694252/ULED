@@ -1,6 +1,7 @@
 package com.dadoutek.uled.model.routerModel
 
 import com.dadoutek.uled.model.dbModel.DbColorNode
+import com.dadoutek.uled.model.dbModel.DbSceneActions
 import java.io.Serializable
 
 
@@ -21,3 +22,4 @@ class UpdateGradientBean(
     val meshType: Int,
     val ser_id: String
 ):Serializable
+

@@ -16,6 +16,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
@@ -31,7 +32,6 @@ import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
@@ -39,7 +39,7 @@ import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -876,7 +876,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         }
     }
 
-    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
 
         if (routerVersion?.finish == true) {
             if (routerVersion.ser_id == "sensorVersion")

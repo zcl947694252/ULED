@@ -1205,4 +1205,5 @@
     <string name="congfig_rgb_fail">配置彩灯RGB值失败</string>
     <string name="gradient_apply_fail">渐变应用失败</string>
     <string name="gradient_stop_fail">渐变停止失败</string>
+    <string name="update_scene_fail">修改场景失败</string>
 </resources>

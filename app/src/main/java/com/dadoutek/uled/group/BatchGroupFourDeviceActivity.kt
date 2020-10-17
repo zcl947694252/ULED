@@ -36,7 +36,7 @@ import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.router.GroupBlinkBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.router.bean.RouterBatchGpBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -985,7 +985,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     @SuppressLint("StringFormatMatches")
-    override fun tzRouterGroupResult(bean: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterGroupResult(bean: RouteGroupingOrDelBean?) {
         if (bean?.ser_id == "batchGp") {
             disposableTimer?.dispose()
             if (bean?.finish) {
@@ -2040,7 +2040,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     @SuppressLint("StringFormatMatches")
-    private fun groupTzRefresh(fromJson: RouteGroupingOrDelOrGetVerBean?) {
+    private fun groupTzRefresh(fromJson: RouteGroupingOrDelBean?) {
         if (fromJson?.finish == true) {
             isAll = false
             setChecked()

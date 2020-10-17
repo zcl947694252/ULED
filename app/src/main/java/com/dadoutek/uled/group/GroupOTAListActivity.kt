@@ -14,6 +14,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
@@ -28,7 +29,7 @@ import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.router.bean.RouterVersionsBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -129,7 +130,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
         disposableRouteTimer?.dispose()
         if (routerVersion?.finish == true) {
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {

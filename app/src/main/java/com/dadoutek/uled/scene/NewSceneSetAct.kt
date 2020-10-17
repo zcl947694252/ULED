@@ -51,6 +51,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -96,14 +97,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
         makePop()
-        if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {//获取以保存数据
+      /*  if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {//获取以保存数据
             isResult = true
             val list = savedInstanceState.getSerializable(DATA_LIST_KEY) as ArrayList<ItemGroup>
             showGroupList.addAll(list)
             scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
         } else {
             isResult = false
-        }
+        }*/
 
         select_icon_ly.setOnClickListener {
             startActivityForResult(Intent(this@NewSceneSetAct, SelectSceneIconActivity::class.java), 1100)
@@ -621,7 +622,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         var list = ArrayList<DbGroup>()
         showCheckListData?.forEach {
-                list.add(it)
+            list.add(it)
         }
         this.sceneEditListAdapter = SceneEditListAdapter(R.layout.template_batch_small_item, list)
         sceneEditListAdapter?.bindToRecyclerView(scene_gp_bottom_list)
@@ -752,100 +753,64 @@ class NewSceneSetAct : TelinkBaseActivity() {
         dbScene.imgName = sceneIcon
         dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
 
-        if (Constant.IS_ROUTE_MODE) {
-            routerAddOrUpdateScene(showGroupList, dbScene!!.id, name, sceneIcon, true)
-        } else {
+        val belongSceneId = dbScene.id!!
+        val actionsList = mutableListOf<DbSceneActions>()
+        for (i in showGroupList!!.indices) {
+            var sceneActions = DbSceneActions()
+            val item = showGroupList[i]
+            sceneActions = when {
+                OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                    setSceneAc(sceneActions, belongSceneId, item, 0x10)
+                }
+                OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                    setSceneAc(sceneActions, belongSceneId, item, 0x05)
+                }
+                OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                    setSceneAc(sceneActions, belongSceneId, item, 0x06, i)
+                }
+                else -> {
+                    setSceneAc(sceneActions, belongSceneId, item, 0x04)
+                }
+            }
+                DBUtils.saveSceneActions(sceneActions)
+                actionsList.add(sceneActions)
+        }
+        if (Constant.IS_ROUTE_MODE)
+            routerAddScene(name, sceneIcon, actionsList)
+        else {
             showLoadingDialog(getString(R.string.saving))
             GlobalScope.launch {
-                DBUtils.saveScene(dbScene, false)
-
-                val belongSceneId = dbScene.id!!
-                for (i in showGroupList!!.indices) {
-                    var sceneActions = DbSceneActions()
-                    val item = showGroupList[i]
-                    when {
-                        OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x10)
-                            sceneActions.isOn = item.isOn
-                            DBUtils.saveSceneActions(sceneActions)
-                        }
-                        OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x05)
-                            sceneActions.isOn = item.isOn
-                            DBUtils.saveSceneActions(sceneActions)
-                        }
-                        OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x06, i)
-                            sceneActions.isOn = item.isOn
-                            DBUtils.saveSceneActions(sceneActions)
-                        }
-                        else -> {
-                            sceneActions = setSceneAc(sceneActions, belongSceneId, item, 0x04)
-                            DBUtils.saveSceneActions(sceneActions)
-                        }
-                    }
-                }
-
                 delay(100)
                 addScene(belongSceneId)
-                hideLoadingDialog()
-                finish()
             }
         }
+        afterSaveScene()
     }
 
-    @SuppressLint("CheckResult")//更新问题
-    private fun routerAddOrUpdateScene(itemGroups: ArrayList<ItemGroup>, dbSceneId: Long, name: String?, sceneIcon: String, isNew: Boolean) {
-        val actionsList = mutableListOf<DbSceneActions>()
-        for (i in itemGroups.indices) {
-            sceneActions = DbSceneActions()
-            sceneActions.id = i + 1L
-            when {
-                OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)) ->
-                    actionsList.add(setSceneAc(sceneActions, dbSceneId, itemGroups[i], 0x10))
-                OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)) ->
-                    actionsList.add(setSceneAc(sceneActions, dbSceneId, itemGroups[i], 0x05))
-                OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)) ->
-                    actionsList.add(setSceneAc(sceneActions, dbSceneId, itemGroups[i], 0x06, i))
-                else ->
-                    actionsList.add(setSceneAc(sceneActions, dbSceneId, itemGroups[i], 0x04))
+    private fun afterSaveScene() {
+        DBUtils.saveScene(dbScene, false)
+        hideLoadingDialog()
+        finish()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerAddScene(name: String, sceneIcon: String, actionsList: MutableList<DbSceneActions>) {
+        RouterModel.routeAddScene(SceneAddBodyBean(name, sceneIcon, actionsList, "addScene"))?.subscribe({
+            when (it.errorCode) {
+                NetworkStatusCode.OK -> {
+                    LogUtils.v("zcl-----------收到创建场景请求-------$it")
+                    showLoadingDialog(getString(R.string.saving))
+                    startAddSceneTimeOut(it.t)
+                }
+                //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
+                // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
+                NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
+                NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
             }
-        }
-        if (isNew)
-            RouterModel.routeAddScene(SceneAddBodyBean(name ?: "场景", sceneIcon, actionsList, "addScene"))?.subscribe({
-                when (it.errorCode) {
-                    NetworkStatusCode.OK -> {
-                        LogUtils.v("zcl-----------收到创建场景请求-------$it")
-                        showLoadingDialog(getString(R.string.saving))
-                        startAddSceneTimeOut(it.t)
-                    }
-                    //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
-                    // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
-                    NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                    NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
-                    NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                }
-            }, {
-                ToastUtils.showShort(it.message)
-            })
-        else
-            RouterModel.routeUpdateScene(dbSceneId, actionsList)?.subscribe({//todo 更新内容未变
-                when (it.errorCode) {
-                    NetworkStatusCode.OK -> {
-                        startAddSceneTimeOut(it.t)
-                    }//更新超时
-                    //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
-                    // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
-                    NetworkStatusCode.ROUTER_DEL_SCENE_NOT_EXITE -> {//该场景不存在，刷新场景数据
-                       SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
-                        initScene()
-                    }
-                    NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
-                    NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                }
-            }, {
-                ToastUtils.showShort(it.message)
-            })
+        }, {
+            ToastUtils.showShort(it.message)
+        })
     }
 
     private fun startAddSceneTimeOut(it: RouterTimeoutBean?) {
@@ -857,8 +822,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun setSceneAc(sceneActions: DbSceneActions, belongSceneId: Long, item: ItemGroup, deviceType: Int, position: Int = 1000000): DbSceneActions {
-        sceneActions.belongSceneId = belongSceneId
+        sceneActions.isOn = item.isOn
         sceneActions.deviceType = deviceType
+        sceneActions.belongSceneId = belongSceneId
         sceneActions.groupAddr = item.groupAddress
 
         if (1 == item.rgbType && deviceType == 0x06) {//是彩灯并且是渐变模式
@@ -871,7 +837,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 sceneActions.gradientName = itemGroup.gradientName
             }
         } else {
-            sceneActions.isOn = item.isOn
             sceneActions.setIsEnableBright(item.isEnableBright)
             sceneActions.setIsEnableWhiteBright(item.isEnableWhiteLight)
             sceneActions.brightness = item.brightness
@@ -968,43 +933,69 @@ class NewSceneSetAct : TelinkBaseActivity() {
         scene?.name = name
         scene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
         val belongSceneId = scene?.id!!
-        when {
-            Constant.IS_ROUTE_MODE -> routerAddOrUpdateScene(itemGroups, belongSceneId, name, scene?.imgName ?: "icon_out", false)
-            else -> {
-                showLoadingDialog(getString(R.string.saving))
-                DBUtils.updateScene(scene!!)
-                DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.id!!))
 
-                for (i in itemGroups.indices) {
-                    var sceneActions = DbSceneActions()
-                    val groupByMeshAddr = DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)
-                    when {
-                        OtherUtils.isCurtain(groupByMeshAddr) -> {
-                            sceneActions = setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x10)
-                            sceneActions.isOn = itemGroups[i].isOn
-                        }
-                        OtherUtils.isConnector(groupByMeshAddr) -> {
-                            sceneActions = setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x05)
-                            sceneActions.isOn = itemGroups[i].isOn
-                        }
-                        OtherUtils.isRGBGroup(groupByMeshAddr) -> sceneActions = setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x06, i)
-                        else -> sceneActions = setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x04)
-                    }
-                    nameList.add(itemGroups[i].groupAddress)
-                    DBUtils.saveSceneActions(sceneActions)
+        if (!Constant.IS_ROUTE_MODE) {
+            showLoadingDialog(getString(R.string.saving))
+            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.id!!))
+        }
+        val actionsList = mutableListOf<DbSceneActions>()
+        for (i in itemGroups.indices) {
+            var sceneActions = DbSceneActions()
+            val groupByMeshAddr = DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)
+            sceneActions = when {
+                OtherUtils.isCurtain(groupByMeshAddr) -> {
+                    setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x10)
                 }
-                isChange = compareList(nameList, groupMeshAddrArrayList)
+                OtherUtils.isConnector(groupByMeshAddr) -> {
+                    setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x05)
+                }
+                OtherUtils.isRGBGroup(groupByMeshAddr) -> setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x06, i)
+                else -> setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x04)
+            }
+            actionsList.add(sceneActions)
+            DBUtils.saveSceneActions(sceneActions)
+            nameList.add(itemGroups[i].groupAddress)
+        }
+        isChange = compareList(nameList, groupMeshAddrArrayList)
+
+        when {
+            Constant.IS_ROUTE_MODE -> routerUpdateScene(belongSceneId, actionsList)
+            else -> {
+                DBUtils.updateScene(scene!!)
                 Thread.sleep(100)
-                updateScene(belongSceneId)
+                updateSceneSendCommend(belongSceneId)
+                finish()
             }
         }
-        //this@NewSceneSetAct.runOnUiThread {  hideLoadingDialog() }
-        finish()
+//this@NewSceneSetAct.runOnUiThread {  hideLoadingDialog() }
+
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerUpdateScene(belongSceneId: Long, actionsList: MutableList<DbSceneActions>) {
+        RouterModel.routeUpdateScene(belongSceneId, actionsList, "updateScene")?.subscribe({
+            LogUtils.v("zcl-----------更新路由场景成功-------$it")
+            when (it.errorCode) {
+                NetworkStatusCode.OK -> {
+                    startAddSceneTimeOut(it.t)
+                }//更新超时
+                //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
+                // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
+                NetworkStatusCode.ROUTER_DEL_SCENE_NOT_EXITE -> {//该场景不存在，刷新场景数据
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+                    initScene()
+                }
+                NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
+                NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
     }
 
     @Throws(InterruptedException::class)
-    private fun updateScene(id: Long) {
-        deleteScene(id)
+    private fun updateSceneSendCommend(id: Long) {
+        deleteSceneSendCommend(id)
         val opcode = Opcode.SCENE_ADD_OR_DEL
         //val list = DBUtils.getActionsBySceneId(id)
         val list = DBUtils.getActionsBySceneId(id)
@@ -1060,7 +1051,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
     }
 
-    private fun deleteScene(id: Long) {
+    private fun deleteSceneSendCommend(id: Long) {
         if (isChange) {
             val opcode = Opcode.SCENE_ADD_OR_DEL
             val params: ByteArray = byteArrayOf(0x00, id.toByte())
@@ -1129,8 +1120,25 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     disposableTimer?.dispose()
                     hideLoadingDialog()
                     getNewScenes()
+
                 }
                 else -> ToastUtils.showShort(routerScene?.msg)
+            }
+        }
+    }
+
+    override fun tzRouteUpdateScene(cmdBodyBean: CmdBodyBean) {
+        if (cmdBodyBean?.ser_id == "updateScene") {
+            hideLoadingDialog()
+            LogUtils.v("zcl-----------收到路由添加通知-------$cmdBodyBean")
+            when {
+                cmdBodyBean?.finish && cmdBodyBean?.status == 0 -> {//-1 全部失败 1 部分成功
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    disposableTimer?.dispose()
+                    hideLoadingDialog()
+                    getNewScenes()
+                }
+                else -> ToastUtils.showShort(getString(R.string.update_scene_fail))
             }
         }
     }
@@ -1143,13 +1151,13 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 .subscribeOn(Schedulers.io())?.subscribe({
                     for (item in it) {
                         DBUtils.saveScene(item, true)
+                        DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(item?.id!!))
                         for (i in item.actions.indices) {
                             //("是不是空的2"+item.id)
-                            val k = i + 1
-                            DBUtils.saveSceneActions(item.actions[i], k.toLong(), item.id)
+                            DBUtils.saveSceneActions(item.actions[i], item.id)
                         }
-                        finish()
                     }
+                    finish()
                 }, {
                     ToastUtils.showShort(it.message)
                     finish()

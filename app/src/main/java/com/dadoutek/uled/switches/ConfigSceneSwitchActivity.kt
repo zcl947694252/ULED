@@ -154,7 +154,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
     @SuppressLint("CheckResult")
     private fun confirmSceneSw() {
-        if (TelinkLightApplication.getApp().connectDevice == null) {
+        if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
             if (mConnectingSnackBar?.isShown != true) {
                 mConfigFailSnackbar?.dismiss()
                 showDisconnectSnackBar()
@@ -165,11 +165,12 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 return
             }
             if (Constant.IS_ROUTE_MODE) {
-                val sceneMeshAddrs = mutableListOf<Int>()
+                val sceneMeshAddrs = ArrayList<Int>(4)
+                mapConfig.toSortedMap()
                 mapConfig.forEach { sceneMeshAddrs.add(it.value.id.toInt()) }
                 routerConfigScene(sceneMeshAddrs)
             } else {
-                pb_ly.visibility = View.VISIBLE
+                showLoadingDialog(getString(R.string.please_wait))
                 GlobalScope.launch {
                     //setSceneForSwitch()
                     val mesh = mApp?.mesh
@@ -214,13 +215,14 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 ?.subscribe({
                     // "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
                     // "errorCode": 90007,"该组不存在，刷新组列表"    "errorCode": 90005,"以下路由没有上线，无法配置"   "errorCode":90011 , "有场景不存在，刷新场景列表"
+                    LogUtils.v("zcl-----------收到路由配置场景请求-------$it")
                     when (it.errorCode) {
                         0 -> {
                             pb_ly.visibility = View.VISIBLE
-                            disposableTimer?.dispose()
-                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
                                     .subscribe {
-                                        sw_progressBar.visibility = View.GONE
+                                        hideLoadingDialog()
                                         ToastUtils.showShort(getString(R.string.config_fail))
                                     }
                         }

@@ -756,7 +756,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             popFinish?.dismiss()
             stopScanTimer()
             closeAnimation()
-            finish()
+            getAndFinish()
         }
 
         scanning_no_factory_btn.setOnClickListener {
@@ -814,6 +814,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
             mAddedDevicesAdapter.notifyItemChanged(position)
         }
+    }
+
+    private fun getAndFinish() {
+        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, object : SyncCallback {
+            override fun start() {}
+
+            override fun complete() {
+                finish()
+            }
+
+            override fun error(msg: String?) {
+                finish()
+            }
+        })
     }
 
     private fun stopScan() {
@@ -943,8 +957,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         var title = when (mAddDeviceType) {
             DeviceType.LIGHT_NORMAL -> getString(R.string.normal_light)
             DeviceType.LIGHT_RGB -> getString(R.string.rgb_light)
-            DeviceType.SENSOR -> getString(R.string.sensor)
-            DeviceType.NORMAL_SWITCH -> getString(R.string.switch_title)
+            98 -> getString(R.string.sensor)
+            99 -> getString(R.string.switch_title)
             DeviceType.SMART_RELAY -> getString(R.string.relay)
             DeviceType.SMART_CURTAIN -> getString(R.string.curtain)
             DeviceType.GATE_WAY -> getString(R.string.Gate_way)
@@ -1823,12 +1837,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             98 -> {
                                 intent = Intent(this, SensorDeviceDetailsActivity::class.java)
                                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
-                                finish()
+                                getAndFinish()
                             }
                             99 -> {
                                 intent = Intent(this, SwitchDeviceDetailsActivity::class.java)
                                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
-                                finish()
+                                getAndFinish()
                             }
                             else -> {
                                 intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
@@ -1865,6 +1879,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         mConnectDisposal?.dispose()
         disposeAllSubscribe()
         mApplication?.removeEventListener(this)
+        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
     }
 
     private fun startMeshTimeoutTimer() {

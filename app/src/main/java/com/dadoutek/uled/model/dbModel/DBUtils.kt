@@ -963,8 +963,7 @@ object DBUtils {
         //                Constant.DB_ADD);
     }
 
-    fun saveSceneActions(sceneActions: DbSceneActions, id: Long?,
-                         sceneId: Long) {
+    fun saveSceneActions(sceneActions: DbSceneActions, sceneId: Long) {
         val actions = DbSceneActions()
         actions.belongSceneId = sceneId
         actions.brightness = sceneActions.brightness

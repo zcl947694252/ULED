@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -259,18 +260,21 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         groupParamList.add(1, secondParm)
         groupParamList.add(2, thirParm)
         groupParamList.add(3, fourParm)
-
-        GlobalScope.launch {
-            var delay = 1000L
-            for (p in groupParamList) {
-                delay(delay)
-                //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
-                //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
-                delay += 300
+        if (!Constant.IS_ROUTE_MODE){
+            GlobalScope.launch {
+                var delay = 1000L
+                for (p in groupParamList) {
+                    delay(delay)
+                    //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
+                    //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
+                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
+                    delay += 300
+                }
+                delay(1500)
+                updateMeshGroup(2)
             }
-            delay(1500)
-            updateMeshGroup(2)
+        }else{
+            routerConfigEightSw(mDeviceInfo?.id?.toLong() ?: 0L)
         }
     }
 
@@ -296,15 +300,19 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         sceneParamList.add(sceneParmTwo)
         sceneParamList.add(sceneParmThird)
         sceneParamList.add(sceneParmFour)
-        var delay = 1000.toLong()
-        GlobalScope.launch {
-            for (p in sceneParamList) {
-                delay(delay)
-                TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
-                delay += 300
+        if (!Constant.IS_ROUTE_MODE){
+            var delay = 1000.toLong()
+            GlobalScope.launch {
+                for (p in sceneParamList) {
+                    delay(delay)
+                    TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_SCENE_SWITCH, mDeviceInfo?.meshAddress ?: 0, p)
+                    delay += 300
+                }
+                delay(1500)
+                updateMeshGroup(1)
             }
-            delay(1500)
-            updateMeshGroup(1)
+        }else{
+            routerConfigEightSw(mDeviceInfo?.id?.toLong() ?: 0L)
         }
     }
 
@@ -802,9 +810,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun routerConfigEightSw(id: Long) {
-        showLoadingDialog(getString(R.string.setting_switch))
-        val keys = listKeysBean as List<KeyBean>
+        val keys = GsonUtil.stringToList(listKeysBean.toString(), KeyBean::class.java)
         RouterModel.configEightSw(id, keys, "configEightSw")?.subscribe({
+            LogUtils.v("zcl-----------收到路由配置八键请求-------$it")
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))

@@ -499,7 +499,7 @@ class SyncDataPutOrGetUtils {
                             for (i in item.actions.indices) {
                                 //("是不是空的2"+item.id)
                                 val k = i + 1
-                                DBUtils.saveSceneActions(item.actions[i], k.toLong(), item.id)
+                                DBUtils.saveSceneActions(item.actions[i], item.id)
                             }
                         }
                     }

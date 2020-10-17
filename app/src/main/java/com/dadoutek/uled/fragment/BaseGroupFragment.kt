@@ -50,13 +50,12 @@ import com.dadoutek.uled.model.httpModel.GroupMdodel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.RouterDelGpBody
-import com.dadoutek.uled.network.RouterTimeoutBean
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -710,7 +709,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
+    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean) {
         LogUtils.v("zcl-----------收到路由删组通知-------${routerGroup}")
         disposableTimer?.dispose()
         if (routerGroup.ser_id == "delGp") {

@@ -26,7 +26,7 @@ import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
@@ -102,7 +102,7 @@ open class BaseFragment : Fragment() {
                         }
                     }
                     Cmd.routeDeleteGroup -> {
-                        val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
+                        val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
                         tzRouterDelGroupResult(routerGroup)
                     }
                     Cmd.routeDeleteScenes ->{
@@ -148,7 +148,7 @@ open class BaseFragment : Fragment() {
     }
 
 
-    open fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean) {
+    open fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean) {
 
     }
 

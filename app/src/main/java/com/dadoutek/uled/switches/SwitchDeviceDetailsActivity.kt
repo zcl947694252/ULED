@@ -18,6 +18,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -34,7 +35,7 @@ import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -654,7 +655,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         }
     }
 
-    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
         LogUtils.v("zcl-----------收到路由获取开关版本号通知-------$routerVersion")
         if (routerVersion?.ser_id == "switchVersion") {
             disposableRouteTimer?.dispose()

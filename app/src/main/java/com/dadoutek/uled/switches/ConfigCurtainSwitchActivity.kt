@@ -88,7 +88,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     }
 
     override fun setConnectMeshAddr(): Int {
-       return mDeviceInfo?.meshAddress?:0
+        return mDeviceInfo?.meshAddress ?: 0
     }
 
 
@@ -143,10 +143,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             mGroupArrayList[0].checked = true
         }
 
-       // mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
+        // mAdapter = SelectSwitchGroupRvAdapter(R.layout.item_select_switch_group_rv, mGroupArrayList)
         //recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         //recyclerView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
-       // mAdapter.bindToRecyclerView(recyclerView)
+        // mAdapter.bindToRecyclerView(recyclerView)
     }
 
     private fun makePop() {
@@ -271,7 +271,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         }
 
         fab.setOnClickListener {
-            if (TelinkLightApplication.getApp().connectDevice == null) {
+            if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()
@@ -282,8 +282,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                     return@setOnClickListener
                 }
                 if (!Constant.IS_ROUTE_MODE)
-                configSw()
-                    else
+                    configSw()
+                else
                     routerConfigSw()
 
             }
@@ -313,7 +313,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
     @SuppressLint("CheckResult")
     private fun routerConfigSw() {
-        RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr,"configNormalSw")
+        RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr, "configNormalSw")
                 ?.subscribe({
                     //    "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
                     //    "errorCode": 90007,"该组不存在，刷新组列表"   "errorCode": 90005,"以下路由没有上线，无法配置"
@@ -340,10 +340,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
 
     override fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl-----------收到路由配置普通开关通知-------$cmdBean")
-        if (cmdBean.ser_id=="configNormalSw"){
+        if (cmdBean.ser_id == "configNormalSw") {
             disposableRouteTimer?.dispose()
             hideLoadingDialog()
-            if (cmdBean.status==0){
+            if (cmdBean.status == 0) {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showShort(getString(R.string.config_success))
                     if (!isReConfig)
@@ -351,7 +351,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                     else
                         finish()
                 }
-            }else{
+            } else {
                 ToastUtils.showShort(getString(R.string.config_fail))
             }
         }
@@ -405,25 +405,33 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         when (info.stateCode) {
             ErrorReportEvent.STATE_SCAN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> { }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> { }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> { }
+                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
+                    }
+                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
+                    }
                 }
                 showDisconnectSnackBar()
             }
             ErrorReportEvent.STATE_CONNECT -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> { }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> { }
+                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
+                    }
+                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
+                    }
                 }
                 showDisconnectSnackBar()
 
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> { }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {}
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {}
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
+                    }
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+                    }
                 }
                 showDisconnectSnackBar()
             }
@@ -549,7 +557,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         connectParams.setConnectMac(mDeviceInfo.macAddress)
 
         mDisconnectSnackBar?.dismiss()
-       // mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.connecting_tip))
+        // mConnectingSnackBar = indefiniteSnackbar(configGroupRoot, getString(R.string.connecting_tip))
         ToastUtils.showShort(getString(R.string.connecting_tip))
         TelinkLightService.Instance()?.autoConnect(connectParams)
     }

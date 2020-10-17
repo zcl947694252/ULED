@@ -51,7 +51,7 @@ import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.MacResetBody
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelOrGetVerBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
@@ -779,7 +779,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.routeStopScan -> tzRouteStopScan(cmdBean)
 
                 Cmd.routeGroupingDevice -> {
-                    val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
+                    val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
                     tzRouterGroupResult(routerGroup)
                 }
                 Cmd.routeAddScenes -> {
@@ -787,8 +787,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     tzRouterAddScene(routerScene)
                 }
 
+                Cmd.routeUpdateScenes ->tzRouteUpdateScene(cmdBean)
+
                 Cmd.routeUpdateDeviceVersion -> {//版本号回调
-                    val routerVersion = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
+                    val routerVersion = Gson().fromJson(msg, RouteGetVerBean::class.java)
                     tzRouterUpdateVersionRecevice(routerVersion)
                 }
 
@@ -818,7 +820,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.tzRouteAddGradient, Cmd.tzRouteDelGradient, Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean)
                 Cmd.tzRouteConnectSwSe -> tzRouterConnectSwSeRecevice(cmdBean)
                 Cmd.routeDeleteGroup -> {
-                    val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelOrGetVerBean::class.java)
+                    val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
                     tzRouterDelGroupResult(routerGroup)
                 }
                 /**
@@ -926,7 +928,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     }
 
-    open fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
+    open fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
 
     }
 
@@ -986,7 +988,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     }
 
-    open fun tzRouterUpdateVersionRecevice(routerVersion: RouteGroupingOrDelOrGetVerBean?) {
+    open fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
 
     }
 
@@ -994,10 +996,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     }
 
-    open fun tzRouterGroupResult(routerGroup: RouteGroupingOrDelOrGetVerBean?) {
+    open fun tzRouterGroupResult(routerGroup: RouteGroupingOrDelBean?) {
 
     }
 
+    open fun tzRouteUpdateScene(cmdBodyBean: CmdBodyBean) {
+    }
     open fun tzStartRouterScan(cmdBodyBean: CmdBodyBean) {
     }
 

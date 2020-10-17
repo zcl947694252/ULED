@@ -180,8 +180,8 @@ object RouterModel {
     /**
      * 路由更新场景
      */
-    fun routeUpdateScene(sceneId: Long, actions: List<DbSceneActions>): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerUpdateScene(sceneId, actions, "updateScene")
+    fun routeUpdateScene(sceneId: Long, actions: List<DbSceneActions>,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerUpdateScene(RouterUpDateSceneBody(sceneId, actions, ser_id))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -309,7 +309,7 @@ object RouterModel {
      * 配置场景开关
      */
     fun configSceneSw(id: Long, groupMeshAddrs: List<Int>,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configSceneSw(id.toInt(), groupMeshAddrs, ser_id)
+        return NetworkFactory.getApi().configSceneSw(SwSceneListBody(id.toInt(), groupMeshAddrs, ser_id))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -317,8 +317,8 @@ object RouterModel {
     /**
      * 配置场景开关
      */
-    fun configEightSw(id: Long, keys: List<KeyBean>,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configEightSw(id.toInt(), keys, ser_id)
+    fun configEightSw(id: Long, keys: List<KeyBean>, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configEightSw(SwEightBody(id.toInt(), keys, ser_id))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
