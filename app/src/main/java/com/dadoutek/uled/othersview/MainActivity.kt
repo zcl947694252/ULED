@@ -418,7 +418,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         registerReceiver(mReceiver, filter)
 
 
-        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        Constant.IS_ROUTE_MODE = false
     }
 
     override fun onPostResume() {

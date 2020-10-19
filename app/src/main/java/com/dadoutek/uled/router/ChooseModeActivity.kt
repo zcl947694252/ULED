@@ -40,7 +40,7 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
 
         updateUi()
 
-        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.visibility =View.GONE
+        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.visibility = View.GONE
 
         choose_mode_ble_iv.setOnClickListener(this)
         choose_mode_router_iv.setOnClickListener(this)
@@ -58,7 +58,7 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
-                    Constant.IS_ROUTE_MODE = !Constant.IS_ROUTE_MODE
+        Constant.IS_ROUTE_MODE = !Constant.IS_ROUTE_MODE
         when (v?.id) {
             R.id.choose_mode_ble_iv -> {
                 UserModel.updateModeStatus().subscribe({
