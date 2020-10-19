@@ -19,12 +19,10 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
-import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.SharedPreferencesUtils
@@ -54,7 +52,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_confirmation_code)
-        typeStr = this.intent.extras!!.getString(Constant.TYPE_USER)
+        typeStr = this.intent.extras!!.getString(Constants.TYPE_USER)
         initViewType()
         initView()
         timing()
@@ -69,13 +67,13 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         phone = this.intent.extras!!.getString("phone")
         account = this.intent.extras!!.getString("account")
         when (typeStr) {
-            Constant.TYPE_VERIFICATION_CODE -> {
+            Constants.TYPE_VERIFICATION_CODE -> {
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + " " + phone
             }
-            Constant.TYPE_REGISTER -> {
+            Constants.TYPE_REGISTER -> {
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
             }
-            Constant.TYPE_FORGET_PASSWORD -> {
+            Constants.TYPE_FORGET_PASSWORD -> {
                 codePhone.text = resources.getString(R.string.follow_the_steps)
             }
         }
@@ -152,17 +150,17 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                         when (result) {
                             SMSSDK.RESULT_COMPLETE -> {
                                 when (typeStr) {
-                                    Constant.TYPE_VERIFICATION_CODE -> verificationLogin()
-                                    Constant.TYPE_REGISTER -> {
+                                    Constants.TYPE_VERIFICATION_CODE -> verificationLogin()
+                                    Constants.TYPE_REGISTER -> {
                                         val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
                                         intent.putExtra("phone", phone)
-                                        intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
+                                        intent.putExtra(Constants.USER_TYPE, Constants.TYPE_REGISTER)
                                         startActivityForResult(intent, 0)
                                         finish()
                                     }
-                                    Constant.TYPE_FORGET_PASSWORD -> {
+                                    Constants.TYPE_FORGET_PASSWORD -> {
                                         val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
-                                        intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
+                                        intent.putExtra(Constants.USER_TYPE, Constants.TYPE_FORGET_PASSWORD)
                                         intent.putExtra("phone", account)
                                         startActivity(intent)
                                         finish()
@@ -267,7 +265,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
         override fun complete() {
             hideLoadingDialog()
-            SharedPreferencesHelper.putBoolean(this@EnterConfirmationCodeActivity, Constant.IS_LOGIN, true)
+            SharedPreferencesHelper.putBoolean(this@EnterConfirmationCodeActivity, Constants.IS_LOGIN, true)
             startActivity(Intent(this@EnterConfirmationCodeActivity, MainActivity::class.java))
             finish()
         }

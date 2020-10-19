@@ -24,7 +24,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.dbModel.DbRegion
@@ -33,17 +33,12 @@ import com.dadoutek.uled.model.httpModel.RegionModel
 import com.dadoutek.uled.model.httpModel.RegionModel.lookAndMakeRegionQR
 import com.dadoutek.uled.model.httpModel.RegionModel.lookAuthorizeCode
 import com.dadoutek.uled.model.httpModel.RegionModel.lookTransferCode
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
-import com.dadoutek.uled.network.bean.TransferRegionBean
 import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
 import com.dadoutek.uled.region.adapter.AreaItemAdapter
 import com.dadoutek.uled.region.bean.ParseCodeBean
 import com.dadoutek.uled.region.bean.RegionBean
-import com.dadoutek.uled.region.bean.ShareCodeBean
-import com.dadoutek.uled.region.bean.TransferBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.PopUtil
@@ -200,7 +195,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
     private fun addRegion(text: Editable) {
         val dbRegion = DbRegion()
-        dbRegion.installMesh = Constant.PIR_SWITCH_MESH_NAME
+        dbRegion.installMesh = Constants.PIR_SWITCH_MESH_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.name = text.toString()
         if (isAddRegion) {
@@ -466,7 +461,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 when (isShowType) {
                     1 -> {
                         val intent = Intent(this@NetworkActivity, UnbindMeNetActivity::class.java)
-                        intent.putExtra(Constant.SHARE_PERSON, regionBean)
+                        intent.putExtra(Constants.SHARE_PERSON, regionBean)
                         startActivity(intent)
                         PopUtil.dismiss(pop)
                     }

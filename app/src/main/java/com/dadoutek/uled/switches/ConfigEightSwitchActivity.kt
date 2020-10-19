@@ -12,7 +12,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.util.GsonUtil
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
@@ -260,7 +260,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         groupParamList.add(1, secondParm)
         groupParamList.add(2, thirParm)
         groupParamList.add(3, fourParm)
-        if (!Constant.IS_ROUTE_MODE){
+        if (!Constants.IS_ROUTE_MODE){
             GlobalScope.launch {
                 var delay = 1000L
                 for (p in groupParamList) {
@@ -300,7 +300,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         sceneParamList.add(sceneParmTwo)
         sceneParamList.add(sceneParmThird)
         sceneParamList.add(sceneParmFour)
-        if (!Constant.IS_ROUTE_MODE){
+        if (!Constants.IS_ROUTE_MODE){
             var delay = 1000.toLong()
             GlobalScope.launch {
                 for (p in sceneParamList) {
@@ -344,7 +344,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         groupParamList.add(1, secondParm)
         groupParamList.add(2, thirParm)
         groupParamList.add(3, fourParm)
-        if (!Constant.IS_ROUTE_MODE) {
+        if (!Constants.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.setting_switch))
             GlobalScope.launch {
                 var delay = 1000.toLong()
@@ -439,7 +439,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 LogUtils.v("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
                 DBUtils.recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD, eightSwitch.type, eightSwitch.keys)
+                        Constants.DB_ADD, eightSwitch.type, eightSwitch.keys)
                 switchData = eightSwitch
             }
         } else {
@@ -623,12 +623,12 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             var name: String = ""
             when (configSwitchType) {
                 0, 2 -> {
-                    var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+                    var group = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
                     groupMap[configButtonTag] = group
                     name = group.name
                 }
                 else -> {
-                    val scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
+                    val scene = data?.getParcelableExtra(Constants.EIGHT_SWITCH_TYPE) as DbScene
                     //var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
                     scene?.let {
                         sceneMap[configButtonTag] = it
@@ -777,7 +777,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEt?.text.toString().trim { it <= ' ' }
-                if (!Constant.IS_ROUTE_MODE)
+                if (!Constants.IS_ROUTE_MODE)
                     renameSw(trim)
                 else
                     routerRenameSw(switchData!!, trim)
@@ -904,8 +904,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
              }else{*/
             val intent = Intent(this@ConfigEightSwitchActivity, ChooseGroupOrSceneActivity::class.java)
             val bundle = Bundle()
-            bundle.putInt(Constant.EIGHT_SWITCH_TYPE, configSwitchType)//传入0代表是群组
-            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
+            bundle.putInt(Constants.EIGHT_SWITCH_TYPE, configSwitchType)//传入0代表是群组
+            bundle.putInt(Constants.DEVICE_TYPE, Constants.DEVICE_TYPE_LIGHT_SW.toInt())
             intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
             //}

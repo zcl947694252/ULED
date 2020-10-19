@@ -6,7 +6,6 @@ import android.support.v7.util.DiffUtil
 import android.support.v7.widget.*
 import android.support.v7.widget.Toolbar
 import android.text.TextUtils
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,14 +15,11 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
-import com.dadoutek.uled.gateway.GwEventListActivity
-import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Constant.*
+import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.adapter.RouterDeviceDetailsAdapter
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -212,7 +208,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
                             LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
                             if (result != null) {
                                 val intent = Intent(this@RouterDeviceDetailsActivity, RoutingNetworkActivity::class.java)
-                                intent.putExtra(Constant.ONE_QR, result)
+                                intent.putExtra(Constants.ONE_QR, result)
                                 startActivity(intent)
                                 finish()
                             } else {

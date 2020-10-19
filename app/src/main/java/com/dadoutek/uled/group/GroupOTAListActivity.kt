@@ -20,7 +20,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.routerModel.RouterModel
@@ -29,7 +29,6 @@ import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.router.bean.RouterVersionsBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -91,7 +90,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_group_ota_list)
-        if (Constant.IS_ROUTE_MODE) {
+        if (Constants.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.please_wait))
             getIntentData()
             getOtaData()
@@ -1001,10 +1000,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     private fun startOtaAct(meshAddr: Int, macAddr: String, version: String, deviceType: Int) {
         val intent = Intent(this@GroupOTAListActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MES_Add, meshAddr)
-        intent.putExtra(Constant.OTA_MAC, macAddr)
-        intent.putExtra(Constant.OTA_VERSION, version)
-        intent.putExtra(Constant.OTA_TYPE, deviceType)
+        intent.putExtra(Constants.OTA_MES_Add, meshAddr)
+        intent.putExtra(Constants.OTA_MAC, macAddr)
+        intent.putExtra(Constants.OTA_VERSION, version)
+        intent.putExtra(Constants.OTA_TYPE, deviceType)
         startActivity(intent)
     }
 

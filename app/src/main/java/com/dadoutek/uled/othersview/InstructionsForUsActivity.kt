@@ -4,17 +4,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.DisplayMetrics
 import android.view.KeyEvent
 import android.webkit.WebView
-import android.webkit.WebViewClient
-import com.blankj.utilcode.util.LogUtils
 
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import kotlinx.android.synthetic.main.toolbar.*
-import java.util.*
 
 class InstructionsForUsActivity : TelinkBaseActivity() {
     /**
@@ -93,7 +89,7 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
             webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html?lang=1")
         }*/
 
-        var webIndex = intent.getStringExtra(Constant.WB_TYPE)
+        var webIndex = intent.getStringExtra(Constants.WB_TYPE)
 
         val config: Configuration = resources.configuration
         when {

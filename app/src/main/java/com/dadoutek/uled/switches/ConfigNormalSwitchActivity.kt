@@ -17,7 +17,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.recordingChange
@@ -173,7 +173,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEt?.text.toString().trim { it <= ' ' }
-                if (!Constant.IS_ROUTE_MODE)
+                if (!Constants.IS_ROUTE_MODE)
                     renameSw(trim)
                 else
                     routerRenameSw(switchDate!!, trim)
@@ -237,7 +237,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
-            currentGroup = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            currentGroup = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
             group_name.text = currentGroup?.name
         }
     }
@@ -252,11 +252,11 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             val intent = Intent(this@ConfigNormalSwitchActivity, ChooseGroupOrSceneActivity::class.java)
             //传入0代表是群组
             val bundle = Bundle()
-            bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
+            bundle.putInt(Constants.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+            bundle.putInt(Constants.DEVICE_TYPE, Constants.DEVICE_TYPE_LIGHT_SW.toInt())
             intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
-            setResult(Constant.RESULT_OK)
+            setResult(Constants.RESULT_OK)
         }
         fab.setOnClickListener {
             if (currentGroup == null) {
@@ -264,14 +264,14 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 return@setOnClickListener
             }
 
-            if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
+            if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
                 if (mConnectingSnackBar?.isShown != true) {
                     showDisconnectSnackBar()
                 }
             } else {
                 // (mAdapter.selectedPos != -1) {
                 sw_progressBar.visibility = View.VISIBLE
-                if (Constant.IS_ROUTE_MODE)
+                if (Constants.IS_ROUTE_MODE)
                     RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr,"configNormalSw")
                             ?.subscribe({
                                 //    "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
@@ -407,7 +407,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
     @SuppressLint("CheckResult")
     private fun showDisconnectSnackBar() {
-        if (!Constant.IS_ROUTE_MODE) {
+        if (!Constants.IS_ROUTE_MODE) {
             TelinkLightService.Instance()?.idleMode(true)
             reconnect()
         } else {
@@ -533,7 +533,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
                 LogUtils.e("zcl", "zcl*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
-                recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
+                recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constants.DB_ADD)
                 switchDate = dbSwitch
             }
             switchDate = dbSwitch
@@ -549,14 +549,14 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     private var mConnectingSnackBar: Snackbar? = null
 
     private fun reconnect() {
-        if (Constant.IS_ROUTE_MODE) return
+        if (Constants.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(mDeviceInfo.meshName)
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
+        pwd = if (mDeviceInfo.meshName == Constants.PIR_SWITCH_MESH_NAME) {
             mesh.factoryPassword.toString()
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName).substring(0, 16)

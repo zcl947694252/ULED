@@ -14,7 +14,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.CountryActivity
@@ -102,7 +102,7 @@ class ForgetPassWordActivity : TelinkBaseActivity(), View.OnClickListener, TextW
                                 dbUser!!.account = it.t
                                 //正式代码走短信验证
                                 val intent = Intent(this@ForgetPassWordActivity, EnterConfirmationCodeActivity::class.java)
-                                intent.putExtra(Constant.TYPE_USER, Constant.TYPE_FORGET_PASSWORD)
+                                intent.putExtra(Constants.TYPE_USER, Constants.TYPE_FORGET_PASSWORD)
                                 intent.putExtra("country_code", countryCode)
                                 intent.putExtra("phone", userName)
                                 intent.putExtra("account", dbUser!!.account)

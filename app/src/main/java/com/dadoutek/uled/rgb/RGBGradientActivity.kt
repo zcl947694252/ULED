@@ -20,7 +20,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbDiyGradient
@@ -49,7 +49,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     private var dstAddress: Int = 0
     private var firstLightAddress: Int = 0
     private var currentShowIsDiy = false
-    var typeStr = Constant.TYPE_GROUP
+    var typeStr = Constants.TYPE_GROUP
     var speed = 50
     var positionState = 0
     protected val FLIP_DISTANCE = 50f
@@ -88,9 +88,9 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         val intent = intent
-        typeStr = intent.getStringExtra(Constant.TYPE_VIEW)
-        dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
-        if (typeStr == Constant.TYPE_GROUP) {
+        typeStr = intent.getStringExtra(Constants.TYPE_VIEW)
+        dstAddress = intent.getIntExtra(Constants.TYPE_VIEW_ADDRESS, 0)
+        if (typeStr == Constants.TYPE_GROUP) {
             val lightList = DBUtils.getLightByGroupMesh(dstAddress)
             if (lightList != null) {
                 if (lightList.size > 0) {
@@ -247,10 +247,10 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
             R.id.diy_mode_set -> {
                 val intent = Intent(this, SetDiyColorAct::class.java)
-                intent.putExtra(Constant.IS_CHANGE_COLOR, true)
-                intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![position])
-                intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
-                intent.putExtra(Constant.DEVICE_TYPE, deviceType)
+                intent.putExtra(Constants.IS_CHANGE_COLOR, true)
+                intent.putExtra(Constants.GRADIENT_KEY, diyGradientList!![position])
+                intent.putExtra(Constants.TYPE_VIEW_ADDRESS, dstAddress)
+                intent.putExtra(Constants.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
             }
 
@@ -346,9 +346,9 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun transAddAct() {
         if (DBUtils.diyGradientList.size < 6) {
             val intent = Intent(this, SetDiyColorAct::class.java)
-            intent.putExtra(Constant.IS_CHANGE_COLOR, false)
-            intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
-            intent.putExtra(Constant.DEVICE_TYPE, deviceType)
+            intent.putExtra(Constants.IS_CHANGE_COLOR, false)
+            intent.putExtra(Constants.TYPE_VIEW_ADDRESS, dstAddress)
+            intent.putExtra(Constants.DEVICE_TYPE, deviceType)
             startActivityForResult(intent, 0)
         } else {
             ToastUtils.showLong(getString(R.string.add_gradient_limit))
@@ -357,10 +357,10 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun transChangeAct(dbDiyGradient: DbDiyGradient) {
         val intent = Intent(this, SetDiyColorAct::class.java)
-        intent.putExtra(Constant.IS_CHANGE_COLOR, true)
-        intent.putExtra(Constant.GRADIENT_KEY, dbDiyGradient)
-        intent.putExtra(Constant.DEVICE_TYPE, deviceType)
-        intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
+        intent.putExtra(Constants.IS_CHANGE_COLOR, true)
+        intent.putExtra(Constants.GRADIENT_KEY, dbDiyGradient)
+        intent.putExtra(Constants.DEVICE_TYPE, deviceType)
+        intent.putExtra(Constants.TYPE_VIEW_ADDRESS, dstAddress)
         startActivityForResult(intent, 0)
     }
 

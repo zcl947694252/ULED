@@ -14,13 +14,10 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
-import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.httpModel.AccountModel
-import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.SharedPreferencesUtils
@@ -43,17 +40,17 @@ class InputPwdActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_pwd)
         phone = intent.getStringExtra("phone")
-        typeStr = intent.getStringExtra(Constant.USER_TYPE)
+        typeStr = intent.getStringExtra(Constants.USER_TYPE)
         initView()
         initListener()
     }
 
     private fun initView() {
-        if (typeStr == Constant.TYPE_REGISTER) {
+        if (typeStr == Constants.TYPE_REGISTER) {
             pwd_notice.text = getString(R.string.please_password)
             pwd_title.text = getString(R.string.enter_password)
             pwd_btn.text = getString(R.string.register)
-        } else if (typeStr == Constant.TYPE_FORGET_PASSWORD) {
+        } else if (typeStr == Constants.TYPE_FORGET_PASSWORD) {
             pwd_notice.text = getString(R.string.follow_the_steps)
             pwd_title.text = getString(R.string.set_password)
             pwd_btn.text = getString(R.string.complete)

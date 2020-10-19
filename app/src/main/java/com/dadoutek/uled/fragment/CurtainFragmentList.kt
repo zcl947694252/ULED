@@ -1,6 +1,6 @@
 package com.dadoutek.uled.fragment
 
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
@@ -11,7 +11,7 @@ class CurtainFragmentList : BaseGroupFragment() {
         return "curtain_light"
     }
     override fun setGroupType(): Long {
-        return Constant.DEVICE_TYPE_CURTAIN
+        return Constants.DEVICE_TYPE_CURTAIN
     }
 
     override fun getGroupData(): Collection<DbGroup> {

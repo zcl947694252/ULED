@@ -19,7 +19,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.dbModel.DbDiyGradient
@@ -66,11 +66,11 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-        isChange = intent.getBooleanExtra(Constant.IS_CHANGE_COLOR, false)
-        dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
-        deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+        isChange = intent.getBooleanExtra(Constants.IS_CHANGE_COLOR, false)
+        dstAddress = intent.getIntExtra(Constants.TYPE_VIEW_ADDRESS, 0)
+        deviceType = intent.getIntExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
         if (isChange) {
-            diyGradient = intent.getParcelableExtra(Constant.GRADIENT_KEY) as? DbDiyGradient
+            diyGradient = intent.getParcelableExtra(Constants.GRADIENT_KEY) as? DbDiyGradient
             colorNodeList = DBUtils.getColorNodeListByDynamicModeId(diyGradient!!.id)
         } else {
             creatNewData()
@@ -363,7 +363,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
             deleteGradient(belongDynamicModeId)
             delay(200)
-            if (Constant.IS_ROUTE_MODE)
+            if (Constants.IS_ROUTE_MODE)
                 diyGradient?.let {
                     RouterModel.routerUpdateGradient(UpdateGradientBean(it.id.toInt(), it.type, it.colorNodes,dstAddress, deviceType,"updateGradient"))?.subscribe({ response ->
                         //    "errorCode": 90020, "该自定义渐变不存在，请重新刷新数据"
@@ -423,7 +423,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             }
 
             Thread.sleep(100)
-            if (Constant.IS_ROUTE_MODE)
+            if (Constants.IS_ROUTE_MODE)
                 diyGradient?.let {
                     /**
                      * @Field("name") String name,
@@ -566,7 +566,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, view, position ->
         val intent = Intent(this, SelectColorGradientAct::class.java)
         colorNodeList!![position].dstAddress = dstAddress
-        intent.putExtra(Constant.COLOR_NODE_KEY, colorNodeList!![position])
+        intent.putExtra(Constants.COLOR_NODE_KEY, colorNodeList!![position])
         startActivityForResult(intent, position)
     }
 

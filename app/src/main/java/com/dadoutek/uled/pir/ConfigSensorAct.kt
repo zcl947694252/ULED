@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.dbModel.DbSensor
+import com.dadoutek.uled.network.ConfigurationBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
@@ -80,7 +81,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private var mSelectGroupSceneAddr: Int = 0xFF  //代表所有灯
     private var isSupportModeSelect = false
     private var isSupportDelayUnitSelect = false
-    private var modeStartUpMode = 0
+    private var modeStartUpMode = 0//触发开灯 关灯
     private var modeDelayUnit = 0
     private var modeSwitchMode = 0
     private val MODE_START_UP_MODE_OPEN = 0
@@ -151,27 +152,27 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         showLoadingDialog(getString(R.string.please_wait))
                         disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
                                 .subscribe({
-                                  //  deleteData()
+                                    //  deleteData()
                                 }, {
-                                  GlobalScope.launch(Dispatchers.Main){
-                                    /*    showDialogHardDelete?.dismiss()
-                                      showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                              .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                  showLoadingDialog(getString(R.string.please_wait))
-                                                  deleteData()
-                                              }
-                                              .setNegativeButton(R.string.btn_cancel, null)
-                                              .show()*/
+                                    GlobalScope.launch(Dispatchers.Main) {
+                                        /*    showDialogHardDelete?.dismiss()
+                                          showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                  .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                      showLoadingDialog(getString(R.string.please_wait))
+                                                      deleteData()
+                                                  }
+                                                  .setNegativeButton(R.string.btn_cancel, null)
+                                                  .show()*/
                                     }
                                 })
-                                    deleteData()
+                        deleteData()
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
     }
 
-     fun deleteData() {
+    fun deleteData() {
         hideLoadingDialog()
         ToastUtils.showShort(getString(R.string.reset_factory_success))
         DBUtils.deleteSensor(currentSensor!!)
@@ -180,7 +181,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun goOta() {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
         if (isBoolean) {
             transformView()
         } else {
@@ -223,10 +224,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private fun transformView() {
         val intent = Intent(this@ConfigSensorAct, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, currentSensor?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, currentSensor?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, currentSensor?.version)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
+        intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
+        intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
+        intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
+        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
         startActivity(intent)
         finish()
     }
@@ -312,7 +313,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun autoConnectSensor() {
-        if (Constant.IS_ROUTE_MODE) return
+        if (Constants.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
@@ -369,7 +370,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         isReConfirm = mDeviceInfo.isConfirm == 1
-        if (isReConfirm){
+        if (isReConfirm) {
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
             toolbarTv.text = currentSensor?.name
         }
@@ -393,9 +394,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         mGroupScenesName?.clear()
         for (item in mGroups) {
             when (item.deviceType) {
-                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
-                Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
-                    if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
+                Constants.DEVICE_TYPE_CONNECTOR, Constants.DEVICE_TYPE_LIGHT_RGB,
+                Constants.DEVICE_TYPE_LIGHT_NORMAL, Constants.DEVICE_TYPE_NO -> {
+                    if (item.deviceCount > 0 || item.deviceType == Constants.DEVICE_TYPE_NO)
                         mGroupScenesName!!.add(item.name)
                 }
             }
@@ -404,6 +405,15 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
+        //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
+        // triggerKey: Int = 0//0全天    1白天   2夜晚
+        //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
+        //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
+        //action	否	int	触发时执行逻辑。0开，1关，2自定义亮度。仅在群组模式下需要该配置
+        //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
+        //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
+        //sid	否	int	配置场景id。仅在场景模式下需要该配置
+        //ConfigurationBean(modeStartUpMode,)
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
         val paramBytes = if (isGroupMode)
@@ -426,12 +436,15 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
             }
             R.id.spSelectStartupMode -> {
-                if (position == 0) {//开灯
-                    tietMinimumBrightness?.setText("0")
-                    modeStartUpMode = MODE_START_UP_MODE_OPEN
-                } else if (position == 1) {//关灯
-                    tietMinimumBrightness?.setText("99")
-                    modeStartUpMode = MODE_START_UP_MODE_CLOSE
+                when (position) {
+                    0 -> {//开灯
+                        tietMinimumBrightness?.setText("0")
+                        modeStartUpMode = MODE_START_UP_MODE_OPEN
+                    }
+                    1 -> {//关灯
+                        tietMinimumBrightness?.setText("99")
+                        modeStartUpMode = MODE_START_UP_MODE_CLOSE
+                    }
                 }
             }
             R.id.spSwitchMode -> {
@@ -493,8 +506,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 } else {
                     Thread {
                         val mode = getModeValue()
-                        if (Constant.IS_ROUTE_MODE) return@Thread
-                        if (TelinkLightApplication.getApp().connectDevice == null) {
+                        if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
                             showLoadingDialog(getString(R.string.connecting_tip))
                             connectDispose = connect(mDeviceInfo.meshAddress, true)?.subscribe({
                                 hideLoadingDialog()
@@ -505,29 +517,33 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                             })
                             return@Thread
                         }
-                        showLoadingDialog(getString(R.string.configuring_sensor))
-                        configPir(mSelectGroupSceneAddr,
-                                tietDelay.text.toString().toInt(),
-                                tietMinimumBrightness.text.toString().toInt(),
-                                spTriggerLux.selectedItem.toString().toInt(), mode)
-                        Thread.sleep(300)
-                        mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress.get()
-                        Commander.updateMeshName(newMeshAddr = mDeviceInfo.meshAddress,
-                                successCallback = {
-                                    hideLoadingDialog()
-                                    saveSensor()
-                                },
-                                failedCallback = {
-                                    snackbar(configPirRoot, getString(R.string.config_fail))
-                                    hideLoadingDialog()
-                                    TelinkLightService.Instance()?.idleMode(true)
-                                    TelinkLightService.Instance()?.disconnect()
-                                })
+                        if (Constants.IS_ROUTE_MODE)
+                            //routerConfigSensor(mDeviceInfo.meshAddress.toLong(), ConfigurationBean(modeStartUpMode),"configSensor")
+                        else
+                            configSensor(mode)
                     }.start()
 
                 }
             }
         }
+    }
+
+    private fun configSensor(mode: Int) {
+        showLoadingDialog(getString(R.string.configuring_sensor))
+        configPir(mSelectGroupSceneAddr, tietDelay.text.toString().toInt(), tietMinimumBrightness.text.toString().toInt(), spTriggerLux.selectedItem.toString().toInt(), mode)
+        Thread.sleep(300)
+        mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress.get()
+        Commander.updateMeshName(newMeshAddr = mDeviceInfo.meshAddress,
+                successCallback = {
+                    hideLoadingDialog()
+                    saveSensor()
+                },
+                failedCallback = {
+                    snackbar(configPirRoot, getString(R.string.config_fail))
+                    hideLoadingDialog()
+                    TelinkLightService.Instance()?.idleMode(true)
+                    TelinkLightService.Instance()?.disconnect()
+                })
     }
 
     @SuppressLint("SetTextI18n")
@@ -572,7 +588,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
         if (isReConfirm) {
             dbSensor.index = mDeviceInfo.id
-            if (100000000!= mDeviceInfo.id)
+            if (100000000 != mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
             DBUtils.saveSensor(dbSensor, isReConfirm)
@@ -592,7 +608,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
-        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
+        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constants.DB_ADD)
         if (!isReConfirm)
             showRenameDialog(dbSensor)
         else

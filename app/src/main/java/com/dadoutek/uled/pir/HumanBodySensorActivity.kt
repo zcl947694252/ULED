@@ -28,21 +28,25 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.NightLightEditGroupAdapter
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
+import com.dadoutek.uled.network.ConfigurationBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
@@ -59,10 +63,8 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.singleLine
 import java.util.*
@@ -92,12 +94,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     private var fiRename: MenuItem? = null
     private var fiVersion: MenuItem? = null
     private var renameEditText: EditText? = null
+
     //底部组适配器
     private var showGroupList: MutableList<ItemGroup>? = null
     private var nightLightGroupGrideAdapter: NightLightGroupRecycleViewAdapter? = null
 
     //显示选择分组下拉的数据 选择组适配器
     private var showCheckListData: MutableList<DbGroup> = mutableListOf()
+
     //private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.select_more_item, showCheckListData)
     private var nightLightEditGroupAdapter: NightLightEditGroupAdapter = NightLightEditGroupAdapter(R.layout.template_batch_small_item, showCheckListData)
     private var modeStartUpMode = 0
@@ -140,7 +144,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         DBUtils.lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id) {
                 menuInflater.inflate(R.menu.menu_rgb_light_setting, menu)
-                fiRename= menu?.findItem(R.id.toolbar_f_rename)
+                fiRename = menu?.findItem(R.id.toolbar_f_rename)
                 fiRename?.isVisible = isReConfirm
                 fiVersion = menu?.findItem(R.id.toolbar_f_version)
                 if (TextUtils.isEmpty(version))
@@ -165,15 +169,18 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val deleteSwitchConfirm = getString(R.string.delete_switch_confirm)
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(deleteSwitchConfirm)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (currentSensor==null)
+                    if (currentSensor == null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
-                    else{
-                        showLoadingDialog(getString(R.string.please_wait))
-                        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
-                                .subscribe({
-                                  //  deleteData()
-                                }, {
-                                    GlobalScope.launch(Dispatchers.Main)  {/*showDialogHardDelete?.dismiss()
+                    else {
+                        if (Constants.IS_ROUTE_MODE)
+                            routerDeviceResetFactory(currentSensor!!.macAddr, currentSensor!!.meshAddr, 98, "deleteHum")
+                        else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                                    .subscribe({
+                                        //  deleteData()
+                                    }, {
+                                        GlobalScope.launch(Dispatchers.Main) {/*showDialogHardDelete?.dismiss()
                                     showDialogHardDelete = android.app.AlertDialog.Builder(this@HumanBodySensorActivity).setMessage(R.string.delete_device_hard_tip)
                                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                                 showLoadingDialog(getString(R.string.please_wait))
@@ -181,17 +188,30 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                                             }
                                             .setNegativeButton(R.string.btn_cancel, null)
                                             .show()*/
-                                    }
-                                })
-                                        deleteData()
+                                        }
+                                    })
+                            deleteData()
+                        }
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
-
     }
 
-     fun deleteData() {
+    override fun tzRouteResetFactoryBySelf(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到deleteHum路由通知-------$cmdBean")
+        if (cmdBean.ser_id == "deleteHum") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                deleteData()
+            } else {
+                ToastUtils.showShort(getString(R.string.reset_factory_fail))
+            }
+        }
+    }
+
+    fun deleteData() {
         hideLoadingDialog()
         ToastUtils.showShort(getString(R.string.reset_factory_success))
         DBUtils.deleteSensor(currentSensor!!)
@@ -200,7 +220,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun goOta() {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
         if (isBoolean) {
             transformView()
         } else {
@@ -243,10 +263,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun transformView() {
         val intent = Intent(this@HumanBodySensorActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, currentSensor?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, currentSensor?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, currentSensor?.version)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
+        intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
+        intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
+        intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
+        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
         startActivity(intent)
         finish()
     }
@@ -294,7 +314,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         brightness_change.setOnClickListener(this)
         choose_group.setOnClickListener(this)
         sensor_update.setOnClickListener(this)
-        time.setOnClickListener(this)
+        old_time.setOnClickListener(this)
         trigger_mode.setOnClickListener(this)
         TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
         TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
@@ -316,7 +336,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 when (deviceInfo.status) {
                     LightAdapter.STATUS_LOGIN -> {
                         disposable?.dispose()
-                        setLoadingVisbiltyOrGone()
+                        hideLoadingDialog()
                         image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
                     }
 
@@ -366,7 +386,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         version = intent.getStringExtra("version")
         getVersion(version)
         isReConfirm = mDeviceInfo.isConfirm == 1//等于1代表是重新配置
-        if (isReConfirm){
+        if (isReConfirm) {
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
             toolbarTv.text = currentSensor?.name
         }
@@ -377,8 +397,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         for (i in lightGroup.indices) {
             when (lightGroup[i].deviceType) {
-                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
-                    if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constant.DEVICE_TYPE_NO)
+                Constants.DEVICE_TYPE_CONNECTOR, Constants.DEVICE_TYPE_LIGHT_RGB, Constants.DEVICE_TYPE_LIGHT_NORMAL, Constants.DEVICE_TYPE_NO -> {
+                    if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constants.DEVICE_TYPE_NO)
                         showCheckListData!!.add(lightGroup[i])
                 }
             }
@@ -448,8 +468,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun getVersion(version: String) {
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            setLoadingVisbiltyOrGone()
+        if (TelinkApplication.getInstance().connectDevice != null && !Constants.IS_ROUTE_MODE) {
+            hideLoadingDialog()
             tvPSVersion.text = version
             var version = tvPSVersion.text.toString()
             var num: String //N-3.1.1
@@ -567,7 +587,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     popupWindow.dismiss()
                     val textGp = EditText(this)
                     textGp.inputType = InputType.TYPE_CLASS_NUMBER
-                     textGp.singleLine = true
+                    textGp.singleLine = true
                     StringUtils.initEditTextFilter(textGp)
                     AlertDialog.Builder(this)
                             .setTitle(R.string.target_brightness)
@@ -660,9 +680,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 }
             }
 
-            R.id.time -> {
+            R.id.old_time -> {
                 var views = LayoutInflater.from(this).inflate(R.layout.popwindow_choose_time, null)
-                var set = findViewById<ConstraintLayout>(R.id.time)
+                var set = findViewById<ConstraintLayout>(R.id.old_time)
                 var popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 popupWindow.contentView = views
                 popupWindow.isFocusable = true
@@ -903,7 +923,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
                 if (showGroupList!!.size > 8)
                     ToastUtils.showLong(getString(R.string.tip_night_light_group_limite_tip))
-                 else
+                else
                     showDataListView()
             }
 
@@ -938,10 +958,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         }
         val device = TelinkLightApplication.getApp().connectDevice
         if (device != null && device.macAddress == mDeviceInfo.macAddress) {
-            Thread {
-                GlobalScope.launch(Dispatchers.Main) {
-                    setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
-                }
+            CoroutineScope(Dispatchers.IO).launch {
+                runOnUiThread { showLoadingDialog(getString(R.string.please_wait)) }
                 LogUtils.e("zcl人体版本中" + DBUtils.getAllSensor())
                 configLightlight()
                 Thread.sleep(300)
@@ -949,26 +967,19 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     mDeviceInfo.meshAddress = MeshAddressGenerator().meshAddress.get()
                 Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                         successCallback = {
-                            setLoadingVisbiltyOrGone()
-                          saveSensor()
+                            hideLoadingDialog()
+                            saveSensor()
                         },
                         failedCallback = {
                             snackbar(sensor_root, getString(R.string.config_fail))
-                            setLoadingVisbiltyOrGone()
+                            hideLoadingDialog()
                             TelinkLightService.Instance()?.idleMode(true)
                         })
 
-            }.start()
+            }
         } else {
             ToastUtils.showLong(getString(R.string.connect_fail))
             autoConnectSensor()
-        }
-    }
-
-    private fun setLoadingVisbiltyOrGone(visiablity: Int = View.GONE, text: String = "") {
-        runOnUiThread {
-            human_progress_ly.visibility = visiablity
-            human_progress_tv.text = text
         }
     }
 
@@ -1021,7 +1032,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val paramBytesGroup = byteArrayOf(DeviceType.NIGHT_LIGHT.toByte(), CMD_CONTROL_GROUP.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)
 
         var canSendGroup = true
+        val listMesh = mutableListOf<Int>()
+        var brightness = 0
         for (i in showGroupList!!.indices) {
+            listMesh.add(showGroupList!![i].groupAddress)
+            brightness = showGroupList!![i].brightness
             if (showGroupList!![i].groupAddress == 0xffff) {
                 paramBytesGroup[i + 2] = 0xFF.toByte()
                 break
@@ -1030,13 +1045,53 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 paramBytesGroup[i + 2] = groupL
             }
         }
+        if (Constants.IS_ROUTE_MODE) {
+            /*
+            //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
+            // triggerKey: Int = 0//0全天    1白天   2夜晚
+            //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
+            //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
+            //action	否	int	触发时执行逻辑。0开，1关，2自定义亮度。仅在群组模式下需要该配置
+            //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
+            //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
+            //sid	否	int	配置场景id。仅在场景模式下需要该配置
+            */
+            var action = switchMode
+            routerConfigSensor(mDeviceInfo.meshAddress.toLong(), ConfigurationBean(action, 0, brightness, 0, selectTime, listMesh, 0, 0), "configHumBody")
+        } else {
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo.meshAddress, paramBytes)
+            Thread.sleep(300)
+            if (canSendGroup)
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo.meshAddress, paramBytesGroup)
+            Thread.sleep(300)
+        }
+    }
 
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo.meshAddress, paramBytes)
-        Thread.sleep(300)
-        if (canSendGroup)
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo.meshAddress, paramBytesGroup)
+    override fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由configHumBody通知-------$cmdBean")
+        if (cmdBean.ser_id == "configHumBody") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() {}
 
-        Thread.sleep(300)
+                    override fun complete() {
+                        val dbsensor = DBUtils.getSensorByID(currentSensor!!.id)
+                        if (!isReConfirm)
+                            showRenameDialog(dbsensor!!)
+                        else
+                            doFinish()
+                    }
+
+                    override fun error(msg: String?) {
+                        ToastUtils.showShort(msg)
+                    }
+                })
+            } else {
+
+            }
+        }
     }
 
     private fun saveSensor() {
@@ -1045,15 +1100,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val allSensor = DBUtils.getAllSensor()
         LogUtils.e("zcl---$allSensor")
         if (isReConfirm) {
-            dbSensor.index = mDeviceInfo.id.toInt()
+            dbSensor.index = mDeviceInfo.id
             if (100000000 != mDeviceInfo.id)
                 dbSensor.id = mDeviceInfo.id.toLong()
         } else {//如果不是重新配置就保存进服务器
             DBUtils.saveSensor(dbSensor, isReConfirm)
             dbSensor.index = dbSensor.id.toInt()//拿到新的服务器id
         }
-        val allSensor1 = DBUtils.getAllSensor()
-        LogUtils.e("zcl---$allSensor1")
 
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
@@ -1065,11 +1118,9 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         DBUtils.saveSensor(dbSensor, isReConfirm)//保存进服务器
 
-        val allSensor2 = DBUtils.getAllSensor()
-        LogUtils.e("zcl---$allSensor2")
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
-        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
+        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constants.DB_ADD)
 
         if (!isReConfirm)
             showRenameDialog(dbSensor)
@@ -1089,7 +1140,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         if (!this.isFinishing) {
             renameDialog.dismiss()
             runOnUiThread {
-            renameDialog.show()
+                renameDialog.show()
             }
         }
 
@@ -1097,8 +1148,13 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
-                DBUtils.saveSensor(dbSensor, false)
+                val trim = renameEditText?.text.toString().trim { it <= ' ' }
+                if (Constants.IS_ROUTE_MODE)
+                    routerUpdateDeviceName(dbSensor.id, trim)
+                else {
+                    dbSensor.name = trim
+                    DBUtils.saveSensor(dbSensor, false)
+                }
                 if (!this.isFinishing)
                     renameDialog.dismiss()
             }
@@ -1107,7 +1163,6 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             if (!this.isFinishing)
                 renameDialog?.dismiss()
         }
-
     }
 
     private fun getControlGroup(): String? {
@@ -1169,7 +1224,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val device = TelinkLightApplication.getApp().connectDevice
         if (device != null && device.macAddress == mDeviceInfo.macAddress) {
             GlobalScope.launch(Dispatchers.Main) {
-                setLoadingVisbiltyOrGone(View.VISIBLE, this@HumanBodySensorActivity.getString(R.string.configuring_sensor))
+                showLoadingDialog(getString(R.string.please_wait))
             }
             val address = device.meshAddress
             //val address = mDeviceInfo.meshAddress
@@ -1189,7 +1244,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             Commander.updateMeshName(
                     successCallback = {
                         this@HumanBodySensorActivity.runOnUiThread {
-                            setLoadingVisbiltyOrGone()
+                            hideLoadingDialog()
                         }
                         saveSensor()
                         TelinkLightService.Instance()?.idleMode(true)
@@ -1197,7 +1252,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     failedCallback = {
                         this@HumanBodySensorActivity.runOnUiThread {
                             snackbar(sensor_root, getString(R.string.config_fail))
-                            setLoadingVisbiltyOrGone()
+                            hideLoadingDialog()
                         }
                         TelinkLightService.Instance()?.idleMode(true)
                     })
@@ -1283,22 +1338,22 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     @SuppressLint("CheckResult")
     private fun autoConnectSensor() {
-        if (Constant.IS_ROUTE_MODE) return
+        if (Constants.IS_ROUTE_MODE) return
         retryConnectCount++
-        setLoadingVisbiltyOrGone(View.VISIBLE, getString(R.string.connecting_tip))
+        showLoadingDialog(getString(R.string.connecting_tip))
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         val name: String? = if (isReConfirm)
             DBUtils.lastUser?.controlMeshName
         else
-            Constant.DEFAULT_MESH_FACTORY_NAME
+            Constants.DEFAULT_MESH_FACTORY_NAME
         connectParams?.setMeshName(name)
 
         connectParams?.setConnectMac(mDeviceInfo.macAddress)
         val substring: String = if (isReConfirm)
             NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16)
         else
-            Constant.DEFAULT_MESH_FACTORY_PASSWORD
+            Constants.DEFAULT_MESH_FACTORY_PASSWORD
 
         connectParams?.setPassword(substring)
         LogUtils.d("zcl开始连接${mDeviceInfo.macAddress}-----------$substring---------$name----")
@@ -1314,7 +1369,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         disposable = Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)
-            setLoadingVisbiltyOrGone()
+            hideLoadingDialog()
             progressBar_sensor?.visibility = View.GONE
             ToastUtils.showLong(getString(R.string.connect_fail))
         }, {})
@@ -1326,6 +1381,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         }
         return super.onKeyDown(keyCode, event)
     }
+
     private fun configReturn() {
         if (!isReConfirm)
             AlertDialog.Builder(this)

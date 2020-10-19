@@ -23,7 +23,7 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constant.*
+import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
@@ -46,6 +46,7 @@ import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
+import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
@@ -274,7 +275,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                         connectSensorTimeoutDisposable?.dispose()
                         disposable?.dispose()
@@ -312,7 +313,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                     }
                     R.id.template_device_icon -> {
                         isClick = OPEN_CLOSE
-                        if (TelinkApplication.getInstance().connectDevice == null && DBUtils.getAllGateWay().size > 0) {
+                        if (TelinkApplication.getInstance().connectDevice == null && DBUtils.getAllGateWay().size > 0 && !IS_ROUTE_MODE) {
                             sendToGw()
                         } else {
                             setOPenOrClose(position)
@@ -337,7 +338,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
         if (IS_ROUTE_MODE)
             currentDevice?.let {
-                routerConnectSensor(it,"connectSensor")
+                routerConnectSensor(it, "connectSensor")
             }
         else {
             showLoadingDialog(getString(R.string.please_wait))
@@ -376,7 +377,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 if (currentDevice?.openTag == 1) {
                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                             0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                    gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
+                    gattBody.ser_id = Constants.SER_ID_SENSOR_OFF
                 } else {
                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                             0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
@@ -385,7 +386,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
                 val s = Base64Utils.encodeToStrings(gattPar)
                 gattBody.data = s
-                gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                gattBody.cmd = Constants.CMD_MQTT_CONTROL
                 gattBody.meshAddr = currentDevice?.meshAddr ?: 0
                 sendToServer(gattBody)
             } else {
@@ -422,18 +423,49 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     @SuppressLint("CheckResult")
     private fun setOPenOrClose(position: Int) {
         if (currentDevice?.version != null && (currentDevice?.version ?: "0").contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
-            val byteArrayOf = if (currentDevice?.openTag == 1) {
-                sendCloseIcon(position)
-                byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
+            if (!IS_ROUTE_MODE) {
+                val byteArrayOf = if (currentDevice?.openTag == 1) {
+                    sendCloseIcon(position)
+                    byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
+                } else {
+                    sendOpenIcon(position)
+                    byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+                }
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentDevice?.meshAddr ?: 0, byteArrayOf)
             } else {
-                sendOpenIcon(position)
-                byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+                if (currentDevice?.openTag == 1)
+                    routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "closeSensor")
+                else
+                    routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "openSensor")
             }
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentDevice?.meshAddr ?: 0, byteArrayOf)
             DBUtils.saveSensor(sensorDatas[position], true)
             adapter?.notifyDataSetChanged()
         } else {
             ToastUtils.showShort(getString(R.string.dissupport))
+        }
+    }
+
+    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
+        when (cmdBean.ser_id) {
+            "closeSensor" -> {
+                hideLoadingDialog()
+                    disposableRouteTimer?.dispose()
+                if (cmdBean.status == 0){
+                    sendCloseIcon(positionCurrent)
+                }else{
+                    ToastUtils.showShort(getString(R.string.close_faile))
+                }
+            }
+            "openSensor" -> {
+                hideLoadingDialog()
+                    disposableRouteTimer?.dispose()
+                if (cmdBean.status == 0){
+                    sendOpenIcon(positionCurrent)
+                }else{
+                    ToastUtils.showShort(getString(R.string.open_faile))
+                }
+            }
         }
     }
 
@@ -703,10 +735,10 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         connectSensorTimeoutDisposable?.dispose()
         disposable?.dispose()
         val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, currentDevice?.macAddr)
-        intent.putExtra(Constant.OTA_MES_Add, currentDevice?.meshAddr)
-        intent.putExtra(Constant.OTA_VERSION, currentDevice?.version)
-        intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
+        intent.putExtra(Constants.OTA_MAC, currentDevice?.macAddr)
+        intent.putExtra(Constants.OTA_MES_Add, currentDevice?.meshAddr)
+        intent.putExtra(Constants.OTA_VERSION, currentDevice?.version)
+        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
         startActivity(intent)
         finish()
     }
@@ -850,14 +882,14 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
         if (routerVersion?.finish == true) {
-            if (routerVersion.ser_id == "sensorVersion"){
+            if (routerVersion.ser_id == "sensorVersion") {
                 disposableRouteTimer?.dispose()
                 LogUtils.v("zcl-----------收到路由请求版本通知-------${routerVersion}")
                 if (routerVersion.status == 0) {
                     disposableRouteTimer?.dispose()
                     currentDevice?.version = routerVersion.succeedNow[0].version
                     val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
-                    DBUtils.saveSensor(currentDevice!!,false)
+                    DBUtils.saveSensor(currentDevice!!, false)
                     makeDeviceInfo()
                     if (switchByID?.version == "" || switchByID?.version == null)
                         ToastUtils.showShort(getString(R.string.get_version_fail))
@@ -865,7 +897,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         skipeDevice(false, currentDevice?.version ?: "")
                 } else {
                     ToastUtils.showShort(getString(R.string.get_version_fail))
-                }}
+                }
+            }
         }
     }
 }

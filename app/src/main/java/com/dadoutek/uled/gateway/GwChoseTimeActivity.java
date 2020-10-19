@@ -23,7 +23,7 @@ import com.dadoutek.uled.R;
 import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.dadoutek.uled.gateway.bean.GwTagBean;
 import com.dadoutek.uled.gateway.bean.GwTasksBean;
-import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Constants;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbScene;
 import com.dadoutek.uled.model.httpModel.GwModel;
@@ -169,7 +169,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                 Base64.Encoder encoder = Base64.getEncoder();
                 String s = encoder.encodeToString(labHeadPar);
                 GwGattBody gattBody = new GwGattBody();
-                gattBody.setSer_id(Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD);
+                gattBody.setSer_id(Constants.GW_GATT_CHOSE_TIME_LABEL_HEAD);
                 gattBody.setData(s);
                 gattBody.setMacAddr(gwTagBean.getMacAddr());
                 gattBody.setTagName(gwTagBean.getTagName());
@@ -236,7 +236,7 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
                     ex.printStackTrace();
                 }
 
-                gattBody.setSer_id(Constant.GW_GATT_SAVE_TIMER_TASK_TIME);
+                gattBody.setSer_id(Constants.GW_GATT_SAVE_TIMER_TASK_TIME);
                 gattBody.setMacAddr(gwTagBean.getMacAddr());
                 sendToServer(gattBody);
             } else {
@@ -414,13 +414,13 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
             case LightAdapter.STATUS_SET_GW_COMPLETED:
                 LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo" + deviceInfo);
                 switch (deviceInfo.gwVoipState) {
-                    case Constant.GW_CONFIG_TIMER_LABEL_VOIP://定时标签头下发
+                    case Constants.GW_CONFIG_TIMER_LABEL_VOIP://定时标签头下发
                         if (disposableHeadTimer != null)
                             disposableHeadTimer.dispose();
                         sendCount= 0;
                         sendTime(tasksBean);//下发task
                         break;
-                    case Constant.GW_CONFIG_TIMER_TASK_VOIP://下发成功返回数据给配置也保存更新
+                    case Constants.GW_CONFIG_TIMER_TASK_VOIP://下发成功返回数据给配置也保存更新
                         sendCount= 0;
                         Intent intent = new Intent();
                         intent.putExtra("data", tasksBean);
@@ -438,13 +438,13 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     public void receviedGwCmd2000(String serId) {
         if (!TextUtils.isEmpty(serId)) {
             switch (Integer.parseInt(serId)) {
-                case Constant.GW_GATT_CHOSE_TIME_LABEL_HEAD:
+                case Constants.GW_GATT_CHOSE_TIME_LABEL_HEAD:
                     if (disposableHeadTimer != null)
                         disposableHeadTimer.dispose();
                     sendCount= 0;
                     sendTime(tasksBean);//下发task
                     break;
-                case Constant.GW_GATT_SAVE_TIMER_TASK_TIME:
+                case Constants.GW_GATT_SAVE_TIMER_TASK_TIME:
                     sendCount= 0;
                     Intent intent = new Intent();
                     intent.putExtra("data", tasksBean);

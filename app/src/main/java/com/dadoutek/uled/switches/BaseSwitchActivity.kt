@@ -27,7 +27,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
@@ -137,7 +137,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-        if (TelinkLightApplication.getApp().connectDevice != null||Constant.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice != null|| Constants.IS_ROUTE_MODE) {
             when (item?.itemId) {
                 R.id.toolbar_f_rename -> reName()
                 R.id.toolbar_fv_change_group -> changeGroup()
@@ -146,7 +146,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 R.id.toolbar_f_delete -> deleteDevice()
             }
         } else {
-            if (Constant.IS_ROUTE_MODE) return@OnMenuItemClickListener true
+            if (Constants.IS_ROUTE_MODE) return@OnMenuItemClickListener true
             showLoadingDialog(getString(R.string.connecting_tip))
             connect(setConnectMeshAddr(), true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())
@@ -200,7 +200,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     sw = DBUtils.getSwitchByMacAddr(macAddress)
                     sw?.let {
-                        if (!Constant.IS_ROUTE_MODE){
+                        if (!Constants.IS_ROUTE_MODE){
                             showLoadingDialog(getString(R.string.please_wait))
                             Commander.resetDevice(sw!!.meshAddr, true)
                                     .subscribe(
@@ -252,7 +252,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     fun deviceOta(mDeviceInfo: DeviceInfo, type: Int = DeviceType.NORMAL_SWITCH) {
         deviceType = type
         otaDeviceInfo = mDeviceInfo
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == mDeviceInfo.macAddress) {
             if (isBoolean)
                 transformView(mDeviceInfo, type)
@@ -298,10 +298,10 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     private fun transformView(mDeviceInfo: DeviceInfo, type: Int) {
         val intent = Intent(this@BaseSwitchActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, mDeviceInfo?.macAddress)
-        intent.putExtra(Constant.OTA_MES_Add, mDeviceInfo?.meshAddress)
-        intent.putExtra(Constant.OTA_VERSION, mDeviceInfo?.firmwareRevision)
-        intent.putExtra(Constant.OTA_TYPE, type)
+        intent.putExtra(Constants.OTA_MAC, mDeviceInfo?.macAddress)
+        intent.putExtra(Constants.OTA_MES_Add, mDeviceInfo?.meshAddress)
+        intent.putExtra(Constants.OTA_VERSION, mDeviceInfo?.firmwareRevision)
+        intent.putExtra(Constants.OTA_TYPE, type)
         val timeMillis = System.currentTimeMillis()
         if (last_start_time == 0 || timeMillis - last_start_time >= debounce_time)
             startActivity(intent)

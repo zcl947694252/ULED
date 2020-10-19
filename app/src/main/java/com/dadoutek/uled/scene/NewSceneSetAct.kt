@@ -23,7 +23,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
 import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
@@ -51,7 +51,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -257,9 +256,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun initScene() {
         val intent = intent
-        isReconfig = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
+        isReconfig = intent.extras!!.get(Constants.IS_CHANGE_SCENE) as Boolean
         if (isReconfig && !isResult) {
-            scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
+            scene = intent.extras!!.get(Constants.CURRENT_SELECT_SCENE) as DbScene
             edit_name.setText(scene?.name)
             //获取场景具体信息
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
@@ -366,7 +365,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         var temperature = showGroupList[position].temperature
         if (showGroupList[position].isOn) {
             isOpen = false
-            if (!Constant.IS_ROUTE_MODE)
+            if (!Constants.IS_ROUTE_MODE)
                 showGroupList[position].isOn = false
             showGroupList[position].isEnableBright = false
             showGroupList[position].isEnableWhiteLight = false
@@ -378,7 +377,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             brightness = 0
             temperature = 0
         } else {
-            if (!Constant.IS_ROUTE_MODE)
+            if (!Constants.IS_ROUTE_MODE)
                 showGroupList[position].isOn = true
             isOpen = true
             showGroupList[position].isEnableBright = true
@@ -390,7 +389,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             dot_rgb.isEnabled = true
         }
         val addr = showGroupList[position].groupAddress
-        if (!Constant.IS_ROUTE_MODE)
+        if (!Constants.IS_ROUTE_MODE)
             Thread {
                 Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
                 Thread.sleep(300)
@@ -458,7 +457,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun close(position: Int) {
         isOpen = false
-        if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+        if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
             routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 0, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = false
@@ -469,7 +468,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun open(position: Int) {
         isOpen = true
-        if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+        if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
             routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 1, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = true
@@ -480,7 +479,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun changeToColorSelect(position: Int) {
         val intent = Intent(this, SelectColorAct::class.java)
-        intent.putExtra(Constant.GROUPS_KEY, showGroupList[position])
+        intent.putExtra(Constants.GROUPS_KEY, showGroupList[position])
         startActivityForResult(intent, position)
     }
 
@@ -585,7 +584,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun registBrocaster() {
         val filter = IntentFilter()
-        filter.addAction(Constant.LOGIN_OUT)
+        filter.addAction(Constants.LOGIN_OUT)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(sceneGroupAdapter?.stompRecevice, filter)
     }
@@ -734,7 +733,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             isReconfig -> updateOldScene()
             else -> saveNewScene()
         }
-        setResult(Constant.RESULT_OK)
+        setResult(Constants.RESULT_OK)
     }
 
 
@@ -775,7 +774,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 DBUtils.saveSceneActions(sceneActions)
                 actionsList.add(sceneActions)
         }
-        if (Constant.IS_ROUTE_MODE)
+        if (Constants.IS_ROUTE_MODE)
             routerAddScene(name, sceneIcon, actionsList)
         else {
             showLoadingDialog(getString(R.string.saving))
@@ -834,7 +833,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 sceneActions.gradientType = itemGroup.gradientType
                 sceneActions.gradientId = itemGroup.gradientId
                 sceneActions.gradientSpeed = itemGroup.gradientSpeed
-                sceneActions.gradientName = itemGroup.gradientName
+                sceneActions.gradientName = itemGroup.gradientName//
             }
         } else {
             sceneActions.setIsEnableBright(item.isEnableBright)
@@ -934,7 +933,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         scene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
         val belongSceneId = scene?.id!!
 
-        if (!Constant.IS_ROUTE_MODE) {
+        if (!Constants.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.saving))
             DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.id!!))
         }
@@ -959,7 +958,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         isChange = compareList(nameList, groupMeshAddrArrayList)
 
         when {
-            Constant.IS_ROUTE_MODE -> routerUpdateScene(belongSceneId, actionsList)
+            Constants.IS_ROUTE_MODE -> routerUpdateScene(belongSceneId, actionsList)
             else -> {
                 DBUtils.updateScene(scene!!)
                 Thread.sleep(100)

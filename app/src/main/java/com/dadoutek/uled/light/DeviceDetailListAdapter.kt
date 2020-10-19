@@ -5,7 +5,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight
@@ -58,7 +58,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
         helper.setText(R.id.template_device_group_name, dbLight.name)
         helper.setVisible(R.id.template_device_card_delete, isDelete)
                 .setText(R.id.template_gp_name, DBUtils.getGroupNameByID(dbLight.belongGroupId, mContext))
-                .setVisible(R.id.template_gp_name, Constant.IS_OPEN_AUXFUN)
+                .setVisible(R.id.template_gp_name, Constants.IS_OPEN_AUXFUN)
                 .setImageResource(R.id.template_device_icon, dbLight.icon)
                 .addOnClickListener(R.id.template_device_setting)
                 .addOnClickListener(R.id.template_device_icon)

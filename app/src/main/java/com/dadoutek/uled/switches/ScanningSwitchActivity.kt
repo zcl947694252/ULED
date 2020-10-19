@@ -6,14 +6,11 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.ble.RxBleManager.initData
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -27,7 +24,6 @@ import kotlinx.android.synthetic.main.empty_box_view.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
-import java.util.*
 
 /**
  * 描述	      ${搜索连接开关}$
@@ -146,7 +142,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         image_no_group.visibility = View.GONE
         val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
                 DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
-        mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
+        mConnectDisposal = connect(meshName = Constants.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constants.DEFAULT_MESH_FACTORY_PASSWORD,
                 retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
                 ?.subscribeOn(Schedulers.io())
                 ?.observeOn(AndroidSchedulers.mainThread())

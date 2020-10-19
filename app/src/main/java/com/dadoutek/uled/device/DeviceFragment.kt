@@ -19,7 +19,7 @@ import com.dadoutek.uled.gateway.GwDeviceDetailActivity
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.DeviceDetailAct
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.BaseFragment
@@ -149,37 +149,37 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         var intent = Intent()
         when (deviceTypeList[position].installType) {
-            Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
+            Constants.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_NORMAL_LIGHT)
             }
-            Constant.INSTALL_RGB_LIGHT -> {//跳转多彩灯
+            Constants.INSTALL_RGB_LIGHT -> {//跳转多彩灯
                 intent = Intent(activity, DeviceDetailAct::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_RGB_LIGHT)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_RGB_LIGHT)
             }
-            Constant.INSTALL_SWITCH -> {//不存在分组
+            Constants.INSTALL_SWITCH -> {//不存在分组
                 intent = Intent(activity, SwitchDeviceDetailsActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_SWITCH)
             }
-            Constant.INSTALL_SENSOR -> {//不存在分组
+            Constants.INSTALL_SENSOR -> {//不存在分组
                 intent = Intent(activity, SensorDeviceDetailsActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_SENSOR)
             }
-            Constant.INSTALL_CURTAIN -> {//分组已修改 旧有联动逻辑存在
+            Constants.INSTALL_CURTAIN -> {//分组已修改 旧有联动逻辑存在
                 intent = Intent(activity, CurtainsDeviceDetailsActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CURTAIN)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_CURTAIN)
             }
-            Constant.INSTALL_CONNECTOR -> {//分组已更新  sandian
+            Constants.INSTALL_CONNECTOR -> {//分组已更新  sandian
                 intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_CONNECTOR)
             }
-            Constant.INSTALL_GATEWAY -> {//不存在分组    sandian
+            Constants.INSTALL_GATEWAY -> {//不存在分组    sandian
                 intent = Intent(activity, GwDeviceDetailActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_GATEWAY)
             }
-            Constant.INSTALL_ROUTER -> {//不存在分组    sandian
+            Constants.INSTALL_ROUTER -> {//不存在分组    sandian
                 intent = Intent(activity, RouterDeviceDetailsActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_ROUTER)
+                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_ROUTER)
             }
         }
         startActivityForResult(intent, Activity.RESULT_OK)
@@ -191,14 +191,14 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
      */
     private fun initAdapterData() {
         deviceTypeList.clear()
-        isAddDevice(R.string.normal_light,DBUtils.getAllNormalLight().size,DeviceType.LIGHT_NORMAL    ,    Constant.INSTALL_NORMAL_LIGHT)
-        isAddDevice(R.string.rgb_light,DBUtils.getAllRGBLight().size,DeviceType.LIGHT_RGB             ,Constant.INSTALL_RGB_LIGHT)
-        isAddDevice(R.string.switch_title,DBUtils.getAllSwitch().size,DeviceType.NORMAL_SWITCH         ,     Constant.INSTALL_SWITCH)
-        isAddDevice(R.string.sensor,DBUtils.getAllSensor().size,DeviceType.SENSOR                     ,Constant.INSTALL_SENSOR)
-        isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN           ,Constant.INSTALL_CURTAIN)
-        isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY                  ,Constant.INSTALL_CONNECTOR)
-        isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY                , Constant.INSTALL_GATEWAY)
-        isAddDevice(R.string.router,DBUtils.getAllRouter().size,DeviceType.ROUTER                , Constant.INSTALL_ROUTER)
+        isAddDevice(R.string.normal_light,DBUtils.getAllNormalLight().size,DeviceType.LIGHT_NORMAL    ,    Constants.INSTALL_NORMAL_LIGHT)
+        isAddDevice(R.string.rgb_light,DBUtils.getAllRGBLight().size,DeviceType.LIGHT_RGB             , Constants.INSTALL_RGB_LIGHT)
+        isAddDevice(R.string.switch_title,DBUtils.getAllSwitch().size,DeviceType.NORMAL_SWITCH         ,     Constants.INSTALL_SWITCH)
+        isAddDevice(R.string.sensor,DBUtils.getAllSensor().size,DeviceType.SENSOR                     , Constants.INSTALL_SENSOR)
+        isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN           , Constants.INSTALL_CURTAIN)
+        isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY                  , Constants.INSTALL_CONNECTOR)
+        isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY                , Constants.INSTALL_GATEWAY)
+        isAddDevice(R.string.router,DBUtils.getAllRouter().size,DeviceType.ROUTER                , Constants.INSTALL_ROUTER)
 
         deviceAdapter.notifyDataSetChanged()
     }
@@ -248,7 +248,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(activity, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
                         startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
                     }
                 }
@@ -311,12 +311,12 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_GROUP_ALLON -> {
+            Constants.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制组全开成功-------")
                 hideLoadingDialog()
 
             }
-            Constant.SER_ID_GROUP_ALLOFF -> {
+            Constants.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
                 hideLoadingDialog()
             }
@@ -324,12 +324,12 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     }
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_GROUP_ALLON -> {
+            Constants.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制组全开成功-------")
                 hideLoadingDialog()
 
             }
-            Constant.SER_ID_GROUP_ALLOFF -> {
+            Constants.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
                 hideLoadingDialog()
             }
@@ -340,7 +340,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         when(v?.id){
             R.id.main_go_help->{
                 var intent = Intent(context, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE,"#add-and-configure")
+                intent.putExtra(Constants.WB_TYPE,"#add-and-configure")
                 startActivity(intent)
             }
             R.id.main_add_device->{

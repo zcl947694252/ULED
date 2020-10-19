@@ -23,8 +23,8 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Constant.*
+import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
@@ -35,7 +35,6 @@ import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -186,7 +185,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             }
             ota.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
-                if (Constant.IS_ROUTE_MODE) return@setOnClickListener
+                if (Constants.IS_ROUTE_MODE) return@setOnClickListener
                 if (currentDevice != null) {
                     TelinkLightService.Instance()?.idleMode(true)
                     showLoadingDialog(getString(R.string.connecting_tip))
@@ -604,7 +603,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                     }
                 }

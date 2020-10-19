@@ -19,10 +19,9 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.CountryActivity
 import com.dadoutek.uled.othersview.MainActivity
@@ -122,7 +121,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                                 dbUser.account = it
 
                                 val intent = Intent(this@VerificationCodeActivity, EnterConfirmationCodeActivity::class.java)
-                                intent.putExtra(Constant.TYPE_USER, Constant.TYPE_VERIFICATION_CODE)
+                                intent.putExtra(Constants.TYPE_USER, Constants.TYPE_VERIFICATION_CODE)
                                 intent.putExtra("country_code", countryCode)
                                 intent.putExtra("phone", userName)
                                 intent.putExtra("account", dbUser.account)

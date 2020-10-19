@@ -1,7 +1,7 @@
 package com.dadoutek.uled.model.routerModel
 
 import com.dadoutek.uled.gateway.bean.DbRouter
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.network.*
@@ -145,7 +145,7 @@ object RouterModel {
      * 路由开始扫描
      */
     fun routerStartScan(scanType: Int, ser_id: String): Observable<Response<ScanDataBean>>? {
-        return NetworkFactory.getApi().routeScanDevcie(scanType, Constant.DEFAULT_MESH_FACTORY_NAME, ser_id)
+        return NetworkFactory.getApi().routeScanDevcie(scanType, Constants.DEFAULT_MESH_FACTORY_NAME, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

@@ -23,7 +23,7 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
@@ -84,7 +84,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        type = this.intent.getIntExtra(Constants.DEVICE_TYPE, 0)
         initView()
     }
 
@@ -188,12 +188,12 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     private fun setTitleAndUpIcon() {
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> {
+            Constants.INSTALL_NORMAL_LIGHT -> {
                 for (i in lightsData.indices)
                     lightsData[i].updateIcon()
                 toolbarTv.text = getString(R.string.normal_light)
             }
-            Constant.INSTALL_RGB_LIGHT -> {
+            Constants.INSTALL_RGB_LIGHT -> {
                 toolbarTv.text = getString(R.string.rgb_light)
                 for (i in lightsData.indices)
                     lightsData[i].updateRgbIcon()
@@ -208,7 +208,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         if (position < lightsData.size) {
             currentDevice = lightsData[position]
             positionCurrent = position
-            if (Constant.IS_ROUTE_MODE)
+            if (Constants.IS_ROUTE_MODE)
                 itemClikMethod(view)
             else {
                 if (TelinkLightApplication.getApp().connectDevice == null && view.id != R.id.template_device_card_delete) {
@@ -228,7 +228,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             R.id.template_device_icon -> {
                 canBeRefresh = true
                 openOrClose(currentDevice!!)
-                if (!Constant.IS_ROUTE_MODE)//如果不是路由模式则直接更新icon
+                if (!Constants.IS_ROUTE_MODE)//如果不是路由模式则直接更新icon
                     sendAfterUpdate()
                 // sendTimeZone(currentDevice!!)
             }
@@ -243,8 +243,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     private fun sendAfterUpdate() {
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> lightsData[positionCurrent]!!.updateIcon()
-            Constant.INSTALL_RGB_LIGHT -> lightsData[positionCurrent]!!.updateRgbIcon()
+            Constants.INSTALL_NORMAL_LIGHT -> lightsData[positionCurrent]!!.updateIcon()
+            Constants.INSTALL_RGB_LIGHT -> lightsData[positionCurrent]!!.updateRgbIcon()
         }
         DBUtils.updateLight(lightsData[positionCurrent])
         listAdapter?.notifyDataSetChanged()
@@ -292,7 +292,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                                     || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {//开灯
                                 gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                         0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                                gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                                gattBody.ser_id = Constants.SER_ID_LIGHT_ON
                             }
                         }
                         else -> {
@@ -300,14 +300,14 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                                     || currentDevice!!.productUUID == DeviceType.LIGHT_NORMAL_OLD) {
                                 gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                         0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                                gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                                gattBody.ser_id = Constants.SER_ID_LIGHT_OFF
                             }
                         }
                     }
 
                     val s = Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentDevice!!.meshAddr
                     sendToServer(gattBody)
                 } else ToastUtils.showShort(getString(R.string.gw_not_online))
@@ -361,11 +361,11 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         var intent = Intent(this@DeviceDetailAct, NormalSettingActivity::class.java)
         if (currentDevice?.productUUID == DeviceType.LIGHT_RGB) {
             intent = Intent(this@DeviceDetailAct, RGBSettingActivity::class.java)
-            intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
+            intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
         }
-        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDevice)
-        intent.putExtra(Constant.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
-        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+        intent.putExtra(Constants.LIGHT_ARESS_KEY, currentDevice)
+        intent.putExtra(Constants.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
+        intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
         startActivityForResult(intent, REQ_LIGHT_SETTING)
     }
 
@@ -374,7 +374,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         this.currentDevice = currentLight
         when (currentLight!!.connectionStatus) {
             ConnectionStatus.OFF.value -> {
-                if (Constant.IS_ROUTE_MODE)// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                if (Constants.IS_ROUTE_MODE)// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                     routeOpenOrCloseBase(currentLight.meshAddr, currentLight.productUUID, 1, "deng")
                 else {
                     when (currentLight!!.productUUID) {
@@ -385,7 +385,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 }
             }
             else -> {
-                if (Constant.IS_ROUTE_MODE)
+                if (Constants.IS_ROUTE_MODE)
                     routeOpenOrCloseBase(currentLight.meshAddr, currentLight.productUUID, 0, "deng")
                 else {
                     when (currentLight!!.productUUID) {
@@ -399,7 +399,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
+         LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
         hideLoadingDialog()
         disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "deng") {
@@ -433,7 +433,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                         nowSize >= SCENE_MAX_COUNT -> ToastUtils.showLong(R.string.scene_16_tip)
                         else -> {
                             val intent = Intent(this, NewSceneSetAct::class.java)
-                            intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                            intent.putExtra(Constants.IS_CHANGE_SCENE, false)
                             startActivity(intent)
                         }
                     }
@@ -465,10 +465,10 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
 
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT ->
-                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-            Constant.INSTALL_RGB_LIGHT ->
-                intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+            Constants.INSTALL_NORMAL_LIGHT ->
+                intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+            Constants.INSTALL_RGB_LIGHT ->
+                intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
         }
         startActivityForResult(intent, 0)
     }
@@ -477,7 +477,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         setScanningMode(true)
         lightsData.clear()
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> {//普通灯列表
+            Constants.INSTALL_NORMAL_LIGHT -> {//普通灯列表
                 allLightData = DBUtils.getAllNormalLight()
                 if (allLightData.size > 0) {
                     for (i in allLightData.indices) {
@@ -491,7 +491,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                     lightsData = sortList(lightsData)
                 }
             }
-            Constant.INSTALL_RGB_LIGHT -> {//全彩灯
+            Constants.INSTALL_RGB_LIGHT -> {//全彩灯
                 allLightData = DBUtils.getAllRGBLight()
                 if (allLightData.size > 0)
                     for (i in allLightData.indices) {
@@ -577,8 +577,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     private fun getNewData(): ArrayList<DbLight> {
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> lightsData = DBUtils.getAllNormalLight()
-            Constant.INSTALL_RGB_LIGHT -> lightsData = DBUtils.getAllRGBLight()
+            Constants.INSTALL_NORMAL_LIGHT -> lightsData = DBUtils.getAllNormalLight()
+            Constants.INSTALL_RGB_LIGHT -> lightsData = DBUtils.getAllRGBLight()
         }
         return lightsData
     }
@@ -658,14 +658,14 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_LIGHT_ON -> {
+            Constants.SER_ID_LIGHT_ON -> {
                 LogUtils.v("zcl-----------远程控制开灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
                 lightsData[positionCurrent].updateIcon()
                 listAdapter?.notifyDataSetChanged()
             }
-            Constant.SER_ID_LIGHT_OFF -> {
+            Constants.SER_ID_LIGHT_OFF -> {
                 LogUtils.v("zcl-----------远程控制关灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value
@@ -677,14 +677,14 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_LIGHT_ON -> {
+            Constants.SER_ID_LIGHT_ON -> {
                 LogUtils.v("zcl-----------远程控制开灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.ON.value
                 lightsData[positionCurrent].updateIcon()
                 listAdapter?.notifyDataSetChanged()
             }
-            Constant.SER_ID_LIGHT_OFF -> {
+            Constants.SER_ID_LIGHT_OFF -> {
                 LogUtils.v("zcl-----------远程控制关灯成功-------")
                 hideLoadingDialog()
                 lightsData[positionCurrent].connectionStatus = ConnectionStatus.OFF.value

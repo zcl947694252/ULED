@@ -5,7 +5,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -36,7 +36,7 @@ class DeviceDetailConnectorAdapter (layoutResId: Int, data: List<DbConnector>?) 
             helper.addOnClickListener(R.id.template_device_setting)
                     .setTag(R.id.template_device_setting, helper.adapterPosition)
                     .setVisible(R.id.template_device_more, false)
-                    .setVisible(R.id.template_gp_name,Constant.IS_OPEN_AUXFUN)
+                    .setVisible(R.id.template_gp_name, Constants.IS_OPEN_AUXFUN)
                     .setTag(R.id.template_device_icon, helper.adapterPosition)
                     .setImageResource(R.id.template_device_icon, dbConnector.icon)
                     .addOnClickListener(R.id.template_device_icon)

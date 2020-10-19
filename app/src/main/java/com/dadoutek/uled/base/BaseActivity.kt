@@ -25,7 +25,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Cmd
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.model.dbModel.DbCurtain
@@ -254,7 +254,7 @@ abstract class BaseActivity : AppCompatActivity() {
     //重启app并杀死原进程
     fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(this, Constants.IS_LOGIN, false)
         AppUtils.relaunchApp()
     }
 
@@ -332,7 +332,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.LOGIN_OUT)
+        filter.addAction(Constants.LOGIN_OUT)
         //filter.addAction(Constant.GW_COMMEND_CODE)
         //filter.addAction(Constant.CANCEL_CODE)
         //filter.addAction(Constant.PARSE_CODE)
@@ -342,7 +342,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     inner class StompReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            val msg = intent?.getStringExtra(Constants.LOGIN_OUT) ?: ""
             var jsonObject = JSONObject(msg)
             when (val cmd = jsonObject.getInt("cmd")) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
@@ -416,7 +416,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     private fun getCmdBean(intent: Intent?): CmdBodyBean {
-        val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+        val msg = intent?.getStringExtra(Constants.LOGIN_OUT) ?: ""
         val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
         return cmdBean
     }
@@ -432,7 +432,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private fun singleDialog(codeBean: MqttBodyBean) {
         LogUtils.e("zcl_baseMe___________收到登出消息")
-        val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+        val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, false)
         if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
             checkNetworkAndSync(this@BaseActivity)
     }

@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Constants;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbCurtain;
 import com.dadoutek.uled.model.dbModel.DbLight;
@@ -252,7 +252,7 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
     }
 
     private void initData() {
-        dbLight = (DbCurtain) getIntent().getSerializableExtra(Constant.UPDATE_LIGHT);
+        dbLight = (DbCurtain) getIntent().getSerializableExtra(Constants.UPDATE_LIGHT);
         log("current-light-mesh" + dbLight.getMeshAddr());
 
         onlineLights = new ArrayList<>();

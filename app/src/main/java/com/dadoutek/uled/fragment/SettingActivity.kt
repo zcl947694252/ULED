@@ -24,7 +24,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.UserModel
@@ -95,7 +95,7 @@ class SettingActivity : TelinkBaseActivity() {
                         }
                         2 -> {
                             UserModel.updateModeStatus().subscribe({
-                                Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
+                                Constants.IS_OPEN_AUXFUN = !Constants.IS_OPEN_AUXFUN
                                 adapter.notifyDataSetChanged()
                             }, {
                                 ToastUtils.showShort(it.message)
@@ -134,14 +134,14 @@ class SettingActivity : TelinkBaseActivity() {
 
     @SuppressLint("StringFormatMatches")
     private fun showResetTipPop() {
-        if (TelinkLightApplication.getApp().connectDevice != null||Constant.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice != null|| Constants.IS_ROUTE_MODE) {
 
-            disposableInterval = Observable.intervalRange(0, Constant.downTime, 0, 1, TimeUnit.SECONDS)
+            disposableInterval = Observable.intervalRange(0, Constants.downTime, 0, 1, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { it1 ->
 
-                        var num = Constant.downTime - 1 - it1
+                        var num = Constants.downTime - 1 - it1
                         if (num == 0L) {
                             setTimerZero()
                         } else {
@@ -193,7 +193,7 @@ class SettingActivity : TelinkBaseActivity() {
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(this, Constants.IS_LOGIN, false)
         DBUtils.deleteAllData()
         CleanUtils.cleanInternalSp()
         CleanUtils.cleanExternalCache()
@@ -221,7 +221,7 @@ class SettingActivity : TelinkBaseActivity() {
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 var intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE, "#user-reset")
+                intent.putExtra(Constants.WB_TYPE, "#user-reset")
                 startActivity(intent)
             }
 

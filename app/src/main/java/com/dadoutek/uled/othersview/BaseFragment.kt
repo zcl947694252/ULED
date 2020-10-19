@@ -23,7 +23,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.model.Cmd
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
@@ -81,7 +81,7 @@ open class BaseFragment : Fragment() {
     private fun initStompReceiver() {
         stompRecevice = StompReceiver()
         val filter = IntentFilter()
-        filter.addAction(Constant.LOGIN_OUT)
+        filter.addAction(Constants.LOGIN_OUT)
         //filter.addAction(Constant.GW_COMMEND_CODE)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         context?.registerReceiver(stompRecevice, filter)
@@ -90,7 +90,7 @@ open class BaseFragment : Fragment() {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
-            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            val msg = intent?.getStringExtra(Constants.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
             try {
                 when (cmdBean.cmd) {
@@ -206,10 +206,10 @@ open class BaseFragment : Fragment() {
             dialogGroupType?.text = list!![position]
             recyclerView.visibility = View.GONE
             when (position) {
-                0 -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                1 -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                2 -> groupType = Constant.DEVICE_TYPE_CURTAIN
-                3 -> groupType = Constant.DEVICE_TYPE_CONNECTOR
+                0 -> groupType = Constants.DEVICE_TYPE_LIGHT_NORMAL
+                1 -> groupType = Constants.DEVICE_TYPE_LIGHT_RGB
+                2 -> groupType = Constants.DEVICE_TYPE_CURTAIN
+                3 -> groupType = Constants.DEVICE_TYPE_CONNECTOR
             }
         }
         popMain.setOnDismissListener {
@@ -246,7 +246,7 @@ open class BaseFragment : Fragment() {
      */
     open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
         GlobalScope.launch(Dispatchers.Main) {
-            if (Constant.IS_ROUTE_MODE)
+            if (Constants.IS_ROUTE_MODE)
                 toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
             else {
                 if (isConnected) {

@@ -18,7 +18,7 @@ import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.gateway.bean.GwTimePeriodsBean
 import com.dadoutek.uled.gateway.util.Base64Utils
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
@@ -95,12 +95,12 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                         val deviceInfo = event.args
                         LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                         when (deviceInfo.gwVoipState) {
-                            Constant.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {
+                            Constants.GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {
                                 if (!this.isFinishing)
                                     sendTime()
                                 LogUtils.v("zcl-----------收到回调发送次数-------")
                             }
-                            Constant.GW_CONFIG_TIME_PERIVODE_TASK_VOIP -> {
+                            Constants.GW_CONFIG_TIME_PERIVODE_TASK_VOIP -> {
                                 receviceSuceessTaskSmallTimes()
                             }
                         }
@@ -259,7 +259,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                             val s = Base64Utils.encodeToStrings(gattPar)
                             val gattBody = GwGattBody()
                             gattBody.data = s
-                            gattBody.ser_id = Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME
+                            gattBody.ser_id = Constants.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME
                             gattBody.macAddr = gwTagBean!!.macAddr
                             gattBody.tagName = gwTagBean?.tagName
                             sendToServer(gattBody)
@@ -321,7 +321,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                 val s = Base64Utils.encodeToStrings(gattPar)
                 val gattBody = GwGattBody()
                 gattBody.data = s
-                gattBody.ser_id = Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD
+                gattBody.ser_id = Constants.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD
                 gattBody.macAddr = gwTagBean?.macAddr
                 gattBody.tagName = gwTagBean?.tagName
                 sendToServer(gattBody)
@@ -363,10 +363,10 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun receviedGwCmd2000(serId: String) {
         when (serId.toInt()) {
-            Constant.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD -> {
+            Constants.GW_GATT_CHOSE_TIME_PEROIDES_LABEL_HEAD -> {
                 sendTime()
             }
-            Constant.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME -> {
+            Constants.GW_GATT_SAVE_TIMER_PERIODES_TASK_TIME -> {
                 hideLoadingDialog()
                 receviceSuceessTaskSmallTimes()
             }

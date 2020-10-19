@@ -40,7 +40,6 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_scene_switch_group.*
-import kotlinx.android.synthetic.main.activity_switch_group.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.design.indefiniteSnackbar
@@ -154,7 +153,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
     @SuppressLint("CheckResult")
     private fun confirmSceneSw() {
-        if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
             if (mConnectingSnackBar?.isShown != true) {
                 mConfigFailSnackbar?.dismiss()
                 showDisconnectSnackBar()
@@ -164,7 +163,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 ToastUtils.showShort(getString(R.string.please_config_all))
                 return
             }
-            if (Constant.IS_ROUTE_MODE) {
+            if (Constants.IS_ROUTE_MODE) {
                 val sceneMeshAddrs = ArrayList<Int>(4)
                 mapConfig.toSortedMap()
                 mapConfig.forEach { sceneMeshAddrs.add(it.value.id.toInt()) }
@@ -176,14 +175,14 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                     val mesh = mApp?.mesh
                     val params = Parameters.createUpdateParameters()
                     when {
-                        BuildConfig.DEBUG ->  params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+                        BuildConfig.DEBUG ->  params.setOldMeshName(Constants.PIR_SWITCH_MESH_NAME)
                         else ->  params.setOldMeshName(mesh?.factoryName)
                     }
                     params.setOldPassword(mesh?.factoryPassword)
                     params.setNewMeshName(mesh?.name)
 
-                    when (Constant.USER_TYPE_NEW) {
-                        SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) ->
+                    when (Constants.USER_TYPE_NEW) {
+                        SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constants.USER_TYPE, Constants.USER_TYPE_OLD) ->
                             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh?.name) + mesh?.name))
                         else -> params.setNewPassword(mesh?.password)
                     }
@@ -403,7 +402,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
                 DBUtils.recordingChange(gotSwitchByMac?.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constant.DB_ADD)
+                        Constants.DB_ADD)
                 switchDate = dbSwitch
             }
         } else {
@@ -526,14 +525,14 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     private fun reconnect() {
-        if (Constant.IS_ROUTE_MODE) return
+        if (Constants.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(mDeviceInfo.meshName)
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME)
+        pwd = if (mDeviceInfo.meshName == Constants.PIR_SWITCH_MESH_NAME)
             mesh.factoryPassword.toString()
         else
             NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName).substring(0, 16)
@@ -585,14 +584,14 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         val mesh = mApp?.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
+            params.setOldMeshName(Constants.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh?.factoryName)
         }
         params.setOldPassword(mesh?.factoryPassword)
         params.setNewMeshName(mesh?.name)
 
-        if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constant.USER_TYPE, Constant.USER_TYPE_OLD) == Constant.USER_TYPE_NEW) {
+        if (SharedPreferencesHelper.getString(TelinkLightApplication.getApp(), Constants.USER_TYPE, Constants.USER_TYPE_OLD) == Constants.USER_TYPE_NEW) {
             params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(mesh?.name) + mesh?.name))
         } else {
             params.setNewPassword(mesh?.password)

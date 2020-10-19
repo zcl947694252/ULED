@@ -9,7 +9,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import kotlinx.android.synthetic.main.choose_group_scene.*
@@ -45,17 +45,17 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
     private fun initData() {
         val elements = DBUtils.groupList
-        elements[0].deviceType = Constant.DEVICE_TYPE_NO
+        elements[0].deviceType = Constants.DEVICE_TYPE_NO
         DBUtils.saveGroup(elements[0], false)
         elements.removeAt(0)
         groupList.addAll(elements)
 
 
         template_recycleView?.layoutManager = GridLayoutManager(this, 5)
-        val get = intent.extras.get(Constant.EIGHT_SWITCH_TYPE)
+        val get = intent.extras.get(Constants.EIGHT_SWITCH_TYPE)
         if (get != null) type = get as Int
 
-        val get1 = intent.extras.get(Constant.DEVICE_TYPE)
+        val get1 = intent.extras.get(Constants.DEVICE_TYPE)
         if (get1 != null) deviceType = get1 as Int
 
         isGroup = type == 0 || type == 2
@@ -67,20 +67,20 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
                 var filter: List<DbGroup> = mutableListOf()
                 when (deviceType) {
-                    Constant.DEVICE_TYPE_LIGHT.toInt(), Constant.DEVICE_TYPE_LIGHT_SW.toInt() -> {
+                    Constants.DEVICE_TYPE_LIGHT.toInt(), Constants.DEVICE_TYPE_LIGHT_SW.toInt() -> {
                         filter = groupList.filter {
-                            it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL ||
-                                    it.deviceType == Constant.DEVICE_TYPE_CONNECTOR
+                            it.deviceType == Constants.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constants.DEVICE_TYPE_LIGHT_NORMAL ||
+                                    it.deviceType == Constants.DEVICE_TYPE_CONNECTOR
                         }
                     }
-                    Constant.DEVICE_TYPE_LIGHT_NORMAL.toInt(), Constant.DEVICE_TYPE_LIGHT_RGB.toInt(), Constant.DEVICE_TYPE_CURTAIN.toInt(),
-                    Constant.DEVICE_TYPE_CONNECTOR.toInt() -> {
+                    Constants.DEVICE_TYPE_LIGHT_NORMAL.toInt(), Constants.DEVICE_TYPE_LIGHT_RGB.toInt(), Constants.DEVICE_TYPE_CURTAIN.toInt(),
+                    Constants.DEVICE_TYPE_CONNECTOR.toInt() -> {
                         filter = groupList.filter { it.deviceType == deviceType.toLong() }
                     }
                 }
                 groupList.clear()
                 groupList.addAll(filter)
-                if (deviceType == Constant.DEVICE_TYPE_LIGHT_SW.toInt())
+                if (deviceType == Constants.DEVICE_TYPE_LIGHT_SW.toInt())
                     groupList.add(0, DBUtils.allGroups[0])
 
                 groupList.forEach {
@@ -119,8 +119,8 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 return@setOnClickListener
             }
             when {
-                isGroup -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
-                else -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
+                isGroup -> setResult(Activity.RESULT_OK, Intent().putExtra(Constants.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
+                else -> setResult(Activity.RESULT_OK, Intent().putExtra(Constants.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
             }
             groupList.forEach { it.isChecked = false }
             sceneList.forEach { it.isChecked = false }

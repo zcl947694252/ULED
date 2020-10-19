@@ -37,8 +37,8 @@ import com.dadoutek.uled.group.GroupListFragment
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.Constant.DEFAULT_MESH_FACTORY_NAME
+import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constants.DEFAULT_MESH_FACTORY_NAME
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Lights
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -48,8 +48,6 @@ import com.dadoutek.uled.model.httpModel.UpdateModel
 import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.mqtt.IGetMessageCallBack
-import com.dadoutek.uled.mqtt.MqttService
-import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
@@ -77,6 +75,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
+import kotlinx.android.synthetic.main.fragment_me.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -150,13 +149,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
-        if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
-            when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
+        if (Constants.isDebug) {//如果是debug模式可以切换 并且显示
+            when (SharedPreferencesHelper.getInt(this, Constants.IS_TECK, 0)) {
                 0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
                 1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek"
                 2 -> DEFAULT_MESH_FACTORY_NAME = "dadourd"
             }
-            Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
+            Constants.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
             main_toast.visibility = VISIBLE
         } else {
             main_toast.visibility = GONE
@@ -170,21 +169,21 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
          getRouterStatus()
         getRegionList()
         getAllStatus()
-        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
-        LogUtils.v("zcl---获取状态------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
+        Constants.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)
+        LogUtils.v("zcl---获取状态------${Constants.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)}-")
     }
 
     @SuppressLint("CheckResult")
     private fun getRouterStatus() {
-        if (Constant.IS_ROUTE_MODE)
+        if (Constants.IS_ROUTE_MODE)
             RouterModel.routerStatus()
                     ?.subscribe({
                         when (it.data.status) {
-                            Constant.ROUTER_OTA_ING -> {
+                            Constants.ROUTER_OTA_ING -> {
                             }
-                            Constant.ROUTER_SCANNING -> {
+                            Constants.ROUTER_SCANNING -> {
                                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, it.data.data.scanType)
+                                intent.putExtra(Constants.DEVICE_TYPE, it.data.data.scanType)
                                 startActivity(intent)
                             }
                         }
@@ -197,15 +196,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun getAllStatus() {
         UserModel.getModeStatus()?.subscribe({
             LogUtils.v("zcl-----------获取状态服务器返回-------$it")
-            Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
-            if (Constant.IS_ROUTE_MODE)
+            Constants.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
+            if (Constants.IS_ROUTE_MODE)
                 TelinkLightService.Instance().idleMode(true)
-            Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
-            SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, false)
+            Constants.IS_OPEN_AUXFUN = it.auxiliaryFunction
+            SharedPreferencesHelper.putBoolean(this, Constants.ROUTE_MODE, Constants.IS_ROUTE_MODE)
             changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
         }, {
-            Constant.IS_ROUTE_MODE = false
-            Constant.IS_OPEN_AUXFUN = false
+            Constants.IS_ROUTE_MODE = false
+            Constants.IS_OPEN_AUXFUN = false
         })
     }
 
@@ -216,7 +215,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             //status	int	状态。0扫描结束，1仍在扫描
             if (it?.data != null && it.data.status == 1) {
                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, it)
+                intent.putExtra(Constants.DEVICE_TYPE, it)
                 startActivity(intent)
             }
         }, {
@@ -227,7 +226,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT && !Constant.IS_ROUTE_MODE)
+        if (requestCode == Activity.RESULT_OK && requestCode == REQUEST_ENABLE_BT && !Constants.IS_ROUTE_MODE)
             ToastUtils.showShort(getString(R.string.open_blutooth_tip))
     }
 
@@ -275,7 +274,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun LogOutAndExitApp() {
-        SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(this@MainActivity, Constants.IS_LOGIN, false)
         mApp?.removeEventListeners()
         TelinkLightService.Instance()?.idleMode(true)
         //重启app并杀死原进程
@@ -418,7 +417,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         registerReceiver(mReceiver, filter)
 
 
-        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        Constants.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)
     }
 
     override fun onPostResume() {
@@ -681,7 +680,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                         },
                                                         {
                                                             LogUtils.v("zcl-----------连接失败继续连接-------")
-                                                            if (!Constant.IS_ROUTE_MODE)
+                                                            if (!Constants.IS_ROUTE_MODE)
                                                                 autoConnect()
                                                             LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
                                                         }
@@ -779,7 +778,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
             val secondTime = System.currentTimeMillis()
-            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, false)
+            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DELETE, false)
             if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")

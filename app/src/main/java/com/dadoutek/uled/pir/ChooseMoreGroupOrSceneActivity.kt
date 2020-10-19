@@ -10,7 +10,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils.groupList
 import com.dadoutek.uled.model.dbModel.DBUtils.sceneList
 import com.dadoutek.uled.model.DeviceType
@@ -46,7 +46,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
     private fun initData() {
         //template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView?.layoutManager = GridLayoutManager(this, 5)
-        type = intent.getIntExtra(Constant.EIGHT_SWITCH_TYPE, 0)
+        type = intent.getIntExtra(Constants.EIGHT_SWITCH_TYPE, 0)
         when (type) {
             0 -> {//选群组
                 groupList.forEach {

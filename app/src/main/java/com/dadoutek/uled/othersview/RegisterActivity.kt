@@ -3,7 +3,6 @@ package com.dadoutek.uled.othersview
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,7 +12,6 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.util.DisplayMetrics
 import android.view.View
 import android.view.WindowManager
 import cn.smssdk.EventHandler
@@ -23,10 +21,9 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.httpModel.UpdateModel
-import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.user.EnterConfirmationCodeActivity
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.StringUtils
@@ -36,7 +33,6 @@ import kotlinx.android.synthetic.main.activity_register.edit_user_phone
 import kotlinx.android.synthetic.main.activity_register.register_completed
 import kotlinx.android.synthetic.main.activity_register.return_image
 import org.json.JSONObject
-import java.util.*
 
 /**
  * Created by hejiajun on 2018/5/16.
@@ -217,7 +213,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
     private fun goSkipActivity() {
         register_completed.isClickable = false
         var intent = Intent(this@RegisterActivity, EnterConfirmationCodeActivity::class.java)
-        intent.putExtra(Constant.TYPE_USER, Constant.TYPE_REGISTER)
+        intent.putExtra(Constants.TYPE_USER, Constants.TYPE_REGISTER)
         intent.putExtra("country_code", countryCode)
         intent.putExtra("phone", edit_user_phone!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), ""))
 

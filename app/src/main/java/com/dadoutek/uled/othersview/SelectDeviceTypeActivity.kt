@@ -12,16 +12,14 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.model.DeviceItem
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.adapter.DeviceTypeAdapter
 import com.dadoutek.uled.router.RoutingNetworkActivity
 import com.dadoutek.uled.util.StringUtils
-import com.jakewharton.rxbinding2.view.RxView
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
-import io.reactivex.internal.operators.observable.ObservableError
 import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -138,7 +136,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
                             LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
                             if (result != null) {
                                 val intent = Intent(this@SelectDeviceTypeActivity, RoutingNetworkActivity::class.java)
-                                intent.putExtra(Constant.ONE_QR, result)
+                                intent.putExtra(Constants.ONE_QR, result)
                                 startActivity(intent)
                                 finish()
                             } else {

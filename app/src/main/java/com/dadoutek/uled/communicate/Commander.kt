@@ -1,7 +1,7 @@
 package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
@@ -372,7 +372,7 @@ object Commander : EventListener<String> {
      * 更新controlMeshName 区分区域类别 不同的区域使用不同的controlMeshName
      */
     fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.controlMeshName, newMeshAddr: Int =
-            Constant.SWITCH_PIR_ADDRESS, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
+            Constants.SWITCH_PIR_ADDRESS, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mUpdateMeshSuccess = false
         TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)

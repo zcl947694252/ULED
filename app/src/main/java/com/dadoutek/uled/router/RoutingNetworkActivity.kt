@@ -11,9 +11,8 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.GwLoginActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.routerModel.RouterModel
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.NetWorkUtils
 import io.reactivex.Observable
@@ -71,7 +70,7 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
     }
 
     private fun initData() {
-        result = intent.getStringExtra(Constant.ONE_QR)
+        result = intent.getStringExtra(Constants.ONE_QR)
         routing_device_code.setText(result)
         routing_device_code.setSelection(result?.length ?: 0)
     }
@@ -89,7 +88,7 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
 
     override fun routerAccessIn(cmdBody: CmdBodyBean) {
         if (cmdBody.ser_id == TAG) {
-            if (cmdBody.status == Constant.ALL_SUCCESS) {
+            if (cmdBody.status == Constants.ALL_SUCCESS) {
                 ToastUtils.showShort(getString(R.string.router_access_in_success))
                 val intent = Intent(this@RoutingNetworkActivity, GwLoginActivity::class.java)
                 intent.putExtra("is_router", true)

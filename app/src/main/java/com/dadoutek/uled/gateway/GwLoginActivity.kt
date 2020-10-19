@@ -21,7 +21,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander.getDeviceVersion
 import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.model.Opcode
@@ -47,7 +47,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -85,7 +84,7 @@ class GwLoginActivity : TelinkBaseActivity() {
 
             @SuppressLint("CheckResult")
             override fun loginFail() {
-                if (Constant.IS_ROUTE_MODE) return
+                if (Constants.IS_ROUTE_MODE) return
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                 Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
                 ToastUtils.showShort(getString(R.string.connecting_tip))
@@ -96,13 +95,13 @@ class GwLoginActivity : TelinkBaseActivity() {
             override fun setGwComplete(deviceInfo: DeviceInfo) { //Dadou   Dadoutek2018
                 LogUtils.v("zcl-----------获取网关相关返回信息-------$deviceInfo")
                 when (deviceInfo.gwVoipState) {
-                    Constant.GW_WIFI_VOIP -> {
+                    Constants.GW_WIFI_VOIP -> {
                         GlobalScope.launch(Dispatchers.Main) {
                             disposableTimer?.dispose()
                             hideLoadingDialog()
                             if (deviceInfo.gwWifiState == 0) {
                                 ToastUtils.showShort(getString(R.string.config_success))
-                                val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constant.IS_GW_CONFIG_WIFI, false)
+                                val boolean = SharedPreferencesHelper.getBoolean(this@GwLoginActivity, Constants.IS_GW_CONFIG_WIFI, false)
                                 if (boolean) {
                                     finish()
                                 } else
@@ -112,7 +111,7 @@ class GwLoginActivity : TelinkBaseActivity() {
                         }
                     }
 
-                    Constant.GW_TIME_ZONE_VOIP -> {
+                    Constants.GW_TIME_ZONE_VOIP -> {
                         GlobalScope.launch(Dispatchers.Main) {
                             disposableTimer?.dispose()
                             hideLoadingDialog()
@@ -188,9 +187,9 @@ class GwLoginActivity : TelinkBaseActivity() {
 
     override fun routerConfigWIFI(cmdBody: CmdBodyBean) {
         if (TAG == cmdBody.ser_id) {
-            if (cmdBody.status == Constant.ALL_SUCCESS) {
+            if (cmdBody.status == Constants.ALL_SUCCESS) {
                 ToastUtils.showShort(getString(R.string.config_WIFI_success))
-                SharedPreferencesHelper.putBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
+                SharedPreferencesHelper.putBoolean(this, Constants.IS_GW_CONFIG_WIFI, false)
                 ActivityUtils.finishAllActivities()
                 ActivityUtils.startActivity(MainActivity::class.java)
             } else {
@@ -343,10 +342,10 @@ class GwLoginActivity : TelinkBaseActivity() {
                 if (TelinkLightApplication.getApp().isConnectGwBle)
                     sendTimeZoneParmars()
 
-                if (!Constant.IS_ROUTE_MODE)
+                if (!Constants.IS_ROUTE_MODE)
                     dbGw = intent.getParcelableExtra("data")
 
-                if (SharedPreferencesHelper.getBoolean(this, Constant.IS_GW_CONFIG_WIFI, false))
+                if (SharedPreferencesHelper.getBoolean(this, Constants.IS_GW_CONFIG_WIFI, false))
                     gw_login_skip.visibility = View.GONE
                 else
                     gw_login_skip.visibility = View.VISIBLE

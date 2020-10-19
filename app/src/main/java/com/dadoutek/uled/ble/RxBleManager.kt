@@ -3,11 +3,9 @@ package com.dadoutek.uled.ble
 import android.annotation.SuppressLint
 import android.content.Context
 import com.blankj.utilcode.util.LogUtils
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils.regionAll
 import com.dadoutek.uled.model.httpModel.RegionModel
-import com.dadoutek.uled.model.Response
-import com.dadoutek.uled.network.NetworkObserver
 import com.jakewharton.rx.ReplayingShare
 import com.polidea.rxandroidble2.RxBleClient
 import com.polidea.rxandroidble2.RxBleConnection
@@ -149,7 +147,7 @@ object RxBleManager {
             b = false
         } else {
             for (rgName in regionList!!)
-                if (name == rgName || name == Constant.DEFAULT_MESH_FACTORY_NAME)
+                if (name == rgName || name == Constants.DEFAULT_MESH_FACTORY_NAME)
                     b = true
         }
         return b

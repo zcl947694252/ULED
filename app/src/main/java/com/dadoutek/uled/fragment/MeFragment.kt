@@ -32,7 +32,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.communicate.Commander.connect
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.model.dbModel.DbCurtain
@@ -48,7 +48,6 @@ import com.dadoutek.uled.othersview.UserAgreementActivity
 import com.dadoutek.uled.region.DeveloperActivity
 import com.dadoutek.uled.region.NetworkActivity
 import com.dadoutek.uled.router.BindRouterActivity
-import com.dadoutek.uled.router.ChooseModeActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.user.DeveloperOtaActivity
@@ -103,7 +102,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         override fun complete() {
             hideLoadingDialog()
             if (isClickExlogin) {
-                SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+                SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
                 TelinkLightService.Instance()?.disconnect()
                 TelinkLightService.Instance()?.idleMode(true)
 
@@ -121,7 +120,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                            SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+                            SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
                             TelinkLightService.Instance()?.idleMode(true)
                             dialog.dismiss()
                             restartApplication()
@@ -195,7 +194,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
-        if (Constant.IS_ROUTE_MODE)
+        if (Constants.IS_ROUTE_MODE)
             bluetooth_image?.setImageResource(R.drawable.icon_cloud)
         mWakeLock?.acquire()
     }
@@ -259,7 +258,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE, "#user-reset")
+                intent.putExtra(Constants.WB_TYPE, "#user-reset")
                 startActivity(intent)
             }
 
@@ -345,7 +344,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 //            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.instructions -> {
                 var intent = Intent(activity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE, "")
+                intent.putExtra(Constants.WB_TYPE, "")
                 startActivity(intent)
             }
 
@@ -359,11 +358,11 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
             R.id.user_reset -> {
                 if (TelinkLightApplication.getApp().connectDevice != null) {
 
-                    disposableInterval = Observable.intervalRange(0, Constant.downTime, 0, 1, TimeUnit.SECONDS)
+                    disposableInterval = Observable.intervalRange(0, Constants.downTime, 0, 1, TimeUnit.SECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                var num = Constant.downTime - 1 - it
+                                var num = Constants.downTime - 1 - it
                                 if (num == 0L) {
                                     setTimerZero()
                                 } else {
@@ -598,7 +597,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
         DBUtils.deleteAllData()
         CleanUtils.cleanInternalSp()
         CleanUtils.cleanExternalCache()
@@ -611,13 +610,13 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     //重启app并杀死原进程
     private fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(activity, Constants.IS_LOGIN, false)
         com.blankj.utilcode.util.AppUtils.relaunchApp()
     }
 
     override fun setLoginChange() {
         super.setLoginChange()
-        if (Constant.IS_ROUTE_MODE)
+        if (Constants.IS_ROUTE_MODE)
             bluetooth_image?.setImageResource(R.drawable.icon_cloud)
         else
             bluetooth_image?.setImageResource(R.drawable.icon_bluetooth)
@@ -625,7 +624,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     override fun setLoginOutChange() {
         super.setLoginOutChange()
-        if (Constant.IS_ROUTE_MODE)
+        if (Constants.IS_ROUTE_MODE)
             bluetooth_image?.setImageResource(R.drawable.icon_cloud)
         else
             bluetooth_image?.setImageResource(R.drawable.bluetooth_no)

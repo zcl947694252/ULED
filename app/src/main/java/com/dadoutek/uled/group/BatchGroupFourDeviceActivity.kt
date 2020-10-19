@@ -25,7 +25,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
@@ -223,9 +223,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_compatible_mode.isChecked = true
         isCompatible = true
 
-        deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, 100)
+        deviceType = intent.getIntExtra(Constants.DEVICE_TYPE, 100)
         gpMeshAddr = intent.getIntExtra("gp", 0)
-        scanningList = intent.getParcelableArrayListExtra(Constant.DEVICE_NUM)
+        scanningList = intent.getParcelableArrayListExtra(Constants.DEVICE_NUM)
 
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
         swipe_refresh_ly.setProgressViewOffset(true, 0, 100)
@@ -375,7 +375,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(deviceType))
         //groupsByDeviceType.addAll(DBUtils.getGroupsByDeviceType(0))
         val element = DBUtils.getGroupByMeshAddr(0xffff)
-        element.deviceType = Constant.DEVICE_TYPE_NO
+        element.deviceType = Constants.DEVICE_TYPE_NO
         DBUtils.saveGroup(element, false)
         groupsByDeviceType.remove(element)
 
@@ -419,7 +419,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     } else {
                         groupsByDeviceType?.get(position)?.name = textGp.text.toString().trim { it <= ' ' }
                         val group = groupsByDeviceType?.get(position)
-                        if (Constant.IS_ROUTE_MODE) {
+                        if (Constants.IS_ROUTE_MODE) {
                             GroupMdodel.batchAddOrUpdateGp(mutableListOf(group))?.subscribe({
                                 if (it.errorCode == 0)
                                     renameGpSuccess(group, position)
@@ -592,7 +592,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                 if (curtain != null) {
                     when {
-                        Constant.IS_ROUTE_MODE -> {
+                        Constants.IS_ROUTE_MODE -> {
                             val subscribe = RouterModel.routeUpdateCurtainName(curtain!!.id, curtain?.name)?.subscribe({
                                 renameCurtainSuccess(curtain)
                             }, {
@@ -630,7 +630,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     connector.name = renameEt?.text.toString().trim { it <= ' ' }
 
                     when {
-                        Constant.IS_ROUTE_MODE -> {
+                        Constants.IS_ROUTE_MODE -> {
                             val subscribe = RouterModel.routeUpdateCurtainName(connector!!.id, connector?.name)?.subscribe({
                                 renameRelaySuccess(connector)
                             }, {
@@ -670,7 +670,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 light?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (light != null) {
                     when {
-                        Constant.IS_ROUTE_MODE -> {
+                        Constants.IS_ROUTE_MODE -> {
                             val subscribe = RouterModel.routeUpdateLightName(light!!.id, light?.name)?.subscribe({
                                 renameLightSuccess(light)
                             }, {
@@ -757,7 +757,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
-                                if (Constant.IS_ROUTE_MODE) return@subscribe
+                                if (Constants.IS_ROUTE_MODE) return@subscribe
                                 if (TelinkLightApplication.getApp().connectDevice == null) {
                                     ToastUtils.showLong(getString(R.string.connecting_tip))
                                     retryConnectCount = 0
@@ -871,7 +871,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         batch_four_group_add_group.setOnClickListener { addNewGroup() }
         grouping_completed.setOnClickListener {
             if (!isComplete) {
-                if (!Constant.IS_ROUTE_MODE) {
+                if (!Constants.IS_ROUTE_MODE) {
                     if (TelinkLightApplication.getApp().connectDevice != null)
                         sureGroups()
                     else
@@ -1652,12 +1652,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 //往DB里添加组数据
-                var groupType = Constant.DEVICE_TYPE_DEFAULT_ALL
+                var groupType = Constants.DEVICE_TYPE_DEFAULT_ALL
                 when (deviceType) {
-                    DeviceType.LIGHT_NORMAL -> groupType = Constant.DEVICE_TYPE_LIGHT_NORMAL
-                    DeviceType.LIGHT_RGB -> groupType = Constant.DEVICE_TYPE_LIGHT_RGB
-                    DeviceType.SMART_CURTAIN -> groupType = Constant.DEVICE_TYPE_CURTAIN
-                    DeviceType.SMART_RELAY -> groupType = Constant.DEVICE_TYPE_CONNECTOR
+                    DeviceType.LIGHT_NORMAL -> groupType = Constants.DEVICE_TYPE_LIGHT_NORMAL
+                    DeviceType.LIGHT_RGB -> groupType = Constants.DEVICE_TYPE_LIGHT_RGB
+                    DeviceType.SMART_CURTAIN -> groupType = Constants.DEVICE_TYPE_CURTAIN
+                    DeviceType.SMART_RELAY -> groupType = Constants.DEVICE_TYPE_CONNECTOR
                 }
                 val dbGroup = DBUtils.addNewGroupWithType(renameEt?.text.toString().trim { it <= ' ' }, groupType)
                 if (dbGroup != null)
@@ -1681,16 +1681,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         //以下是检索组里有多少设备的代码
         for (group in groupList) {
             when (group.deviceType) {
-                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                     group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
                 }
-                Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                Constants.DEVICE_TYPE_LIGHT_RGB -> {
                     group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
                 }
-                Constant.DEVICE_TYPE_CONNECTOR -> {
+                Constants.DEVICE_TYPE_CONNECTOR -> {
                     group.deviceCount = DBUtils.getRelayByGroupID(group.id).size  //查询改组内设备数量
                 }
-                Constant.DEVICE_TYPE_CURTAIN -> {
+                Constants.DEVICE_TYPE_CURTAIN -> {
                     group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
                 }
             }
@@ -2033,7 +2033,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val manuDataMask = byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
 
         val scanFilter = ScanFilter.Builder()
-                .setManufacturerData(Constant.VENDOR_ID, manuData, manuDataMask)
+                .setManufacturerData(Constants.VENDOR_ID, manuData, manuDataMask)
                 .build()
         scanFilters.add(scanFilter)
         return scanFilters

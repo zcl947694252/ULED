@@ -40,7 +40,7 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.GwModel
@@ -303,14 +303,14 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     open fun seeHelpe() {
         var wbType = when (setGroupType()) {
-            Constant.DEVICE_TYPE_LIGHT_NORMAL -> "#control-normal-group"
-            Constant.DEVICE_TYPE_LIGHT_RGB -> "#control-color-light-group"
-            Constant.DEVICE_TYPE_CURTAIN -> "#control-curtain-group"
-            Constant.DEVICE_TYPE_CONNECTOR -> "#control-relay-group"
+            Constants.DEVICE_TYPE_LIGHT_NORMAL -> "#control-normal-group"
+            Constants.DEVICE_TYPE_LIGHT_RGB -> "#control-color-light-group"
+            Constants.DEVICE_TYPE_CURTAIN -> "#control-curtain-group"
+            Constants.DEVICE_TYPE_CONNECTOR -> "#control-relay-group"
             else -> "#control-normal-group"
         }
         var intent = Intent(mContext, InstructionsForUsActivity::class.java)
-        intent.putExtra(Constant.WB_TYPE, wbType)
+        intent.putExtra(Constants.WB_TYPE, wbType)
         startActivity(intent)
     }
 
@@ -320,7 +320,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             if (it.id.toString() != it.last_authorizer_user_id) {
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             } else {
-                if (groupList[postion].deviceType == Constant.DEVICE_TYPE_CURTAIN || groupList[postion].deviceType == Constant.DEVICE_TYPE_CONNECTOR || postion != 0) {
+                if (groupList[postion].deviceType == Constants.DEVICE_TYPE_CURTAIN || groupList[postion].deviceType == Constants.DEVICE_TYPE_CONNECTOR || postion != 0) {
                     when {
                         !isDelete -> {
                             isDelete = true
@@ -340,7 +340,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             }
                         }
                     }
-                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, isDelete)
+                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_DELETE, isDelete)
                     groupAdapter?.changeState(isDelete)
                     groupList[postion].isSelected = isDelete
                     refreshData()
@@ -357,10 +357,10 @@ abstract class BaseGroupFragment : BaseFragment() {
         for (group in groupList) {
             when (group.deviceType) {
                 //查询改组内设备数量  普通灯和冷暖灯是一个方法  查询什么设备类型有grouplist内容决定
-                Constant.DEVICE_TYPE_LIGHT_NORMAL -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size
-                Constant.DEVICE_TYPE_LIGHT_RGB -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
-                Constant.DEVICE_TYPE_CONNECTOR -> group.deviceCount = DBUtils.getRelayByGroupID(group.id).size  //查询改组内设备数量
-                Constant.DEVICE_TYPE_CURTAIN -> group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
+                Constants.DEVICE_TYPE_LIGHT_NORMAL -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size
+                Constants.DEVICE_TYPE_LIGHT_RGB -> group.deviceCount = DBUtils.getLightByGroupID(group.id).size  //查询改组内设备数量
+                Constants.DEVICE_TYPE_CONNECTOR -> group.deviceCount = DBUtils.getRelayByGroupID(group.id).size  //查询改组内设备数量
+                Constants.DEVICE_TYPE_CURTAIN -> group.deviceCount = DBUtils.getCurtainByGroupID(group.id).size  //查询改组内设备数量//窗帘和传感器是一个方法
             }
         }
 
@@ -402,17 +402,17 @@ abstract class BaseGroupFragment : BaseFragment() {
                     if (isOpen) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constant.SER_ID_GROUP_ON
+                        gattBody.ser_id = Constants.SER_ID_GROUP_ON
                     } else {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constant.SER_ID_GROUP_OFF
+                        gattBody.ser_id = Constants.SER_ID_GROUP_OFF
                     }
 
                     //val encoder = Base64.getEncoder()
                     // val s = encoder.encodeToString(gattPar)
                     gattBody.data = Base64Utils.encodeToStrings(gattPar)
-                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentGroup!!.meshAddr
                     sendToServer(gattBody, isOpen)
                 } else {
@@ -494,39 +494,39 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         when (view!!.id) {
             R.id.template_device_icon -> {
-                if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
+                if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
                     goConnect(false)
                     sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
                 } else
-                    if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
-                            || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO) {
+                    if (currentGroup!!.deviceType == Constants.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constants.DEVICE_TYPE_LIGHT_NORMAL
+                            || currentGroup!!.deviceType == Constants.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constants.DEVICE_TYPE_NO) {
                         if (currentGroup!!.status == 0) {//0关1开
-                            if (Constant.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                            if (Constants.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                                 routeOpenOrClose(currentGroup!!.meshAddr, 97, 1, "zu")
                             } else {
                                 Commander.openOrCloseLights(dstAddr, true)
                                 groupOpenSuccess(position)
                             }
-                            if (Constant.IS_ROUTE_MODE)
+                            if (Constants.IS_ROUTE_MODE)
                                 currentGroup?.connectionStatus = 1
                         } else {
-                            if (Constant.IS_ROUTE_MODE) {
+                            if (Constants.IS_ROUTE_MODE) {
                                 routeOpenOrClose(currentGroup!!.meshAddr, 97, 0, "zu")
                             } else {
                                 Commander.openOrCloseLights(dstAddr, false)
                                 groupCloseSuccess(position)
                             }
-                            if (Constant.IS_ROUTE_MODE)
+                            if (Constants.IS_ROUTE_MODE)
                                 currentGroup?.connectionStatus = 0
                         }
 
-                        if (Constant.IS_ROUTE_MODE)
+                        if (Constants.IS_ROUTE_MODE)
                             DBUtils.saveGroup(currentGroup!!, true)
 
                         LogUtils.v("zcl所有组------------------${DBUtils.allGroups[0].connectionStatus}")
                     } else {
                         if (currentGroup!!.status == 0) {
-                            if (Constant.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                            if (Constants.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                                 routeOpenOrClose(currentGroup!!.meshAddr, currentGroup!!.deviceType.toInt(), 1, "zu")
                             } else {
                                 Commander.openOrCloseCurtain(dstAddr, true, false)
@@ -534,7 +534,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             }
                         } else {
                             when {
-                                Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                                Constants.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                                     routeOpenOrClose(currentGroup!!.meshAddr, 97, 0, "zu")
                                 }
                                 else -> {
@@ -543,7 +543,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 }
                             }
                         }
-                        if (Constant.IS_ROUTE_MODE)
+                        if (Constants.IS_ROUTE_MODE)
                             DBUtils.saveGroup(currentGroup!!, true)
                     }
             }
@@ -551,12 +551,12 @@ abstract class BaseGroupFragment : BaseFragment() {
             R.id.template_device_setting -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
-                    val isLight = groupType == Constant.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constant.DEVICE_TYPE_LIGHT_RGB
+                    val isLight = groupType == Constants.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constants.DEVICE_TYPE_LIGHT_RGB
                     when {
                         isLight && position == 0 -> {
-                            if (TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE) {
+                            if (TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE) {
                                 val intentSetting = Intent(context, NormalSettingActivity::class.java)
-                                intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                                intentSetting.putExtra(Constants.TYPE_VIEW, Constants.TYPE_GROUP)
                                 intentSetting.putExtra("group", DBUtils.allGroups[0])
                                 startActivityForResult(intentSetting, 1)
                             } else {
@@ -565,26 +565,26 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 activity.autoConnect()
                             }
                         }
-                        currentGroup!!.deviceType != Constant.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType) -> {
+                        currentGroup!!.deviceType != Constants.DEVICE_TYPE_DEFAULT_ALL && (currentGroup!!.deviceType == groupType) -> {
                             var num = 0
                             when (groupType) {
-                                Constant.DEVICE_TYPE_LIGHT_NORMAL -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
-                                Constant.DEVICE_TYPE_LIGHT_RGB -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                                Constants.DEVICE_TYPE_LIGHT_NORMAL -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
+                                Constants.DEVICE_TYPE_LIGHT_RGB -> num = DBUtils.getLightByGroupID(currentGroup!!.id).size
                                 //蓝牙接收器
-                                Constant.DEVICE_TYPE_CONNECTOR -> num = DBUtils.getRelayByGroupID(currentGroup!!.id).size
-                                Constant.DEVICE_TYPE_CURTAIN -> num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
+                                Constants.DEVICE_TYPE_CONNECTOR -> num = DBUtils.getRelayByGroupID(currentGroup!!.id).size
+                                Constants.DEVICE_TYPE_CURTAIN -> num = DBUtils.getCurtainByGroupID(currentGroup!!.id).size
                             }
 
                             if (num != 0) {
                                 var intent: Intent? = null
                                 when (groupType) {
-                                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> intent = Intent(mContext, NormalSettingActivity::class.java)
-                                    Constant.DEVICE_TYPE_LIGHT_RGB -> intent = Intent(mContext, RGBSettingActivity::class.java)
+                                    Constants.DEVICE_TYPE_LIGHT_NORMAL -> intent = Intent(mContext, NormalSettingActivity::class.java)
+                                    Constants.DEVICE_TYPE_LIGHT_RGB -> intent = Intent(mContext, RGBSettingActivity::class.java)
                                     //蓝牙接收器
-                                    Constant.DEVICE_TYPE_CONNECTOR -> intent = Intent(mContext, ConnectorSettingActivity::class.java)
-                                    Constant.DEVICE_TYPE_CURTAIN -> intent = Intent(mContext, WindowCurtainsActivity::class.java)
+                                    Constants.DEVICE_TYPE_CONNECTOR -> intent = Intent(mContext, ConnectorSettingActivity::class.java)
+                                    Constants.DEVICE_TYPE_CURTAIN -> intent = Intent(mContext, WindowCurtainsActivity::class.java)
                                 }
-                                intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                                intent?.putExtra(Constants.TYPE_VIEW, Constants.TYPE_GROUP)
                                 intent?.putExtra("group", currentGroup)
                                 when (TelinkLightApplication.getApp().connectDevice) {
                                     null -> goConnect()
@@ -603,18 +603,18 @@ abstract class BaseGroupFragment : BaseFragment() {
             R.id.template_device_more -> {
                 var intent = Intent()
                 when (groupType) {
-                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                    Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                         intent = Intent(mContext, LightsOfGroupActivity::class.java)
                         intent.putExtra("light", "cw_light")
                     }
-                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                    Constants.DEVICE_TYPE_LIGHT_RGB -> {
                         intent = Intent(mContext, LightsOfGroupActivity::class.java)
                         intent.putExtra("light", "rgb_light")
                     }//蓝牙接收器
-                    Constant.DEVICE_TYPE_CONNECTOR -> {
+                    Constants.DEVICE_TYPE_CONNECTOR -> {
                         intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
                     }
-                    Constant.DEVICE_TYPE_CURTAIN -> {
+                    Constants.DEVICE_TYPE_CURTAIN -> {
                         intent = Intent(mContext, CurtainOfGroupActivity::class.java)
                     }
                 }
@@ -629,11 +629,11 @@ abstract class BaseGroupFragment : BaseFragment() {
         AlertDialog.Builder(mContext)
                 .setMessage(getString(R.string.delete_group_confirm, dbGroup?.name))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    if (Constant.IS_ROUTE_MODE) {
+                    if (Constants.IS_ROUTE_MODE) {
                         routeDeleteGroup(dbGroup)
                     } else {
                         when (dbGroup.deviceType) {
-                            Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                            Constants.DEVICE_TYPE_LIGHT_RGB, Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
                                 val lights = DBUtils.getLightByGroupID(dbGroup.id)
                                 showLoadingDialog(getString(R.string.please_wait))
                                 deleteGroup(lights, dbGroup,
@@ -644,7 +644,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                             deleteFailToast()
                                         })
                             }
-                            Constant.DEVICE_TYPE_CURTAIN -> {
+                            Constants.DEVICE_TYPE_CURTAIN -> {
                                 val lights = DBUtils.getCurtainByGroupID(dbGroup.id)
                                 showLoadingDialog(getString(R.string.please_wait))
                                 deleteGroupCurtain(lights, dbGroup,
@@ -655,7 +655,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                             deleteFailToast()
                                         })
                             }
-                            Constant.DEVICE_TYPE_CONNECTOR -> {
+                            Constants.DEVICE_TYPE_CONNECTOR -> {
                                 val lights = DBUtils.getRelayByGroupID(dbGroup.id)
                                 showLoadingDialog(getString(R.string.please_wait))
                                 deleteGroupRelay(lights, dbGroup,
@@ -744,7 +744,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     private fun goConnect(ishow: Boolean = true) {
-        if (Constant.IS_ROUTE_MODE)
+        if (Constants.IS_ROUTE_MODE)
             return
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         if (ishow)
@@ -836,7 +836,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             } else {//往DB里添加组数据
                 val dbGroup = DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, setGroupType())
                 dbGroup?.let {
-                    if (Constant.IS_ROUTE_MODE) {
+                    if (Constants.IS_ROUTE_MODE) {
                         GroupMdodel.batchAddOrUpdateGp(mutableListOf(dbGroup!!))?.subscribe({
                             if (it.errorCode == 0)
                                 addGroupSuccess(dbGroup)
@@ -1022,13 +1022,13 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_GROUP_ON -> {
+            Constants.SER_ID_GROUP_ON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()
                 groupOpenSuccess(currentPosition)
             }
-            Constant.SER_ID_GROUP_OFF -> {
+            Constants.SER_ID_GROUP_OFF -> {
                 LogUtils.v("zcl-----------远程控制群组关闭成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()
@@ -1039,13 +1039,13 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_GROUP_ON -> {
+            Constants.SER_ID_GROUP_ON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()
                 groupOpenSuccess(currentPosition)
             }
-            Constant.SER_ID_GROUP_OFF -> {
+            Constants.SER_ID_GROUP_OFF -> {
                 LogUtils.v("zcl-----------远程控制群组关闭成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()

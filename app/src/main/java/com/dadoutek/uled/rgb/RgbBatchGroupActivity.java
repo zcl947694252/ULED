@@ -41,7 +41,7 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.Constants;
 import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbGroup;
@@ -349,11 +349,11 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
                 //进入分组
                 startGrouping();
             } else if (mConnectTimer == null) {
-                if (Constant.IS_ROUTE_MODE) return;
+                if (Constants.IS_ROUTE_MODE) return;
                 autoConnect();
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
-                if (Constant.IS_ROUTE_MODE) return;
+                if (Constants.IS_ROUTE_MODE) return;
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 
             }
@@ -735,7 +735,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
             } else {
                 //往DB里添加组数据
                 DBUtils.INSTANCE.addNewGroupWithType(textGp.getText().toString().trim(),
-                        Constant.DEVICE_TYPE_LIGHT_RGB);
+                        Constants.DEVICE_TYPE_LIGHT_RGB);
                 refreshView();
                 dialog.dismiss();
                 InputMethodManager imm =
@@ -780,7 +780,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
         recyclerViewGroups.smoothScrollToPosition(groups.size() - 1);
         groupsRecyclerViewAdapter.notifyDataSetChanged();
         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
     }
 
     private OnRecyclerviewItemClickListener onRecyclerviewItemClickListener =
@@ -799,7 +799,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
                     }
                     groupsRecyclerViewAdapter.notifyDataSetChanged();
                     SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                            Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                            Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                 }
             };
 
@@ -1007,7 +1007,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
         LogUtils.e("zcl--" + groups.toString());
 
         Intent intent = getIntent();
-        scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
+        scanCURTAIN = intent.getBooleanExtra(Constants.IS_SCAN_CURTAIN, false);
         lightType = intent.getStringExtra("lightType");
         //冷暖灯传递的all light
         if (lightType.equals("rgb_light")) {
@@ -1041,7 +1041,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
                         this.groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         this.groups.get(i).checked = false;
                     }
@@ -1058,7 +1058,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
                         this.groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         this.groups.get(i).checked = false;
                     }

@@ -7,7 +7,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.httpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -108,12 +108,12 @@ class SyncDataPutOrGetUtils {
                 when (tableName) {
                     "DB_GROUP" -> {
                         when (type) {
-                            Constant.DB_ADD -> {// 添加token lastReginID
+                            Constants.DB_ADD -> {// 添加token lastReginID
                                 val group = DBUtils.getGroupByID(changeId)
                                 return group?.let { GroupMdodel.add(/*token,*/ it, /*group.belongRegionId, */id, changeId) }!!
                             }
-                            Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
+                            Constants.DB_UPDATE -> {
                                 val group = DBUtils.getGroupByID(changeId)
                                 return group?.let {
                                     return GroupMdodel.add(/*token,*/ group, /*group.belongRegionId, */id, changeId)!!
@@ -127,7 +127,7 @@ class SyncDataPutOrGetUtils {
                                    val gw = DBUtils.getGatewayByID(changeId)
                                    return gw?.let { GwModel.add(it) }
                                }*/
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 val list = arrayListOf(changeId.toInt())
                                 val gattBody = GwGattBody()
                                 gattBody.idList = list
@@ -143,14 +143,14 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_LIGHT" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val light = DBUtils.getLightByID(changeId)
                                 return light?.let { LightModel.add(token, it, id, changeId) }
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 return LightModel.delete(token, id, changeId.toInt())
                             }
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_UPDATE -> {
                                 val light = DBUtils.getLightByID(changeId)
 
                                 light?.let {
@@ -161,14 +161,14 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_CONNECTOR" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val light = DBUtils.getConnectorByID(changeId)
                                 return light?.let { ConnectorModel.add(token, it, id, changeId) }
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 return ConnectorModel.delete(token, id, changeId.toInt())
                             }
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_UPDATE -> {
                                 val light = DBUtils.getConnectorByID(changeId)
                                 light?.let {
                                     return ConnectorModel.update(token, light, id, changeId.toInt())
@@ -178,14 +178,14 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_SWITCH", "DB_EIGHT_SWITCH" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val switch = DBUtils.getSwitchByID(changeId)
                                 return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 return SwitchMdodel.delete(token, id, changeId.toInt())
                             }
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_UPDATE -> {
                                 val switch = DBUtils.getSwitchByID(changeId)
                                 switch?.let {
                                     return SwitchMdodel.update(token, switch, changeId.toInt(), id)
@@ -214,14 +214,14 @@ class SyncDataPutOrGetUtils {
 
                     "DB_SENSOR" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
                                 return sensor?.let { SensorMdodel.add(token, it, id, changeId) }
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 return SensorMdodel.delete(token, id, changeId.toInt())
                             }
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_UPDATE -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
                                 sensor?.let { return SensorMdodel.update(token, sensor, changeId.toInt(), id) }
                             }
@@ -229,14 +229,14 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_CURTAIN" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val curtain = DBUtils.getCurtainByID(changeId)
                                 return curtain?.let { CurtainMdodel.add(token, it, id, changeId) }
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 return CurtainMdodel.delete(token, id, changeId.toInt())
                             }
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_UPDATE -> {
                                 val curtain = DBUtils.getCurtainByID(changeId)
                                 if (curtain != null) {
                                     return CurtainMdodel.update(token, curtain, changeId.toInt(), id)
@@ -246,7 +246,7 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_REGION" -> {
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val region = DBUtils.getRegionByID(changeId)
                                 return RegionModel.add(token, region, id, changeId)
                             }
@@ -262,7 +262,7 @@ class SyncDataPutOrGetUtils {
 
                         lateinit var postInfoStr: String
                         var bodyScene: RequestBody? = null
-                        if (scene != null && type != Constant.DB_DELETE) {
+                        if (scene != null && type != Constants.DB_DELETE) {
                             val body = DbSceneBody()
                             val gson = Gson()
                             body.name = scene.name
@@ -275,18 +275,18 @@ class SyncDataPutOrGetUtils {
                         }
 
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val scene = DBUtils.getSceneByID(changeId)
                                 //("scene_add--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.add(token, bodyScene, id, changeId)
                                 }
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 //("scene_delete--id==" + changeId)
                                 return SceneModel.delete(token, changeId.toInt(), id)
                             }
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_UPDATE -> {
                                 //("scene_update--id==" + changeId)
                                 if (bodyScene != null) {
                                     return SceneModel.update(token, changeId.toInt(), bodyScene, id)
@@ -300,7 +300,7 @@ class SyncDataPutOrGetUtils {
                         val gradient = DBUtils.getGradientByID(changeId)
                         lateinit var postInfoStr: String
                         var bodyGradient: RequestBody? = null
-                        if (gradient != null && type != Constant.DB_DELETE) {
+                        if (gradient != null && type != Constants.DB_DELETE) {
                             val body: DbGradientBody = DbGradientBody()
                             val gson: Gson = Gson()
                             body.name = gradient.name
@@ -315,19 +315,19 @@ class SyncDataPutOrGetUtils {
                         }
 
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
                                 if (bodyGradient != null) {
                                     return GradientModel.add(token, bodyGradient, id, changeId)
                                 }
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 val body = DbDeleteGradientBody()
                                 body.idList = ArrayList()
                                 body.idList.add(changeId.toInt())
                                 return GradientModel.delete(token, body, id)
                             }
-                            Constant.DB_UPDATE -> {
+                            Constants.DB_UPDATE -> {
                                 if (bodyGradient != null) {
                                     return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
                                 }
@@ -343,15 +343,15 @@ class SyncDataPutOrGetUtils {
                         }
 
                         when (type) {
-                            Constant.DB_ADD -> {
+                            Constants.DB_ADD -> {
                                 //注册时已经添加
                                 return null
                             }
-                            Constant.DB_DELETE -> {
+                            Constants.DB_DELETE -> {
                                 //无用户删除操作
                                 return null
                             }
-                            Constant.DB_UPDATE ->
+                            Constants.DB_UPDATE ->
                                 return AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!")
 
                         }
@@ -385,7 +385,7 @@ class SyncDataPutOrGetUtils {
                         if (it.size != 0) {
                             setupMesh()
                             SharedPreferencesHelper.putString(TelinkLightApplication.getApp(),
-                                    Constant.USER_TYPE, Constant.USER_TYPE_NEW)
+                                    Constants.USER_TYPE, Constants.USER_TYPE_NEW)
                         } else {
                             setupMeshCreat(accountNow)
                         }
@@ -562,13 +562,13 @@ class SyncDataPutOrGetUtils {
 
         private fun setupMeshCreat(account: String) {
             val account = SharedPreferencesHelper.getString(TelinkLightApplication.getApp()
-                    , Constant.DB_NAME_KEY, "dadou")
+                    , Constants.DB_NAME_KEY, "dadou")
             val dbRegio = DbRegion()
             dbRegio.belongAccount = account
             dbRegio.controlMesh = account
             dbRegio.controlMeshPwd = account
-            dbRegio.installMesh = Constant.DEFAULT_MESH_FACTORY_NAME
-            dbRegio.installMeshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD
+            dbRegio.installMesh = Constants.DEFAULT_MESH_FACTORY_NAME
+            dbRegio.installMeshPwd = Constants.DEFAULT_MESH_FACTORY_PASSWORD
             DBUtils.saveRegion(dbRegio, false)
 
             val application = DeviceHelper.getApplication() as TelinkLightApplication

@@ -33,7 +33,7 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.model.ScannedDeviceItem
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constant.VENDOR_ID
+import com.dadoutek.uled.model.Constants.VENDOR_ID
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.dbModel.DBUtils.lastRegion
@@ -707,7 +707,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         recycler_view_groups?.smoothScrollToPosition(groups!!.size - 1)
         groupsRecyclerViewAdapter.notifyDataSetChanged()
         SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
-                Constant.DEFAULT_GROUP_ID, currentGroupIndex)
+                Constants.DEFAULT_GROUP_ID, currentGroupIndex)
     }
 
 
@@ -779,7 +779,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             list_devices.visibility = View.GONE
             scanning_num.visibility = View.GONE
             btn_stop_scan.visibility = View.GONE
-            if (Constant.IS_ROUTE_MODE) {
+            if (Constants.IS_ROUTE_MODE) {
                 routerStopScan()
             } else {
                 stopScan()
@@ -844,7 +844,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun routerStopScan() {
-        RouterModel.routeStopScan(TAG, Constant.SCAN_SERID)
+        RouterModel.routeStopScan(TAG, Constants.SCAN_SERID)
                 ?.subscribe({ itr ->
                     LogUtils.v("zcl-----------收到路由停止请求-------$itr")
                     when (itr.errorCode) {
@@ -938,7 +938,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun initData() {
         val intent = intent
         // mAddDeviceType = intent.getIntExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-        val serializable = intent.getIntExtra(Constant.DEVICE_TYPE, 0)
+        val serializable = intent.getIntExtra(Constants.DEVICE_TYPE, 0)
         mAddDeviceType = if (serializable == 0) DeviceType.LIGHT_NORMAL else serializable
 
         LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")
@@ -972,7 +972,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     groups[i].checked = true
                     currentGroupIndex = i
                     SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
-                            Constant.DEFAULT_GROUP_ID, currentGroupIndex)
+                            Constants.DEFAULT_GROUP_ID, currentGroupIndex)
                 } else {
                     groups[i].checked = false
                 }
@@ -1109,7 +1109,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     private fun onLeScanTimeout() {
         isScanning = false
-        if (Constant.IS_ROUTE_MODE) {
+        if (Constants.IS_ROUTE_MODE) {
             skipeType()
         } else {
             TelinkLightService.Instance()?.idleMode(false)
@@ -1132,8 +1132,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun startScan() {
-        LogUtils.v("zcl-----------收到路由扫描开始-------${Constant.IS_ROUTE_MODE}IS_ROUTE_MODE")
-        if (Constant.IS_ROUTE_MODE) {//发送命令
+        LogUtils.v("zcl-----------收到路由扫描开始-------${Constants.IS_ROUTE_MODE}IS_ROUTE_MODE")
+        if (Constants.IS_ROUTE_MODE) {//发送命令
             routerStartScan()
         } else {
             isScanning = true
@@ -1213,9 +1213,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         LogUtils.v("zcl-----------收到路由开始扫描-------$cmdBodyBean")
         if (cmdBodyBean.ser_id == TAG) {
             disposableTimer?.dispose()
-            if (cmdBodyBean.status == Constant.ALL_SUCCESS) {//扫描成功继续重新计算超时时间
+            if (cmdBodyBean.status == Constants.ALL_SUCCESS) {//扫描成功继续重新计算超时时间
                 routeTimerOut()
-                Constant.SCAN_SERID = cmdBodyBean.scanSerId
+                Constants.SCAN_SERID = cmdBodyBean.scanSerId
             } else {
                 ToastUtils.showShort(cmdBodyBean.msg)
                 closeAnimation()
@@ -1244,7 +1244,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun getScanRouterState() {
         RouterModel.getRouteScanningResult()?.subscribe({
             it.data?.let { it1 ->
-                Constant.SCAN_SERID = it1.scanSerId.toLong()
+                Constants.SCAN_SERID = it1.scanSerId.toLong()
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -1285,7 +1285,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             params.setScanFilters(getFilters())
 
                     params.setMeshName(mesh?.factoryName)
-                    params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
+                    params.setOutOfMeshName(Constants.OUT_OF_MESH_NAME)
                     params.setTimeoutSeconds(scanTimeoutTime.toInt())
                     params.setScanMode(true)
                     TelinkLightService.Instance()?.startScan(params)
@@ -1564,7 +1564,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 DeviceType.SMART_CURTAIN_SWITCH -> startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
             }
             DeviceType.GATE_WAY -> {
-                if (Constant.IS_ROUTE_MODE) {
+                if (Constants.IS_ROUTE_MODE) {
                     skipeGw()
                 } else {
                     if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
@@ -1748,7 +1748,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun skipeBatchActivity() {
-        if (Constant.IS_ROUTE_MODE) {//获取扫描数据
+        if (Constants.IS_ROUTE_MODE) {//获取扫描数据
             getRouterScanResult()
         } else {
             val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
@@ -1836,12 +1836,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         when (mAddDeviceType) {
                             98 -> {
                                 intent = Intent(this, SensorDeviceDetailsActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
+                                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_SENSOR)
                                 getAndFinish()
                             }
                             99 -> {
                                 intent = Intent(this, SwitchDeviceDetailsActivity::class.java)
-                                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
+                                intent.putExtra(Constants.DEVICE_TYPE, Constants.INSTALL_SWITCH)
                                 getAndFinish()
                             }
                             else -> {
@@ -1856,8 +1856,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun skipeActivity(intent: Intent) {
-        intent.putParcelableArrayListExtra(Constant.DEVICE_NUM, mAddedDevicesInfos)
-        intent.putExtra(Constant.DEVICE_TYPE, mAddDeviceType)
+        intent.putParcelableArrayListExtra(Constants.DEVICE_NUM, mAddedDevicesInfos)
+        intent.putExtra(Constants.DEVICE_TYPE, mAddDeviceType)
         startActivity(intent)
         hideLoadingDialog()
         finish()
@@ -1867,7 +1867,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         TelinkLightApplication.getApp().isConnectGwBle = true
         val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
         intent.putExtra("data", dbGw)
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
+        SharedPreferencesHelper.putBoolean(this, Constants.IS_GW_CONFIG_WIFI, false)
         startActivity(intent)
         finish()
     }
