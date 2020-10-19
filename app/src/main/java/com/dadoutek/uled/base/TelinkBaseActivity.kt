@@ -41,6 +41,7 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
+import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.mqtt.IGetMessageCallBack
@@ -210,12 +211,37 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             ToastUtils.showShort(it.message)
         })
     }
+    open fun routerConnectSensor(it: DbSensor, ser_id:String) {
+         RouterModel.routerConnectSwOrSe(it.id, it?.productUUID ?: DeviceType.NIGHT_LIGHT, ser_id)
+                ?.subscribe({ response ->
+                    when (response.errorCode) {
+                        0 -> {
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                    .subscribe {
+                                        showLoadingDialog(getString(R.string.please_wait))
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.connect_fail))
+                                    }
+                        }
+                        90018 -> {
+                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                            finish()
+                        }
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
 
+                }, { it1 ->
+                    ToastUtils.showShort(it1.message)
+                })
+    }
     @SuppressLint("CheckResult")
     open fun getRouterVersion(mesAddress: MutableList<Int>, deviceType: Int, serId: String) {
         //普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
         // 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
         val subscribe = RouterModel.getDevicesVersion(mesAddress, deviceType, serId)?.subscribe({
+            LogUtils.v("zcl-----------路由请求版本-------$it")
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))
@@ -232,6 +258,31 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerConfigSensor(id: Long, configurationBean: ConfigurationBean, ser_id: String) {
+        RouterModel.configSensor(id, configurationBean, ser_id)?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.config_fail))
+                            }
+                }
+                90022 -> {
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    finish()
+                }
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -769,8 +820,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
                     }
                 }
-                Cmd.routeInAccount -> routerAccessIn(cmdBean)
-                Cmd.routeConfigWifi -> routerConfigWIFI(cmdBean)
+                Cmd.tzRouteInAccount -> routerAccessIn(cmdBean)
+                Cmd.tzRouteConfigWifi -> routerConfigWIFI(cmdBean)
                 Cmd.tzRouteResetFactoryBySelf -> {
                     tzRouteResetFactoryBySelf(cmdBean)
                 }
@@ -807,6 +858,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 Cmd.tzRouteConfigEightSw -> {//配置普通开关
                     tzRouterConfigEightSwRecevice(cmdBean)
+                }
+                Cmd.tzRouteConfigEightSesonr -> {//配置普通开关
+                    tzRouterConfigSensorRecevice(cmdBean)
                 }
 
                 Cmd.routeOTAing -> {
@@ -891,131 +945,39 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
-    open fun tzRouterConfigEightSwRecevice(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterConfigSceneSwRecevice(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterConfigDoubleSwRecevice(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterSysGradientApply(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterGradientStop(cmdBean: CmdBodyBean) {
-
-
-    }
-
-
-    open fun tzRouterGradientApply(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterConfigRGB(cmdBean: CmdBodyBean) {
-    }
-
-    open fun tzRouterConfigWhite(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
-
-    }
-
-    open fun tzRouteResetFactoryBySelf(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouteUserReset(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterSafeLock(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterSSSpeed(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterSSSW(cmdBean: CmdBodyBean, b: Boolean) {
-
-    }
-
-    open fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {
-
-    }
-
-    open fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouteStopScan(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
-
-    }
-
-    open fun tzRouterOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
-
-    }
-
-    open fun tzRouterOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {
-
-    }
-
-    open fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
-
-    }
-
-    open fun tzRouterAddScene(routerScene: RouteSceneBean?) {
-
-    }
-
-    open fun tzRouterGroupResult(routerGroup: RouteGroupingOrDelBean?) {
-
-    }
-
-    open fun tzRouteUpdateScene(cmdBodyBean: CmdBodyBean) {
-    }
-    open fun tzStartRouterScan(cmdBodyBean: CmdBodyBean) {
-    }
-
-    open fun routerConfigWIFI(cmdBody: CmdBodyBean) {
-
-    }
-
-    open fun routerAccessIn(cmdBody: CmdBodyBean) {
-
-    }
-
-    open fun tzRouteDeviceNum(scanResultBean: CmdBodyBean) {
-
-    }
+    open fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigEightSwRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigSceneSwRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigDoubleSwRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterSysGradientApply(cmdBean: CmdBodyBean) {}
+    open fun tzRouterGradientStop(cmdBean: CmdBodyBean) {}
+    open fun tzRouterGradientApply(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigRGB(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigWhite(cmdBean: CmdBodyBean) {}
+    open fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {}
+    open fun tzRouteResetFactoryBySelf(cmdBean: CmdBodyBean) {}
+    open fun tzRouteUserReset(cmdBean: CmdBodyBean) {}
+    open fun tzRouterSafeLock(cmdBean: CmdBodyBean) {}
+    open fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {}
+    open fun tzRouterResetFactory(cmdBean: CmdBodyBean) {}
+    open fun tzRouterSSSpeed(cmdBean: CmdBodyBean) {}
+    open fun tzRouterSSSW(cmdBean: CmdBodyBean, b: Boolean) {}
+    open fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {}
+    open fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {}
+    open fun tzRouteStopScan(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {}
+    open fun tzRouterOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {}
+    open fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {}
+    open fun tzRouterAddScene(routerScene: RouteSceneBean?) {}
+    open fun tzRouterGroupResult(routerGroup: RouteGroupingOrDelBean?) {}
+    open fun tzRouteUpdateScene(cmdBodyBean: CmdBodyBean) {}
+    open fun tzStartRouterScan(cmdBodyBean: CmdBodyBean) {}
+    open fun routerConfigWIFI(cmdBody: CmdBodyBean) {}
+    open fun routerAccessIn(cmdBody: CmdBodyBean) {}
+    open fun tzRouteDeviceNum(scanResultBean: CmdBodyBean) {}
 
     @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
     private fun unbindDialog(codeBean: MqttBodyBean) {

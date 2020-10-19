@@ -19,8 +19,8 @@ public class Cmd implements Serializable {
     public static final int routeScanDeviceInfo = 3002;
     public static final int routeStopScan = 3019;
     public static final int routeStartScann = 3001;
-    public static final int routeInAccount = 3000;
-    public static final int routeConfigWifi = 3022;
+    public static final int tzRouteInAccount = 3000;
+    public static final int tzRouteConfigWifi = 3022;
 
 
     public static final int gwControlCallback = 2500;
@@ -39,6 +39,7 @@ public class Cmd implements Serializable {
     public static final int tzRouteConfigNormalSw =3013;
     public static final int tzRouteConfigEightSw =3016;
     public static final int tzRouteConfigSceneSw =3015;
+    public static final int tzRouteConfigEightSesonr =3017;
     public static final int tzRouteResetFactoryBySelf =3021;
     public static final int tzRouteOpenOrClose =4000;
     public static final int tzRouteConfigBri =4002;

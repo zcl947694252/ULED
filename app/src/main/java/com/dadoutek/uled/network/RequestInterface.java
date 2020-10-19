@@ -1280,7 +1280,7 @@ public interface RequestInterface {
     @FormUrlEncoded
     @POST("router/sensor/configure")
     Observable<Response<RouterTimeoutBean>> configSensor(@Field("id") int id,
-                                                         @Field("configuration") List<ConfigurationBean> keys,
+                                                         @Field("configuration") ConfigurationBean configurationBean,
                                                          @Field("ser_id") String ser_id);
 
     /*

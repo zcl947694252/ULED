@@ -1402,6 +1402,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, group?.slowUpSlowDownSpeed.toByte()))
         Thread.sleep(500)
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr ?: 0xffff,
+                //0x01 CONFIG_EXTEND_ALL_JBZL
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 1, 1, 0, 0, 0))//1是开 0是关 第四位
     }
 

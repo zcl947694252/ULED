@@ -127,6 +127,8 @@ dependencies {
 //其中latest.release指代最新版本号，也可以指定明确的版本号，例如1.2.0
     implementation 'com.tencent.bugly:nativecrashreport:3.7.1'
 
+
+
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
     implementation 'com.jakewharton:butterknife:8.8.1'

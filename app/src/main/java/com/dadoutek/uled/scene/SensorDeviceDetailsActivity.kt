@@ -67,6 +67,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
@@ -341,7 +342,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
         if (IS_ROUTE_MODE)
             currentDevice?.let {
-                routerConnectSensor(it)
+                routerConnectSensor(it,"connectSensor")
             }
         else {
             showLoadingDialog(getString(R.string.please_wait))
@@ -353,33 +354,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             })
         }
     }
-
-    private fun routerConnectSensor(it: DbSensor): Disposable? {
-        return RouterModel.routerConnectSwOrSe(it.id, currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT, "connectSensor")
-                ?.subscribe({ response ->
-                    when (response.errorCode) {
-                        0 -> {
-                            disposableTimer?.dispose()
-                            disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                                    .subscribe {
-                                        showLoadingDialog(getString(R.string.please_wait))
-                                        hideLoadingDialog()
-                                        ToastUtils.showShort(getString(R.string.connect_fail))
-                                    }
-                        }
-                        90018 -> {
-                            ToastUtils.showShort(getString(R.string.device_not_exit))
-                            finish()
-                        }
-                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                    }
-
-                }, { it1 ->
-                    ToastUtils.showShort(it1.message)
-                })
-    }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("CheckResult")
@@ -863,48 +837,41 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
-        if (cmdBean.ser_id=="connectSensor")
-        if (cmdBean.finish) {
-            if (cmdBean.status == 0) {
-                ToastUtils.showShort(getString(R.string.connect_success))
-                image_bluetooth.setImageResource(R.drawable.icon_cloud)
-                getRouterVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
-            } else {
-                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
-                ToastUtils.showShort(getString(R.string.connect_fail))
+        if (cmdBean.ser_id == "connectSensor")
+            if (cmdBean.finish) {
+                disposableRouteTimer?.dispose()
+                hideLoadingDialog()
+                LogUtils.v("zcl-----------收到路由连接传感器成功-------$cmdBean")
+                if (cmdBean.status == 0) {
+                    ToastUtils.showShort(getString(R.string.connect_success))
+                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                    getRouterVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
+                } else {
+                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                }
             }
-        }
     }
 
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
 
         if (routerVersion?.finish == true) {
-            if (routerVersion.ser_id == "sensorVersion")
-                if (routerVersion.cmd == 0) {
+            if (routerVersion.ser_id == "sensorVersion"){
+                disposableRouteTimer?.dispose()
+                LogUtils.v("zcl-----------收到路由请求版本通知-------${routerVersion}")
+                if (routerVersion.status == 0) {
                     disposableRouteTimer?.dispose()
-                    val deviceInfo = DeviceInfo()
-                    deviceInfo.macAddress = currentDevice?.macAddr
-                    deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
-                    deviceInfo.firmwareRevision = currentDevice?.version
-                    deviceInfo.productUUID = currentDevice?.productUUID ?: 0
-                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
-                        override fun start() {}
-
-                        override fun complete() {
-                            val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
-                            if (switchByID?.version == "" || switchByID?.version == null)
-                                ToastUtils.showShort(getString(R.string.get_version_fail))
-                            else
-                                skipeDevice(false, currentDevice?.version ?: "")
-                        }
-
-                        override fun error(msg: String?) {
-                            ToastUtils.showShort(getString(R.string.get_version_fail))
-                        }
-                    })
+                    currentDevice?.version = routerVersion.succeedNow[0].version
+                    val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
+                    DBUtils.saveSensor(currentDevice!!,false)
+                    makeDeviceInfo()
+                    if (switchByID?.version == "" || switchByID?.version == null)
+                        ToastUtils.showShort(getString(R.string.get_version_fail))
+                    else
+                        skipeDevice(false, currentDevice?.version ?: "")
                 } else {
                     ToastUtils.showShort(getString(R.string.get_version_fail))
-                }
+                }}
         }
     }
 }

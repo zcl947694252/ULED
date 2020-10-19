@@ -17,8 +17,8 @@ import java.io.Serializable
  */
 data class ConfigurationBean(
     val action: Int,
-    val brightness: Int,
     val condition: Int,
+    val brightness: Int,
     val durationTimeUnit: Int,
     val durationTimeValue: Int,
     val groupMeshAddrs: List<Int>,

@@ -326,8 +326,8 @@ object RouterModel {
     /**
      * 配置传感器
      */
-    fun configSensor(id: Long, configurationBeans: List<ConfigurationBean>): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configSensor(id.toInt(), configurationBeans, "configEightSw")
+    fun configSensor(id: Long, configurationBean: ConfigurationBean,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configSensor(id.toInt(), configurationBean, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

@@ -31,13 +31,17 @@ import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.NightLightGroupRecycleViewAdapter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.dbModel.DBUtils.saveSensor
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.dbModel.DbSensor
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.ConfigurationBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -360,7 +364,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             R.id.pir_config_see_help -> {//新版传感器设置隐藏查看帮助
                 var intent = Intent(this@PirConfigActivity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE,"#sensor-scene-mode")
+                intent.putExtra(Constant.WB_TYPE, "#sensor-scene-mode")
                 startActivity(intent)
             }
 
@@ -371,25 +375,25 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun configDevice() {
-        var time = pir_config_overtime_tv.text.toString()
+        var durationTimeValue = pir_config_overtime_tv.text.toString()
         when {
-            TextUtils.isEmpty(time) -> {
+            TextUtils.isEmpty(durationTimeValue) -> {
                 TmtUtils.midToast(this, getString(R.string.timeout_period_is_empty))
                 return
             }
-            timeUnitType == 0 && time.toInt() < 10 -> {//1 代表分0代表秒
+            timeUnitType == 0 && durationTimeValue.toInt() < 10 -> {//1 代表分0代表秒
                 TmtUtils.midToast(this, getString(R.string.timeout_time_less_ten))
                 return
             }
-            timeUnitType == 0 && time.toInt() > 255 -> {
+            timeUnitType == 0 && durationTimeValue.toInt() > 255 -> {
                 TmtUtils.midToast(this, getString(R.string.timeout_255))
                 return
             }
-            timeUnitType == 1 && time.toInt() < 1 -> {
+            timeUnitType == 1 && durationTimeValue.toInt() < 1 -> {
                 TmtUtils.midToast(this, getString(R.string.timeout_1m))
                 return
             }
-            timeUnitType == 1 && time.toInt() > 255 -> {
+            timeUnitType == 1 && durationTimeValue.toInt() > 255 -> {
                 TmtUtils.midToast(this, getString(R.string.timeout_255_big))
                 return
             }
@@ -402,41 +406,92 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 return
             }
             else -> {//符合所有条件
-                val device = TelinkLightApplication.getApp().connectDevice
-                if (device != null) {
-                    GlobalScope.launch {
-                        setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
-                        sendCommandOpcode(time.toInt())
-                        delay(300)
-                        //if (!isConfirm)//不是冲洗创建 更新mesh
-                        mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
-                        Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
-                                successCallback = {
-                                    setLoadingVisbiltyOrGone()
-                                    GlobalScope.launch {
-                                        delay(timeMillis = 500)
-                                        saveSensor()
-                                    }
-                                },
-                                failedCallback = {
-                                    snackbar(sensor_root, getString(R.string.config_fail))
-                                    setLoadingVisbiltyOrGone()
-                                    TelinkLightService.Instance()?.idleMode(true)
-                                })
+                    if (currentSensor != null) {
+                        if (Constant.IS_ROUTE_MODE) {
+                            //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
+                            // triggerKey: Int = 0//0全天    1白天   2夜晚
+                            //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
+                            //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
+                            //action	否	int	触发时执行逻辑。0开，1关，2自定义亮度。仅在群组模式下需要该配置
+                            //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
+                            //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
+                            //sid	否	int	配置场景id。仅在场景模式下需要该配置
+                            var mode = if (isGroupMode) 0 else 1
+                            var  condition =triggerKey
+                            val mutableListOf = mutableListOf<Int>()
+                            showGroupList.forEach { mutableListOf.add(it.groupAddress) }
+                            routerConfigSensor(currentSensor!!.id, ConfigurationBean(triggerAfterShow, condition, customBrightnessNum, timeUnitType,
+                                    durationTimeValue.toInt(), mutableListOf, mode, (currentScene?.id?:0).toInt()), "ConfigNpr")
+                        } else{
+                            GlobalScope.launch {
+                                setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
+                                sendCommandOpcode(durationTimeValue.toInt())
+                                delay(300)
+                                //if (!isConfirm)//不是冲洗创建 更新mesh
+                                mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
+                                Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
+                                        successCallback = {
+                                            setLoadingVisbiltyOrGone()
+                                            GlobalScope.launch {
+                                                delay(timeMillis = 500)
+                                                saveSensor()
+                                            }
+                                        },
+                                        failedCallback = {
+                                            snackbar(sensor_root, getString(R.string.config_fail))
+                                            setLoadingVisbiltyOrGone()
+                                            TelinkLightService.Instance()?.idleMode(true)
+                                        })
 
-                    }
-                } else {
-                    ToastUtils.showLong(getString(R.string.connect_fail))
-                    autoConnect()
-                    timeDispsable = Observable.timer(10000, TimeUnit.MILLISECONDS).subscribe {
-                        runOnUiThread {
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.connect_fail))
+                            }
+                        }
+
+                    } else {
+                        ToastUtils.showLong(getString(R.string.connect_fail))
+                        if (!Constant.IS_ROUTE_MODE)
+                            routerConnectSensor(currentSensor!!,"retryConnectSensor")
+                        else autoConnect()
+                        timeDispsable = Observable.timer(10000, TimeUnit.MILLISECONDS).subscribe {
+                            runOnUiThread {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.connect_fail))
+                            }
                         }
                     }
-                }
             }
         }
+    }
+
+    override fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id == "ConfigNpr")
+            if (cmdBean.finish) {
+                disposableRouteTimer?.dispose()
+                hideLoadingDialog()
+                LogUtils.v("zcl-----------收到路由连接传感器成功-------$cmdBean")
+                if (cmdBean.status == 0) {
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                } else {
+                    ToastUtils.showShort(getString(R.string.config_fail))
+                }
+            }
+    }
+    @SuppressLint("CheckResult")
+    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id == "retryConnectSensor")
+            if (cmdBean.finish) {
+                disposableRouteTimer?.dispose()
+                hideLoadingDialog()
+                LogUtils.v("zcl-----------收到路由连接传感器成功-------$cmdBean")
+                if (cmdBean.status == 0) {
+                    ToastUtils.showShort(getString(R.string.connect_success))
+                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                } else {
+                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                }
+            }
     }
 
     private fun configureComplete() {
@@ -630,7 +685,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         }
         renameDialog?.setOnDismissListener {
             if (!isReConfirm)
-            finish()
+                finish()
         }
     }
 
@@ -649,22 +704,22 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     fun autoConnect() {
         if (Constant.IS_ROUTE_MODE) return
         val deviceTypes = mutableListOf(DeviceType.SENSOR)
-            ToastUtils.showLong(getString(R.string.connecting_tip))
-            connectDisposable?.dispose()
-            connectDisposable = connect(macAddress = mDeviceInfo!!.macAddress, fastestMode = true, retryTimes = 2, deviceTypes = deviceTypes)
-                    ?.subscribe({
-                        runOnUiThread {
-                            hideLoadingDialog()
-                            TmtUtils.midToast(this, getString(R.string.connect_success))
-                        }
-                        LogUtils.d("connect success")
-                    }, {
-                        runOnUiThread {
-                            hideLoadingDialog()
-                            TmtUtils.midToast(this, getString(R.string.connect_fail))
-                        }
-                        LogUtils.d("connect failed")
-                    })
+        ToastUtils.showLong(getString(R.string.connecting_tip))
+        connectDisposable?.dispose()
+        connectDisposable = connect(macAddress = mDeviceInfo!!.macAddress, fastestMode = true, retryTimes = 2, deviceTypes = deviceTypes)
+                ?.subscribe({
+                    runOnUiThread {
+                        hideLoadingDialog()
+                        TmtUtils.midToast(this, getString(R.string.connect_success))
+                    }
+                    LogUtils.d("connect success")
+                }, {
+                    runOnUiThread {
+                        hideLoadingDialog()
+                        TmtUtils.midToast(this, getString(R.string.connect_fail))
+                    }
+                    LogUtils.d("connect failed")
+                })
 
     }
 
