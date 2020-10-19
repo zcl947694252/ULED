@@ -165,11 +165,11 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.setOnClickListener { startActivity(Intent(this@MainActivity, RouterOtaActivity::class.java)) }
         initBottomNavigation()
         checkVersionAvailable()
-        // getScanResult()
+         getScanResult()
 
-        // getRouterStatus()
+         getRouterStatus()
         getRegionList()
-        //getAllStatus()
+        getAllStatus()
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         LogUtils.v("zcl---获取状态------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
     }
