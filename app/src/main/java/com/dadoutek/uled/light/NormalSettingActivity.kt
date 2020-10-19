@@ -995,7 +995,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun updateGroupResult(light: DbLight, group: DbGroup) {
         if (Constant.IS_ROUTE_MODE) {
             val bodyBean = GroupBodyBean(mutableListOf(light.meshAddr), light.productUUID, "normalGp", group.meshAddr)
-            routerToGpDevice(bodyBean)
+            routerChangeGpDevice(bodyBean)
         } else {
             Commander.addGroup(light.meshAddr, group.meshAddr, {
                 group.deviceType = light.productUUID.toLong()
@@ -1145,7 +1145,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (connectDevice != null/*&&connectDevice.meshAddress==light!!.meshAddr*/ || Constant.IS_ROUTE_MODE) {
             if (Constant.IS_ROUTE_MODE) {
                 val mesAddress = mutableListOf(light.meshAddr)
-                getRouterVersion(mesAddress, light.productUUID, "cwVersion")
+                routerGetVersion(mesAddress, light.productUUID, "cwVersion")
             } else {
                 val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
                         .subscribe(
@@ -1403,7 +1403,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         Thread.sleep(500)
         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr ?: 0xffff,
                 //0x01 CONFIG_EXTEND_ALL_JBZL
-                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 1, 1, 0, 0, 0))//1是开 0是关 第四位
+                byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 2, 1, 0, 0, 0))//1是开 0是关 第四位
     }
 
     private fun setLightGUIImg(iconLight: Int = R.mipmap.round, progress: Int = 0, temperatureValue: Int = 0, isClose: Boolean = false) {
@@ -1723,11 +1723,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             } else {
                 light?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (Constant.IS_ROUTE_MODE) {
-                    RouterModel.routeUpdateLightName(light.id, light?.name)?.subscribe({
-                        renameSucess()
-                    }, {
-                        ToastUtils.showShort(it.message)
-                    })
+                    routerUpdateDeviceName(light.id, light?.name)
                 } else {
                     renameSucess()
                 }
@@ -1736,7 +1732,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-    private fun renameSucess() {
+
+     override fun renameSucess() {
         DBUtils.updateLight(light!!)
         toolbarTv.text = light?.name
     }
@@ -2040,7 +2037,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     fun remove() {
         if (Constant.IS_ROUTE_MODE) {
-            deviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "lightFactory")
+            routerDeviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "lightFactory")
         } else {
             if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
                 AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))

@@ -240,7 +240,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                                     .mLightCtrl.currentLight.isConnected || Constant.IS_ROUTE_MODE) {
 
                         if (Constant.IS_ROUTE_MODE) {
-                            deviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "rgbFactory")
+                            routerDeviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "rgbFactory")
                         } else {
                             showLoadingDialog(getString(R.string.please_wait))
                             val subscribe = Commander.resetDevice(light!!.meshAddr)
@@ -512,7 +512,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null || Constant.IS_ROUTE_MODE) {
             if (Constant.IS_ROUTE_MODE)
-                getRouterVersion(mutableListOf(light?.meshAddr ?: 0), 6, "rgbVersion")
+                routerGetVersion(mutableListOf(light?.meshAddr ?: 0), 6, "rgbVersion")
             else {
                 val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
                         .subscribe({ s ->

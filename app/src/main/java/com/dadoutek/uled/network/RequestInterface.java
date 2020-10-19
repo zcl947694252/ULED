@@ -1277,11 +1277,10 @@ public interface RequestInterface {
      * "configuration": { "mode": 0, "condition": 0, "durationTimeUnit": 0,
      * "durationTimeValue": 10,"sid": 1 }}
      */
-    @FormUrlEncoded
     @POST("router/sensor/configure")
-    Observable<Response<RouterTimeoutBean>> configSensor(@Field("id") int id,
+    Observable<Response<RouterTimeoutBean>> configSensor(@Body ConfigSensorBody body/*@Field("id") int id,
                                                          @Field("configuration") ConfigurationBean configurationBean,
-                                                         @Field("ser_id") String ser_id);
+                                                         @Field("ser_id") String ser_id*/);
 
     /*
     -------------------------------------控制指令相关-------------------------------------------------------*/

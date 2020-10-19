@@ -219,7 +219,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                     })
                             deleteData()
                         }else{
-                            deviceResetFactory(sw!!.macAddr, sw!!.meshAddr, 99, "swFactory")
+                            routerDeviceResetFactory(sw!!.macAddr, sw!!.meshAddr, 99, "swFactory")
                         }
 
                     }

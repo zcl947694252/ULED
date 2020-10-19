@@ -22,14 +22,12 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.OtaPrepareListner
-import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.GwModel
-import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -39,12 +37,10 @@ import com.dadoutek.uled.pir.PirConfigActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
@@ -67,7 +63,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
@@ -845,7 +840,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.connect_success))
                     image_bluetooth.setImageResource(R.drawable.icon_cloud)
-                    getRouterVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
+                    routerGetVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
                 } else {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
@@ -854,7 +849,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
-
         if (routerVersion?.finish == true) {
             if (routerVersion.ser_id == "sensorVersion"){
                 disposableRouteTimer?.dispose()

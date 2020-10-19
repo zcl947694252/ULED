@@ -183,112 +183,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 //        registerReceiver(changeRecevicer, filter)
     }
 
-    @SuppressLint("CheckResult")
-    open fun routeOpenOrCloseBase(meshAddr: Int, productUUID: Int, status: Int, serId: String) {//如果发送后失败则还原 0关1开
-        LogUtils.v("zcl-----------收到路由开关灯指令-------deviceType-------$productUUID")
-        val subscribe = RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
-            LogUtils.v("zcl-----------收到路由成功-------$it")
-            //    "errorCode": 90018,该设备不存在，请重新刷新数据"   "errorCode": 90008,该设备没有绑定路由，无法操作"
-            //   "errorCode": 90007该组不存在，请重新刷新数据"   errorCode": 90005,"message": "该设备绑定的路由没在线"
-            when (it.errorCode) {
-                0 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                if (productUUID == DeviceType.LIGHT_NORMAL)
-                                    ToastUtils.showShort(getString(R.string.open_faile))
-                            }
-                }
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-            }
-        }, {
-            LogUtils.v("zcl-----------收到路由失败-------$it")
-            ToastUtils.showShort(it.message)
-        })
-    }
-    open fun routerConnectSensor(it: DbSensor, ser_id:String) {
-         RouterModel.routerConnectSwOrSe(it.id, it?.productUUID ?: DeviceType.NIGHT_LIGHT, ser_id)
-                ?.subscribe({ response ->
-                    when (response.errorCode) {
-                        0 -> {
-                            disposableRouteTimer?.dispose()
-                            disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                                    .subscribe {
-                                        showLoadingDialog(getString(R.string.please_wait))
-                                        hideLoadingDialog()
-                                        ToastUtils.showShort(getString(R.string.connect_fail))
-                                    }
-                        }
-                        90018 -> {
-                            ToastUtils.showShort(getString(R.string.device_not_exit))
-                            finish()
-                        }
-                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                    }
-
-                }, { it1 ->
-                    ToastUtils.showShort(it1.message)
-                })
-    }
-    @SuppressLint("CheckResult")
-    open fun getRouterVersion(mesAddress: MutableList<Int>, deviceType: Int, serId: String) {
-        //普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
-        // 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
-        val subscribe = RouterModel.getDevicesVersion(mesAddress, deviceType, serId)?.subscribe({
-            LogUtils.v("zcl-----------路由请求版本-------$it")
-            when (it.errorCode) {
-                0 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.get_version_fail))
-                            }
-                }
-                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-            }
-        }, {
-            ToastUtils.showShort(it.message)
-        })
-    }
-
-    @SuppressLint("CheckResult")
-    open fun routerConfigSensor(id: Long, configurationBean: ConfigurationBean, ser_id: String) {
-        RouterModel.configSensor(id, configurationBean, ser_id)?.subscribe({
-            when (it.errorCode) {
-                0 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.config_fail))
-                            }
-                }
-                90022 -> {
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
-                    finish()
-                }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-            }
-        }, {
-            ToastUtils.showShort(it.message)
-        })
-    }
-
     private fun startTimerUpdate() {
         upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
             if (netWorkCheck(this))//oom溢出
@@ -772,35 +666,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         registerReceiver(stompRecevice, filter)
     }
 
-    @SuppressLint("CheckResult")
-    open fun deviceResetFactory(mac: String, meshAddr: Int, productUUID: Int, ser_id: String) {
-        //    "errorCode": 20030,已生成移交码，此时不支持任何恢复操作，请删除移交码再重试"
-        RouterModel.routeResetFactory(MacResetBody(macAddr = mac, meshAddr = meshAddr, meshType = productUUID, ser_id = ser_id))?.subscribe({
-            when (it.errorCode) {
-                0 -> {
-                    LogUtils.v("zcl-----------收到路由的恢复出厂结果-------$it")
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.reset_factory_fail))
-                            }
-                }
-                90030 -> ToastUtils.showShort(getString(R.string.transfer_accounts_code_exit_cont_perform))
-                900018 -> {
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
-                    finish()
-                }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-            }
-        }, {
-            ToastUtils.showShort(it.message)
-        })
-    }
-
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -1129,14 +994,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
-                    }
-                    ?.doFinally {
+                    }?.doFinally {
                         mConnectDisposable = null
-                    }
-                    ?.doOnError {
+                    }?.doOnError {
                         TelinkLightService.Instance()?.idleMode(false)
                     }
-
         } else {
             LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
             Observable.create {
@@ -1519,7 +1381,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     @SuppressLint("CheckResult")
-    open fun routerToGpDevice(bodyBean: GroupBodyBean) {
+    open fun routerChangeGpDevice(bodyBean: GroupBodyBean) {
         RouterModel.routeBatchGpNew(bodyBean)?.subscribe({ itR ->
             LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")
             when (itR.errorCode) {
@@ -1541,6 +1403,158 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             LogUtils.v("zcl-----------收到路由fenzu失败-------$it")
             ToastUtils.showShort(it.message)
         })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerDeviceResetFactory(mac: String, meshAddr: Int, productUUID: Int, ser_id: String) {
+        //    "errorCode": 20030,已生成移交码，此时不支持任何恢复操作，请删除移交码再重试"
+        RouterModel.routeResetFactory(MacResetBody(macAddr = mac, meshAddr = meshAddr, meshType = productUUID, ser_id = ser_id))?.subscribe({
+            when (it.errorCode) {
+                0 -> {
+                    LogUtils.v("zcl-----------收到路由的恢复出厂结果-------$it")
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                            }
+                }
+                90030 -> ToastUtils.showShort(getString(R.string.transfer_accounts_code_exit_cont_perform))
+                900018 -> {
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    finish()
+                }
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routeOpenOrCloseBase(meshAddr: Int, productUUID: Int, status: Int, serId: String) {//如果发送后失败则还原 0关1开
+        LogUtils.v("zcl-----------收到路由开关灯指令-------deviceType-------$productUUID")
+        val subscribe = RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
+            LogUtils.v("zcl-----------收到路由成功-------$it")
+            //    "errorCode": 90018,该设备不存在，请重新刷新数据"   "errorCode": 90008,该设备没有绑定路由，无法操作"
+            //   "errorCode": 90007该组不存在，请重新刷新数据"   errorCode": 90005,"message": "该设备绑定的路由没在线"
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                if (productUUID == DeviceType.LIGHT_NORMAL)
+                                    ToastUtils.showShort(getString(R.string.open_faile))
+                            }
+                }
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+            }
+        }, {
+            LogUtils.v("zcl-----------收到路由失败-------$it")
+            ToastUtils.showShort(it.message)
+        })
+    }
+    @SuppressLint("CheckResult")
+    open fun routerConnectSensor(it: DbSensor, ser_id:String) {
+        //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+        RouterModel.routerConnectSwOrSe(it.id, it.productUUID, ser_id)
+                ?.subscribe({ response ->
+                    LogUtils.v("zcl-----------收到路由请求连接开关或者传感器-------$it")
+                    when (response.errorCode) {
+                        0 -> {
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                    .subscribe {
+                                        showLoadingDialog(getString(R.string.please_wait))
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.connect_fail))
+                                    }
+                        }
+                        90018 -> {
+                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                            finish()
+                        }
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+
+                }, { it1 ->
+                    ToastUtils.showShort(it1.message)
+                })
+    }
+    @SuppressLint("CheckResult")
+    open fun routerGetVersion(mesAddress: MutableList<Int>, deviceType: Int, serId: String) {
+        //普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
+        // 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
+        val subscribe = RouterModel.getDevicesVersion(mesAddress, deviceType, serId)?.subscribe({
+            LogUtils.v("zcl-----------路由请求版本-------$it")
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.get_version_fail))
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerConfigSensor(id: Long, configuration: ConfigurationBean, ser_id: String) {
+        RouterModel.configSensor(id, configuration, ser_id)?.subscribe({
+            LogUtils.v("zcl-----------收到路由请求配置-------$it")
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.config_fail))
+                            }
+                }
+                90022 -> {
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    finish()
+                }
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerUpdateDeviceName(id: Long, name: String) {
+        RouterModel.routeUpdateLightName(id,name)?.subscribe({
+            renameSucess()
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    open fun renameSucess() {
+
     }
 
     override fun setMessage(cmd: Int, extCmd: Int, message: String) {
