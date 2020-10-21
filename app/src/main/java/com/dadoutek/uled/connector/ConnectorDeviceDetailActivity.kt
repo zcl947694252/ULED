@@ -20,7 +20,10 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.BindRouterActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -41,10 +44,10 @@ import org.jetbrains.anko.singleLine
  * 蓝牙接收器列表
  */
 class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener {
-    private  var launch: Job? = null
+    private var launch: Job? = null
     private val relayDatas: MutableList<DbConnector> = mutableListOf()
     private var inflater: LayoutInflater? = null
-    private var adaper: DeviceDetailConnectorAdapter? = null
+    private var relayAdaper: DeviceDetailConnectorAdapter? = null
     private var currentDevice: DbConnector? = null
     private var positionCurrent: Int = 0
     private var canBeRefresh = true
@@ -64,6 +67,20 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         initView()
     }
 
+    //显示路由
+    override fun bindRouterVisible(): Boolean {
+        return true
+    }
+
+    override fun bindDeviceRouter() {
+        val dbGroup = DbGroup()
+        dbGroup.brightness=10000
+        dbGroup.deviceType = DeviceType.SMART_RELAY.toLong()
+        var intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", dbGroup)
+        startActivity(intent)
+    }
+
     override fun batchGpVisible(): Boolean {
         return true
     }
@@ -73,7 +90,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
             DBUtils.deleteConnector(it)
             relayDatas.remove(it)
         }
-        adaper?.notifyDataSetChanged()
+        relayAdaper?.notifyDataSetChanged()
         isEmptyDevice()
     }
 
@@ -88,12 +105,12 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
     }
 
     override fun editeDeviceAdapter() {
-        adaper!!.changeState(isEdite)
-        adaper!!.notifyDataSetChanged()
+        relayAdaper!!.changeState(isEdite)
+        relayAdaper!!.notifyDataSetChanged()
     }
 
     override fun setToolbar(): Toolbar {
-      return toolbar
+        return toolbar
     }
 
     override fun setDeviceDataSize(num: Int): Int {
@@ -101,7 +118,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
     }
 
     override fun setLayoutId(): Int {
-       return R.layout.template_device_detail_list
+        return R.layout.template_device_detail_list
     }
 
     override fun onResume() {
@@ -114,9 +131,9 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
     private fun initView() {
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        adaper = DeviceDetailConnectorAdapter(R.layout.template_device_type_item, relayDatas)
-        adaper!!.onItemChildClickListener = onItemChildClickListener
-        adaper!!.bindToRecyclerView(recycleView)
+        relayAdaper = DeviceDetailConnectorAdapter(R.layout.template_device_type_item, relayDatas)
+        relayAdaper!!.onItemChildClickListener = onItemChildClickListener
+        relayAdaper!!.bindToRecyclerView(recycleView)
         for (i in relayDatas?.indices!!) {
             relayDatas!![i].updateIcon()
         }
@@ -146,8 +163,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
                 if (TelinkLightApplication.getApp().connectDevice == null) {
                     ToastUtils.showLong(getString(R.string.device_not_connected))
                 } else {
-                   // addNewGroup()
-                    popMain.showAtLocation(window.decorView, Gravity.CENTER,0,0)
+                    // addNewGroup()
+                    popMain.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 }
             }
             R.id.create_scene -> {
@@ -225,199 +242,220 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         Opcode.LIGHT_ON_OFF
         val unit = when (view.id) {
             R.id.template_device_icon -> {
-                if (TelinkLightApplication.getApp().connectDevice == null) {
+                if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
                     autoConnect()
                 } else {
                     canBeRefresh = true
-                    if (currentDevice!!.connectionStatus == ConnectionStatus.OFF.value) {
-                        if (currentDevice!!.productUUID == DeviceType.SMART_CURTAIN) {
-                            Commander.openOrCloseCurtain(currentDevice!!.meshAddr, true, false)
-                        } else {
-                            Commander.openOrCloseLights(currentDevice!!.meshAddr, true)
-                        }
 
-                        currentDevice!!.connectionStatus = ConnectionStatus.ON.value
-                    } else {
-                        if (currentDevice!!.productUUID == DeviceType.SMART_CURTAIN) {
-                            Commander.openOrCloseCurtain(currentDevice!!.meshAddr, false, false)
-                        } else {
-                            Commander.openOrCloseLights(currentDevice!!.meshAddr, false)
-                        }
-                        currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
-                    }
-
-                    currentDevice!!.updateIcon()
-                    DBUtils.updateConnector(currentDevice!!)
-                    runOnUiThread {
-                        adapter?.notifyDataSetChanged()
-                    }
-                }
-            }
-            R.id.template_device_setting -> {
-                val lastUser = DBUtils.lastUser
-                lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (TelinkLightApplication.getApp().connectDevice == null) {
-                            autoConnect()
-                        } else {
-                            var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
-                            if (currentDevice?.productUUID == DeviceType.LIGHT_RGB) {
-                                intent = Intent(this@ConnectorDeviceDetailActivity, RGBSettingActivity::class.java)
-                                intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
+                    when (currentDevice!!.connectionStatus) {
+                        ConnectionStatus.OFF.value -> {
+                            if (Constants.IS_ROUTE_MODE)
+                                routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 1, "relayOpen")
+                            else {
+                                Commander.openOrCloseCurtain(currentDevice!!.meshAddr, true, false)
+                                afterOpenOrClose(adapter!!)
                             }
-                            intent.putExtra(Constants.LIGHT_ARESS_KEY, currentDevice)
-                            intent.putExtra(Constants.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
-                            intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
-                            startActivityForResult(intent, REQ_LIGHT_SETTING)
+                        }
+                        else -> {
+                            if (Constants.IS_ROUTE_MODE)
+                                routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 0, "relayClose")
+                            else {
+                                Commander.openOrCloseCurtain(currentDevice!!.meshAddr, false, false)
+                                afterOpenOrClose(adapter!!)
+                            }
                         }
                     }
                 }
+        }
+        R.id.template_device_setting -> {
+        val lastUser = DBUtils.lastUser
+        lastUser?.let {
+            if (it.id.toString() != it.last_authorizer_user_id)
+                ToastUtils.showLong(getString(R.string.author_region_warm))
+            else {
+                if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
+                    autoConnect()
+                } else {
+                    var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
+                    intent.putExtra(Constants.LIGHT_ARESS_KEY, currentDevice)
+                    intent.putExtra(Constants.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
+                    intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
+                    startActivityForResult(intent, REQ_LIGHT_SETTING)
+                }
             }
-            R.id.template_device_card_delete-> {
-                val string = getString(R.string.sure_delete_device, currentDevice?.name)
-                builder?.setMessage(string)
-                builder?.create()?.show()
-            }
-            else -> ToastUtils.showLong(R.string.connecting_tip)
+        }
+    }
+        R.id.template_device_card_delete -> {
+        val string = getString(R.string.sure_delete_device, currentDevice?.name)
+        builder?.setMessage(string)
+        builder?.create()?.show()
+    }
+        else -> ToastUtils.showLong(R.string.connecting_tip)
+    }
+}
+
+    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+              LogUtils.v("zcl-----------收到路由relayOpen通知-------$cmdBean")
+                      if (cmdBean.ser_id=="relayOpen"||cmdBean.ser_id=="relayClose"){
+                          disposableRouteTimer?.dispose()
+                          hideLoadingDialog()
+                          if (cmdBean.status==0){
+                              afterOpenOrClose(relayAdaper)
+                          }else{
+                              when(cmdBean.ser_id){
+                                  "relayOpen"->ToastUtils.showShort(getString(R.string.open_faile))
+                                  "relayClose"->ToastUtils.showShort(getString(R.string.close_faile))
+                              }
+                          }
+                      }
+    }
+
+    private fun afterOpenOrClose(adapter: BaseQuickAdapter<*, *>?) {
+        when (currentDevice!!.connectionStatus) {
+            ConnectionStatus.OFF.value -> currentDevice!!.connectionStatus = ConnectionStatus.ON.value
+            else -> currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
+        }
+        currentDevice!!.updateIcon()
+        DBUtils.updateConnector(currentDevice!!)
+        runOnUiThread {
+            adapter?.notifyDataSetChanged()
         }
     }
 
     private fun initData() {
-        setScanningMode(true)
-        relayDatas.clear()
-        val allLightData = DBUtils.getAllRelay()
-        if (allLightData.size > 0) {
-            var listGroup: ArrayList<DbConnector> = ArrayList()
-            var noGroup: ArrayList<DbConnector> = ArrayList()
-            for (i in allLightData.indices)
-                if (StringUtils.getConnectorGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped))
-                    noGroup.add(allLightData[i])
-                 else
-                    listGroup.add(allLightData[i])
+    setScanningMode(true)
+    relayDatas.clear()
+    val allLightData = DBUtils.getAllRelay()
+    if (allLightData.size > 0) {
+        var listGroup: ArrayList<DbConnector> = ArrayList()
+        var noGroup: ArrayList<DbConnector> = ArrayList()
+        for (i in allLightData.indices)
+            if (StringUtils.getConnectorGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped))
+                noGroup.add(allLightData[i])
+            else
+                listGroup.add(allLightData[i])
 
-            if (noGroup.size > 0)
-                for (i in noGroup.indices)
-                    relayDatas.add(noGroup[i])
+        if (noGroup.size > 0)
+            for (i in noGroup.indices)
+                relayDatas.add(noGroup[i])
 
-            if (listGroup.size > 0)
-                for (i in listGroup.indices)
-                    relayDatas.add(listGroup[i])
+        if (listGroup.size > 0)
+            for (i in listGroup.indices)
+                relayDatas.add(listGroup[i])
 
-            recycleView.visibility = View.VISIBLE
-            no_device_relativeLayout.visibility = View.GONE
+        recycleView.visibility = View.VISIBLE
+        no_device_relativeLayout.visibility = View.GONE
 
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-        } else {
-            recycleView.visibility = View.GONE
-            no_device_relativeLayout.visibility = View.VISIBLE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
-            toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-                val lastUser = DBUtils.lastUser
-                lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (dialog_relay?.visibility == View.GONE)
-                            showPopupMenu()
-                    }
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+    } else {
+        recycleView.visibility = View.GONE
+        no_device_relativeLayout.visibility = View.VISIBLE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
+        toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
+            val lastUser = DBUtils.lastUser
+            lastUser?.let {
+                if (it.id.toString() != it.last_authorizer_user_id)
+                    ToastUtils.showLong(getString(R.string.author_region_warm))
+                else {
+                    if (dialog_relay?.visibility == View.GONE)
+                        showPopupMenu()
                 }
             }
         }
     }
+}
 
-    override fun onPause() {
-        super.onPause()
-        disposableConnectTimer?.dispose()
-    }
+override fun onPause() {
+    super.onPause()
+    disposableConnectTimer?.dispose()
+}
 
-    private fun showPopupMenu() {
-        dialog_relay?.visibility = View.VISIBLE
-    }
+private fun showPopupMenu() {
+    dialog_relay?.visibility = View.VISIBLE
+}
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mConnectDisposal?.dispose()
-        canBeRefresh = false
-        acitivityIsAlive = false
-        launch?.cancel()
-    }
+override fun onDestroy() {
+    super.onDestroy()
+    mConnectDisposal?.dispose()
+    canBeRefresh = false
+    acitivityIsAlive = false
+    launch?.cancel()
+}
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        notifyData()
-        launch?.cancel()
-         launch = GlobalScope.launch {
-            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-            delay(2500)
-            if (this@ConnectorDeviceDetailActivity == null ||
-                    this@ConnectorDeviceDetailActivity.isDestroyed ||
-                    this@ConnectorDeviceDetailActivity.isFinishing || !acitivityIsAlive) {
-            } else {
-                autoConnect()
-            }
+override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    super.onActivityResult(requestCode, resultCode, data)
+    notifyData()
+    launch?.cancel()
+    launch = GlobalScope.launch {
+        //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+        delay(2500)
+        if (this@ConnectorDeviceDetailActivity == null ||
+                this@ConnectorDeviceDetailActivity.isDestroyed ||
+                this@ConnectorDeviceDetailActivity.isFinishing || !acitivityIsAlive) {
+        } else {
+            autoConnect()
         }
     }
+}
 
-    fun notifyData() {
-        val mOldDatas: MutableList<DbConnector> = relayDatas
-        val mNewDatas: MutableList<DbConnector> = getNewData()
-        val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
-            override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldDatas.get(oldItemPosition).id?.equals(mNewDatas.get
-                (newItemPosition).id) ?: false
-            }
+fun notifyData() {
+    val mOldDatas: MutableList<DbConnector> = relayDatas
+    val mNewDatas: MutableList<DbConnector> = getNewData()
+    val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return mOldDatas.get(oldItemPosition).id?.equals(mNewDatas.get
+            (newItemPosition).id) ?: false
+        }
 
-            override fun getOldListSize(): Int {
-                return mOldDatas.size ?: 0
-            }
+        override fun getOldListSize(): Int {
+            return mOldDatas.size ?: 0
+        }
 
-            override fun getNewListSize(): Int {
-                return mNewDatas.size ?: 0
-            }
+        override fun getNewListSize(): Int {
+            return mNewDatas.size ?: 0
+        }
 
-            override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = mOldDatas[oldItemPosition]
-                val beanNew = mNewDatas[newItemPosition]
-                return if (beanOld.name != beanNew.name) {
-                    return false//如果有内容不同，就返回false
-                } else true
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            val beanOld = mOldDatas[oldItemPosition]
+            val beanNew = mNewDatas[newItemPosition]
+            return if (beanOld.name != beanNew.name) {
+                return false//如果有内容不同，就返回false
+            } else true
 
-            }
-        }, true)
-        adaper?.let { diffResult.dispatchUpdatesTo(it) }
+        }
+    }, true)
+    relayAdaper?.let { diffResult.dispatchUpdatesTo(it) }
 
-        relayDatas.clear()
-        relayDatas.addAll(mNewDatas)
+    relayDatas.clear()
+    relayDatas.addAll(mNewDatas)
 
 //        adaper!!.setNewData(lightsData)
-        adaper?.notifyDataSetChanged()
+    relayAdaper?.notifyDataSetChanged()
 
-    }
+}
 
-    private fun getNewData(): MutableList<DbConnector> {
-        relayDatas.clear()
-        relayDatas.addAll(DBUtils.getAllRelay())
-        return relayDatas
-    }
+private fun getNewData(): MutableList<DbConnector> {
+    relayDatas.clear()
+    relayDatas.addAll(DBUtils.getAllRelay())
+    return relayDatas
+}
 
-    fun autoConnect() {
-        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
-        if ( size < 0)
-            return
-        mConnectDisposal = connect()
-                ?.subscribe(
-                        {
-                            LogUtils.d(it)
-                        }
-                        ,
-                        {
-                            LogUtils.d(it)
-                        }
-                )
-    }
+fun autoConnect() {
+    val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+    if (size < 0)
+        return
+    mConnectDisposal = connect()
+            ?.subscribe(
+                    {
+                        LogUtils.d(it)
+                    }
+                    ,
+                    {
+                        LogUtils.d(it)
+                    }
+            )
+}
 
 
 }

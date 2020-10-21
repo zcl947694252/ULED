@@ -50,6 +50,7 @@ public class Cmd implements Serializable {
     public static final int tzRouteSysGradientApply =4012;
     public static final int tzRouteGradientApply =4014;
     public static final int tzRouteGradientStop =4016;
+    public static final int tzRouteContorlCurtain =4018;
     public static final int tzRouteSlowUPSlowDownSw =4019;
     public static final int tzRouteSlowUPSlowDownSpeed =4020;
     public static final int tzRouteUserReset =4021;

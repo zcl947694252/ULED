@@ -366,12 +366,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             if (Constants.IS_ROUTE_MODE)
                 diyGradient?.let {
                     RouterModel.routerUpdateGradient(UpdateGradientBean(it.id.toInt(), it.type, it.colorNodes,dstAddress, deviceType,"updateGradient"))?.subscribe({ response ->
-                        //    "errorCode": 90020, "该自定义渐变不存在，请重新刷新数据"
-                        //    "errorCode": 90018,"该设备不存在，请重新刷新数据"
-                        //    "errorCode": 90008,"该设备没有绑定路由，无法添加自定义渐变"
-                        //    "errorCode": 90007,"该组不存在，无法操作"
-                        //    "errorCode": 90005,"以下路由没有上线，无法更新自定义渐变"
-                        //    "errorCode": 90004, "账号下区域下没有路由，无法操作"
+                        //"errorCode": 90020, "该自定义渐变不存在，请重新刷新数据"     "errorCode": 90018,"该设备不存在，请重新刷新数据"
+                        //"errorCode": 90008,"该设备没有绑定路由，无法添加自定义渐变"  "errorCode": 90007,"该组不存在，无法操作"
+                        //"errorCode": 90005,"以下路由没有上线，无法更新自定义渐变"    "errorCode": 90004, "账号下区域下没有路由，无法操作"
                         when (response.errorCode) {
                             0 -> {
                                 disposableTimer?.dispose()

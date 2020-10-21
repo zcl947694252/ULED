@@ -114,7 +114,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
                         if (Constants.IS_ROUTE_MODE) {
-                            routeDeleteGroup(group!!)
+                            routeDeleteGroup("delCWGp",group!!)
                         } else {
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
@@ -133,38 +133,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             R.id.brightness_btn -> setBrightness()
             R.id.temperature_btn -> setTemperature()
         }
-    }
-
-    @SuppressLint("CheckResult")
-    private fun routeDeleteGroup(dbGroup: DbGroup) {
-        RouterModel.routerDelGp(RouterDelGpBody("delCWGp", dbGroup.meshAddr))?.subscribe({
-            /**
-            90007,"该组不存在，本地删除即可 "  90015,"空组直接本地删除，后台数据库也会同步删除(无需app调用删除接口)"
-            90008,该组里的全部设备都未绑定路由，无法删除" 90005,"以下路由全部没有上线，无法开始分组" 90009,"默认组无法删除"
-             */
-            when (it.errorCode) {
-                0, 90015,90007 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
-                    if (it.errorCode==0){
-                        disposableRouteTimer?.dispose()
-                        disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                .subscribe {
-                                    hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.delete_gp_fail))
-                                }
-                    }else{
-                        DBUtils.deleteGroupOnly(dbGroup)
-                        deleteGpSuccess()
-                    }
-                }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
-            }
-            LogUtils.v("zcl-----------收到路由删组-------$it")
-        }, {
-            ToastUtils.showShort(it.message)
-        })
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
@@ -190,7 +158,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
 
-    private fun deleteGpSuccess() {
+     override fun deleteGpSuccess() {
         SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
         this.hideLoadingDialog()
         this?.setResult(Constants.RESULT_OK)
@@ -1541,7 +1509,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     private fun routerSingleOta() {
-        this.startActivity<RouterOtaActivity>("groupOrDeviceId" to light!!.id, "DeviceType" to light.productUUID, "GroupOrTypeOrDevice" to 3)
+        this.startActivity<RouterOtaActivity>("deviceId" to light!!.id,"deviceType" to DeviceType.LIGHT_NORMAL,"deviceMac" to light!!.macAddr)
     }
 
 
@@ -1723,7 +1691,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             } else {
                 light?.name = renameEt?.text.toString().trim { it <= ' ' }
                 if (Constants.IS_ROUTE_MODE) {
-                    routerUpdateDeviceName(light.id, light?.name)
+                    routerUpdateLightName(light.id, light?.name)
                 } else {
                     renameSucess()
                 }

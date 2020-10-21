@@ -553,7 +553,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 lastUser?.let {
                     val isLight = groupType == Constants.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constants.DEVICE_TYPE_LIGHT_RGB
                     when {
-                        isLight && position == 0 -> {
+                        isLight && position == 0 -> {//进入所有灯
                             if (TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE) {
                                 val intentSetting = Intent(context, NormalSettingActivity::class.java)
                                 intentSetting.putExtra(Constants.TYPE_VIEW, Constants.TYPE_GROUP)
@@ -586,9 +586,10 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 }
                                 intent?.putExtra(Constants.TYPE_VIEW, Constants.TYPE_GROUP)
                                 intent?.putExtra("group", currentGroup)
-                                when (TelinkLightApplication.getApp().connectDevice) {
-                                    null -> goConnect()
-                                    else -> startActivityForResult(intent, 2)
+                                if (TelinkLightApplication.getApp().connectDevice==null&&!Constants.IS_ROUTE_MODE) {
+                                    goConnect()
+                                }else{
+                                     startActivityForResult(intent, 2)
                                 }
                             }
                         }

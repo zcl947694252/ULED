@@ -9,21 +9,37 @@ import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.*
 import android.widget.SeekBar
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.rgb.ColorSceneSelectDiyRecyclerViewAdapter
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.InputRGBColorDialog
 import com.dadoutek.uled.util.OtherUtils
+import io.reactivex.Observable
+import kotlinx.android.synthetic.main.activity_rgb_group_setting.*
 import kotlinx.android.synthetic.main.activity_select_color.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.activity_select_color.color_b
+import kotlinx.android.synthetic.main.activity_select_color.color_g
+import kotlinx.android.synthetic.main.activity_select_color.color_picker
+import kotlinx.android.synthetic.main.activity_select_color.color_r
+import kotlinx.android.synthetic.main.activity_select_color.diy_color_recycler_list_view
+import kotlinx.android.synthetic.main.activity_select_color.ll_b
+import kotlinx.android.synthetic.main.activity_select_color.ll_g
+import kotlinx.android.synthetic.main.activity_select_color.ll_r
+import kotlinx.android.synthetic.main.activity_select_color.rgb_white_seekbar
+import kotlinx.android.synthetic.main.activity_select_color.tv_brightness_w
+import kotlinx.coroutines.*
 import top.defaults.colorpicker.ColorObserver
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * 描述	    场景选择颜色弹框
@@ -34,6 +50,7 @@ import java.util.*
  */
 
 class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
+    private var color: Int = 0
     private var itemGroup: ItemGroup? = null
     private var presetColors: MutableList<ItemColorPreset>? = null
     private var colorSelectDiyRecyclerViewAdapter: ColorSceneSelectDiyRecyclerViewAdapter? = null
@@ -194,7 +211,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
                     ws = 0
 
                 delay(80)
-                changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
+                changeColor(red, green, blue, true)
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
@@ -232,32 +249,77 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
                 Thread {
                     itemGroup!!.color = color
 
-                    changeColor(r.toByte(), g.toByte(), b.toByte(), false)
+                    changeColor(r, g, b, false)
 
                 }.start()
             }
         }
     }
 
-    private fun changeColor(R: Byte, G: Byte, B: Byte, isOnceSet: Boolean) {
-
-        var red = R
-        var green = G
-        var blue = B
-
-        val opcode = Opcode.SET_TEMPERATURE
-
-
+    private fun changeColor(r: Int, G: Int, B: Int, isOnceSet: Boolean) {
+        var red = r.toByte()
+        var green = G.toByte()
+        var blue = B.toByte()
+        val opcode = Opcode.SET_TEMPERATURE  //0x04 代表rgb
         val params = byteArrayOf(0x04, red, green, blue)
+        Log.d("RGBCOLOR", String.format("R = %x, G = %x, B = %x", red, green, blue))
 
-        val logStr = String.format("R = %x, G = %x, B = %x", red, green, blue)
-        Log.d("RGBCOLOR", logStr)
+        var white = itemGroup!!.color and 0xff000000.toInt() shr 24
+        color = (white shl 24) or (r shl 16) or (G shl 8) or B
 
-        if (isOnceSet) {
-            Thread.sleep(50)
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
-        } else {
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
+        if (Constants.IS_ROUTE_MODE)//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
+            routerConfigRGBNum(itemGroup!!.groupAddress, 97, color)
+        else {
+
+            if (isOnceSet) {
+                Thread.sleep(50)
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
+            } else {
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
+            }
+        }
+    }
+
+
+    @SuppressLint("CheckResult")
+    private fun routerConfigRGBNum(meshAddr: Int, deviceType: Int, color: Int) {
+        RouterModel.routeConfigRGBNum(meshAddr, deviceType, color, "setRGB")?.subscribe({
+            LogUtils.v("zcl-----------收到路由调节色盘成功-------")
+            when (it.errorCode) {
+                0 -> {
+                    // showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
+                            }
+                }
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    override fun tzRouterConfigRGB(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl------收到路由调节色盘通知------------$cmdBean")
+
+        hideLoadingDialog()
+        if (cmdBean.ser_id == "setRGB") {
+            disposableRouteTimer?.dispose()
+            if (cmdBean.status == 0) {
+                color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
+                itemGroup?.color = color
+            } else {
+                color_picker.setInitialColor((itemGroup!!.color and 0xffffff) or 0xff000000.toInt())
+                ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
+            }
         }
     }
 
@@ -269,25 +331,15 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         val blue = color and 0x0000ff
 
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
-//        Thread {
-        changeColor(red.toByte(), green.toByte(), blue.toByte(), true)
-
+        changeColor(red, green, blue, true)
         try {
             Thread.sleep(100)
-
-            val opcode: Byte = Opcode.SET_LUM
-            val params: ByteArray = byteArrayOf(brightness!!.toByte())
             itemGroup!!.color = (wValue shl 24) or (red shl 16) or (green shl 8) or blue
-
             Thread.sleep(50)
-//            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
-
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
 
-//        tv_brightness_w.text = getString(R.string.w_bright, w.toString() + "")
-//        scrollView?.setBackgroundColor(color)
         color_r?.text = red.toString()
         color_g?.text = green.toString()
         color_b?.text = blue.toString()
@@ -297,10 +349,8 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
     internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
         presetColors?.get(position)!!.color = itemGroup!!.color
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as Dot?
-//        textView?.setBackgroundColor(0xff000000.toInt() or itemGroup!!.color)
         textView?.setChecked(true, 0xff000000.toInt() or itemGroup!!.color)
         Log.e("TAG_COLOR", itemGroup!!.color.toString())
-//        textView?.text = ""
         SharedPreferencesHelper.putObject(this, Constants.PRESET_COLOR, presetColors)
         false
     }

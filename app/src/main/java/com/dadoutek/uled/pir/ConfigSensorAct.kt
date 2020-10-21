@@ -25,6 +25,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
@@ -34,11 +35,13 @@ import com.dadoutek.uled.network.ConfigurationBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -56,6 +59,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.design.snackbar
 import java.util.*
 import kotlin.collections.ArrayList
@@ -149,27 +153,43 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     if (currentSensor == null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
                     else {
-                        showLoadingDialog(getString(R.string.please_wait))
-                        disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
-                                .subscribe({
-                                    //  deleteData()
-                                }, {
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                        /*    showDialogHardDelete?.dismiss()
+                        if (Constants.IS_ROUTE_MODE)
+                            routerDeviceResetFactory(currentSensor!!.macAddr, currentSensor!!.meshAddr, 98, "deleteOldPir")
+                        else {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            disposableReset = Commander.resetDevice(currentSensor!!.meshAddr, true)
+                                    .subscribe({
+                                        //  deleteData()
+                                    }, {
+                                        GlobalScope.launch(Dispatchers.Main) {
+                                            /*    showDialogHardDelete?.dismiss()
                                           showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                                                   .setPositiveButton(android.R.string.ok) { _, _ ->
                                                       showLoadingDialog(getString(R.string.please_wait))
-                                                      deleteData()
-                                                  }
+                                                      deleteData() }
                                                   .setNegativeButton(R.string.btn_cancel, null)
                                                   .show()*/
-                                    }
-                                })
-                        deleteData()
+                                        }
+                                    })
+                            deleteData()
+                        }
                     }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
+    }
+
+    override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
+              LogUtils.v("zcl-----------收到路由deleteOldPir通知-------$cmdBean")
+                      if (cmdBean.ser_id=="deleteOldPir"){
+                          disposableRouteTimer?.dispose()
+                          hideLoadingDialog()
+                          if (cmdBean.status==0){
+                              deleteData()
+                          }else{
+                              ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                          }
+                      }
     }
 
     fun deleteData() {
@@ -405,15 +425,6 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun configPir(groupAddr: Int, delayTime: Int, minBrightness: Int, triggerValue: Int, mode: Int) {
-        //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
-        // triggerKey: Int = 0//0全天    1白天   2夜晚
-        //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
-        //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
-        //action	否	int	触发时执行逻辑。0开，1关，2自定义亮度。仅在群组模式下需要该配置
-        //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
-        //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
-        //sid	否	int	配置场景id。仅在场景模式下需要该配置
-        //ConfigurationBean(modeStartUpMode,)
         val groupH: Byte = (groupAddr shr 8 and 0xff).toByte()
         val groupL: Byte = (groupAddr and 0xff).toByte()
         val paramBytes = if (isGroupMode)
@@ -517,15 +528,58 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                             })
                             return@Thread
                         }
-                        if (Constants.IS_ROUTE_MODE)
-                            //routerConfigSensor(mDeviceInfo.meshAddress.toLong(), ConfigurationBean(modeStartUpMode),"configSensor")
-                        else
+                        if (Constants.IS_ROUTE_MODE){
+                            //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
+                            // triggerKey: Int = 0//0全天    1白天   2夜晚
+                            //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
+                            //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
+                            //action	否	int	触发时执行逻辑。0开，1关，2自定义亮度。仅在群组模式下需要该配置
+                            //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
+                            //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
+                            //sid	否	int	配置场景id。仅在场景模式下需要该配置
+                            var durationUnit = if (modeDelayUnit==0) 0 else 1
+                            val configurationBean = ConfigurationBean(modeStartUpMode, 0, tietMinimumBrightness.text.toString().toInt(), durationUnit,
+                                    spTriggerLux.selectedItem.toString().toInt(), mutableListOf(mSelectGroupSceneAddr), 0, 0)
+                            routerConfigSensor(mDeviceInfo.meshAddress.toLong(), configurationBean,"configSensor")
+                      }  else
                             configSensor(mode)
                     }.start()
 
                 }
             }
         }
+    }
+
+    override fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {
+              LogUtils.v("zcl-----------收到路由configSensor通知-------$cmdBean")
+                      if (cmdBean.ser_id=="configSensor"){
+                          disposableRouteTimer?.dispose()
+                          hideLoadingDialog()
+                          if (cmdBean.status==0){
+                              SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                                  override fun start() { }
+
+                                  override fun complete() {
+                                      val sensorByID = DBUtils.getSensorByID(currentSensor!!.id)
+                                      if (!isReConfirm)
+                                          showRenameDialog(sensorByID!!)
+                                      else
+                                          doFinish()
+                                  }
+
+                                  override fun error(msg: String?) {
+                                      val sensorByID = DBUtils.getSensorByID(currentSensor!!.id)
+                                      if (!isReConfirm)
+                                          showRenameDialog(sensorByID!!)
+                                      else
+                                          doFinish()
+                                  }
+                              })
+
+                          }else{
+                              ToastUtils.showShort(getString(R.string.config_fail))
+                          }
+                      }
     }
 
     private fun configSensor(mode: Int) {
@@ -568,19 +622,26 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             if (StringUtils.compileExChar(renameEditText?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                dbSensor.name = renameEditText?.text.toString().trim { it <= ' ' }
-                DBUtils.saveSensor(dbSensor, false)
+                val trim = renameEditText?.text.toString().trim { it <= ' ' }
+                if (Constants.IS_ROUTE_MODE)
+                    routerUpdateSensorName(dbSensor.id,trim)
+                else{
+                    dbSensor.name = trim
+                    DBUtils.saveSensor(dbSensor, false)
+                }
                 if (!this.isFinishing)
                     renameDialog.dismiss()
             }
         }
-
-
         renameCancel?.setOnClickListener {
             if (!this.isFinishing)
                 renameDialog?.dismiss()
         }
+    }
 
+    override fun renameSucess() {
+        currentSensor?.name = renameEditText?.text.toString().trim { it <= ' ' }
+        DBUtils.saveSensor(currentSensor!!, false)
     }
 
     private fun saveSensor() {
@@ -621,6 +682,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         LogUtils.d("FINAL_VALUE" + (modeStartUpMode or modeDelayUnit or modeSwitchMode))
         return modeStartUpMode or modeDelayUnit or modeSwitchMode
     }
+
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (KeyEvent.KEYCODE_BACK == keyCode) {

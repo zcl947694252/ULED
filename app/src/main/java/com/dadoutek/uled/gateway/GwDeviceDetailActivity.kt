@@ -552,7 +552,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
     private fun connectGw(configType: Int) {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(17, TimeUnit.SECONDS)
+        disposableTimer = Observable.timer(20, TimeUnit.SECONDS)
                 .subscribe {
                     hideLoadingDialog()
                     if (configType != 3)
@@ -565,7 +565,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableConnect?.dispose()
-            disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 8L)?.subscribe({
+            disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 6L)?.subscribe({
                 disposableTimer?.dispose()
                 TelinkLightApplication.getApp().isConnectGwBle = true
                 when (configType) {
@@ -588,6 +588,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun connectService() {
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightApplication.getApp().offLine = false

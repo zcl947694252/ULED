@@ -22,9 +22,11 @@ import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbCurtain
@@ -32,12 +34,17 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.DeviceInfo
@@ -122,34 +129,65 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-
     private fun getVersion() {
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            Log.e("TAG", curtain!!.meshAddr.toString())
-            val disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
-                    .subscribe({ s ->
-                        localVersion = s
-                        if (localVersion != "") {
-                            if (versionText != null) {
-                                if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
-                                    versionText.text = resources.getString(R.string.firmware_version) + localVersion
-                                    curtain!!.version = localVersion
-                                    this.versionText.visibility = View.GONE
-                                } else {
-                                    versionText.text = resources.getString(R.string.firmware_version) + localVersion
-                                    curtain!!.version = localVersion
-                                    this.versionText.visibility = View.GONE
+        if (TelinkApplication.getInstance().connectDevice != null || Constants.IS_ROUTE_MODE) {
+            if (Constants.IS_ROUTE_MODE)
+                routerGetVersion(mutableListOf(curtain!!.meshAddr), curtain!!.productUUID, "curtainVersion")
+            else {
+                Log.e("TAG", curtain!!.meshAddr.toString())
+                val disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
+                        .subscribe({ s ->
+                            localVersion = s
+                            if (localVersion != "") {
+                                if (versionText != null) {
+                                    if (OtaPrepareUtils.instance().checkSupportOta(localVersion)!!) {
+                                        versionText.text = resources.getString(R.string.firmware_version) + localVersion
+                                        curtain!!.version = localVersion
+                                        this.versionText.visibility = View.GONE
+                                    } else {
+                                        versionText.text = resources.getString(R.string.firmware_version) + localVersion
+                                        curtain!!.version = localVersion
+                                        this.versionText.visibility = View.GONE
+                                    }
+                                    DBUtils.saveCurtain(curtain!!, false)
                                 }
-                                DBUtils.saveCurtain(curtain!!, false)
                             }
-                        }
-                        null
-                    }, {
-                        LogUtils.d(it)
-                    })
+                            null
+                        }, {
+                            LogUtils.d(it)
+                        })
+            }
         }
     }
 
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
+        LogUtils.v("zcl-----------收到路由curtainVersion通知-------$routerVersion")
+        if (routerVersion!!.ser_id == "curtainVersion") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            when (routerVersion.status) {
+                0 -> {
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+                    if (routerVersion.succeedNow.isNotEmpty())
+                        curtain?.version = routerVersion.succeedNow[0].version
+                    updateVersion(curtain?.version)
+                }
+                else -> {
+                    ToastUtils.showShort(getString(R.string.get_version_fail))
+                }
+            }
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun updateVersion(version: String?) {
+        localVersion = version
+        versionText.text = resources.getString(R.string.firmware_version) + localVersion
+        this.versionText.visibility = when {
+            OtaPrepareUtils.instance().checkSupportOta(localVersion)!! -> View.GONE
+            else -> View.GONE
+        }
+    }
 
     private fun initMeshDresData() {
         this.ctAdress = this.intent.getIntExtra(Constants.CURTAINS_ARESS_KEY, 0)
@@ -170,10 +208,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     R.id.toolbar_c_rename -> renameLight()
                     R.id.toolbar_c_factory -> /*onceReset()*/remove()
                     R.id.toolbar_c_change_group -> updateGroup()
-                    R.id.toolbar_c_commutation -> electricCommutation()
-                    R.id.toolbar_c_hand_recovery -> handRecovery()
-                    R.id.toolbar_c_software_restart -> sofwareRestart()
-                    R.id.toolbar_c_slow_up -> slowUp()
+
+                    R.id.toolbar_c_commutation -> electricCommutation()//电机换向
+                    R.id.toolbar_c_hand_recovery -> handRecovery()//手拉恢复
+                    R.id.toolbar_c_software_restart -> sofwareRestart()//设备重启
+                    R.id.toolbar_c_slow_up -> slowUp()//缓起缓停
                     R.id.toolbar_c_ota -> updateOTA()
                 }
             }
@@ -205,7 +244,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         break
                     }
                 }
-
                 if (canSave) {
                     curtainGroup?.name = renameEt?.text.toString().trim { it <= ' ' }
                     DBUtils.updateGroup(curtainGroup!!)
@@ -216,26 +254,56 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-
     @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
                 .setMessage(getString(R.string.delete_group_confirm, curtainGroup?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    showLoadingDialog(getString(R.string.deleting))
-                    deleteGroup(DBUtils.getCurtainByGroupID(curtainGroup!!.id), curtainGroup!!,
-                            successCallback = {
-                                this.hideLoadingDialog()
-                                this.setResult(Constants.RESULT_OK)
-                                this.finish()
-                            },
-                            failedCallback = {
-                                this.hideLoadingDialog()
-                                ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
-                            })
+                    if (Constants.IS_ROUTE_MODE)
+                        routeDeleteGroup("delCurtainGp", curtainGroup!!)
+                    else {
+                        showLoadingDialog(getString(R.string.deleting))
+                        deleteGroup(DBUtils.getCurtainByGroupID(curtainGroup!!.id), curtainGroup!!,
+                                successCallback = {
+                                    this.hideLoadingDialog()
+                                    this.setResult(Constants.RESULT_OK)
+                                    this.finish()
+                                },
+                                failedCallback = {
+                                    this.hideLoadingDialog()
+                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
+                                })
+                    }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
+    }
+
+    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+    override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean?) {
+        LogUtils.v("zcl-----------收到路由删组通知-------${routerGroup}")
+        disposableRouteTimer?.dispose()
+        if (routerGroup?.ser_id == "delCurtainGp") {
+            hideLoadingDialog()
+            if (routerGroup?.finish) {
+                when (routerGroup?.status) {
+                    0 -> {
+                        deleteGpSuccess()
+                        ToastUtils.showShort(getString(R.string.delete_group_success))
+                    }
+                    1 -> ToastUtils.showShort(getString(R.string.delete_group_some_fail))
+                    -1 -> ToastUtils.showShort(getString(R.string.delete_gp_fail))
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.router_del_gp, routerGroup.succeedNow.size))
+            }
+        }
+    }
+
+    override fun deleteGpSuccess() {
+        this.hideLoadingDialog()
+        this.setResult(Constants.RESULT_OK)
+        this.finish()
     }
 
     private fun updateGroup() {//更新分组 断开提示
@@ -258,7 +326,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateGroupResult(light: DbCurtain, group: DbGroup) {
         if (group != null) {
-            if (TelinkApplication.getInstance().connectDevice == null) {
+            if (TelinkApplication.getInstance().connectDevice == null && !Constants.IS_ROUTE_MODE) {
                 ToastUtils.showLong(R.string.group_fail)
             } else {
                 /* showLoadingDialog(getString(R.string.grouping))
@@ -285,20 +353,44 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                              }
                          }
                      }*/
+                if (Constants.IS_ROUTE_MODE)
+                    routerChangeGpDevice(GroupBodyBean(mutableListOf(light.meshAddr), light.productUUID, "curtainGp", group.meshAddr))
+                else {
+                    Commander.addGroup(light.meshAddr, group.meshAddr, {
+                        group.deviceType = curtain!!.productUUID.toLong()
+                        DBUtils.updateGroup(group)
+                        light.hasGroup = true
+                        light.belongGroupId = group.id
+                        light.name = light.name
+                        DBUtils.updateCurtain(light)
+                        ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                        finish()
+                    }, {
+                        ToastUtils.showShort(getString(R.string.grouping_fail))
+                    })
+                }
+            }
+        }
+    }
 
-                Commander.addGroup(light.meshAddr, group.meshAddr, {
-                    group.deviceType = curtain!!.productUUID.toLong()
-                    DBUtils.updateGroup(group)
-
-                    light.hasGroup = true
-                    light.belongGroupId = group.id
-                    light.name = light.name
-                    DBUtils.updateCurtain(light)
-                    ToastUtils.showShort(getString(R.string.grouping_success_tip))
-                    finish()
-                }, {
-                    ToastUtils.showShort(getString(R.string.grouping_fail))
-                })
+    @SuppressLint("StringFormatMatches")
+    override fun tzRouterGroupResult(bean: RouteGroupingOrDelBean?) {
+        if (bean?.ser_id == "curtainGp") {
+            LogUtils.v("zcl-----------收到路由分组通知-------$bean")
+            disposableRouteTimer?.dispose()
+            if (bean?.finish) {
+                hideLoadingDialog()
+                when (bean?.status) {
+                    -1 -> ToastUtils.showShort(getString(R.string.group_failed))
+                    0, 1 -> {
+                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                            override fun start() {}
+                            override fun complete() {}
+                            override fun error(msg: String?) {}
+                        })
+                    }
+                }
             }
         }
     }
@@ -316,6 +408,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params)
         curtain!!.belongGroupId = group.id
     }
+
     /**
      * 删除指定灯的之前的分组
      * @param lightMeshAddr 灯的mesh地址
@@ -432,123 +525,132 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         setSpeed()
 
         if (!currentShowGroupSetPage) {
-
             if (curtain!!.status != null) {
                 when (curtain!!.status) {
-                    0 -> {
-                        pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
-                        closeBtn.setImageResource(R.drawable.icon_curtain_close)
-                        closeText.setTextColor(Color.parseColor("#333333"))
-                        openBtn.setImageResource(R.drawable.icon_curtain_close)
-                        openText.setTextColor(Color.parseColor("#333333"))
-                    }
-                    1 -> {
-                        curtainImage.setImageResource(R.drawable.curtain_close)
-                        pauseBtn.setImageResource(R.drawable.icon_suspend)
-                        closeBtn.setImageResource(R.drawable.icon_open_yes)
-                        closeText.setTextColor(Color.parseColor("#0080EA"))
-                        openBtn.setImageResource(R.drawable.icon_curtain_close)
-                        openText.setTextColor(Color.parseColor("#333333"))
-                    }
-                    2 -> {
-                        curtainImage.setImageResource(R.drawable.curtain)
-                        pauseBtn.setImageResource(R.drawable.icon_suspend)
-                        openBtn.setImageResource(R.drawable.icon_open_yes)
-                        openText.setTextColor(Color.parseColor("#0080EA"))
-                        closeBtn.setImageResource(R.drawable.icon_curtain_close)
-                        closeText.setTextColor(Color.parseColor("#333333"))
-                    }
+                    0 -> afterPause()
+                    1 -> afterOff()
+                    2 -> afterOpen()
                 }
             }
-
-            if (curtain!!.inverse != null)
-                curtain!!.inverse = commutationBoolean
-
-            if (curtain!!.closeSlowStart != null)
-                curtain!!.closeSlowStart = slowBoolean
-
-            if (curtain!!.closePull != null)
-                curtain!!.closePull = handBoolean
-
-            if (curtain!!.speed != null)
-                indicatorSeekBar.setProgress(curtain!!.speed.toFloat())
+            curtain!!.inverse = commutationBoolean
+            curtain!!.closeSlowStart = slowBoolean
+            curtain!!.closePull = handBoolean
+            indicatorSeekBar.setProgress(curtain!!.speed.toFloat())
         }
     }
 
     private fun setSpeed() {
-        if (typeStr == Constants.TYPE_GROUP) {
-            indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
-                override fun onSeeking(seekParams: SeekParams) {
-                    val i = seekParams.progress
-                    Log.e("TAG", i.toString())
-                    when (i) {
-                        1 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 1, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                        }
-                        2 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 2, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                        }
-                        3 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 3, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                        }
-                        4 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 4, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
+        when (typeStr) {
+            Constants.TYPE_GROUP -> {
+                indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
+                    override fun onSeeking(seekParams: SeekParams) {
+                        val i = seekParams.progress
+                        val opcode = Opcode.CURTAIN_ON_OFF
+                        if (Constants.IS_ROUTE_MODE)
+                            routerControlCurtain(0x15, "configSpeed")
+                        else {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, i.toByte(), Opcode.CURTAIN_PACK_END)
                             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
                         }
                     }
+
+                    override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
+                    override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
                 }
-
-                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
-
-                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
             }
-        } else {
-            indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
-                override fun onSeeking(seekParams: SeekParams) {
-                    val i = seekParams.progress
-                    Log.e("TAG", i.toString())
-                    when (i) {
-                        1 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 1, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
+            else -> {
+                indicatorSeekBar.onSeekChangeListener = object : OnSeekChangeListener {
+                    override fun onSeeking(seekParams: SeekParams) {
+                        val i = seekParams.progress
+                        val opcode = Opcode.CURTAIN_ON_OFF
+
+                        if (Constants.IS_ROUTE_MODE)
+                            routerControlCurtain(0x15, "configSpeed")
+                        else {
+                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, i.toByte(), Opcode.CURTAIN_PACK_END)
                             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-                            curtain!!.speed = 1
-                            DBUtils.updateCurtain(curtain!!)
-                        }
-                        2 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 2, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-                            curtain!!.speed = 2
-                            DBUtils.updateCurtain(curtain!!)
-                        }
-                        3 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 3, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-                            curtain!!.speed = 3
-                            DBUtils.updateCurtain(curtain!!)
-                        }
-                        4 -> {
-                            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, 4, Opcode.CURTAIN_PACK_END)
-                            val opcode = Opcode.CURTAIN_ON_OFF
-                            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-                            curtain!!.speed = 4
+                            curtain!!.speed = i
                             DBUtils.updateCurtain(curtain!!)
                         }
                     }
+
+                    override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
+
+                    override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
                 }
+            }
+        }
+    }
 
-                override fun onStartTrackingTouch(seekBar: IndicatorSeekBar) {}
+    @SuppressLint("CheckResult")//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea
+    private fun routerControlCurtain(opcode: Int, ser_id: String) {
+        var meshType = if (typeStr == Constants.TYPE_GROUP) 97 else curtain!!.productUUID
+        var address = if (typeStr == Constants.TYPE_GROUP) curtainGroup!!.meshAddr else curtain!!.meshAddr
+        RouterModel.routeControlCurtain(address, meshType, opcode, indicatorSeekBar.progress, ser_id)
+                ?.subscribe({
+                    LogUtils.v("zcl-----------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea--$opcode----$it")
+                    when (it.errorCode) {
+                        0 -> {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.speed_faile))
+                                    }
+                        }
+                        90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+    }
 
-                override fun onStopTrackingTouch(seekBar: IndicatorSeekBar) {}
+
+    override fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由控制通知-------$cmdBean")
+        if (cmdBean.ser_id == "configSpeed" || cmdBean.ser_id == "curtainReset" || cmdBean.ser_id == "pauseCur" || cmdBean.ser_id == "offCur"
+                || cmdBean.ser_id == "openCur") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+
+            when (cmdBean.ser_id) {
+                "configSpeed" -> {
+                    if (cmdBean.status == 0)
+                        curtain?.let {
+                            curtain!!.speed = indicatorSeekBar.progress
+                            DBUtils.updateCurtain(curtain!!)
+                        }
+                    else
+                        ToastUtils.showShort(getString(R.string.speed_faile))
+                }
+                "curtainReset" -> {
+                    if (cmdBean.status == 0)
+                        ToastUtils.showShort(getString(R.string.reset_factory_success))
+                    else
+                        ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                }
+                "pauseCur" -> {
+                    if (cmdBean.status == 0)
+                        afterPause()
+                    else
+                        ToastUtils.showShort(getString(R.string.pause_faile))
+                }
+                "offCur" -> {
+                    if (cmdBean.status == 0)
+                        afterOff()
+                    else
+                        ToastUtils.showShort(getString(R.string.off_faile))
+                }
+                "openCur" -> {
+                    if (cmdBean.status == 0)
+                        afterOpen()
+                    else
+                        ToastUtils.showShort(getString(R.string.off_faile))
+                }
             }
         }
     }
@@ -701,32 +803,31 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun sofwareRestart() {
-        if (typeStr == Constants.TYPE_GROUP) {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-        } else {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
+        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
+        val opcode = Opcode.CURTAIN_ON_OFF
+        if (Constants.IS_ROUTE_MODE)
+            routerControlCurtain(0xEA, "curtainReset")
+        when (typeStr) {
+            Constants.TYPE_GROUP -> TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+            else -> TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
         }
 
     }
 
     private fun handRecovery() {
         if (typeStr == Constants.TYPE_GROUP) {
-            when {
+            handBoolean = when {
                 handBoolean -> {
                     val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x01, Opcode.CURTAIN_PACK_END)
                     val opcode = Opcode.CURTAIN_ON_OFF
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                    handBoolean = false
+                    false
                 }
                 else -> {
                     val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x12, 0x00, Opcode.CURTAIN_PACK_END)
                     val opcode = Opcode.CURTAIN_ON_OFF
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                    handBoolean = true
+                    true
                 }
             }
         } else {
@@ -780,29 +881,32 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(getString(R.string.sure_delete_device, curtain?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                    if (Constants.IS_ROUTE_MODE||TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val deviceMeshAddr = if (typeStr == Constants.TYPE_GROUP) curtainGroup?.meshAddr else curtain?.meshAddr
-                        showLoadingDialog(getString(R.string.please_wait))
-                        val dispose = Commander.resetDevice(deviceMeshAddr ?: 0)
-                                .subscribe({
-                                    LogUtils.v("zcl-----恢复出厂成功")
-                                    //  deleteData()
-                                }, {
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                        /*    showDialogHardDelete?.dismiss()
-                                          showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                                  .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                      showLoadingDialog(getString(R.string.please_wait))
-                                                      deleteData()
-                                                  }
-                                                  .setNegativeButton(R.string.btn_cancel, null)
-                                                  .show()*/
+                        if (Constants.IS_ROUTE_MODE)
+                            routerDeviceResetFactory(curtain!!.macAddr,curtain!!.meshAddr,DeviceType.SMART_CURTAIN,"delCurtain")
+                        else{
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val dispose = Commander.resetDevice(deviceMeshAddr ?: 0)
+                                    .subscribe({
+                                        LogUtils.v("zcl-----恢复出厂成功")
+                                        //  deleteData()
+                                    }, {
+                                        GlobalScope.launch(Dispatchers.Main) {
+                                            /*    showDialogHardDelete?.dismiss()
+                                              showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                      .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                          showLoadingDialog(getString(R.string.please_wait))
+                                                          deleteData()
+                                                      }
+                                                      .setNegativeButton(R.string.btn_cancel, null)
+                                                      .show()*/
 
-                                    }
-                                })
+                                        }
+                                    })
 
-                        deleteData()
-
+                            deleteData()
+                        }
                     } else ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
 
                 }
@@ -810,6 +914,18 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .show()
     }
 
+    override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
+              LogUtils.v("zcl-----------收到路由delCurtain通知-------$cmdBean")
+                      if (cmdBean.ser_id=="delCurtain"){
+                          disposableRouteTimer?.dispose()
+                          hideLoadingDialog()
+                          if (cmdBean.status==0){
+                              deleteData()
+                          }else{
+                              ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                          }
+                      }
+    }
     fun deleteData() {
         hideLoadingDialog()
         if (typeStr == Constants.TYPE_GROUP) {
@@ -831,18 +947,18 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun electricCommutation() {
         if (typeStr == Constants.TYPE_GROUP) {
-            when {
+            commutationBoolean = when {
                 commutationBoolean -> {
                     val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x01, Opcode.CURTAIN_PACK_END)
                     val opcode = Opcode.CURTAIN_ON_OFF
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                    commutationBoolean = false
+                    false
                 }
                 else -> {
                     val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x11, 0x00, Opcode.CURTAIN_PACK_END)
                     val opcode = Opcode.CURTAIN_ON_OFF
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-                    commutationBoolean = true
+                    true
                 }
             }
         } else {
@@ -871,81 +987,85 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
 
     private fun pauseWindow() {
-        if (typeStr == Constants.TYPE_GROUP) {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-            pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
-            closeBtn.setImageResource(R.drawable.icon_curtain_close)
-            closeText.setTextColor(Color.parseColor("#333333"))
-            openBtn.setImageResource(R.drawable.icon_curtain_close)
-            openText.setTextColor(Color.parseColor("#333333"))
-        } else {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-            pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
-            closeBtn.setImageResource(R.drawable.icon_curtain_close)
-            closeText.setTextColor(Color.parseColor("#333333"))
-            openBtn.setImageResource(R.drawable.icon_curtain_close)
-            openText.setTextColor(Color.parseColor("#333333"))
-            curtain!!.status = 0
-            DBUtils.updateCurtain(curtain!!)
+        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
+        val opcode = Opcode.CURTAIN_ON_OFF
+        when {
+            Constants.IS_ROUTE_MODE -> routerControlCurtain(0x0B, "pauseCur")
+            else -> {
+                when (typeStr) {
+                    Constants.TYPE_GROUP -> TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                    else -> {
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
+                        curtain!!.status = 0
+                        DBUtils.updateCurtain(curtain!!)
+                    }
+                }
+                afterPause()
+            }
         }
+    }
 
+    private fun afterPause() {
+        pauseBtn.setImageResource(R.drawable.icon_suspend_pre)
+        closeBtn.setImageResource(R.drawable.icon_curtain_close)
+        closeText.setTextColor(Color.parseColor("#333333"))
+        openBtn.setImageResource(R.drawable.icon_curtain_close)
+        openText.setTextColor(Color.parseColor("#333333"))
     }
 
     private fun offWindow() {
-        if (typeStr == Constants.TYPE_GROUP) {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-            curtainImage.setImageResource(R.drawable.curtain_close)
-            pauseBtn.setImageResource(R.drawable.icon_suspend)
-            closeBtn.setImageResource(R.drawable.icon_open_yes)
-            closeText.setTextColor(Color.parseColor("#0080EA"))
-            openBtn.setImageResource(R.drawable.icon_curtain_close)
-            openText.setTextColor(Color.parseColor("#333333"))
-        } else {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-            curtainImage.setImageResource(R.drawable.curtain_close)
-            pauseBtn.setImageResource(R.drawable.icon_suspend)
-            closeBtn.setImageResource(R.drawable.icon_open_yes)
-            closeText.setTextColor(Color.parseColor("#0080EA"))
-            openBtn.setImageResource(R.drawable.icon_curtain_close)
-            openText.setTextColor(Color.parseColor("#333333"))
-            curtain!!.status = 1
-            DBUtils.updateCurtain(curtain!!)
+        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
+        val opcode = Opcode.CURTAIN_ON_OFF
+        when {
+            Constants.IS_ROUTE_MODE -> routerControlCurtain(0x0C, "offCur")
+            else -> {
+                if (typeStr == Constants.TYPE_GROUP) {
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                } else {
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
+                    curtain!!.status = 1
+                    DBUtils.updateCurtain(curtain!!)
+                }
+                afterOff()
+            }
         }
     }
 
-    private fun openWindow() {
-        if (typeStr == Constants.TYPE_GROUP) {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
-            curtainImage.setImageResource(R.drawable.curtain)
-            pauseBtn.setImageResource(R.drawable.icon_suspend)
-            openBtn.setImageResource(R.drawable.icon_open_yes)
-            openText.setTextColor(Color.parseColor("#0080EA"))
-            closeBtn.setImageResource(R.drawable.icon_curtain_close)
-            closeText.setTextColor(Color.parseColor("#333333"))
-        } else {
-            val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
-            val opcode = Opcode.CURTAIN_ON_OFF
-            TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
-            curtainImage.setImageResource(R.drawable.curtain)
-            pauseBtn.setImageResource(R.drawable.icon_suspend)
-            openBtn.setImageResource(R.drawable.icon_open_yes)
-            openText.setTextColor(Color.parseColor("#0080EA"))
-            closeBtn.setImageResource(R.drawable.icon_curtain_close)
-            closeText.setTextColor(Color.parseColor("#333333"))
-            curtain!!.status = 2
-            DBUtils.updateCurtain(curtain!!)
-        }
+    private fun afterOff() {
+        curtainImage.setImageResource(R.drawable.curtain_close)
+        pauseBtn.setImageResource(R.drawable.icon_suspend)
+        closeBtn.setImageResource(R.drawable.icon_open_yes)
+        closeText.setTextColor(Color.parseColor("#0080EA"))
+        openBtn.setImageResource(R.drawable.icon_curtain_close)
+        openText.setTextColor(Color.parseColor("#333333"))
+    }
 
+    private fun openWindow() {
+        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
+        val opcode = Opcode.CURTAIN_ON_OFF
+
+        when {
+            Constants.IS_ROUTE_MODE -> routerControlCurtain(0x0A, "openCur")
+            else -> {
+                if (typeStr == Constants.TYPE_GROUP) {
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
+                } else {
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
+                    curtain!!.status = 2
+                    DBUtils.updateCurtain(curtain!!)
+                }
+                afterOpen()
+            }
+        }
+    }
+
+    private fun afterOpen() {
+        curtainImage.setImageResource(R.drawable.curtain)
+        pauseBtn.setImageResource(R.drawable.icon_suspend)
+        openBtn.setImageResource(R.drawable.icon_open_yes)
+        openText.setTextColor(Color.parseColor("#0080EA"))
+        closeBtn.setImageResource(R.drawable.icon_curtain_close)
+        closeText.setTextColor(Color.parseColor("#333333"))
     }
 
     /**
@@ -1002,8 +1122,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun deleteAllSceneByLightAddr(lightMeshAddr: Int) {
         val opcode = Opcode.SCENE_ADD_OR_DEL
-        val params: ByteArray
-        params = byteArrayOf(0x00, 0xff.toByte())
+        val params: ByteArray = byteArrayOf(0x00, 0xff.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 

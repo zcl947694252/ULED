@@ -23,6 +23,7 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -33,6 +34,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
@@ -63,7 +65,6 @@ import java.util.concurrent.TimeUnit
  * 开关列表
  */
 class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
-    private var disposableTimer: Disposable? = null
     private var popupWindow: PopupWindow? = null
     private var popVersion: TextView? = null
     private var views: View? = null
@@ -113,6 +114,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     override fun bindDeviceRouter() {
         val dbGroup = DbGroup()
+        dbGroup.brightness=10000
         dbGroup.deviceType = DeviceType.NORMAL_SWITCH.toLong()
         var intent = Intent(this, BindRouterActivity::class.java)
         intent.putExtra("group", dbGroup)
@@ -121,7 +123,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     //显示路由
     override fun bindRouterVisible(): Boolean {
-        return false
+        return true
     }
 
     override fun setDeletePositiveBtn() {
@@ -370,7 +372,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
-                goSearchSwitch()
+               goSearchSwitch()
+
             }
         }
     }
@@ -618,7 +621,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     private fun goSearchSwitch() {
         installId = INSTALL_SWITCH
-        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId, getString(R.string.Gate_way))
+        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), installId, getString(R.string.switch_title))
     }
 
     @SuppressLint("CheckResult")

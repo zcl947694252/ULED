@@ -133,7 +133,8 @@ class BindRouterActivity : TelinkBaseActivity() {
                 bind_router_all.setImageResource(R.drawable.icon_all_checked)
             else
                 bind_router_all.setImageResource(R.drawable.icon_all_check)
-            setAllSelect(isAll) }
+            setAllSelect(isAll)
+        }
     }
 
 
@@ -157,7 +158,7 @@ class BindRouterActivity : TelinkBaseActivity() {
                 }
                 relayAdapter.notifyDataSetChanged()
             }
-           DeviceType.NORMAL_SWITCH -> {
+            DeviceType.NORMAL_SWITCH -> {
                 deviceDataSw.forEach {
                     it.selected = all
                 }
@@ -263,21 +264,21 @@ class BindRouterActivity : TelinkBaseActivity() {
             })
             hideLoadingDialog()
         }, {
-            ToastUtils.showShort(getString(R.string.bind_fail)+it.message)
+            ToastUtils.showShort(getString(R.string.bind_fail) + it.message)
             hideLoadingDialog()
         })
     }
 
     private fun changeGroupingCompleteState() {
-       var  selectSize  =when (currentGroup?.deviceType?.toInt()) {
-           DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> deviceDataLight.filter { it.isSelected }.size
-           DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH,
-           DeviceType.EIGHT_SWITCH, DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH ->deviceDataSw.filter { it.isSelected }.size
-           DeviceType.SENSOR ->deviceDataSensor.filter { it.isSelected }.size
-           DeviceType.SMART_CURTAIN -> deviceDataCurtain.filter { it.isSelected }.size
-           DeviceType.SMART_RELAY ->deviceDataRelay.filter { it.isSelected }.size
-           else -> deviceDataLight.filter { it.isSelected }.size
-       }
+        var selectSize = when (currentGroup?.deviceType?.toInt()) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> deviceDataLight.filter { it.isSelected }.size
+            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH,
+            DeviceType.EIGHT_SWITCH, DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH -> deviceDataSw.filter { it.isSelected }.size
+            DeviceType.SENSOR -> deviceDataSensor.filter { it.isSelected }.size
+            DeviceType.SMART_CURTAIN -> deviceDataCurtain.filter { it.isSelected }.size
+            DeviceType.SMART_RELAY -> deviceDataRelay.filter { it.isSelected }.size
+            else -> deviceDataLight.filter { it.isSelected }.size
+        }
         if (selectSize > 0 && routerList.any { it.isSelect }) {//选中分组并且有选中设备的情况下
             grouping_completed.setBackgroundResource(R.drawable.rect_blue_5)
             grouping_completed.isClickable = true
@@ -306,7 +307,15 @@ class BindRouterActivity : TelinkBaseActivity() {
         when (currentGroup?.deviceType?.toInt()) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> {
                 deviceDataLight.clear()
-                deviceDataLight.addAll(DBUtils.getLightByGroupID(currentGroup?.id ?: 0))
+                when {
+                    currentGroup?.brightness != 10000 -> deviceDataLight.addAll(DBUtils.getLightByGroupID(currentGroup?.id ?: 0))
+                    else -> {
+                        if (currentGroup?.deviceType?.toInt() == DeviceType.LIGHT_RGB)
+                            deviceDataLight.addAll(DBUtils.getAllRGBLight())
+                        else
+                            deviceDataLight.addAll(DBUtils.getAllNormalLight())
+                    }
+                }
                 lightAdapter.notifyDataSetChanged()
             }
             DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH,
@@ -322,12 +331,18 @@ class BindRouterActivity : TelinkBaseActivity() {
             }
             DeviceType.SMART_CURTAIN -> {
                 deviceDataCurtain.clear()
-                deviceDataCurtain.addAll(DBUtils.getCurtainByGroupID(currentGroup?.id ?: 0))
+                if (currentGroup?.brightness != 10000)
+                    deviceDataCurtain.addAll(DBUtils.getCurtainByGroupID(currentGroup?.id ?: 0))
+                else
+                    deviceDataCurtain.addAll(DBUtils.getAllCurtains())
                 curtainAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_RELAY -> {
                 deviceDataRelay.clear()
-                deviceDataRelay.addAll(DBUtils.getRelayByGroupID(currentGroup?.id ?: 0))
+                if (currentGroup?.brightness != 10000)
+                    deviceDataRelay.addAll(DBUtils.getRelayByGroupID(currentGroup?.id ?: 0))
+                else
+                    deviceDataRelay.addAll(DBUtils.getAllRelay())
                 relayAdapter.notifyDataSetChanged()
             }
         }

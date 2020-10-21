@@ -493,7 +493,7 @@
     <string name="config_night_light_select_group">Выберите хотя бы одну группу</string>
     <string name="tip_phone_ble_off">Блютуз телефона выключено, обновление остановлено</string>
     <string name="instruction_manual">Инструкция по эксплуатации: http://www.dadoutek.com/app/README/index.html</string>
-    <string name="re_upgrade">Повторное обновление</string>
+    <string name="retry_ota">Повторное обновление</string>
     <string name="get_code_ing">Получить SMS код…</string>
     <string name="create_scene_select">Добавить сцену</string>
     <string name="normal_light_describe">Например: светильники с одной и двумя цветными температурами</string>
@@ -1051,5 +1051,11 @@
     <string name="gradient_apply_fail">渐变应用失败</string>
     <string name="gradient_stop_fail">渐变停止失败</string>
     <string name="update_scene_fail">修改场景失败</string>
+    <string name="speed_faile">速度调节失败</string>
+    <string name="pause_faile">暂停失败</string>
+    <string name="off_faile">关闭失败</string>
+    <string name="ota_success">OTA升级成功</string>
+    <string name="ota_fail">OTA升级失败</string>
+    <string name="stop_ota">停止升级</string>
 
 </resources>

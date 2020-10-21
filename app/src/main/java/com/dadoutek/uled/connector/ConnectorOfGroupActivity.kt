@@ -77,6 +77,7 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener, View.OnClickListener {
+    private var bindRouter: MenuItem? = null
     private val REQ_LIGHT_SETTING: Int = 0x01
     private lateinit var group: DbGroup
     private var mDataManager: DataManager? = null
@@ -177,6 +178,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         batchGp = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
         onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
+        bindRouter = toolbar.menu?.findItem(R.id.toolbar_bind_router)
 
         batchGp?.title = getString(R.string.batch_group)
         onlineUpdate?.title = getString(R.string.online_upgrade)
@@ -184,6 +186,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
         deleteDevice?.isVisible = true
         batchGp?.isVisible = true
+        bindRouter?.isVisible = true
+
         toolbar.setOnMenuItemClickListener { itm ->
             DBUtils.lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)
@@ -193,10 +197,15 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                         R.id.toolbar_batch_gp -> skipeBatch()
                         R.id.toolbar_on_line -> goOta()
                         R.id.toolbar_delete_device -> editeDevice()
+                        R.id.toolbar_bind_router -> bindDeviceRouter()
                     }
             }
             true
         }
+    }
+
+    private fun bindDeviceRouter() {
+
     }
 
     private fun skipeBatch() {

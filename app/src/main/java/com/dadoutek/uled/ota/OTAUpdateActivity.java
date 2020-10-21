@@ -722,7 +722,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 btn_start_update.setClickable(false);
                 TelinkLightApplication.Companion.getApp().removeEventListener(this);
             } else {
-                btn_start_update.setText(getString(R.string.re_upgrade));
+                btn_start_update.setText(getString(R.string.retry_ota));
                 btn_start_update.setVisibility(View.VISIBLE);
                 btn_start_update.setClickable(true);
             }

@@ -23,14 +23,18 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.BindRouterActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
@@ -47,6 +51,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -86,6 +91,24 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         type = this.intent.getIntExtra(Constants.DEVICE_TYPE, 0)
         initView()
+    }
+
+    //显示路由
+    override fun bindRouterVisible(): Boolean {
+        return true
+    }
+
+    override fun bindDeviceRouter() {
+        val dbGroup = DbGroup()
+        dbGroup.brightness = 10000
+        dbGroup.deviceType =  when (type) {
+            Constants.INSTALL_NORMAL_LIGHT ->DeviceType.LIGHT_NORMAL.toLong()
+            Constants.INSTALL_RGB_LIGHT -> DeviceType.LIGHT_RGB.toLong()
+            else -> DeviceType.LIGHT_NORMAL.toLong()
+        }
+        var intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", dbGroup)
+        startActivity(intent)
     }
 
     override fun batchGpVisible(): Boolean {
@@ -399,7 +422,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
-         LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
+        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
         hideLoadingDialog()
         disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "deng") {
@@ -565,7 +588,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                     val beanNew = mNewDatas?.get(newItemPosition)
                     return if (!beanOld?.name.equals(beanNew?.name))
                         return false//如果有内容不同，就返回false
-                     else
+                    else
                         true
                 }
             }, true)

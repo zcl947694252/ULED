@@ -257,6 +257,9 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                       }
     }
 
+    override fun routerRenameSwSuccess(trim: String) {
+
+    }
     private fun updateMesh() {
         newMeshAddr =if (isReConfig) mDeviceInfo?.meshAddress else MeshAddressGenerator().meshAddress.get()
         LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
@@ -618,10 +621,16 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                switchDate?.name = renameEt?.text.toString().trim { it <= ' ' }
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+
+                switchDate?.name = trim
                 if (switchDate != null) {
+                    if (Constants.IS_ROUTE_MODE)
+                        routerRenameSw(switchDate!!,trim)
+                    else{
                     toolbarTv.text = switchDate?.name
                     DBUtils.updateSwicth(switchDate!!)
+                    }
                 } else
                     ToastUtils.showLong(getString(R.string.rename_faile))
 
@@ -640,6 +649,11 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             if (!isReConfig)
                 finish()
         }
+    }
+
+    override fun renameSucess() {
+        toolbarTv.text = switchDate?.name
+        DBUtils.updateSwicth(switchDate!!)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

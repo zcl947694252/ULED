@@ -247,7 +247,7 @@
 
                          <TextView
                                  android:id="@+id/sb_w_bright_num"
-                                 android:layout_width="@dimen/dp_40"
+                                 android:layout_width="42dp"
                                  android:layout_height="wrap_content"
                                  android:layout_marginStart="10dp"
                                  android:layout_marginEnd="@dimen/dp_10"
@@ -284,7 +284,7 @@
                                  android:layout_marginEnd="8dp"
                                  android:background="@drawable/add_enabled" />
                          <CheckBox
-                                 android:id="@+id/cb_brightness_enable"
+                                 android:id="@+id/cb_white_enable"
                                  android:layout_width="40dp"
                                  android:layout_height="match_parent"
                                  android:layout_marginStart="10dp"
@@ -351,7 +351,7 @@
 
                          <TextView
                                  android:id="@+id/sbBrightness_num"
-                                 android:layout_width="@dimen/dp_40"
+                                 android:layout_width="42dp"
                                  android:layout_height="wrap_content"
                                  android:layout_marginStart="10dp"
                                  android:layout_marginEnd="@dimen/dp_10"
@@ -388,7 +388,7 @@
                                  android:layout_marginEnd="8dp"
                                  android:background="@drawable/add_enabled" />
                          <CheckBox
-                                 android:id="@+id/cb_brightness_rgb_enable"
+                                 android:id="@+id/cb_brightness_enable"
                                  android:layout_width="40dp"
                                  android:layout_height="match_parent"
                                  android:layout_marginStart="10dp"

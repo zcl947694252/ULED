@@ -687,7 +687,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
                 btn_start_update.isClickable = false
                 TelinkLightApplication.getApp().removeEventListener(this)
             } else {
-                btn_start_update.text = getString(R.string.re_upgrade)
+                btn_start_update.text = getString(R.string.retry_ota)
                 btn_start_update.visibility = View.VISIBLE
                 btn_start_update.isClickable = true
             }

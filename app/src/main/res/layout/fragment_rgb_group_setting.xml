@@ -243,7 +243,7 @@
                         android:progress="99" />
 
                 <CheckBox
-                        android:id="@+id/cb_brightness_enable"
+                        android:id="@+id/cb_white_enable"
                         android:layout_width="40dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"
@@ -325,7 +325,7 @@
                         android:progress="99" />
 
                 <CheckBox
-                        android:id="@+id/cb_brightness_rgb_enable"
+                        android:id="@+id/cb_brightness_enable"
                         android:layout_width="40dp"
                         android:layout_height="match_parent"
                         android:layout_marginStart="10dp"

@@ -64,7 +64,6 @@ import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.singleLine
 import java.util.*
@@ -1150,7 +1149,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             } else {
                 val trim = renameEditText?.text.toString().trim { it <= ' ' }
                 if (Constants.IS_ROUTE_MODE)
-                    routerUpdateDeviceName(dbSensor.id, trim)
+                    routerUpdateSensorName(dbSensor.id, trim)
                 else {
                     dbSensor.name = trim
                     DBUtils.saveSensor(dbSensor, false)

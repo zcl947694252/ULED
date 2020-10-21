@@ -584,7 +584,7 @@
     <string name="config_night_light_select_group">请至少选择一个分组</string>
     <string name="tip_phone_ble_off">手机蓝牙关闭,升级失败</string>
     <string name="instruction_manual">使用说明书: http://www.dadoutek.com/app/README/index.html</string>
-    <string name="re_upgrade">重新升级</string>
+    <string name="retry_ota">重新升级</string>
     <string name="get_code_ing">获取验证...</string>
     <string name="create_scene_select">添加场景</string>
     <string name="normal_light_describe">例如：单色温,双色温灯</string>
@@ -1206,4 +1206,10 @@
     <string name="gradient_apply_fail">渐变应用失败</string>
     <string name="gradient_stop_fail">渐变停止失败</string>
     <string name="update_scene_fail">修改场景失败</string>
+    <string name="speed_faile">速度调节失败</string>
+    <string name="pause_faile">暂停失败</string>
+    <string name="off_faile">关闭失败</string>
+    <string name="ota_success">OTA升级成功</string>
+    <string name="ota_fail">OTA升级失败</string>
+    <string name="stop_ota">停止升级</string>
 </resources>

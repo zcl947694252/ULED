@@ -1,6 +1,7 @@
 package com.dadoutek.uled.connector
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -20,6 +21,8 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
+import com.app.hubert.guide.util.LogUtil
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -33,7 +36,11 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAConnectorActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -45,6 +52,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -58,6 +66,7 @@ import kotlinx.coroutines.launch
 import java.util.*
 
 class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
+    private var isOpen: Boolean = false
     private var isConfigGroup: Boolean = false
     var fiDelete: MenuItem? = null
     var fiFactoryReset: MenuItem? = null
@@ -93,11 +102,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                var name = renameEt?.text.toString().trim { it <= ' ' }
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+
                 var canSave = true
                 val groups = DBUtils.allGroups
                 for (i in groups.indices) {
-                    if (groups[i].name == name) {
+                    if (groups[i].name == trim) {
                         ToastUtils.showLong(TelinkLightApplication.getApp().getString(R.string.repeat_name))
                         canSave = false
                         break
@@ -116,33 +126,47 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
-                        showLoadingDialog(getString(R.string.please_wait))
-                        val disposable = Commander.resetDevice(currentDbConnector!!.meshAddr)
-                                .subscribe({
-                                    // deleteData()
-                                }, {
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                        /*    showDialogHardDelete?.dismiss()
-                                          showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                                  .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                      showLoadingDialog(getString(R.string.please_wait))
-                                                      deleteData()
-                                                  }
-                                                  .setNegativeButton(R.string.btn_cancel, null)
-                                                  .show()*/
-                                    }
-                                })
-                        deleteData()
-
-
-                    } else {
-                        ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
-                        this.finish()
-                    }
+                    if (Constants.IS_ROUTE_MODE)
+                        routerDeviceResetFactory(currentDbConnector!!.macAddr, currentDbConnector!!.meshAddr, currentDbConnector!!.productUUID, "deleteConnector")
+                    else
+                        if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            val disposable = Commander.resetDevice(currentDbConnector!!.meshAddr)
+                                    .subscribe({
+                                        // deleteData()
+                                    }, {
+                                        GlobalScope.launch(Dispatchers.Main) {
+                                            /*    showDialogHardDelete?.dismiss()
+                                              showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                      .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                          showLoadingDialog(getString(R.string.please_wait))
+                                                          deleteData()
+                                                      }
+                                                      .setNegativeButton(R.string.btn_cancel, null)
+                                                      .show()*/
+                                        }
+                                    })
+                            deleteData()
+                        } else {
+                            ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
+                            this.finish()
+                        }
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
+    }
+
+    override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由deleteConnector通知-------$cmdBean")
+        if (cmdBean.ser_id == "deleteConnector") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                deleteData()
+            } else {
+                ToastUtils.showShort(getString(R.string.reset_factory_fail))
+            }
+        }
     }
 
     private fun deleteData() {
@@ -187,19 +211,45 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun updateGroupResult(light: DbConnector, group: DbGroup) {
-        Commander.addGroup(light.meshAddr, group.meshAddr, {
-            group.deviceType = light.productUUID.toLong()
-            light.hasGroup = true
-            light.belongGroupId = group.id
-            light.name = light.name
-            DBUtils.updateConnector(light)
-            ToastUtils.showShort(getString(R.string.grouping_success_tip))
-            if (group != null)
-                DBUtils.updateGroup(group!!)//更新组类型
-            finish()
-        }, {
-            ToastUtils.showShort(getString(R.string.grouping_fail))
-        })
+        if (Constants.IS_ROUTE_MODE)
+            routerChangeGpDevice(GroupBodyBean(mutableListOf(light.meshAddr), light.productUUID, "connectorGp", group.meshAddr))
+        else {
+            Commander.addGroup(light.meshAddr, group.meshAddr, {
+                group.deviceType = light.productUUID.toLong()
+                light.hasGroup = true
+                light.belongGroupId = group.id
+                light.name = light.name
+                DBUtils.updateConnector(light)
+                ToastUtils.showShort(getString(R.string.grouping_success_tip))
+                if (group != null)
+                    DBUtils.updateGroup(group!!)//更新组类型
+                finish()
+            }, {
+                ToastUtils.showShort(getString(R.string.grouping_fail))
+            })
+        }
+    }
+
+    @SuppressLint("StringFormatMatches")
+    override fun tzRouterGroupResult(bean: RouteGroupingOrDelBean?) {
+        if (bean?.ser_id == "connectorGp") {
+            LogUtils.v("zcl-----------收到路由普通灯分组通知-------$bean")
+            disposableRouteTimer?.dispose()
+            if (bean?.finish) {
+                hideLoadingDialog()
+                when (bean?.status) {
+                    -1 -> ToastUtils.showShort(getString(R.string.group_failed))
+                    0, 1 -> {
+                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                            override fun start() {}
+                            override fun complete() {}
+                            override fun error(msg: String?) {}
+                        })
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -382,12 +432,25 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                currentDbConnector?.name = renameEt?.text.toString().trim { it <= ' ' }
-                DBUtils.updateConnector(currentDbConnector!!)
-                toolbarTv?.text = currentDbConnector?.name
-                renameDialog.dismiss()
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+                if (Constants.IS_ROUTE_MODE)
+                    RouterModel.routeUpdateRelayName(currentDbConnector!!.id, trim)?.subscribe({
+                        afterRenameSucess(trim)
+                    }, {
+                        ToastUtils.showShort(getString(R.string.rename_faile))
+                    })
+                else {
+                    afterRenameSucess(trim)
+                }
             }
         }
+    }
+
+    private fun afterRenameSucess(trim: String) {
+        currentDbConnector?.name = trim
+        DBUtils.updateConnector(currentDbConnector!!)
+        toolbarTv?.text = currentDbConnector?.name
+        renameDialog.dismiss()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -442,7 +505,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-        if (TelinkLightApplication.getApp().connectDevice != null) {
+        if (TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE) {
             when (item?.itemId) {
                 R.id.toolbar_f_rename -> if (isConfigGroup) renameGroup() else renameDevice()
                 R.id.toolbar_fv_change_group -> updateGroup()
@@ -456,7 +519,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 R.id.toolbar_on_line -> renameGroup()
             }
         } else {
-            if (Constants.IS_ROUTE_MODE) return@OnMenuItemClickListener true
             showLoadingDialog(getString(R.string.connecting_tip))
             val subscribe = connect(currentDbConnector!!.meshAddr, true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())?.subscribe({
@@ -523,36 +585,76 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             initViewLight()
             getVersion()
         }
-        connector_switch.isChecked = currentDbConnector?.connectionStatus==1
+        connector_switch.isChecked = currentDbConnector?.connectionStatus == 1
         connector_switch?.setOnCheckedChangeListener { _, isChecked ->
-            if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE)
+            if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE)
                 autoConnect()
             else {
                 if (isChecked)
                     openOrClose(true)
                 else
                     openOrClose(false)
-                if (!isConfigGroup){
-                    currentDbConnector!!.updateIcon()
-                    DBUtils.updateConnector(currentDbConnector!!)
-                }
             }
         }
     }
 
     private fun openOrClose(b: Boolean) {
-        if (currentDbConnector?.productUUID == DeviceType.SMART_CURTAIN) {
-            Commander.openOrCloseCurtain(currentDbConnector?.meshAddr ?: 0, isOpen = b, isPause = false)
+        isOpen = b
+        var status = if (b) 1 else 0
+        if (isConfigGroup) {
+            if (Constants.IS_ROUTE_MODE) {
+                routeOpenOrCloseBase(currentDbConnector!!.meshAddr, 97, status, "switchGp")
+            } else {
+                Commander.openOrCloseLights(currentGroup?.meshAddr ?: 0, b)
+                afterSwitchGp(b)
+            }
         } else {
-            if (isConfigGroup)
-            Commander.openOrCloseLights(currentGroup?.meshAddr ?: 0, b)
-                else
-            Commander.openOrCloseLights(currentDbConnector?.meshAddr ?: 0, b)
+            if (Constants.IS_ROUTE_MODE) {
+                routeOpenOrCloseBase(currentDbConnector!!.meshAddr, currentDbConnector!!.productUUID, status, "switchConnector")
+            } else {
+                Commander.openOrCloseCurtain(currentDbConnector?.meshAddr ?: 0, isOpen = b, isPause = false)
+                afterSwConnector(b)
+            }
         }
+    }
+
+    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由switchGp通知-------$cmdBean")
+        if (cmdBean.ser_id == "switchGp" || cmdBean.ser_id == "switchConnector") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                when (cmdBean.ser_id) {
+                    "switchGp" -> {
+                        afterSwitchGp(isOpen)
+                    }
+                    "switchConnector" -> {
+                        afterSwConnector(isOpen)
+                    }
+                }
+            } else {
+                val string = if (isOpen) getString(R.string.open_faile) else getString(R.string.close_faile)
+                ToastUtils.showShort(string)
+            }
+        }
+    }
+
+
+    private fun afterSwConnector(b: Boolean) {
         if (b)
             currentDbConnector?.connectionStatus = ConnectionStatus.ON.value
         else
             currentDbConnector?.connectionStatus = ConnectionStatus.OFF.value
+        currentDbConnector!!.updateIcon()
+        DBUtils.updateConnector(currentDbConnector!!)
+    }
+
+    private fun afterSwitchGp(b: Boolean) {
+        if (b)
+            currentGroup?.connectionStatus = ConnectionStatus.ON.value
+        else
+            currentGroup?.connectionStatus = ConnectionStatus.OFF.value
+        DBUtils.saveGroup(currentGroup!!, false)
     }
 
     fun autoConnect() {
@@ -602,13 +704,13 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                 fiVersion?.title = localVersion
                                 if (TextUtils.isEmpty(localVersion))
                                     localVersion = getString(R.string.number_no)
-                                runOnUiThread {  fiVersion?.title = localVersion }
+                                runOnUiThread { fiVersion?.title = localVersion }
                                 DBUtils.saveConnector(currentDbConnector!!, false)
                             },
                             {
                                 if (TextUtils.isEmpty(localVersion))
                                     localVersion = getString(R.string.number_no)
-                                runOnUiThread {  fiVersion?.title = localVersion }
+                                runOnUiThread { fiVersion?.title = localVersion }
                             }
                     )
         }

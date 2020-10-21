@@ -239,7 +239,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         toolbar.setNavigationOnClickListener {
             finish()
         }
-        toolbarTv.text = getString(R.string.switch_title)
+        toolbarTv.text = getString(R.string.router)
     }
 
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->

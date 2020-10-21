@@ -41,6 +41,7 @@ import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
+import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.routerModel.RouterModel
@@ -464,12 +465,14 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         stopTimerUpdate()
 
     }
+
     fun bindService() {
         serviceConnection = MyServiceConnection()
         serviceConnection?.setIGetMessageCallBack(this)
         val intent = Intent(this, MqttService::class.java)
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
     }
+
     open fun unbindSe() { //解绑服务
         serviceConnection?.let {
             unbindService(it)
@@ -509,7 +512,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             loadDialog!!.setCanceledOnTouchOutside(false)
             loadDialog!!.setContentView(layout)
             if (!this.isDestroyed) {
-                loadDialog!!.show()
+                runOnUiThread {
+                    loadDialog!!.show()
+                }
             }
         }
     }
@@ -703,7 +708,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     tzRouterAddScene(routerScene)
                 }
 
-                Cmd.routeUpdateScenes ->tzRouteUpdateScene(cmdBean)
+                Cmd.routeUpdateScenes -> tzRouteUpdateScene(cmdBean)
 
                 Cmd.routeUpdateDeviceVersion -> {//版本号回调
                     val routerVersion = Gson().fromJson(msg, RouteGetVerBean::class.java)
@@ -746,6 +751,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                  * 控制指令下的通知
                  */
                 Cmd.tzRouteOpenOrClose -> tzRouterOpenOrClose(cmdBean)
+                Cmd.tzRouteContorlCurtain -> tzRouteContorlCurtaine(cmdBean)
                 Cmd.tzRouteConfigRgb -> tzRouterConfigRGB(cmdBean)
                 Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean, true)
                 Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean, false)
@@ -810,6 +816,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    open fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigEightSwRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigSceneSwRecevice(cmdBean: CmdBodyBean) {}
@@ -1328,6 +1335,42 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     @SuppressLint("CheckResult")
+    open fun routeDeleteGroup(serId: String, dbGroup: DbGroup) {
+        RouterModel.routerDelGp(RouterDelGpBody(serId, dbGroup.meshAddr))?.subscribe({
+            /**
+            90007,"该组不存在，本地删除即可 "  90015,"空组直接本地删除，后台数据库也会同步删除(无需app调用删除接口)"
+            90008,该组里的全部设备都未绑定路由，无法删除" 90005,"以下路由全部没有上线，无法开始分组" 90009,"默认组无法删除"
+             */
+            when (it.errorCode) {
+                0, 90015, 90007 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    if (it.errorCode == 0) {
+                        disposableRouteTimer?.dispose()
+                        disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                .subscribe {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.delete_gp_fail))
+                                }
+                    } else {
+                        DBUtils.deleteGroupOnly(dbGroup)
+                        deleteGpSuccess()
+                    }
+                }
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
+            }
+            LogUtils.v("zcl-----------收到路由删组-------$it")
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    open fun deleteGpSuccess() {
+
+    }
+
+    @SuppressLint("CheckResult")
     open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
         LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
         RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, serId)?.subscribe({
@@ -1355,11 +1398,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
-    fun configBriOrColorTempResult(it: Response<RouterTimeoutBean>, isBri: Boolean) {
+    open fun configBriOrColorTempResult(it: Response<RouterTimeoutBean>, isBri: Boolean) {
         LogUtils.v("zcl-----------收到配置亮度-------$isBri")
         when (it.errorCode) {
             0 -> {
-                showLoadingDialog(getString(R.string.please_wait))
+                //showLoadingDialog(getString(R.string.please_wait))
                 disposableRouteTimer?.dispose()
                 disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                         .subscribe {
@@ -1462,8 +1505,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             ToastUtils.showShort(it.message)
         })
     }
+
     @SuppressLint("CheckResult")
-    open fun routerConnectSensor(it: DbSensor, ser_id:String) {
+    open fun routerConnectSensor(it: DbSensor, ser_id: String) {
         //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
         RouterModel.routerConnectSwOrSe(it.id, it.productUUID, ser_id)
                 ?.subscribe({ response ->
@@ -1490,6 +1534,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     ToastUtils.showShort(it1.message)
                 })
     }
+
     @SuppressLint("CheckResult")
     open fun routerGetVersion(mesAddress: MutableList<Int>, deviceType: Int, serId: String) {
         //普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
@@ -1498,7 +1543,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             LogUtils.v("zcl-----------路由请求版本-------$it")
             when (it.errorCode) {
                 0 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
+                    //showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                             .subscribe {
@@ -1545,8 +1590,17 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     @SuppressLint("CheckResult")
-    open fun routerUpdateDeviceName(id: Long, name: String) {
-        RouterModel.routeUpdateLightName(id,name)?.subscribe({
+    open fun routerUpdateLightName(id: Long, name: String) {
+        RouterModel.routeUpdateLightName(id, name)?.subscribe({
+            renameSucess()
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerUpdateSensorName(id: Long, name: String) {
+        RouterModel.routeUpdateSensorName(id, name)?.subscribe({
             renameSucess()
         }, {
             ToastUtils.showShort(it.message)

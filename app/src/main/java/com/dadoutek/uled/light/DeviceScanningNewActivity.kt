@@ -1197,7 +1197,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     finish()
                 }//该账号该区域下没有路由
                 90005 -> {
-                    ToastUtils.showShort(getString(R.string.no_router_use))
+                    ToastUtils.showShort(getString(R.string.router_offline))
                     scanFail()
                     stopScanTimer()
                 }//该账号该区域下没有可用的路由，请检查路由是否上电联网

@@ -22,6 +22,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.OtaPrepareListner
+import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -38,6 +39,7 @@ import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.stomp.MqttBodyBean
+import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
@@ -137,7 +139,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     //显示路由
     override fun bindRouterVisible(): Boolean {
-        return false
+        return true
     }
 
     override fun bindDeviceRouter() {
@@ -241,7 +243,13 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 if (it.id.toString() != it.last_authorizer_user_id)
                     ToastUtils.showLong(getString(R.string.author_region_warm))
                 else {
-                    startActivity(Intent(this, ScanningSensorActivity::class.java))
+                    if (!IS_ROUTE_MODE) {
+                        startActivity(Intent(this, ScanningSensorActivity::class.java))
+                    } else {
+                      var  intent = Intent(this, DeviceScanningNewActivity::class.java)
+                        intent.putExtra(Constants.DEVICE_TYPE, 98)       //connector也叫relay
+                        startActivityForResult(intent, 0)
+                    }
                     doFinish()
                 }
             }
@@ -423,23 +431,24 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     @SuppressLint("CheckResult")
     private fun setOPenOrClose(position: Int) {
         if (currentDevice?.version != null && (currentDevice?.version ?: "0").contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
-            if (!IS_ROUTE_MODE) {
-                val byteArrayOf = if (currentDevice?.openTag == 1) {
-                    sendCloseIcon(position)
-                    byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                } else {
-                    sendOpenIcon(position)
-                    byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+            when {
+                !IS_ROUTE_MODE -> {
+                    val byteArrayOf = if (currentDevice?.openTag == 1) {
+                        sendCloseIcon(position)
+                        byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
+                    } else {
+                        sendOpenIcon(position)
+                        byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
+                    }
+                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentDevice?.meshAddr ?: 0, byteArrayOf)
                 }
-                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, currentDevice?.meshAddr ?: 0, byteArrayOf)
-            } else {
-                if (currentDevice?.openTag == 1)
-                    routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "closeSensor")
-                else
-                    routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "openSensor")
+                else -> {
+                    if (currentDevice?.openTag == 1)
+                        routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "closeSensor")
+                    else
+                        routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "openSensor")
+                }
             }
-            DBUtils.saveSensor(sensorDatas[position], true)
-            adapter?.notifyDataSetChanged()
         } else {
             ToastUtils.showShort(getString(R.string.dissupport))
         }
@@ -472,12 +481,16 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     private fun sendOpenIcon(position: Int) {
         sensorDatas[position].openTag = 1
         sensorDatas[position].updateIcon()
+        DBUtils.saveSensor(sensorDatas[position], true)
+        adapter?.notifyDataSetChanged()
         ToastUtils.showShort(getString(R.string.open))
     }
 
     private fun sendCloseIcon(position: Int) {
         sensorDatas[position].openTag = 0
         sensorDatas[position].updateIcon()
+        DBUtils.saveSensor(sensorDatas[position], true)
+        adapter?.notifyDataSetChanged()
         ToastUtils.showShort(getString(R.string.close))
     }
 

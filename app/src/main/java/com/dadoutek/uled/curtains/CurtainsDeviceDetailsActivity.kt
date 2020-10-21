@@ -23,6 +23,8 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.ItemTypeGroup
+import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -75,6 +77,20 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
         }
         adapter?.notifyDataSetChanged()
         isEmptyDevice()
+    }
+
+    //显示路由
+    override fun bindRouterVisible(): Boolean {
+        return true
+    }
+
+    override fun bindDeviceRouter() {
+        val dbGroup = DbGroup()
+        dbGroup.brightness=10000
+        dbGroup.deviceType = DeviceType.SMART_CURTAIN.toLong()
+        var intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", dbGroup)
+        startActivity(intent)
     }
 
     override fun editeDeviceAdapter() {
@@ -312,7 +328,6 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
                 .setTitle(R.string.create_new_group)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
-
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
@@ -356,17 +371,17 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
         currentDevice = curtainDatas?.get(position)
         positionCurrent = position
-        if (TelinkLightApplication.getApp().connectDevice == null){
-            autoConnectAll()
-        }
-        else {
-            when (view.id) {
-                R.id.template_device_card_delete -> {
-                      val string = getString(R.string.sure_delete_device, currentDevice?.name)
+        when {
+            TelinkLightApplication.getApp().connectDevice == null&&!IS_ROUTE_MODE -> autoConnectAll()
+            else -> {
+                when (view.id) {
+                    R.id.template_device_card_delete -> {
+                        val string = getString(R.string.sure_delete_device, currentDevice?.name)
                         builder?.setMessage(string)
-                    builder?.create()?.show()
+                        builder?.create()?.show()
+                    }
+                    R.id.template_device_setting -> skipSetting()
                 }
-                R.id.template_device_setting -> skipSetting()
             }
         }
     }

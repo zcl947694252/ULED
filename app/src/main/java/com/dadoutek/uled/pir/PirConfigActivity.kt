@@ -687,7 +687,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                     dbSensor.name = trim
                     saveSensor(dbSensor, false)
                 } else {
-                    routerUpdateDeviceName(dbSensor.id, trim)
+                    routerUpdateSensorName(dbSensor.id, trim)
                 }
                 if (!this.isFinishing)
                     renameDialog.dismiss()
