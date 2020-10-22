@@ -672,21 +672,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         }
     }
 
-    private fun SensorDeviceDetailsActivity.skipeDevice(isOTA: Boolean, s: String) {
-        if (isOTA) {
-            currentDevice?.version = s
-            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
-            if (isBoolean) {
-                transformView()
-            } else {
-                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                    OtaPrepareUtils.instance().gotoUpdateView(this@SensorDeviceDetailsActivity, s, otaPrepareListner)
-                } else {
-                    ToastUtils.showLong(getString(R.string.version_disabled))
-                    hideLoadingDialog()
-                }
-            }
-        } else {
+    private fun skipeDevice(isOTA: Boolean, s: String) {
             LogUtils.v("zcl传感器判断------------${currentDevice?.version}------$s")
             when (deviceInfo.productUUID) {
                 DeviceType.SENSOR -> {//老版本人体感应器
@@ -709,53 +695,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                     }
                 }
             }
-
-        }
     }
-
-    private var otaPrepareListner: OtaPrepareListner = object : OtaPrepareListner {
-
-        override fun downLoadFileStart() {
-            showLoadingDialog(getString(R.string.get_update_file))
-        }
-
-        override fun startGetVersion() {
-            showLoadingDialog(getString(R.string.verification_version))
-        }
-
-        override fun getVersionSuccess(s: String) {
-            hideLoadingDialog()
-        }
-
-        override fun getVersionFail() {
-            ToastUtils.showLong(R.string.verification_version_fail)
-            hideLoadingDialog()
-        }
-
-
-        override fun downLoadFileSuccess() {
-            hideLoadingDialog()
-            transformView()
-        }
-
-        override fun downLoadFileFail(message: String) {
-            hideLoadingDialog()
-            ToastUtils.showLong(R.string.download_pack_fail)
-        }
-    }
-
-    private fun transformView() {
-        connectSensorTimeoutDisposable?.dispose()
-        disposable?.dispose()
-        val intent = Intent(this@SensorDeviceDetailsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.OTA_MAC, currentDevice?.macAddr)
-        intent.putExtra(Constants.OTA_MES_Add, currentDevice?.meshAddr)
-        intent.putExtra(Constants.OTA_VERSION, currentDevice?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
-        startActivity(intent)
-        finish()
-    }
-
 
     /**
      * 重新配置 小心进入后断开

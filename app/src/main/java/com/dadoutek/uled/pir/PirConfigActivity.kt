@@ -40,6 +40,7 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -58,6 +59,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.singleLine
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -619,7 +621,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun goOta() {
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-        if (isBoolean) {
+        if (isBoolean || Constants.IS_ROUTE_MODE) {
             transformView()
         } else {
             if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
@@ -660,13 +662,18 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun transformView() {
-        val intent = Intent(this@PirConfigActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
-        intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
-        intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
-        startActivity(intent)
-        finish()
+        if (Constants.IS_ROUTE_MODE)
+            startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
+                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+        else {
+            val intent = Intent(this@PirConfigActivity, OTAUpdateActivity::class.java)
+            intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
+            intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
+            intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
+            intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+            startActivity(intent)
+            finish()
+        }
     }
 
 

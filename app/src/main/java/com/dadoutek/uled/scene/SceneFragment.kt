@@ -106,6 +106,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                                else-> ToastUtils.showShort(it.message)
                             }
                         }, {
                             ToastUtils.showShort(it.message)
@@ -205,6 +206,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
                                 ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
                                 ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
+                                else-> ToastUtils.showShort(it.message)
                             }
 
                         }, {

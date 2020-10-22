@@ -37,6 +37,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
@@ -61,6 +62,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -478,35 +480,14 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        if (handBoolean) {
-            if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_recovery)
-            } else {
-                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_recovery)
-            }
-        } else {
-            if (currentShowGroupSetPage) {
+        when {
+            handBoolean -> menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_recovery)
+            slowBoolean -> menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache)
+            else -> {
                 menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_cancel)
-            } else {
-                menu?.findItem(R.id.toolbar_c_hand_recovery)?.setTitle(R.string.hand_cancel)
-            }
-        }
-
-        if (slowBoolean) {
-            if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache)
-            } else {
-                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache)
-            }
-
-        } else {
-            if (currentShowGroupSetPage) {
-                menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
-            } else {
                 menu?.findItem(R.id.toolbar_c_slow_up)?.setTitle(R.string.slow_up_the_cache_cancel)
             }
         }
-
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -596,13 +577,21 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                             disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                                     .subscribe {
                                         hideLoadingDialog()
-                                        ToastUtils.showShort(getString(R.string.speed_faile))
+                                        when (opcode) {
+                                            0x0a -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                                            0x0b -> ToastUtils.showShort(getString(R.string.pause_faile))
+                                            0x0c -> ToastUtils.showShort(getString(R.string.close_faile))
+                                            0x15 -> ToastUtils.showShort(getString(R.string.speed_faile))
+                                            0xec -> ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                                            0xea -> ToastUtils.showShort(getString(R.string.reset_curtain_fail))
+                                        }
                                     }
                         }
                         90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                         90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                         90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                         90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                        else -> ToastUtils.showShort(it.message)
                     }
                 }, {
                     ToastUtils.showShort(it.message)
@@ -613,7 +602,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl-----------收到路由控制通知-------$cmdBean")
         if (cmdBean.ser_id == "configSpeed" || cmdBean.ser_id == "curtainReset" || cmdBean.ser_id == "pauseCur" || cmdBean.ser_id == "offCur"
-                || cmdBean.ser_id == "openCur") {
+                || cmdBean.ser_id == "openCur" || cmdBean.ser_id == "delCurtain") {
             disposableRouteTimer?.dispose()
             hideLoadingDialog()
 
@@ -629,9 +618,16 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
                 "curtainReset" -> {
                     if (cmdBean.status == 0)
-                        ToastUtils.showShort(getString(R.string.reset_factory_success))
+                        ToastUtils.showShort(getString(R.string.reset_curtain_success))
                     else
+                        ToastUtils.showShort(getString(R.string.reset_curtain_fail))
+                }
+                "delCurtain" -> {
+                    if (cmdBean.status == 0) {
+                        deleteData()
+                    } else {
                         ToastUtils.showShort(getString(R.string.reset_factory_fail))
+                    }
                 }
                 "pauseCur" -> {
                     if (cmdBean.status == 0)
@@ -665,7 +661,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateOTA() {
         when {
-            versionText.text != null && versionText.text != "" -> checkPermission()
+            versionText.text != null && versionText.text != "" -> if (Constants.IS_ROUTE_MODE)
+                startActivity<RouterOtaActivity>("deviceMeshAddress" to curtain!!.meshAddr, "deviceType" to curtain!!.productUUID,
+                        "deviceMac" to curtain!!.macAddr)
+            else checkPermission()
             else -> Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
         }
     }
@@ -881,11 +880,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(getString(R.string.sure_delete_device, curtain?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (Constants.IS_ROUTE_MODE||TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                    if (Constants.IS_ROUTE_MODE || TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
                         val deviceMeshAddr = if (typeStr == Constants.TYPE_GROUP) curtainGroup?.meshAddr else curtain?.meshAddr
                         if (Constants.IS_ROUTE_MODE)
-                            routerDeviceResetFactory(curtain!!.macAddr,curtain!!.meshAddr,DeviceType.SMART_CURTAIN,"delCurtain")
-                        else{
+                            routerControlCurtain(0xEC, "delCurtain")
+                        else {
                             showLoadingDialog(getString(R.string.please_wait))
                             val dispose = Commander.resetDevice(deviceMeshAddr ?: 0)
                                     .subscribe({
@@ -914,18 +913,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 .show()
     }
 
-    override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
-              LogUtils.v("zcl-----------收到路由delCurtain通知-------$cmdBean")
-                      if (cmdBean.ser_id=="delCurtain"){
-                          disposableRouteTimer?.dispose()
-                          hideLoadingDialog()
-                          if (cmdBean.status==0){
-                              deleteData()
-                          }else{
-                              ToastUtils.showShort(getString(R.string.reset_factory_fail))
-                          }
-                      }
-    }
     fun deleteData() {
         hideLoadingDialog()
         if (typeStr == Constants.TYPE_GROUP) {

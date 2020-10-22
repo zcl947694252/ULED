@@ -35,6 +35,7 @@ import com.dadoutek.uled.network.ConfigurationBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -61,6 +62,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.design.snackbar
+import org.jetbrains.anko.startActivity
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -180,16 +182,16 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
-              LogUtils.v("zcl-----------收到路由deleteOldPir通知-------$cmdBean")
-                      if (cmdBean.ser_id=="deleteOldPir"){
-                          disposableRouteTimer?.dispose()
-                          hideLoadingDialog()
-                          if (cmdBean.status==0){
-                              deleteData()
-                          }else{
-                              ToastUtils.showShort(getString(R.string.reset_factory_fail))
-                          }
-                      }
+        LogUtils.v("zcl-----------收到路由deleteOldPir通知-------$cmdBean")
+        if (cmdBean.ser_id == "deleteOldPir") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                deleteData()
+            } else {
+                ToastUtils.showShort(getString(R.string.reset_factory_fail))
+            }
+        }
     }
 
     fun deleteData() {
@@ -202,7 +204,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     private fun goOta() {
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-        if (isBoolean) {
+        if (isBoolean || Constants.IS_ROUTE_MODE) {
             transformView()
         } else {
             if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
@@ -243,13 +245,18 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun transformView() {
-        val intent = Intent(this@ConfigSensorAct, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
-        intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
-        intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
-        startActivity(intent)
-        finish()
+        if (Constants.IS_ROUTE_MODE)
+            startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
+                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+        else {
+            val intent = Intent(this@ConfigSensorAct, OTAUpdateActivity::class.java)
+            intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
+            intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
+            intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
+            intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun initListener() {
@@ -528,7 +535,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                             })
                             return@Thread
                         }
-                        if (Constants.IS_ROUTE_MODE){
+                        if (Constants.IS_ROUTE_MODE) {
                             //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
                             // triggerKey: Int = 0//0全天    1白天   2夜晚
                             //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
@@ -537,11 +544,11 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                             //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
                             //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
                             //sid	否	int	配置场景id。仅在场景模式下需要该配置
-                            var durationUnit = if (modeDelayUnit==0) 0 else 1
+                            var durationUnit = if (modeDelayUnit == 0) 0 else 1
                             val configurationBean = ConfigurationBean(modeStartUpMode, 0, tietMinimumBrightness.text.toString().toInt(), durationUnit,
                                     spTriggerLux.selectedItem.toString().toInt(), mutableListOf(mSelectGroupSceneAddr), 0, 0)
-                            routerConfigSensor(mDeviceInfo.meshAddress.toLong(), configurationBean,"configSensor")
-                      }  else
+                            routerConfigSensor(mDeviceInfo.meshAddress.toLong(), configurationBean, "configSensor")
+                        } else
                             configSensor(mode)
                     }.start()
 
@@ -551,35 +558,35 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     override fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {
-              LogUtils.v("zcl-----------收到路由configSensor通知-------$cmdBean")
-                      if (cmdBean.ser_id=="configSensor"){
-                          disposableRouteTimer?.dispose()
-                          hideLoadingDialog()
-                          if (cmdBean.status==0){
-                              SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
-                                  override fun start() { }
+        LogUtils.v("zcl-----------收到路由configSensor通知-------$cmdBean")
+        if (cmdBean.ser_id == "configSensor") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() {}
 
-                                  override fun complete() {
-                                      val sensorByID = DBUtils.getSensorByID(currentSensor!!.id)
-                                      if (!isReConfirm)
-                                          showRenameDialog(sensorByID!!)
-                                      else
-                                          doFinish()
-                                  }
+                    override fun complete() {
+                        val sensorByID = DBUtils.getSensorByID(currentSensor!!.id)
+                        if (!isReConfirm)
+                            showRenameDialog(sensorByID!!)
+                        else
+                            doFinish()
+                    }
 
-                                  override fun error(msg: String?) {
-                                      val sensorByID = DBUtils.getSensorByID(currentSensor!!.id)
-                                      if (!isReConfirm)
-                                          showRenameDialog(sensorByID!!)
-                                      else
-                                          doFinish()
-                                  }
-                              })
+                    override fun error(msg: String?) {
+                        val sensorByID = DBUtils.getSensorByID(currentSensor!!.id)
+                        if (!isReConfirm)
+                            showRenameDialog(sensorByID!!)
+                        else
+                            doFinish()
+                    }
+                })
 
-                          }else{
-                              ToastUtils.showShort(getString(R.string.config_fail))
-                          }
-                      }
+            } else {
+                ToastUtils.showShort(getString(R.string.config_fail))
+            }
+        }
     }
 
     private fun configSensor(mode: Int) {
@@ -624,8 +631,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             } else {
                 val trim = renameEditText?.text.toString().trim { it <= ' ' }
                 if (Constants.IS_ROUTE_MODE)
-                    routerUpdateSensorName(dbSensor.id,trim)
-                else{
+                    routerUpdateSensorName(dbSensor.id, trim)
+                else {
                     dbSensor.name = trim
                     DBUtils.saveSensor(dbSensor, false)
                 }

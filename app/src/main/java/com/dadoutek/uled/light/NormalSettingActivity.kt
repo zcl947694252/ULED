@@ -1366,10 +1366,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         group?.slowUpSlowDownStatus = 1
         slow_rg_view.visibility = GONE
         DBUtils.updateGroup(group!!)
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr
-                ?: 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, group?.slowUpSlowDownSpeed.toByte()))
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr, byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBSD, group?.slowUpSlowDownSpeed.toByte()))
         Thread.sleep(500)
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr ?: 0xffff,
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_GRADIENT_OPCODE, group?.meshAddr,
                 //0x01 CONFIG_EXTEND_ALL_JBZL
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 2, 1, 0, 0, 0))//1是开 0是关 第四位
     }
@@ -1498,7 +1497,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun updateOTA() {
         if (Constants.IS_ROUTE_MODE) {
-            routerSingleOta()
+            startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,"deviceType" to DeviceType.LIGHT_NORMAL,"deviceMac" to light!!.macAddr)
         } else {
             if (findItem?.title != null && findItem?.title != "version") {
                 checkPermission()
@@ -1506,10 +1505,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
             }
         }
-    }
-
-    private fun routerSingleOta() {
-        this.startActivity<RouterOtaActivity>("deviceId" to light!!.id,"deviceType" to DeviceType.LIGHT_NORMAL,"deviceMac" to light!!.macAddr)
     }
 
 
@@ -2154,6 +2149,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                 }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -2201,6 +2197,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                 }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

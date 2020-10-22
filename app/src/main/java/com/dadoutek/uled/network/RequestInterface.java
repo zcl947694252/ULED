@@ -1072,6 +1072,18 @@ public interface RequestInterface {
                                             @Field("start") long start);
 
     /**
+     * 路由升级，升级前先获取路由版本号
+     * https://dev.dadoutek.com/xxxx/router/router-ota  POST
+     * start	是	long	用于查询的时间戳，单位ms，ota结果记录的start字段会存储这个值
+     * macAddr	是	string	目标路由macAddr
+     * "start": 1597046661669,
+     * "macAddr": "0102030405",
+     */
+    @FormUrlEncoded
+    @POST("router/router-ota")
+    Observable<Response<RouterTimeoutBean>> routeOtaRouter(@Field("start") long startTime,
+                                                           @Field("macAddr") String macAddr);
+    /**
      * 获取ota升级结果
      * 请求URL
      * https://dev.dadoutek.com/xxxx/ota/result/list  GET
@@ -1487,18 +1499,6 @@ public interface RequestInterface {
     Observable<Response<RouterTimeoutBean>> routeGetVersion(@Field("macAddr") long macAddr,
                                                             @Field("ser_id") String ser_id);
 
-    /**
-     * 路由升级，升级前先获取路由版本号
-     * https://dev.dadoutek.com/xxxx/router/router-ota  POST
-     * start	是	long	用于查询的时间戳，单位ms，ota结果记录的start字段会存储这个值
-     * macAddr	是	string	目标路由macAddr
-     * "start": 1597046661669,
-     * "macAddr": "0102030405",
-     */
-    @FormUrlEncoded
-    @POST("router/router-ota")
-    Observable<Response<RouterTimeoutBean>> routeOtaRouter(@Field("start") long startTime,
-                                                           @Field("macAddr") long macAddr);
 
     /**
      * 灯更新  请求URL  https://dev.dadoutek.com/xxxx/light/update/{id} PUT

@@ -1201,6 +1201,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     scanFail()
                     stopScanTimer()
                 }//该账号该区域下没有可用的路由，请检查路由是否上电联网
+                else-> ToastUtils.showShort(it.message)
             }
 
         }, {

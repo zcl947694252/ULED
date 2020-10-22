@@ -459,6 +459,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             LogUtils.v("zcl-----------收到路由开关组失败-------$it")
@@ -701,6 +702,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
+                else-> ToastUtils.showShort(it.message)
             }
             LogUtils.v("zcl-----------收到路由删组-------$it")
         }, {

@@ -23,22 +23,11 @@
                 app:lightWaveColor="@color/light"
                 app:lightWaveDirect="R2L"
                 app:lockWave="false"
-                app:maxValue="100"
+                app:maxValue="120"
                 app:value="0"
                 app:valueSize="@dimen/text_size_35"
                 app:waveHeight="30dp"
                 app:waveNum="1" />
-
-        <TextView
-                android:id="@+id/router_ota_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:background="@color/dark"
-                android:gravity="center"
-                android:text="@string/routing_update"
-                android:textColor="@color/white"
-                android:textSize="35sp" />
     </RelativeLayout>
 
     <TextView

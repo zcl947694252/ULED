@@ -1,4 +1,4 @@
-package com.dadoutek.uled.group
+package com.dadoutek.uled.router
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -18,6 +18,7 @@ import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
+import com.dadoutek.uled.group.*
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constants
@@ -28,7 +29,6 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
-import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.RouterVersionsBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -55,13 +55,14 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 创建者     ZCL
- * 创建时间   2020/6/10 11:25
+ * 创建时间   2020/10/22 16:24
  * 描述
+ *
  * 更新者     $
  * 更新时间   $
  * 更新描述
  */
-class GroupOTAListActivity : TelinkBaseActivity() {
+class RouterOtaListActivity : TelinkBaseActivity() {
     private var disposableTimer: Disposable? = null
     private var deviceType: Int = 0
     private var isGroup: Boolean = false
@@ -136,7 +137,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                 override fun start() {}
                 override fun complete() {
-                    this@GroupOTAListActivity.startActivity<RouterOtaActivity>("groupOrDeviceId" to dbGroup!!.id, "DeviceType" to deviceType, "GroupOrTypeOrDevice" to 1)
+                    startActivity<RouterOtaActivity>("groupOrDeviceId" to dbGroup!!.id, "DeviceType" to deviceType, "GroupOrTypeOrDevice" to 1)
                 }
 
                 override fun error(msg: String?) {
@@ -463,10 +464,24 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         sensorList.forEach { meshAddrList.add(it.meshAddr) }
     }
 
+
+
+    open fun numberCharat(string: String): String {
+        val sBuffer = StringBuffer()
+        string.forEach { i ->
+            if (!(48 > i.toInt() || i.toInt() > 57)) {
+                sBuffer.append(i)
+            }
+        }
+        return sBuffer.toString()
+    }
+
+
+
     private fun supportAndUNLight() {
         lightList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+                //it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     if (split[1] != "" && split[1] != null) {
@@ -488,20 +503,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         lightList.addAll(unsupport)
     }
 
-    open fun numberCharat(string: String): String {
-        val sBuffer = StringBuffer()
-        string.forEach { i ->
-            if (!(48 > i.toInt() || i.toInt() > 57)) {
-                sBuffer.append(i)
-            }
-        }
-        return sBuffer.toString()
-    }
-
     private fun supportAndUNSwitch() {
         switchList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+                //it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     var versionNum = numberCharat(split[1])
@@ -524,7 +529,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun supportAndUNSensor() {
         sensorList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+               // it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     val versionNum = numberCharat(split[1])
@@ -547,7 +552,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun supportAndUNCurtain() {
         curtainList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+               // it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     val versionNum = numberCharat(split[1])
@@ -570,7 +575,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun supportAndUNConnector() {
         relayList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
+               // it.isSupportOta = OtaPrepareUtils.instance().checkSupportOta(itv)
                 val split = itv.split("-")
                 if (split.size >= 2) {
                     val versionNum = numberCharat(split[1])
@@ -639,7 +644,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     LogUtils.v("zcl获取服务器bin-----------$it-------")
                     mapBin = it
                     updataDevice()
-
                 }, {
                     ToastUtils.showShort(getString(R.string.get_bin_fail))
                     finish()
@@ -952,7 +956,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
 
     private fun getFilePath(meshAddr: Int, macAddr: String, version: String, deviceType: Int) {
-        OtaPrepareUtils.instance().gotoUpdateView(this@GroupOTAListActivity, version, object : OtaPrepareListner {
+        OtaPrepareUtils.instance().gotoUpdateView(this, version, object : OtaPrepareListner {
 
             override fun downLoadFileStart() {
                 showLoadingDialog(getString(R.string.get_update_file))
@@ -1002,13 +1006,13 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun startOtaAct(meshAddr: Int, macAddr: String, version: String, deviceType: Int) {
         if (Constants.IS_ROUTE_MODE)
             startActivity<RouterOtaActivity>("deviceMeshAddress" to meshAddr,"deviceType" to deviceType,"deviceMac" to macAddr)
-         else{
-        val intent = Intent(this@GroupOTAListActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.OTA_MES_Add, meshAddr)
-        intent.putExtra(Constants.OTA_MAC, macAddr)
-        intent.putExtra(Constants.OTA_VERSION, version)
-        intent.putExtra(Constants.OTA_TYPE, deviceType)
-        startActivity(intent)}
+        else{
+            val intent = Intent(this, OTAUpdateActivity::class.java)
+            intent.putExtra(Constants.OTA_MES_Add, meshAddr)
+            intent.putExtra(Constants.OTA_MAC, macAddr)
+            intent.putExtra(Constants.OTA_VERSION, version)
+            intent.putExtra(Constants.OTA_TYPE, deviceType)
+            startActivity(intent)}
     }
 
     override fun onDestroy() {

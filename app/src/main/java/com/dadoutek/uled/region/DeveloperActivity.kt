@@ -486,6 +486,7 @@ class DeveloperActivity : BaseActivity() {
                                 }
                     }
                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    else-> ToastUtils.showShort(it.message)
                 }
             }, {
                 ToastUtils.showShort(it.message)

@@ -36,6 +36,7 @@ import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -51,6 +52,7 @@ import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -252,6 +254,14 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     fun deviceOta(mDeviceInfo: DeviceInfo, type: Int = DeviceType.NORMAL_SWITCH) {
         deviceType = type
         otaDeviceInfo = mDeviceInfo
+        if (Constants.IS_ROUTE_MODE)
+            startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress,"deviceType" to mDeviceInfo.productUUID,
+                    "deviceMac" to mDeviceInfo.macAddress)
+        else bleOta(mDeviceInfo, type)
+
+    }
+
+    private fun bleOta(mDeviceInfo: DeviceInfo, type: Int) {
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == mDeviceInfo.macAddress) {
             if (isBoolean)
@@ -361,6 +371,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

@@ -19,6 +19,7 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
+import cn.smssdk.gui.util.Const
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -40,6 +41,7 @@ import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -66,6 +68,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.singleLine
+import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -220,7 +223,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     private fun goOta() {
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-        if (isBoolean) {
+        if (isBoolean||Constants.IS_ROUTE_MODE) {
             transformView()
         } else {
             if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
@@ -261,13 +264,18 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun transformView() {
-        val intent = Intent(this@HumanBodySensorActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
-        intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
-        intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
-        startActivity(intent)
-        finish()
+        if (Constants.IS_ROUTE_MODE)
+            startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
+                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+        else {
+            val intent = Intent(this@HumanBodySensorActivity, OTAUpdateActivity::class.java)
+            intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
+            intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
+            intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
+            intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun setAdapters() {

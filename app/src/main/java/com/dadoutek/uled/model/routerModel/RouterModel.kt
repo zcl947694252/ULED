@@ -226,8 +226,8 @@ object RouterModel {
     /**
      *停止路由ota
      */
-    fun routerStopOTA(time: Long): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerStopOTA("router_ota", time)
+    fun routerStopOTA(time: Long,ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerStopOTA(ser_id, time)
                // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -485,8 +485,8 @@ object RouterModel {
     /**
      * 获取路由版本号
      */
-    fun routeOtaRouter(mac: Long, start: Long): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeOtaRouter(mac, start)
+    fun routeOtaRouter(mac: String, start: Long): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeOtaRouter(start,mac)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

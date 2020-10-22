@@ -115,6 +115,7 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
                             }
                 }
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

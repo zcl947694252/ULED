@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import cn.smssdk.gui.util.Const
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -36,6 +37,7 @@ import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.BindRouterActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -187,7 +189,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             }
             ota.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
-                if (Constants.IS_ROUTE_MODE) return@setOnClickListener
+                if (IS_ROUTE_MODE) return@setOnClickListener
                 if (currentDevice != null) {
                     TelinkLightService.Instance()?.idleMode(true)
                     showLoadingDialog(getString(R.string.connecting_tip))
@@ -269,6 +271,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                             ToastUtils.showShort(getString(R.string.router_offline))
                             hideLoadingDialog()
                         }
+                        else-> ToastUtils.showShort(it.message)
                     }
                 }, {
                     ToastUtils.showShort(it.message)
@@ -464,8 +467,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     private fun isDirectConnectDevice() {
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
-        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == currentDevice?.macAddr) {
-            if (isBoolean) {
+        if ((TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == currentDevice?.macAddr)|| IS_ROUTE_MODE) {
+            if (isBoolean|| IS_ROUTE_MODE) {
                 transformView()
             } else {
                 OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, currentDevice?.version, otaPrepareListner)
@@ -645,6 +648,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                             }
                             NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
                             NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
+                            else-> ToastUtils.showShort(it.message)
                         }
                     }, {
                         ToastUtils.showShort(it.message)

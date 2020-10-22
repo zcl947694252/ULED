@@ -15,15 +15,60 @@
         <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-            <include layout="@layout/template_recycleview" />
+
+            <LinearLayout
+                    android:id="@+id/group_ota_number_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingEnd="15dp"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/group_ota_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/ota_all_num"
+                        android:textColor="@color/gray_3"
+                        android:textSize="13sp" />
+
+                <TextView
+                        android:id="@+id/group_ota_success"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/ota_success_num"
+                        android:textColor="@color/blue_text"
+                        android:textSize="13sp" />
+                <TextView
+                        android:id="@+id/group_ota_fail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/ota_fail_num"
+                        android:textColor="@color/red_error"
+                        android:textSize="13sp" />
+            </LinearLayout>
+
+            <include
+                    layout="@layout/template_recycleview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/group_ota_number_ly" />
+
             <TextView
                     android:id="@+id/loading_tansform"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_below="@+id/group_ota_number_ly"
+                    android:background="#4222"
                     android:gravity="center"
-                    android:visibility="gone"
                     android:textSize="25sp"
-                    android:background="#4222"/>
+                    android:visibility="gone" />
         </RelativeLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

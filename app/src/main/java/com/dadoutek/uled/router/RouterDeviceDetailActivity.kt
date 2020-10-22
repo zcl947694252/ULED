@@ -1,4 +1,5 @@
 package com.dadoutek.uled.router
+
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -30,19 +31,20 @@ import kotlinx.android.synthetic.main.activity_switch_device_details.add_device_
 import kotlinx.android.synthetic.main.activity_switch_device_details.no_device_relativeLayout
 import kotlinx.android.synthetic.main.activity_switch_device_details.recycleView
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.startActivity
 
 /**
  * 开关列表
  */
-class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
-    private val REQUEST_CODE: Int=1000
+class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
+    private val REQUEST_CODE: Int = 1000
     private var popupWindow: PopupWindow? = null
     private var popVersion: TextView? = null
     private var views: View? = null
     private var last_start_time = 0
     private var debounce_time = 1000
-    private  var routerData: MutableList<DbRouter> = mutableListOf()
-    private var adapter: RouterDeviceDetailsAdapter   = RouterDeviceDetailsAdapter(R.layout.template_device_type_item, routerData, this)
+    private var routerData: MutableList<DbRouter> = mutableListOf()
+    private var adapter: RouterDeviceDetailsAdapter = RouterDeviceDetailsAdapter(R.layout.template_device_type_item, routerData, this)
     private var currentDevice: DbRouter? = null
     private var positionCurrent: Int = 10000
     private var installDevice: TextView? = null
@@ -86,7 +88,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
     }
 
     override fun setDeviceDataSize(num: Int): Int {
-        return  routerData.size
+        return routerData.size
     }
 
     override fun setLayoutId(): Int {
@@ -234,7 +236,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
         createGroup = findViewById(R.id.create_group)
         createScene = findViewById(R.id.create_scene)
 
-        add_device_btn.setOnClickListener{addDevice()}
+        add_device_btn.setOnClickListener { addDevice() }
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
@@ -258,7 +260,8 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
                         builder?.create()?.show()
                     }
                     R.id.template_device_setting -> goConfig()
-                    else->{}
+                    else -> {
+                    }
                 }
             }
         }
@@ -277,11 +280,8 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity(){
 
 
     private fun transformView() {
-        val intent = Intent(this@RouterDeviceDetailsActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(OTA_TYPE, DeviceType.ROUTER)
-        val timeMillis = System.currentTimeMillis()
-        if (last_start_time == 0 || timeMillis - last_start_time >= debounce_time)
-            startActivity(intent)
+        startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to currentDevice!!.productUUID,
+                "deviceMac" to currentDevice!!.macAddr)
     }
 
 

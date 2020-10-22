@@ -39,6 +39,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAConnectorActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
@@ -63,6 +64,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.startActivity
 import java.util.*
 
 class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener {
@@ -511,7 +513,11 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 R.id.toolbar_fv_change_group -> updateGroup()
                 R.id.toolbar_f_ota -> {
                     if (!TextUtils.isEmpty(localVersion))
-                        checkPermission()
+                        if (Constants.IS_ROUTE_MODE)
+                            startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
+                                    "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr)
+                        else
+                            checkPermission()
                     else
                         Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
                 }

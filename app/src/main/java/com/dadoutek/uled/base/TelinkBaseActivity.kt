@@ -739,7 +739,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 Cmd.routeOTAFinish -> {
                     val routerOTAFinishBean = Gson().fromJson(msg, RouterOTAFinishBean::class.java)
-                    tzRouterOTAFinishRecevice(routerOTAFinishBean)
+                    tzRouterOTAStopRecevice(routerOTAFinishBean)
                 }
                 Cmd.tzRouteAddGradient, Cmd.tzRouteDelGradient, Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean)
                 Cmd.tzRouteConnectSwSe -> tzRouterConnectSwSeRecevice(cmdBean)
@@ -840,7 +840,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun tzRouteStopScan(cmdBean: CmdBodyBean) {}
     open fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {}
-    open fun tzRouterOTAFinishRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {}
+    open fun tzRouterOTAStopRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {}
     open fun tzRouterOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {}
     open fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {}
     open fun tzRouterAddScene(routerScene: RouteSceneBean?) {}
@@ -1359,6 +1359,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
+                else-> ToastUtils.showShort(it.message)
             }
             LogUtils.v("zcl-----------收到路由删组-------$it")
         }, {
@@ -1420,6 +1421,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+            else-> ToastUtils.showShort(it.message)
         }
     }
 
@@ -1471,6 +1473,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -1499,6 +1502,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             LogUtils.v("zcl-----------收到路由失败-------$it")
@@ -1557,6 +1561,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -1583,6 +1588,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                else-> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

@@ -135,12 +135,12 @@ public class SharedPreferencesUtils {
     }
 
     public static void setLastOtaTime(long time) {
-        SharedPreferencesHelper.putObject(TelinkLightApplication.Companion.getApp(),
+        SharedPreferencesHelper.putLong(TelinkLightApplication.Companion.getApp(),
                 Constants.OTA_TIME, time);
     }
 
-    public static void getLastOtaTime() {
-        SharedPreferencesHelper.getInt(TelinkLightApplication.Companion.getApp(),
+    public static long getLastOtaTime() {
+       return SharedPreferencesHelper.getLong(TelinkLightApplication.Companion.getApp(),
                 Constants.OTA_TIME, 0);
     }
 }

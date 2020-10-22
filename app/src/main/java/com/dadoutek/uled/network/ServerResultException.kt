@@ -161,7 +161,7 @@ object ServerResultException {
             NetworkStatusCode.ALL_GROUP_CONT_DEL -> {//默认组无法删除
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.all_gp_cont_del))
             }
-            NetworkStatusCode.ROUTER_CONT_OTA_TO_GET_LAST_OTA -> {//该路由器已被其他人添加
+            NetworkStatusCode.ROUTER_CONT_OTA_TO_GET_LAST_OTA -> {
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_cant_ota))
             }
             NetworkStatusCode.ROUTER_OTAING_CONT_OTA -> {//该路由器已被其他人添加

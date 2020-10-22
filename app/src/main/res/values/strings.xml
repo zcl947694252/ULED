@@ -1168,4 +1168,18 @@
     <string name="ota_success">OTA升级成功</string>
     <string name="ota_fail">OTA升级失败</string>
     <string name="stop_ota">停止升级</string>
+    <string name="reset_curtain_success">窗帘重启成功</string>
+    <string name="reset_curtain_fail">窗帘重启失败</string>
+    <string name="ota_stop_fail">OTA停止升级失败</string>
+    <string name="no_get_version">设备未获取版本号</string>
+    <string name="version_error">版本异常</string>
+    <string name="router_ota_faile">路由回复失败</string>
+    <string name="router_load_bin_faile">路由下载bin文件失败</string>
+    <string name="router_time_out">路由回复超时</string>
+    <string name="startTime_not_exit">该start对应的记录不存在</string>
+    <string name="router_version_error">路由版本号不正确，请先获取路由版本号再试</string>
+    <string name="router_not_exit">路由不存在,请刷新路由列表</string>
+    <string name="ota_all_num">升级总数:</string>
+    <string name="ota_success_num">升级成功数:</string>
+    <string name="ota_fail_num">升级失败数:</string>
 </resources>

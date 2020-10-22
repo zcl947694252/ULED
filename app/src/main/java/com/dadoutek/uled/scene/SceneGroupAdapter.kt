@@ -753,6 +753,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             90008 -> ToastUtils.showShort(mContext.getString(R.string.no_bind_router_cant_perform))
             90007 -> ToastUtils.showShort(mContext.getString(R.string.gp_not_exit))
             90005 -> ToastUtils.showShort(mContext.getString(R.string.router_offline))
+            else-> ToastUtils.showShort(it.message)
         }
     }
 
