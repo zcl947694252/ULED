@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -78,13 +79,17 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.singleLine
 import java.util.concurrent.TimeUnit
 
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    private var showTime: Long = 0
     private var serviceConnection: MyServiceConnection? = null
     private var viewInstall: View? = null
     private var installTitleTv: TextView? = null
@@ -175,6 +180,43 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         serviceConnection?.mqttService?.init()
     }
 
+    fun isSuportOta(version: String?): Boolean {
+        version?.let {
+            val split = version.split("-")
+            if (split.size >= 2) {
+                val versionNum = numberCharat(split[1])
+                LogUtils.v("zcl比较版本号-------$version------${TelinkLightApplication.mapBin[split[0]] ?: 0}-----${versionNum}")
+                val keys = TelinkLightApplication.mapBin.keys
+                return keys.contains(split[0])
+            }
+        }
+        return false
+    }
+
+    fun isMostNew(version: String?): Boolean {
+        version?.let {
+            val split = version?.split("-")
+            if (split.size >= 2) {
+                val versionNum = numberCharat(split[1])
+                LogUtils.v("zcl比较版本号-------$version------${TelinkLightApplication.mapBin[split[0]] ?: 0}-----${versionNum}")
+                if (!TextUtils.isEmpty(versionNum))
+                    return versionNum.toInt() >= TelinkLightApplication.mapBin[split[0]] ?: 0
+            }
+        }
+        return false
+    }
+
+    open fun numberCharat(string: String): String {
+        val sBuffer = StringBuffer()
+        val replace = string.replace(".", "", true)
+     val str = replace.replace("[a-zA-Z]".toRegex(), "")
+        str.forEach { i ->
+            if (!(48 > i.toInt() || i.toInt() > 57)) {
+                sBuffer.append(i)
+            }
+        }
+        return sBuffer.toString()
+    }
 
     private fun initChangeRecevicer() {
         changeRecevicer = ChangeRecevicer()
@@ -428,6 +470,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     override fun onResume() {
         super.onResume()
+        bindService()
         if (!LeBluetooth.getInstance().enable(applicationContext) && !Constants.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         isResume = true
@@ -474,8 +517,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     open fun unbindSe() { //解绑服务
-        serviceConnection?.let {
-            unbindService(it)
+        try {
+            serviceConnection?.let {
+                unbindService(it)
+            }
+        } catch (e: java.lang.Exception) {
+            LogUtils.v("zcl-----------${e.message}-------${e.printStackTrace()}")
         }
     }
 
@@ -513,6 +560,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             loadDialog!!.setContentView(layout)
             if (!this.isDestroyed) {
                 runOnUiThread {
+                    showTime = System.currentTimeMillis()
                     loadDialog!!.show()
                 }
             }
@@ -521,7 +569,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     fun hideLoadingDialog() {
         if (!this@TelinkBaseActivity.isFinishing && loadDialog != null && loadDialog!!.isShowing) {
+            //if (System.currentTimeMillis() - showTime > 2000)
             runOnUiThread { loadDialog?.dismiss() }
+            /* else
+                 Observable.timer(2, TimeUnit.SECONDS).subscribe {
+                     runOnUiThread { loadDialog?.dismiss() }
+                 }*/
         }
     }
 
@@ -532,6 +585,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     override fun onPause() {
         super.onPause()
+        unbindSe()
         stopTimerUpdate()
         showDialogHardDelete?.dismiss()
         mConnectDisposable?.dispose()
@@ -1359,7 +1413,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
             LogUtils.v("zcl-----------收到路由删组-------$it")
         }, {
@@ -1421,7 +1475,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-            else-> ToastUtils.showShort(it.message)
+            else -> ToastUtils.showShort(it.message)
         }
     }
 
@@ -1473,7 +1527,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -1502,7 +1556,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             LogUtils.v("zcl-----------收到路由失败-------$it")
@@ -1519,7 +1573,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     when (response.errorCode) {
                         0 -> {
                             disposableRouteTimer?.dispose()
-                            disposableRouteTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                            disposableRouteTimer = Observable.timer((response.t.timeout).toLong() + 1, TimeUnit.MILLISECONDS)
                                     .subscribe {
                                         showLoadingDialog(getString(R.string.please_wait))
                                         hideLoadingDialog()
@@ -1547,9 +1601,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             LogUtils.v("zcl-----------路由请求版本-------$it")
             when (it.errorCode) {
                 0 -> {
-                    //showLoadingDialog(getString(R.string.please_wait))
+                    showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong() + 1, TimeUnit.SECONDS)
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.get_version_fail))
@@ -1561,7 +1615,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -1588,7 +1642,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

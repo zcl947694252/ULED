@@ -245,9 +245,14 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun transformView() {
-        if (Constants.IS_ROUTE_MODE)
+        when {
+            !isSuportOta(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            else -> {
+        if (Constants.IS_ROUTE_MODE){
             startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
                     "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+        finish()}
         else {
             val intent = Intent(this@ConfigSensorAct, OTAUpdateActivity::class.java)
             intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
@@ -256,7 +261,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
             startActivity(intent)
             finish()
-        }
+        }}}
     }
 
     private fun initListener() {

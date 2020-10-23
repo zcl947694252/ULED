@@ -23,7 +23,6 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
-import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight

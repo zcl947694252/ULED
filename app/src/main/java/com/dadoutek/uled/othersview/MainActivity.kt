@@ -18,6 +18,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AlertDialog
+import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -49,6 +50,7 @@ import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.mqtt.IGetMessageCallBack
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.scene.SceneFragment
@@ -145,7 +147,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
         //MqttManger.initMqtt()
-        bindService()
+        //bindService()
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
@@ -161,16 +163,39 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener { startActivity(Intent(this@MainActivity, RouterOtaActivity::class.java)) }
+        main_toast.setOnClickListener {  getBin()}
         initBottomNavigation()
         checkVersionAvailable()
-         getScanResult()
+        getScanResult()
 
-         getRouterStatus()
+        getRouterStatus()
         getRegionList()
         getAllStatus()
+        getBin()
         Constants.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)
         LogUtils.v("zcl---获取状态------${Constants.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)}-")
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getBin() {
+        showLoadingDialog(getString(R.string.please_wait))
+        NetworkFactory.getApi().binList
+                .subscribeOn(Schedulers.io())
+                .compose(NetworkTransformer())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe({ it ->
+                    LogUtils.v("zcl获取服务器bin-----------$it-------")
+                    hideLoadingDialog()
+                    TelinkLightApplication.mapBin =it
+                  /*  it.forEach {
+                        val split = it.split("=")
+                        if (split.size >= 2 && !TextUtils.isEmpty(split[0]) && !TextUtils.isEmpty(split[1]))
+                            mapBin[split[0]] = split[1].toInt()
+                    }*/
+                }, {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.get_bin_fail))
+                    finish()
+                })
     }
 
     @SuppressLint("CheckResult")
@@ -727,7 +752,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mConnectDisposable?.dispose()
         AllenVersionChecker.getInstance().cancelAllMission(this)
         //解绑服务
-       unbindSe()
+        unbindSe()
     }
 
     private fun onServiceConnected(event: ServiceEvent) {}

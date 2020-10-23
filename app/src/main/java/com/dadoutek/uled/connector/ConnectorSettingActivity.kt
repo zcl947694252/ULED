@@ -25,6 +25,7 @@ import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.base.RouteGetVerBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
@@ -512,14 +513,21 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 R.id.toolbar_f_rename -> if (isConfigGroup) renameGroup() else renameDevice()
                 R.id.toolbar_fv_change_group -> updateGroup()
                 R.id.toolbar_f_ota -> {
-                    if (!TextUtils.isEmpty(localVersion))
-                        if (Constants.IS_ROUTE_MODE)
-                            startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
-                                    "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr)
-                        else
-                            checkPermission()
-                    else
-                        Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+                    when {
+                        !TextUtils.isEmpty(localVersion) -> when {
+                            !isSuportOta(currentDbConnector?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+                            isMostNew(currentDbConnector?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+                            else -> {
+                                when {
+                                    Constants.IS_ROUTE_MODE ->{ startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
+                                            "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr)
+                                    finish()}
+                                    else -> checkPermission()
+                                }
+                            }
+                        }
+                        else -> Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+                    }
                 }
                 R.id.toolbar_f_delete -> remove()
                 R.id.toolbar_on_line -> renameGroup()
@@ -699,27 +707,53 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun getVersion() {
-        if (TelinkApplication.getInstance().connectDevice != null) {
-            val disposable = Commander.getDeviceVersion(currentDbConnector!!.meshAddr)
-                    .subscribe(
-                            { s: String ->
-                                localVersion = s
-                                if (TextUtils.isEmpty(s))
-                                    localVersion = getString(R.string.number_no)
-                                currentDbConnector!!.version = localVersion
-                                fiVersion?.title = localVersion
-                                if (TextUtils.isEmpty(localVersion))
-                                    localVersion = getString(R.string.number_no)
-                                runOnUiThread { fiVersion?.title = localVersion }
-                                DBUtils.saveConnector(currentDbConnector!!, false)
-                            },
-                            {
-                                if (TextUtils.isEmpty(localVersion))
-                                    localVersion = getString(R.string.number_no)
-                                runOnUiThread { fiVersion?.title = localVersion }
-                            }
-                    )
+        when {
+            Constants.IS_ROUTE_MODE -> routerGetVersion(mutableListOf(currentDbConnector!!.meshAddr), DeviceType.SMART_RELAY, "getRalyVersion")
+            TelinkApplication.getInstance().connectDevice != null -> {
+                val disposable = Commander.getDeviceVersion(currentDbConnector!!.meshAddr)
+                        .subscribe(
+                                { s: String ->
+                                    localVersion = s
+                                    if (TextUtils.isEmpty(s))
+                                        localVersion = getString(R.string.number_no)
+                                    currentDbConnector!!.version = localVersion
+                                    fiVersion?.title = localVersion
+                                    if (TextUtils.isEmpty(localVersion))
+                                        localVersion = getString(R.string.number_no)
+                                    runOnUiThread { fiVersion?.title = localVersion }
+                                    DBUtils.saveConnector(currentDbConnector!!, false)
+                                },
+                                {
+                                    if (TextUtils.isEmpty(localVersion))
+                                        localVersion = getString(R.string.number_no)
+                                    runOnUiThread { fiVersion?.title = localVersion }
+                                }
+                        )
+            }
         }
+    }
+
+    override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
+           LogUtils.v("zcl-----------收到路由getRalyVersion通知-------$routerVersion")
+                   if (routerVersion?.ser_id=="getRalyVersion"){
+                       disposableRouteTimer?.dispose()
+                       hideLoadingDialog()
+                       if (routerVersion?.status==0){
+                           currentDbConnector?.version = routerVersion?.succeedNow[0].version
+                           DBUtils.saveConnector(currentDbConnector!!,false)
+                           localVersion = routerVersion?.succeedNow[0].version
+                           runOnUiThread { fiVersion?.title = localVersion }
+                       }else{
+                           ToastUtils.showShort(getString(R.string.get_version_fail))
+                       }
+                   }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val relay = DBUtils.getConnectorByID(currentDbConnector!!.id)
+        localVersion = relay?.version
+        runOnUiThread { fiVersion?.title = localVersion }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

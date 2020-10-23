@@ -311,45 +311,52 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun isDirectConnectDevice(granted: Boolean) {
-        if (Constants.IS_ROUTE_MODE)
-            startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,
-                    "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr)
-        else{
-            var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-            if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
-                if (granted!!) {
-                    if (isBoolean) {
-                        transformView()
-                    } else {
-                        OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
-                    }
-                } else {
-                    ToastUtils.showLong(R.string.update_permission_tip)
-                }
-            } else {
-                showLoadingDialog(getString(R.string.please_wait))
-                TelinkLightService.Instance()?.idleMode(true)
-                mConnectDeviceDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .flatMap {
-                            connect(light!!.meshAddr, macAddress = light!!.macAddr)
+        when {
+            !isSuportOta(light?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            isMostNew(light?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            else -> {
+                if (Constants.IS_ROUTE_MODE){
+                    startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,
+                            "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr)
+                finish()}
+                else {
+                    var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
+                    if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
+                        if (granted!!) {
+                            if (isBoolean) {
+                                transformView()
+                            } else {
+                                OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
+                            }
+                        } else {
+                            ToastUtils.showLong(R.string.update_permission_tip)
                         }
-                        ?.subscribe(
-                                {
-                                    hideLoadingDialog()
-                                    if (isBoolean) {
-                                        transformView()
-                                    } else {
-                                        OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
-                                    }
+                    } else {
+                        showLoadingDialog(getString(R.string.please_wait))
+                        TelinkLightService.Instance()?.idleMode(true)
+                        mConnectDeviceDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .flatMap {
+                                    connect(light!!.meshAddr, macAddress = light!!.macAddr)
                                 }
-                                ,
-                                {
-                                    hideLoadingDialog()
-                                    runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
-                                    LogUtils.d(it)
-                                })
+                                ?.subscribe(
+                                        {
+                                            hideLoadingDialog()
+                                            if (isBoolean) {
+                                                transformView()
+                                            } else {
+                                                OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
+                                            }
+                                        }
+                                        ,
+                                        {
+                                            hideLoadingDialog()
+                                            runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                            LogUtils.d(it)
+                                        })
+                    }
+                }
             }
         }
     }
@@ -409,18 +416,27 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private fun transformView() {
         mConnectDeviceDisposable?.dispose()
-        if (Constants.IS_ROUTE_MODE)
-            startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,
-                    "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr)
-        else{
-        val intent = Intent(this@RGBSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.UPDATE_LIGHT, light)
-        intent.putExtra(Constants.OTA_MAC, light?.macAddr)
-        intent.putExtra(Constants.OTA_MES_Add, light?.meshAddr)
-        intent.putExtra(Constants.OTA_VERSION, light?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.LIGHT_RGB)
-        startActivity(intent)
-        finish()}
+        when {
+            !isSuportOta(light?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            isMostNew(light?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            else -> {
+
+                if (Constants.IS_ROUTE_MODE){
+                    startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,
+                            "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr)
+                finish()}
+                else {
+                    val intent = Intent(this@RGBSettingActivity, OTAUpdateActivity::class.java)
+                    intent.putExtra(Constants.UPDATE_LIGHT, light)
+                    intent.putExtra(Constants.OTA_MAC, light?.macAddr)
+                    intent.putExtra(Constants.OTA_MES_Add, light?.meshAddr)
+                    intent.putExtra(Constants.OTA_VERSION, light?.version)
+                    intent.putExtra(Constants.OTA_TYPE, DeviceType.LIGHT_RGB)
+                    startActivity(intent)
+                    finish()
+                }
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1088,7 +1104,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun briCheckUi(b: Boolean) {
         rgb_sbBrightness.isEnabled = b
         sbBrightness_add.isEnabled = b
-        sbBrightness_less.isEnabled =b
+        sbBrightness_less.isEnabled = b
     }
 
 
@@ -1502,7 +1518,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                                else-> ToastUtils.showShort(it.message)
+                                else -> ToastUtils.showShort(it.message)
                             }
                         }, {
                             ToastUtils.showShort(it.message)
@@ -2283,7 +2299,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
 
         }) {
@@ -2318,7 +2334,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -2352,7 +2368,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -2384,7 +2400,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -2677,7 +2693,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

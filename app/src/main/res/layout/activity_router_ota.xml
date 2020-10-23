@@ -27,7 +27,7 @@
                 app:value="0"
                 app:valueSize="@dimen/text_size_35"
                 app:waveHeight="30dp"
-                app:waveNum="1" />
+                app:waveNum="0" />
     </RelativeLayout>
 
     <TextView

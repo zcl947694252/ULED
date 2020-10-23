@@ -661,10 +661,19 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateOTA() {
         when {
-            versionText.text != null && versionText.text != "" -> if (Constants.IS_ROUTE_MODE)
-                startActivity<RouterOtaActivity>("deviceMeshAddress" to curtain!!.meshAddr, "deviceType" to curtain!!.productUUID,
-                        "deviceMac" to curtain!!.macAddr)
-            else checkPermission()
+            versionText.text != null && versionText.text != "" ->
+                when {
+                    !isSuportOta(curtain?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+                    isMostNew(curtain?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+                    else -> {
+                        when {
+                            Constants.IS_ROUTE_MODE ->{ startActivity<RouterOtaActivity>("deviceMeshAddress" to curtain!!.meshAddr, "deviceType" to curtain!!.productUUID,
+                                    "deviceMac" to curtain!!.macAddr)
+                            finish()}
+                            else -> checkPermission()
+                        }
+                    }
+                }
             else -> Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
         }
     }
@@ -679,11 +688,15 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                 .subscribe(
                                         { s ->
                                             hideLoadingDialog()
-                                            if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                                                curtain!!.version = s
-                                                isDirectConnectDevice()
-                                            } else
-                                                ToastUtils.showLong(getString(R.string.version_disabled))
+                                            when {
+                                                !isSuportOta(curtain?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+                                                isMostNew(curtain?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+                                                else -> {
+                                                    curtain!!.version = s
+                                                    isDirectConnectDevice()
+
+                                                }
+                                            }
                                         }, { hideLoadingDialog() }
                                 )
                     } else {

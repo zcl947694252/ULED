@@ -247,6 +247,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         if (currentDevice != null) {
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting_tip))
+            disposableRouteTimer?.dispose()
             if (IS_ROUTE_MODE) {
                 RouterModel.routerConnectSwOrSe(currentDevice?.id ?: 0, 99, "connectSw")?.subscribe({
                     LogUtils.v("zcl-----------收到路由请求连接成功-------$it")
@@ -636,23 +637,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                 if (cmdBean.status == 0) {
                     image_bluetooth.setImageResource(R.drawable.icon_cloud)
                     ToastUtils.showShort(getString(R.string.connect_success))
-                    RouterModel.getDevicesVersion(mutableListOf(currentDevice!!.meshAddr), 99, "switchVersion")?.subscribe({
-                        when (it.errorCode) {
-                            NetworkStatusCode.OK -> {
-                                disposableRouteTimer?.dispose()
-                                disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.MILLISECONDS)
-                                        .subscribe {
-                                            hideLoadingDialog()
-                                            //ToastUtils.showShort(getString(R.string.get_version_fail))
-                                        }
-                            }
-                            NetworkStatusCode.DEVICE_NOT_BINDROUTER -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
-                            NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                            else-> ToastUtils.showShort(it.message)
-                        }
-                    }, {
-                        ToastUtils.showShort(it.message)
-                    })
+                    routerGetVersion(mutableListOf(currentDevice!!.meshAddr), 99, "switchVersion")
                 } else {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
@@ -665,6 +650,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         LogUtils.v("zcl-----------收到路由获取开关版本号通知-------$routerVersion")
         if (routerVersion?.ser_id == "switchVersion") {
             disposableRouteTimer?.dispose()
+            hideLoadingDialog()
             if (routerVersion.finish) {
                 if (routerVersion.status == 0) {
                     disposableRouteTimer?.dispose()

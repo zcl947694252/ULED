@@ -20,6 +20,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
+
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
@@ -105,7 +106,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> {
                 when {
                     DBUtils.getAllNormalLight().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    TelinkLightApplication.getApp().connectDevice != null -> startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.LIGHT_NORMAL, "gp" to group?.meshAddr)
+                    TelinkLightApplication.getApp().connectDevice != null||Constants.IS_ROUTE_MODE ->
+                        startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.LIGHT_NORMAL, "gp" to group?.meshAddr)
                     else -> ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }

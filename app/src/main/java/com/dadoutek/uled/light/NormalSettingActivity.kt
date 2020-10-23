@@ -114,7 +114,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
                         if (Constants.IS_ROUTE_MODE) {
-                            routeDeleteGroup("delCWGp",group!!)
+                            routeDeleteGroup("delCWGp", group!!)
                         } else {
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
@@ -158,7 +158,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
 
-     override fun deleteGpSuccess() {
+    override fun deleteGpSuccess() {
         SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
         this.hideLoadingDialog()
         this?.setResult(Constants.RESULT_OK)
@@ -1496,13 +1496,20 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     private fun updateOTA() {
-        if (Constants.IS_ROUTE_MODE) {
-            startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,"deviceType" to DeviceType.LIGHT_NORMAL,"deviceMac" to light!!.macAddr)
-        } else {
-            if (findItem?.title != null && findItem?.title != "version") {
-                checkPermission()
-            } else {
-                Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+        when {
+            !isSuportOta(light?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            isMostNew(light?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            else -> {
+                when {
+                    Constants.IS_ROUTE_MODE -> {
+                        startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr, "deviceType" to DeviceType.LIGHT_NORMAL, "deviceMac" to light!!.macAddr)
+                        finish()
+                    }
+                    else -> when {
+                        findItem?.title != null && findItem?.title != "version" -> checkPermission()
+                        else -> Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
+                    }
+                }
             }
         }
     }
@@ -1696,7 +1703,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
 
-     override fun renameSucess() {
+    override fun renameSucess() {
         DBUtils.updateLight(light!!)
         toolbarTv.text = light?.name
     }
@@ -1870,7 +1877,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             setAddAndMinusIcon(progress)
                         } else {
                             if (!Constants.IS_ROUTE_MODE)
-                            light?.brightness = progress
+                                light?.brightness = progress
                             setAddAndMinusIcon(progress)
                         }
                         Log.e("TAG", progress.toString())
@@ -2149,7 +2156,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                 }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -2197,7 +2204,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                 }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

@@ -41,7 +41,7 @@ class GroupOTASwitchAdapter(resId: Int, data: MutableList<DbSwitch>) : BaseQuick
             version.textColor = mContext.getColor(R.color.gray_3)
         }
 
-        if (item?.isSupportOta == true) {
+        if (item?.isSupportOta == true && !item.isMostNew) {
             helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_switch)
                     .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
         } else {

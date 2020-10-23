@@ -23,6 +23,7 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
@@ -211,7 +212,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun skipeBatch() {
         when {
             DBUtils.getAllRelay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-            TelinkLightApplication.getApp().connectDevice != null ->
+            TelinkLightApplication.getApp().connectDevice != null||Constants.IS_ROUTE_MODE ->
                 startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group?.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }

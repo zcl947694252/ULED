@@ -662,20 +662,26 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun transformView() {
-        if (Constants.IS_ROUTE_MODE)
-            startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
-                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
-        else {
-            val intent = Intent(this@PirConfigActivity, OTAUpdateActivity::class.java)
-            intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
-            intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
-            intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
-            intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
-            startActivity(intent)
-            finish()
+        when {
+            !isSuportOta(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            else -> {
+                if (Constants.IS_ROUTE_MODE){
+                    startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
+                            "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+                finish()}
+                else {
+                    val intent = Intent(this@PirConfigActivity, OTAUpdateActivity::class.java)
+                    intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
+                    intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
+                    intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
+                    intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+                    startActivity(intent)
+                    finish()
+                }
+            }
         }
     }
-
 
     @SuppressLint("SetTextI18n")
     fun showRenameDialog(dbSensor: DbSensor) {

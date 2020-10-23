@@ -52,7 +52,7 @@ class GroupOTALightAdapter(resId: Int, data: MutableList<DbLight>) : BaseQuickAd
         else
             helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_n)
 
-        if (item?.isSupportOta == true) {
+        if (item?.isSupportOta == true && !item.isMostNew) {
             if (isRgb)
                 helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_no_circle)
             else

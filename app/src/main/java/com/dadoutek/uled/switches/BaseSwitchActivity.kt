@@ -254,11 +254,17 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     fun deviceOta(mDeviceInfo: DeviceInfo, type: Int = DeviceType.NORMAL_SWITCH) {
         deviceType = type
         otaDeviceInfo = mDeviceInfo
-        if (Constants.IS_ROUTE_MODE)
-            startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress,"deviceType" to mDeviceInfo.productUUID,
-                    "deviceMac" to mDeviceInfo.macAddress)
-        else bleOta(mDeviceInfo, type)
-
+        when {
+            !isSuportOta(mDeviceInfo?.firmwareRevision) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            isMostNew(mDeviceInfo?.firmwareRevision) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            else -> {
+                when {
+                    Constants.IS_ROUTE_MODE -> {startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress, "deviceType" to mDeviceInfo.productUUID,
+                            "deviceMac" to mDeviceInfo.macAddress)
+                    finish()}
+                    else -> bleOta(mDeviceInfo, type)
+                }
+            }}
     }
 
     private fun bleOta(mDeviceInfo: DeviceInfo, type: Int) {

@@ -28,6 +28,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
+
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -379,7 +380,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private fun skipeBatch() {
         when {
             DBUtils.getAllCurtains().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-            TelinkLightApplication.getApp().connectDevice != null -> startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.SMART_CURTAIN, "gp" to group?.meshAddr)
+            TelinkLightApplication.getApp().connectDevice != null ||Constants.IS_ROUTE_MODE->
+                startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.SMART_CURTAIN, "gp" to group?.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }
     }

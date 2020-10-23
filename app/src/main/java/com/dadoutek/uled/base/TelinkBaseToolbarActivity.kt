@@ -15,8 +15,6 @@ import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.router.RouterOtaActivity
-import com.dadoutek.uled.router.RouterOtaListActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import org.jetbrains.anko.startActivity
 
@@ -111,45 +109,39 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
     private fun goOta() {
             when (type) {
             Constants.INSTALL_NORMAL_LIGHT -> {
-                when {
-                    DBUtils.getAllNormalLight().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constants.IS_ROUTE_MODE -> this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
+                when (DBUtils.getAllNormalLight().size) {
+                    0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_NORMAL)
                 }
             }
 
             Constants.INSTALL_RGB_LIGHT -> {
-                when {
-                    DBUtils.getAllRGBLight().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constants.IS_ROUTE_MODE -> this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
+                when (DBUtils.getAllRGBLight().size) {
+                    0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_RGB)
                 }
             }
             Constants.INSTALL_CURTAIN -> {
-                when {
-                    DBUtils.getAllCurtains().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constants.IS_ROUTE_MODE -> this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
+                when (DBUtils.getAllCurtains().size) {
+                    0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SMART_CURTAIN)
                 }
             }
             Constants.INSTALL_CONNECTOR -> {
-                when {
-                    DBUtils.getAllRelay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constants.IS_ROUTE_MODE -> this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
+                when (DBUtils.getAllRelay().size) {
+                    0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SMART_RELAY)
                 }
             }
             Constants.INSTALL_SWITCH -> {
-                when {
-                    DBUtils.getAllSwitch().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constants.IS_ROUTE_MODE -> this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
+                when (DBUtils.getAllSwitch().size) {
+                    0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.NORMAL_SWITCH)
                 }
             }
             Constants.INSTALL_SENSOR -> {
-                when {
-                    DBUtils.getAllSensor().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constants.IS_ROUTE_MODE -> this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
+                when (DBUtils.getAllSensor().size) {
+                    0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SENSOR)
                 }
             }
@@ -157,16 +149,13 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
                 when {
                     DBUtils.getAllGateWay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
                     Constants.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport))
-                    //this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.GATE_WAY)
                 }
             }
             Constants.INSTALL_ROUTER -> {
                 when {
                     DBUtils.getAllRouter().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                   Constants.IS_ROUTE_MODE ->
-                       //this.startActivity<RouterOtaListActivity>("groupOrDeviceId" to 0, "DeviceType" to type, "GroupOrTypeOrDevice" to 2)
-                       ToastUtils.showShort(getString(R.string.dissupport))
+                   Constants.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.ROUTER)
                 }
             }

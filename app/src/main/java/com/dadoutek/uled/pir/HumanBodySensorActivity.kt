@@ -264,9 +264,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun transformView() {
-        if (Constants.IS_ROUTE_MODE)
+        when {
+            !isSuportOta(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            else -> {
+        if (Constants.IS_ROUTE_MODE){
             startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
                     "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+        finish()}
         else {
             val intent = Intent(this@HumanBodySensorActivity, OTAUpdateActivity::class.java)
             intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
@@ -276,7 +281,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             startActivity(intent)
             finish()
         }
-    }
+    }}}
 
     private fun setAdapters() {
         scene_gp_bottom_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)

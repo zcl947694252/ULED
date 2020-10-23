@@ -11,15 +11,19 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.RouterOTAFinishBean
 import com.dadoutek.uled.base.RouterOTAingNumBean
 import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.RouterOTAResultBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_router_ota.*
+import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
 
@@ -73,6 +77,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                             .subscribe {
                                 hideLoadingDialog()
+
                                 ToastUtils.showShort(getString(R.string.ota_stop_fail))
                             }
                 }
@@ -102,7 +107,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
     private fun devicesToOTA() {
         startGetStatuss()
         val currentTimeMillis1 = System.currentTimeMillis()
-        if (Constants.IS_ROUTE_MODE)
+        if (isRouter)
             routerOtaByself(currentTimeMillis1)
         else
             otaDevice(currentTimeMillis1)
@@ -143,6 +148,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     ToastUtils.showShort(getString(R.string.ota_update_title))
                     router_ota_start.text = getString(R.string.stop_ota)
                     otaCount = 0
+                    router_ota_wave_progress_bar?.value = 0f
                 } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
                 90998 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
                     isOtaing = false
@@ -270,6 +276,8 @@ class RouterOtaActivity : TelinkBaseActivity() {
         hideLoadingDialog()
         router_ota_start.text = getString(R.string.start_update)
         router_ota_wave_progress_bar.value = 0f
+        Thread.sleep(100)
+        router_ota_wave_progress_bar.value = 0f
     }
 
     private fun afterOtaFailState(resultBean: RouterOTAResultBean) {
@@ -283,7 +291,10 @@ class RouterOtaActivity : TelinkBaseActivity() {
             2 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
             3 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
             4 -> ToastUtils.showShort(getString(R.string.version_error))
-            5 -> ToastUtils.showShort(getString(R.string.the_last_version))
+            5 -> {
+                ToastUtils.showShort(getString(R.string.the_last_version))
+                twoSecondFinish()
+            }
             6 -> ToastUtils.showShort(getString(R.string.router_ota_faile))
             7 -> ToastUtils.showShort(getString(R.string.router_offline))
             8 -> ToastUtils.showShort(getString(R.string.router_load_bin_faile))
@@ -292,6 +303,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         if (resultBean.failedCode != -1) {
             router_ota_start.text = getString(R.string.retry_ota)
             router_ota_wave_progress_bar.value = 0f
+            disposableRouteTimer?.dispose()
         }
     }
 
@@ -299,9 +311,21 @@ class RouterOtaActivity : TelinkBaseActivity() {
         ToastUtils.showShort(getString(R.string.ota_success))
         router_ota_start.text = getString(R.string.ota_success)
         router_ota_start.isClickable = false
-        ToastUtils.showLong(R.string.exit_update)
         initUi()
         router_ota_num.text = "1"
+        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+            override fun start() {}
+            override fun complete() {
+                twoSecondFinish()
+            }
+            override fun error(msg: String?) {
+                twoSecondFinish()
+            }
+        })
+    }
+
+    private fun twoSecondFinish() {
+        ToastUtils.showLong(R.string.exit_update)
         handler.postDelayed({ finish() }, 2000)
     }
 
@@ -311,6 +335,8 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        getStatusDispose?.dispose()
+        disposableRouteTimer?.dispose()
         handler.removeCallbacksAndMessages(null)
     }
 }
