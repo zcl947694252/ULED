@@ -278,7 +278,7 @@ class SendLightsInfo : Service(), EventListener<String> {
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected != true)
                 startScan()
             else
                 login()

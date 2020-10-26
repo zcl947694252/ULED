@@ -248,7 +248,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                               GlobalScope.launch(Dispatchers.Main) {
                                   ToastUtils.showShort(getString(R.string.config_success))
                                   if (!isReConfig)
-                                      showRenameDialog(switchDate)
+                                      showRenameDialog(switchDate, false)
                                   else
                                       finish()
                               }
@@ -274,7 +274,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
             if (switchDate == null)
                 switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
             if (!isReConfig)
-                showRenameDialog(switchDate)
+                showRenameDialog(switchDate, false)
             else
                 finish()
 
@@ -309,7 +309,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     }
 
     override fun reName() {
-        showRenameDialog(switchDate)
+        showRenameDialog(switchDate, false)
     }
 
     override fun onClick(v: View?) {

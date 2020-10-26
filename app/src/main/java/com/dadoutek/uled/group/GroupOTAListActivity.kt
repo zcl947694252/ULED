@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.text.TextUtils
+import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import androidx.annotation.RequiresApi
@@ -15,6 +16,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.RouteGetVerBean
+import com.dadoutek.uled.base.RouterOTAFinishBean
 import com.dadoutek.uled.base.RouterOTAingNumBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
@@ -27,6 +29,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkStatusCode
+import com.dadoutek.uled.network.RouterOTAResultBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -97,11 +100,21 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         initListener()
     }
 
+    private fun setPop() {
+        hinitOne.text = getString(R.string.is_exit_ota)
+        cancelf.setOnClickListener { popFinish?.dismiss() }
+        confirmf.setOnClickListener {
+            devicesStopOTA()
+            popFinish?.dismiss()
+        }
+    }
+
     @SuppressLint("CheckResult")
     private fun getMostNewVersion() {
         RouterModel.getDevicesVersion(meshAddrList, deviceType, "gpOta")?.subscribe({
+            LogUtils.v("zcl-----------收到路由请求版本申请-------$it")
             when (it.errorCode) {
-                NetworkStatusCode.OK -> startGetVersionTimer(it.t.timeout+1L)
+                NetworkStatusCode.OK -> startGetVersionTimer(it.t.timeout + 1L)
                 //全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由 DEVICE_NOT_BINDROUTER 90008
                 // 以下路由没有上线，无法删获取版本  ROUTER_ALL_OFFLINE= 90005
                 NetworkStatusCode.DEVICE_NOT_BINDROUTER -> {
@@ -126,8 +139,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         disposableRouteTimer = Observable.timer(t, TimeUnit.SECONDS)
                 .subscribe {
                     LogUtils.v("zcl-----------执行路由获取版本超时-------")
+                    hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.get_version_fail))
-                    finish()
+                    //finish()
                 }
     }
 
@@ -155,21 +169,22 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult", "SetTextI18n")
     private fun routerOtaDevice(meshList: MutableList<Int>) {
         val time = System.currentTimeMillis()
-        startGetStatus()
+        startGetStatus(false)
         RouterModel.toDevicesOTA(meshList, deviceType, time)?.subscribe({
             LogUtils.v("zcl-----------收到路由升级请求---deviceMeshAddress$meshList---time$time-------deviceTye${deviceType}----$it")
             isStartOta = false
             when (it.errorCode) {
                 0 -> {
+                    ota_progress.visibility = View.VISIBLE
                     currentTime = time
                     SharedPreferencesUtils.setLastOtaTime(currentTime)
                     isStartOta = true
-                    btnStopGradient.text = getString(R.string.otaing)
+                    btn_gp_ota_start.text = getString(R.string.otaing)
                     group_ota_number_ly.visibility = View.VISIBLE
                     group_ota_all.text = getString(R.string.ota_all_num) + meshList.size
                     group_ota_success.text = getString(R.string.ota_success_num) + "0"
                     group_ota_fail.text = getString(R.string.ota_fail_num) + "0"
-                    btnStopGradient.isClickable = false
+                    btn_gp_ota_start.isClickable = false
                     ToastUtils.showShort(getString(R.string.ota_update_title))
                 } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
                 90998 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
@@ -185,9 +200,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         })
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun startGetStatus() {
-        getStatusDispose = Observable.interval(30, 30, TimeUnit.SECONDS).subscribe {
+    @SuppressLint("SetTextI18n", "CheckResult")
+    private fun startGetStatus(isFinish: Boolean) {
             RouterModel.routerOTAResult(1, 5000, currentTime)?.subscribe({
                 //status	int	ota结果。-1失败 0成功 1升级中 2已停止 3处理中
                 LogUtils.v("zcl-----------获取路由状态-------$it")
@@ -195,74 +209,123 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val filterFail = it.filter { item -> item.status == -1 }
                 group_ota_success.text = getString(R.string.ota_success_num) + filterSuccess.size
                 group_ota_fail.text = getString(R.string.ota_success_num) + filterFail.size
-                filterSuccess.forEach {
-                    when (deviceType) {
-                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                            val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
-                            filter.forEach { it2 ->
-                                if (it.macAddr == it2.macAddr) {
-                                    it2.isMostNew = true
-                                    return@forEach
-                                }
-                            }
-                            lightAdaper.notifyDataSetChanged()
-                        }
-                        DeviceType.NORMAL_SWITCH -> {
-                            val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
-                            filter.forEach { it2 ->
-                                if (it.macAddr == it2.macAddr) {
-                                    it2.isMostNew = true
-                                    return@forEach
-                                }
-                            }
-                            switchAdaper.notifyDataSetChanged()
-                        }
-                        DeviceType.SENSOR -> {
-                            val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
-                            filter.forEach { it2 ->
-                                if (it.macAddr == it2.macAddr) {
-                                    it2.isMostNew = true
-                                    return@forEach
-                                }
-                            }
-                            sensorAdaper.notifyDataSetChanged()
-                        }
-                        DeviceType.SMART_CURTAIN -> {
-                            val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
-                            filter.forEach { it2 ->
-                                if (it.macAddr == it2.macAddr) {
-                                    it2.isMostNew = true
-                                    return@forEach
-                                }
-                            }
-                            curtainAdaper.notifyDataSetChanged()
-                        }
-                        DeviceType.SMART_RELAY -> {
-                            val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
-                            filter.forEach { it2 ->
-                                if (it.macAddr == it2.macAddr) {
-                                    it2.isMostNew = true
-                                    return@forEach
-                                }
-                            }
-                            relayAdaper.notifyDataSetChanged()
-                        }
-                        DeviceType.GATE_WAY -> {
-                            val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
-                            filter.forEach { it2 ->
-                                if (it.macAddr == it2.macAddr) {
-                                    it2.isMostNew = true
-                                    return@forEach
-                                }
-                            }
-                            gwAdaper.notifyDataSetChanged()
-                        }
-                    }
-
+                filterSuccess.forEach { it1 ->
+                    setMostNew(it1)
+                }
+                if (isFinish) {
+                    ota_progress.visibility = View.GONE
+                    isStartOta = false
+                    ToastUtils.showShort(getString(R.string.ota_finish))
+                    btn_gp_ota_start.text = getString(R.string.start_update)
+                    btn_gp_ota_start.isClickable = true
                 }
             }, {
                 ToastUtils.showShort(it.message)
             })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun devicesStopOTA() {
+        RouterModel.routerStopOTA(currentTime, "router_ota")?.subscribe({
+            LogUtils.v("zcl-----------收到路由停止升级请求---time$currentTime----$it")
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.ota_stop_fail))
+                            }
+                }
+                90023 -> ToastUtils.showShort(getString(R.string.startTime_not_exit))
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                else -> ToastUtils.showShort(it.message)
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    override fun tzRouterOTAStopRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
+        LogUtils.v("zcl-----------收到路由ota停止通知-------$routerOTAFinishBean")
+        if (routerOTAFinishBean?.finish == true) {
+            if (routerOTAFinishBean.ser_id == "router_ota") {
+                if (routerOTAFinishBean.status == 0 ){
+                    disposableRouteTimer?.dispose()
+                    finish()
+                }
+            }
+        }
+    }
+
+    private fun setMostNew(it: RouterOTAResultBean) {
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
+                filter.forEach { it2 ->
+                    if (it.macAddr == it2.macAddr) {
+                        it2.isMostNew = true
+                        return@forEach
+                    }
+                }
+                lightAdaper.notifyDataSetChanged()
+            }
+            DeviceType.NORMAL_SWITCH -> {
+                val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
+                filter.forEach { it2 ->
+                    if (it.macAddr == it2.macAddr) {
+                        it2.isMostNew = true
+                        return@forEach
+                    }
+                }
+                switchAdaper.notifyDataSetChanged()
+            }
+            DeviceType.SENSOR -> {
+                val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
+                filter.forEach { it2 ->
+                    if (it.macAddr == it2.macAddr) {
+                        it2.isMostNew = true
+                        return@forEach
+                    }
+                }
+                sensorAdaper.notifyDataSetChanged()
+            }
+            DeviceType.SMART_CURTAIN -> {
+                val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
+                filter.forEach { it2 ->
+                    if (it.macAddr == it2.macAddr) {
+                        it2.isMostNew = true
+                        return@forEach
+                    }
+                }
+                curtainAdaper.notifyDataSetChanged()
+            }
+            DeviceType.SMART_RELAY -> {
+                val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
+                filter.forEach { it2 ->
+                    if (it.macAddr == it2.macAddr) {
+                        it2.isMostNew = true
+                        return@forEach
+                    }
+                }
+                relayAdaper.notifyDataSetChanged()
+            }
+            DeviceType.GATE_WAY -> {
+                val filter = lightList.filter { it1 -> it1.isSupportOta && !it1.isMostNew }
+                filter.forEach { it2 ->
+                    if (it.macAddr == it2.macAddr) {
+                        it2.isMostNew = true
+                        return@forEach
+                    }
+                }
+                gwAdaper.notifyDataSetChanged()
+            }
         }
     }
 
@@ -273,13 +336,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         hideLoadingDialog()
         val status = routerOTAingNumBean?.status
         val otaResult = routerOTAingNumBean?.otaResult
-        if (routerOTAingNumBean?.finish == true) {
-            ToastUtils.showShort(getString(R.string.ota_finish))
-            btnStopGradient.text = getString(R.string.start_update)
-            btnStopGradient.isClickable = true
-        } else {
+            startGetStatus(routerOTAingNumBean?.finish==true)
 
-        }
 //        if (status == 0 && deviceMac == otaResult?.macAddr && otaResult?.failedCode == -1)
 //            afterOtaSuccess()
 //        else
@@ -600,12 +658,14 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         lightList.forEach {
             it.version?.let { itv ->
                 // it.isSupportOta&&!it.isMostNew= OtaPrepareUtils.instance().checkSupportOta(itv)
-                it.isMostNew = isSuportOta(itv)
-                it.isSupportOta= isMostNew(itv)
+                val suportOta = isSuportOta(itv)
+                val mostNew = isMostNew(itv)
+                it.isSupportOta = suportOta
+                it.isMostNew = mostNew
             }
         }
 
-        var unsupport = lightList.filter { !it.isSupportOta|| it.isMostNew }
+        var unsupport = lightList.filter { !it.isSupportOta || it.isMostNew }
         lightList.removeAll(unsupport)
         lightList.addAll(unsupport)
     }
@@ -613,12 +673,12 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun supportAndUNSwitch() {
         switchList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta= isSuportOta(itv)
+                it.isSupportOta = isSuportOta(itv)
                 it.isMostNew = isMostNew(itv)
             }
         }
 
-        var unsupport = switchList.filter { !it.isSupportOta|| it.isMostNew }
+        var unsupport = switchList.filter { !it.isSupportOta || it.isMostNew }
         switchList.removeAll(unsupport)
         switchList.addAll(unsupport)
     }
@@ -627,13 +687,13 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         sensorList.forEach {
             it.version?.let { itv ->
                 // it.isSupportOta&&!it.isMostNew= OtaPrepareUtils.instance().checkSupportOta(itv)
-                it.isSupportOta= isSuportOta(itv)
+                it.isSupportOta = isSuportOta(itv)
                 it.isMostNew = isMostNew(itv)
             }
         }
 
         var unsupport = sensorList.filter {
-            !it.isSupportOta|| it.isMostNew
+            !it.isSupportOta || it.isMostNew
         }
         sensorList.removeAll(unsupport)
         sensorList.addAll(unsupport)
@@ -642,13 +702,13 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun supportAndUNCurtain() {
         curtainList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta= isSuportOta(itv)
+                it.isSupportOta = isSuportOta(itv)
                 it.isMostNew = isMostNew(itv)
             }
         }
 
         var unsupport = curtainList.filter {
-            !it.isSupportOta|| it.isMostNew
+            !it.isSupportOta || it.isMostNew
         }
         curtainList.removeAll(unsupport)
         curtainList.addAll(unsupport)
@@ -657,12 +717,12 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun supportAndUNConnector() {
         relayList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta= isSuportOta(itv)
+                it.isSupportOta = isSuportOta(itv)
                 it.isMostNew = isMostNew(itv)
             }
         }
 
-        var unsupport = relayList.filter { !it.isSupportOta|| it.isMostNew }
+        var unsupport = relayList.filter { !it.isSupportOta || it.isMostNew }
         relayList.removeAll(unsupport)
         relayList.addAll(unsupport)
         relayAdaper.notifyDataSetChanged()
@@ -671,34 +731,36 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun supportAndUNGateway() {
         lightList.forEach {
             it.version?.let { itv ->
-                it.isSupportOta= isSuportOta(itv)
+                it.isSupportOta = isSuportOta(itv)
                 it.isMostNew = isMostNew(itv)
             }
         }
 
-        var unsupport = lightList.filter { !it.isSupportOta|| it.isMostNew }
+        var unsupport = lightList.filter { !it.isSupportOta || it.isMostNew }
         lightList.removeAll(unsupport)
         lightList.addAll(unsupport)
     }
 
     private fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        toolbar.setNavigationOnClickListener { finish() }
+        toolbar.setNavigationOnClickListener {
+            isFinish()
+        }
         toolbarTv.text = getString(R.string.group_ota)
         template_recycleView.layoutManager = GridLayoutManager(this, 2)/*LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)*/
         template_recycleView.addItemDecoration(RecyclerGridDecoration(this, 2))
-        btnStopGradient.text = getString(R.string.start_update)
         when {
             Constants.IS_ROUTE_MODE -> {
                 group_ota_number_ly.visibility = View.GONE
-                btnStopGradient.visibility = View.VISIBLE
+                btn_gp_ota_start.visibility = View.VISIBLE
             }
             else -> {
                 group_ota_number_ly.visibility = View.GONE
-                btnStopGradient.visibility = View.GONE
+                btn_gp_ota_start.visibility = View.GONE
             }
         }
         isStartOta = false
+        setPop()
 
         //设置进度View下拉的起始点和结束点，scale 是指设置是否需要放大或者缩小动画
         ota_swipe_refresh_ly.setProgressViewOffset(true, -0, 500)
@@ -710,13 +772,20 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         ota_swipe_refresh_ly.setDistanceToTriggerSync(200)
     }
 
+    private fun isFinish() {
+        if (isStartOta)
+            popFinish.showAtLocation(window.decorView.rootView, Gravity.CENTER, 0, 0)
+        else
+            finish()
+    }
+
     private fun initListener() {
         loading_tansform.setOnClickListener { }
         ota_swipe_refresh_ly.setOnRefreshListener {
             setRefresh()
             isStartOta = !isStartOta
         }
-        btnStopGradient.setOnClickListener {
+        btn_gp_ota_start.setOnClickListener {
             if (!isStartOta)
                 routerStartOrStop()
             else
@@ -728,46 +797,46 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         val meshList = mutableListOf<Int>()
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                val filter = lightList.filter { it.productUUID == deviceType }.filter { it.isSupportOta&&!it.isMostNew }
+                val filter = lightList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     meshList.add(it.meshAddr)
                 }
             }
             DeviceType.SMART_CURTAIN -> {
-                val filter = curtainList.filter { it.productUUID == deviceType }.filter { it.isSupportOta&&!it.isMostNew}
+                val filter = curtainList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     meshList.add(it.meshAddr)
                 }
             }
             DeviceType.SMART_RELAY -> {
-                val filter = relayList.filter { it.productUUID == deviceType }.filter { it.isSupportOta&&!it.isMostNew}
+                val filter = relayList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     meshList.add(it.meshAddr)
                 }
             }
             DeviceType.NORMAL_SWITCH -> {
 
-                val filter = switchList.filter { it.productUUID == deviceType }.filter { it.isSupportOta&&!it.isMostNew}
+                val filter = switchList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     meshList.add(it.meshAddr)
                 }
             }
             DeviceType.SENSOR -> {
                 if (Constants.IS_ROUTE_MODE) {
-                    val filter = sensorList.filter { it.productUUID == deviceType }.filter { it.isSupportOta&&!it.isMostNew}
+                    val filter = sensorList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                     filter.forEach {
                         meshList.add(it.meshAddr)
                     }
                 }
             }
             DeviceType.GATE_WAY -> {
-                val filter = gwList.filter { it.productUUID == deviceType }.filter { it.isSupportOta&&!it.isMostNew}
+                val filter = gwList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     meshList.add(it.meshAddr)
                 }
             }
         }
-        if (isStartOta)
+        if (!isStartOta)
             routerOtaDevice(meshList)
     }
 
@@ -793,6 +862,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
+        if (Constants.IS_ROUTE_MODE)
+            return@OnItemClickListener
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> bleOTALight(lightList[position])
             DeviceType.SMART_CURTAIN -> bleOTACurtain(curtainList[position])
@@ -832,7 +903,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 }
                 else -> getFilePath(dbgw.meshAddr, dbgw.macAddr, dbgw.version, DeviceType.GATE_WAY)
             }
-            else ->ToastUtils.showShort(getString(R.string.dissupport_ota))
+            else -> ToastUtils.showShort(getString(R.string.dissupport_ota))
         }
     }
 
@@ -933,7 +1004,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 }
                 else -> getFilePath(dbrelay.meshAddr, dbrelay.macAddr, dbrelay.version, dbrelay.productUUID)
             }
-            else ->ToastUtils.showShort(getString(R.string.dissupport_ota))
+            else -> ToastUtils.showShort(getString(R.string.dissupport_ota))
         }
     }
 
@@ -973,7 +1044,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun bleOTALight(dbLight: DbLight) {
         when {
-            Constants.IS_ROUTE_MODE->routerStartOrStop()
+            Constants.IS_ROUTE_MODE -> routerStartOrStop()
             dbLight.isMostNew -> ToastUtils.showShort(getString(R.string.the_last_version))
             dbLight.isSupportOta -> {
                 when {
@@ -1015,18 +1086,18 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun getDeviceVersionLight(dbLight: DbLight) {
         if (Constants.IS_ROUTE_MODE)
-            
-        Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
-                { s: String ->
-                    dbLight!!.version = s
-                    DBUtils.saveLight(dbLight!!, true)
-                    setLightData()
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.get_version_success))
-                }, {
-            hideLoadingDialog()
-            ToastUtils.showLong(getString(R.string.get_version_fail))
-        })
+
+            Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
+                    { s: String ->
+                        dbLight!!.version = s
+                        DBUtils.saveLight(dbLight!!, true)
+                        setLightData()
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.get_version_success))
+                    }, {
+                hideLoadingDialog()
+                ToastUtils.showLong(getString(R.string.get_version_fail))
+            })
     }
 
     private fun getDeviceVersionCurtain(dbLight: DbCurtain) {
@@ -1159,5 +1230,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         dispose?.dispose()
+    }
+
+    override fun onBackPressed() {
+        isFinish()
     }
 }

@@ -586,6 +586,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val filter = IntentFilter()
         filter.addAction(Constants.LOGIN_OUT)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
+        try {
+            unregisterReceiver(sceneGroupAdapter?.stompRecevice)
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
+        }
         registerReceiver(sceneGroupAdapter?.stompRecevice, filter)
     }
 

@@ -314,12 +314,15 @@ object Commander : EventListener<String> {
                     }
 
                     override fun onNext(t: Long) {
-                        if (t >= 10) {   //10次 * 200 = 2000, 也就是超过了2s就超时
-                            onComplete()
-                            failedCallback.invoke()
-                        } else if (mGroupSuccess) {
-                            onComplete()
-                            successCallback.invoke()
+                        when {
+                            t >= 10 -> {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                                onComplete()
+                                failedCallback.invoke()
+                            }
+                            mGroupSuccess -> {
+                                onComplete()
+                                successCallback.invoke()
+                            }
                         }
                     }
 
@@ -377,8 +380,8 @@ object Commander : EventListener<String> {
         TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)
         TelinkLightService.Instance()?.adapter!!.mode = LightAdapter.MODE_UPDATE_MESH
-        TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.newMeshAddress = newMeshAddr
-        TelinkLightService.Instance()?.adapter!!.mLightCtrl.reset(Strings.stringToBytes(newMeshName, 16), password, null)
+        TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.newMeshAddress = newMeshAddr
+        TelinkLightService.Instance()?.adapter?.mLightCtrl?.reset(Strings.stringToBytes(newMeshName, 16), password, null)
 
         Observable.interval(0, 200, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())

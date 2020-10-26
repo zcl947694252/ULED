@@ -137,7 +137,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun reName() {
-        showRenameDialog(switchDate)
+        showRenameDialog(switchDate, false)
     }
 
     override fun setLayoutId(): Int {
@@ -184,7 +184,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     GlobalScope.launch(Dispatchers.Main) {
                         ToastUtils.showShort(getString(R.string.config_success))
                         if (!isReConfig)
-                            showRenameDialog(switchDate)
+                            showRenameDialog(switchDate, false)
                         else
                             finish()
                     }
@@ -410,7 +410,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showShort(getString(R.string.config_success))
                     if (!isReConfig)
-                        showRenameDialog(switchDate)
+                        showRenameDialog(switchDate, false)
                     else
                         finish()
                 }

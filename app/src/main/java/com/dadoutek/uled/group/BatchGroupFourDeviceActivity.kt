@@ -237,18 +237,20 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         swipe_refresh_ly.setDistanceToTriggerSync(200)
         setAdapterAndSubscribleData()
         autoConnect()
-        disposableIntervalTime?.dispose()
-        disposableIntervalTime = Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
-                .subscribe {
-                    if (blinkList.size > 0) {
-                        //   LogUtils.v("zcl-----------收到理由闪烁-------$blinkList---------${blinkList.size}")
-                        RouterModel.routeBatchGpBlink(GroupBlinkBodyBean(blinkList, deviceType))?.subscribe({
-                            // LogUtils.v("zcl----------收到理由闪烁--------成功")
-                        }, {
-                            //  LogUtils.v("zcl----------收到理由闪烁--------失败")
-                        })
+        if (Constants.IS_ROUTE_MODE){
+            disposableIntervalTime?.dispose()
+            disposableIntervalTime = Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
+                    .subscribe {
+                        if (blinkList.size > 0) {
+                            //   LogUtils.v("zcl-----------收到理由闪烁-------$blinkList---------${blinkList.size}")
+                            RouterModel.routeBatchGpBlink(GroupBlinkBodyBean(blinkList, deviceType))?.subscribe({
+                                // LogUtils.v("zcl----------收到理由闪烁--------成功")
+                            }, {
+                                //  LogUtils.v("zcl----------收到理由闪烁--------失败")
+                            })
+                        }
                     }
-                }
+        }
     }
 
     @SuppressLint("StringFormatMatches")

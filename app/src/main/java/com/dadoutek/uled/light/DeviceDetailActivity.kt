@@ -421,10 +421,10 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
         hideLoadingDialog()
         disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "deng") {
+        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
             when (this.currentDevice!!.connectionStatus) {
                 ConnectionStatus.OFF.value -> this.currentDevice!!.connectionStatus = ConnectionStatus.ON.value
                 else -> this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value

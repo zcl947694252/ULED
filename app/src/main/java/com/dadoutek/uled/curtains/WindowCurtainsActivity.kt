@@ -893,7 +893,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<Activity>(this)).setMessage(getString(R.string.sure_delete_device, curtain?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (Constants.IS_ROUTE_MODE || TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                    if (Constants.IS_ROUTE_MODE || TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected==true) {
                         val deviceMeshAddr = if (typeStr == Constants.TYPE_GROUP) curtainGroup?.meshAddr else curtain?.meshAddr
                         if (Constants.IS_ROUTE_MODE)
                             routerControlCurtain(0xEC, "delCurtain")

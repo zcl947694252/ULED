@@ -101,7 +101,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     }
 
     override fun reName() {
-        showRenameDialog(switchDate)
+        showRenameDialog(switchDate, false)
     }
 
     override fun setLayoutId(): Int {
@@ -348,7 +348,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showShort(getString(R.string.config_success))
                     if (!isReConfig)
-                        showRenameDialog(switchDate)
+                        showRenameDialog(switchDate, false)
                     else
                         finish()
                 }
@@ -373,7 +373,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
             if (switchDate == null)
                 switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
             if (!isReConfig)
-                showRenameDialog(switchDate)
+                showRenameDialog(switchDate, false)
             else
                 finish()
         },
@@ -468,7 +468,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                         }
                     }
                     mIsConfiguring -> {
-                        showRenameDialog(switchDate)
+                        showRenameDialog(switchDate, false)
                     }
                     else -> showDisconnectSnackBar()
                 }

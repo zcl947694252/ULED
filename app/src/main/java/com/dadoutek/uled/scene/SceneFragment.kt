@@ -51,6 +51,7 @@ import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
+import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -132,13 +133,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         if (cmdBean.ser_id=="applyScene"){
             LogUtils.v("zcl-----------收到路由场景应用通知-------$cmdBean")
             disposableRouteTimer?.dispose()
-          CoroutineScope(Dispatchers.Main).launch {
-              hideLoadingDialog()
-              when (cmdBean.status) {
-                  0 ->ToastUtils.showShort(getString(R.string.scene_apply_success))
-                  else -> ToastUtils.showShort(getString(R.string.scene_apply_fail))
-              }
-          }
+         runOnUiThread {
+             hideLoadingDialog()
+             when (cmdBean.status) {
+                 0 ->ToastUtils.showShort(getString(R.string.scene_apply_success))
+                 else -> ToastUtils.showShort(getString(R.string.scene_apply_fail))
+             }
+         }
         }
     }
 
@@ -271,6 +272,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     sendToServer(gattBody)
                 } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
+                    LogUtils.v("zcl-----------$it-------")
                 }
             }, {
                 hideLoadingDialog()

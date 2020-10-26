@@ -76,6 +76,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${
  */
 class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
+    private var currentIsGp: Boolean = false
     private var clickDiy: Boolean = false
     private var color: Int = 0
     private var sendProgress: Int = 1
@@ -132,7 +133,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private var mScanTimeoutDisposal: Disposable? = null
     private var mCheckRssiDisposal: Disposable? = null
     private var acitivityIsAlive = true
-    var isReset = false
+    private var swOpen = true
 
     @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
@@ -169,13 +170,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun routerConfigBrightnesssOrColorTemp(brightness: Boolean) = when {
         brightness -> {//亮度
             when {
-                typeStr == Constants.TYPE_GROUP && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, "gpBri")
+                currentShowGroupSetPage && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, "gpBri")
                 else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, "rgbBri")
             }
         }
         else -> {
             when {
-                typeStr == Constants.TYPE_GROUP && group != null -> routeConfigTempGpOrLight(group!!.meshAddr, 97, sendProgress, "gpTem")
+                currentShowGroupSetPage && group != null -> routeConfigTempGpOrLight(group!!.meshAddr, 97, sendProgress, "gpTem")
                 else -> routeConfigTempGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, "rgbTem")
             }
         }
@@ -240,10 +241,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
 
-    fun deleteData() {
+    private fun deleteData() {
         hideLoadingDialog()
         DBUtils.deleteLight(light!!)
-        isReset = true
         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(light!!.meshAddr))
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this!!)
 
@@ -315,11 +315,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             !isSuportOta(light?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
             isMostNew(light?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
-                if (Constants.IS_ROUTE_MODE){
+                if (Constants.IS_ROUTE_MODE) {
                     startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,
                             "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr)
-                finish()}
-                else {
+                    finish()
+                } else {
                     var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
                     if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
                         if (granted!!) {
@@ -421,11 +421,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             isMostNew(light?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
 
-                if (Constants.IS_ROUTE_MODE){
+                if (Constants.IS_ROUTE_MODE) {
                     startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,
                             "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr)
-                finish()}
-                else {
+                    finish()
+                } else {
                     val intent = Intent(this@RGBSettingActivity, OTAUpdateActivity::class.java)
                     intent.putExtra(Constants.UPDATE_LIGHT, light)
                     intent.putExtra(Constants.OTA_MAC, light?.macAddr)
@@ -457,6 +457,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun initType() {
+        mApplication = application as TelinkLightApplication
         typeStr = intent.getStringExtra(Constants.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
@@ -467,49 +468,92 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
             toolbar.overflowIcon = moreIcon
         }
-
-        //lin = LayoutInflater.from(this).inflate(R.layout.template_add_help, null)
         main_add_device?.text = getString(R.string.mode_diy)
         main_go_help?.visibility = View.VISIBLE
-
-        if (Constants.IS_OPEN_AUXFUN) {
-            ll_r.visibility = View.VISIBLE
-            ll_g.visibility = View.VISIBLE
-            ll_b.visibility = View.VISIBLE
-        } else {
-            ll_r.visibility = View.GONE
-            ll_g.visibility = View.GONE
-            ll_b.visibility = View.GONE
+        when {
+            Constants.IS_OPEN_AUXFUN -> rgbVisiblity(View.VISIBLE)
+            else -> rgbVisiblity(View.GONE)
         }
-
-
-        if (typeStr == Constants.TYPE_GROUP) {
-            currentShowGroupSetPage = true
-            initToolbarGroup()
-            initDataGroup()
-            initViewGroup()
-
-            img_function1.setImageResource(R.drawable.icon_editor)
-            img_function1.visibility = View.VISIBLE
-            img_function1.setOnClickListener {
-                renameGp()
+        /*--------------------群组与灯具分支-------------*/
+        currentShowGroupSetPage = typeStr == Constants.TYPE_GROUP
+        when {
+            currentShowGroupSetPage -> {
+                group = intent.extras!!.get("group") as DbGroup
+                toolbarTv.text = getString(R.string.select_group)
+                img_function1.visibility = View.VISIBLE
+                img_function1.setOnClickListener { renameGp() }
+                img_function1.setImageResource(R.drawable.icon_editor)
+                when {
+                    group != null -> {
+                        when (group!!.meshAddr) {
+                            0xffff -> toolbarTv.text = getString(R.string.allLight)
+                            else -> toolbarTv.text = group?.name
+                        }
+                    }
+                }
             }
-        } else {
-            img_function1.visibility = View.GONE
-            currentShowGroupSetPage = false
-            initToolbar()
-            initView()
-            getVersion()
+            else -> {
+                light = intent.extras!!.get(Constants.LIGHT_ARESS_KEY) as DbLight
+                img_function1.visibility = View.GONE
+                tvRename.visibility = View.GONE
+                toolbarTv.text = light?.name
+            }
         }
+
+        toolbar.setOnMenuItemClickListener(menuItemClickListener)
+        rgb_switch.setOnClickListener { swLight(true) }
+
+        when {
+            currentShowGroupSetPage -> initViewGroup()
+            else -> {
+                initView()
+                getVersion()
+            }
+        }
+    }
+
+    private fun setSwIcon() {
+        var status = when {
+            currentShowGroupSetPage -> group?.connectionStatus
+            else -> light?.connectionStatus
+        }
+        when (status) {
+            1 -> rgb_switch.setImageResource(R.drawable.icon_light_open)
+            else -> rgb_switch.setImageResource(R.drawable.icon_light_close)
+        }
+    }
+
+    private fun swLight(isClick: Boolean) {
+        var connectionStatus = if (currentShowGroupSetPage) group?.connectionStatus else light?.connectionStatus
+        var status = when {
+            isClick -> if (connectionStatus == 1) 0 else 1
+            else -> connectionStatus?:1
+        }
+
+        val meshAddr = if (currentShowGroupSetPage) group!!.meshAddr else light!!.meshAddr
+        val productUUID = if (currentShowGroupSetPage) 97 else 6
+
+        when {
+            Constants.IS_ROUTE_MODE -> {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97 0关1开
+                swOpen = status == 1
+                routeOpenOrCloseBase(meshAddr, productUUID, status, "rgbSwitch")
+            }
+            else -> openOrClose(status == 1)
+        }
+    }
+
+    private fun rgbVisiblity(visible: Int) {
+        ll_r.visibility = visible
+        ll_g.visibility = visible
+        ll_b.visibility = visible
     }
 
     @SuppressLint("CheckResult")
     private fun getVersion() {
         if (TelinkApplication.getInstance().connectDevice != null || Constants.IS_ROUTE_MODE) {
-            if (Constants.IS_ROUTE_MODE)
-                routerGetVersion(mutableListOf(light?.meshAddr ?: 0), 6, "rgbVersion")
-            else {
-                val subscribe = Commander.getDeviceVersion(light!!.meshAddr)
+            when {
+                Constants.IS_ROUTE_MODE -> routerGetVersion(mutableListOf(light?.meshAddr ?: 0), 6, "rgbVersion")
+                else -> Commander.getDeviceVersion(light!!.meshAddr)
                         .subscribe({ s ->
                             updateVersion(s)
                             null
@@ -533,43 +577,19 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     override fun onResume() {
         super.onResume()
-        light?.let {
-            rgb_switch.isChecked = it.connectionStatus == ConnectionStatus.ON.value
-        }
+        swLight(false)
     }
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
-        light = this.intent.extras!!.get(Constants.LIGHT_ARESS_KEY) as DbLight
         this.fromWhere = this.intent.getStringExtra(Constants.LIGHT_REFRESH_KEY)
         this.gpAddress = this.intent.getIntExtra(Constants.GROUP_ARESS_KEY, 0)
         dataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
-        tvRename.visibility = View.GONE
-        toolbarTv.text = light?.name
-
-        if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97 0关1开
-            routeOpenOrCloseBase(light!!.meshAddr, 6, light?.connectionStatus ?: 1, "rgbSwitch")
-        } else {
-            openOrClose(light?.connectionStatus == 1)
-        }
-
-        rgb_switch.setOnCheckedChangeListener { _, isChecked ->
-            if (light != null)
-                when {
-                    Constants.IS_ROUTE_MODE -> {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97 0关1开
-                        var status = if (isChecked) 1 else 0
-                        routeOpenOrCloseBase(light!!.meshAddr, 6, status, "rgbSwitch")
-                    }
-                    else -> openOrClose(isChecked)
-                }
-        }
 
         localVersion = when {
             TextUtils.isEmpty(light!!.version) -> getString(R.string.number_no)
             else -> light!!.version
         }
-
-        rgb_switch.isChecked = light!!.connectionStatus == ConnectionStatus.ON.value
 
         tvRename!!.setOnClickListener(this.clickListener)
         tvOta!!.setOnClickListener(this.clickListener)
@@ -732,35 +752,39 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun openOrClose(isOpen: Boolean) {
         LogUtils.e("currentLight$isOpen")
         afterSendOpenOrClose(isOpen)
-
-        Thread {
-            //Thread.sleep(300) // 延时3S  防止通信失败
+        swOpen = isOpen
+        CoroutineScope(Dispatchers.IO).launch {
             Commander.openOrCloseLights(addr, isOpen)
-        }.start()
+        }
     }
 
-    private fun afterSendOpenOrClose(currentLight: Boolean) {
-        if (currentLight) {
-            enableAllUI(true)
-            if (typeStr == Constants.TYPE_GROUP) {
-                addr = group!!.meshAddr
-                group!!.connectionStatus = ConnectionStatus.ON.value
-            } else {
-                addr = light!!.meshAddr
-                light!!.connectionStatus = ConnectionStatus.ON.value
+    private fun afterSendOpenOrClose(isOpen: Boolean) {
+        enableAllUI(isOpen)
+        when {
+            isOpen -> {
+                if (currentShowGroupSetPage) {
+                    addr = group!!.meshAddr
+                    group!!.connectionStatus = ConnectionStatus.ON.value
+                } else {
+                    addr = light!!.meshAddr
+                    light!!.connectionStatus = ConnectionStatus.ON.value
+                }
             }
-
-        } else {
-            enableAllUI(false)
-            if (typeStr == Constants.TYPE_GROUP) {
-                addr = group!!.meshAddr
-                group!!.connectionStatus = ConnectionStatus.OFF.value
-            } else {
-                addr = light!!.meshAddr
-                light!!.connectionStatus = ConnectionStatus.OFF.value
+            else -> {
+                if (currentShowGroupSetPage) {
+                    addr = group!!.meshAddr
+                    group!!.connectionStatus = ConnectionStatus.OFF.value
+                } else {
+                    addr = light!!.meshAddr
+                    light!!.connectionStatus = ConnectionStatus.OFF.value
+                }
             }
-
         }
+        when {
+            currentShowGroupSetPage -> DBUtils.saveGroup(group!!, false)
+            else -> DBUtils.saveLight(light!!, false)
+        }
+        setSwIcon()
     }
 
     private val cbOnClickListener = OnClickListener {
@@ -1105,16 +1129,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         rgb_sbBrightness.isEnabled = b
         sbBrightness_add.isEnabled = b
         sbBrightness_less.isEnabled = b
-    }
-
-
-    private fun initToolbar() {
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
-    }
-
-    private fun initToolbarGroup() {
-        toolbarTv.text = getString(R.string.select_group)
-        toolbar.setOnMenuItemClickListener(menuItemClickListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -1812,44 +1826,22 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
     }
 
-    private fun initDataGroup() {
-        this.mApplication = this.application as TelinkLightApplication
-        this.group = this.intent.extras!!.get("group") as DbGroup
-        when {
-            Constants.IS_ROUTE_MODE -> {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97 0关1开
-                routeOpenOrCloseBase(group!!.meshAddr, 97, group?.connectionStatus ?: 1, "rgbSwitch")
-            }
-            else -> openOrClose(group?.connectionStatus == 1)
-        }
-    }
-
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initViewGroup() {
-        if (group != null) {
-            if (group!!.meshAddr == 0xffff) {
-                toolbarTv.text = getString(R.string.allLight)
-            } else {
-                toolbarTv.text = group?.name
-            }
-        }
-
 //        color_picker.isLongClickable = true
         this.color_picker!!.setOnTouchListener(this)
 //        color_picker.isEnabled = true
-
-        rgb_switch.setOnCheckedChangeListener { _, isChecked ->
-            if (group != null) {
-                when {
-                    Constants.IS_ROUTE_MODE -> {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97 0关1开
-                        var status = if (isChecked) 1 else 0
-                        routeOpenOrCloseBase(group!!.meshAddr, 97, status, "rgbSwitch")
+        /*    rgb_switch.setOnCheckedChangeListener { _, isChecked ->
+                if (group != null) {
+                    when {
+                        Constants.IS_ROUTE_MODE -> {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97 0关1开
+                            var status = if (isChecked) 1 else 0
+                            routeOpenOrCloseBase(group!!.meshAddr, 97, status, "rgbSwitch")
+                        }
+                        else -> openOrClose(isChecked)
                     }
-                    else -> openOrClose(isChecked)
                 }
-            }
-        }
-        rgb_switch.isChecked = group!!.connectionStatus == ConnectionStatus.ON.value
-
+            }*/
         dynamic_rgb.setOnClickListener(this.clickListener)
         ll_r.setOnClickListener(this.clickListener)
         ll_g.setOnClickListener(this.clickListener)
@@ -2893,7 +2885,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             hideLoadingDialog()
         } else {
             hideLoadingDialog()
-            if (typeStr == Constants.TYPE_GROUP) {
+            if (currentShowGroupSetPage) {
                 when {
                     isBri -> rgb_sbBrightness.progress = group?.brightness ?: 1
                     else -> rgb_sbBrightness.progress = group?.colorTemperature ?: 1
@@ -2921,32 +2913,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
         hideLoadingDialog()
         disposableRouteTimer?.dispose()
         when (cmdBean.ser_id) {
             "rgbSwitch" -> {
-
-                when (if (typeStr == Constants.TYPE_GROUP) group!!.connectionStatus
-                else light!!.connectionStatus) {
-                    ConnectionStatus.OFF.value -> if (typeStr == Constants.TYPE_GROUP)
-                        group!!.connectionStatus = ConnectionStatus.ON.value
-                    else
-                        light!!.connectionStatus = ConnectionStatus.ON.value
-
-                    else -> if (typeStr == Constants.TYPE_GROUP)
-                        group!!.connectionStatus = ConnectionStatus.OFF.value
-                    else
-                        light!!.connectionStatus = ConnectionStatus.OFF.value
-                }
+                LogUtils.v("zcl------收到路由开关灯通知--------$swOpen----$cmdBean")
                 when (cmdBean.status) {
-                    0 -> {
-                        val isOpen = if (typeStr == Constants.TYPE_GROUP)
-                            group!!.connectionStatus == ConnectionStatus.ON.value
-                        else
-                            light!!.connectionStatus == ConnectionStatus.ON.value
-                        afterSendOpenOrClose(isOpen)
-                    }
+                    0 -> afterSendOpenOrClose(swOpen)
                     else -> ToastUtils.showShort(getString(R.string.open_faile))
                 }
             }
@@ -2971,7 +2944,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         if (cmdBean.ser_id == "rgbFactory") {
             LogUtils.v("zcl-----------收到路由恢复出厂得到通知-------$cmdBean")
             hideLoadingDialog()
-            disposableTimer?.dispose()
+            disposableRouteTimer?.dispose()
             if (cmdBean.status == 0)
                 deleteData()
             else
@@ -2998,7 +2971,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     override fun toString(): String {
-        return "RGBSettingActivity(color=$color, sendProgress=$sendProgress, disposableTimer=$disposableTimer, deviceType=$deviceType, addr=$addr, lastTime=$lastTime, fiChangeGp=$fiChangeGp, findItem=$findItem, requestCodeNum=$requestCodeNum, mConnectDeviceDisposable=$mConnectDeviceDisposable, clickPostion=$clickPostion, postionAndNum=$postionAndNum, mApplication=$mApplication, stopTracking=$stopTracking, presetColors=$presetColors, colorSelectDiyRecyclerViewAdapter=$colorSelectDiyRecyclerViewAdapter, group=$group, mConnectTimer=$mConnectTimer, localVersion=$localVersion, light=$light, gpAddress=$gpAddress, fromWhere=$fromWhere, dataManager=$dataManager, mDisposable=$mDisposable, mRxPermission=$mRxPermission, mConnectDevice=$mConnectDevice, POSIONANDNUM='$POSIONANDNUM', currentShowGroupSetPage=$currentShowGroupSetPage, isExitGradient=$isExitGradient, isDiyMode=$isDiyMode, isPresetMode=$isPresetMode, diyPosition=$diyPosition, isDelete=$isDelete, dstAddress=$dstAddress, firstLightAddress=$firstLightAddress, typeStr='$typeStr', speed=$speed, positionState=$positionState, buildInModeList=$buildInModeList, diyGradientList=$diyGradientList, rgbGradientAdapter=$rgbGradientAdapter, rgbDiyGradientAdapter=$rgbDiyGradientAdapter, applyDisposable=$applyDisposable, downTime=$downTime, thisTime=$thisTime, onBtnTouch=$onBtnTouch, tvValue=$tvValue, redColor=$redColor, greenColor=$greenColor, blueColor=$blueColor, mConnectDisposal=$mConnectDisposal, mScanDisposal=$mScanDisposal, mScanTimeoutDisposal=$mScanTimeoutDisposal, mCheckRssiDisposal=$mCheckRssiDisposal, acitivityIsAlive=$acitivityIsAlive, isReset=$isReset, otaPrepareListner=$otaPrepareListner, cbOnClickListener=$cbOnClickListener, handler=$handler, handler_brightness_add=$handler_brightness_add, handler_brightness_less=$handler_brightness_less, handler_less=$handler_less, clickListener=$clickListener, onItemChildClickListener=$onItemChildClickListener, onItemChildClickListenerDiy=$onItemChildClickListenerDiy, onItemChildLongClickListenerDiy=$onItemChildLongClickListenerDiy, menuItemClickListener=$menuItemClickListener, diyOnItemChildClickListener=$diyOnItemChildClickListener, diyOnItemChildLongClickListener=$diyOnItemChildLongClickListener, barChangeListener=$barChangeListener, colorObserver=$colorObserver)"
+        return "RGBSettingActivity(color=$color, sendProgress=$sendProgress, disposableTimer=$disposableTimer, deviceType=$deviceType, addr=$addr, lastTime=$lastTime, fiChangeGp=$fiChangeGp, findItem=$findItem, requestCodeNum=$requestCodeNum, mConnectDeviceDisposable=$mConnectDeviceDisposable, clickPostion=$clickPostion, postionAndNum=$postionAndNum, mApplication=$mApplication, stopTracking=$stopTracking, presetColors=$presetColors, colorSelectDiyRecyclerViewAdapter=$colorSelectDiyRecyclerViewAdapter, group=$group, mConnectTimer=$mConnectTimer, localVersion=$localVersion, light=$light, gpAddress=$gpAddress, fromWhere=$fromWhere, dataManager=$dataManager, mDisposable=$mDisposable, mRxPermission=$mRxPermission, mConnectDevice=$mConnectDevice, POSIONANDNUM='$POSIONANDNUM', currentShowGroupSetPage=$currentShowGroupSetPage, isExitGradient=$isExitGradient, isDiyMode=$isDiyMode, isPresetMode=$isPresetMode, diyPosition=$diyPosition, isDelete=$isDelete, dstAddress=$dstAddress, firstLightAddress=$firstLightAddress, typeStr='$typeStr', speed=$speed, positionState=$positionState, buildInModeList=$buildInModeList, diyGradientList=$diyGradientList, rgbGradientAdapter=$rgbGradientAdapter, rgbDiyGradientAdapter=$rgbDiyGradientAdapter, applyDisposable=$applyDisposable, downTime=$downTime, thisTime=$thisTime, onBtnTouch=$onBtnTouch, tvValue=$tvValue, redColor=$redColor, greenColor=$greenColor, blueColor=$blueColor, mConnectDisposal=$mConnectDisposal, mScanDisposal=$mScanDisposal, mScanTimeoutDisposal=$mScanTimeoutDisposal, mCheckRssiDisposal=$mCheckRssiDisposal, acitivityIsAlive=$acitivityIsAlive, otaPrepareListner=$otaPrepareListner, cbOnClickListener=$cbOnClickListener, handler=$handler, handler_brightness_add=$handler_brightness_add, handler_brightness_less=$handler_brightness_less, handler_less=$handler_less, clickListener=$clickListener, onItemChildClickListener=$onItemChildClickListener, onItemChildClickListenerDiy=$onItemChildClickListenerDiy, onItemChildLongClickListenerDiy=$onItemChildLongClickListenerDiy, menuItemClickListener=$menuItemClickListener, diyOnItemChildClickListener=$diyOnItemChildClickListener, diyOnItemChildLongClickListener=$diyOnItemChildLongClickListener, barChangeListener=$barChangeListener, colorObserver=$colorObserver)"
     }
 
 }

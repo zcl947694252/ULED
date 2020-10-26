@@ -221,10 +221,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         currentTimeMillis = SharedPreferencesUtils.getLastOtaTime()
         setPop()
         toolbar.setNavigationOnClickListener {
-            if (isOtaing)
-                popFinish.showAtLocation(window.decorView.rootView, Gravity.CENTER, 0, 0)
-            else
-                finish()
+            isFinish()
         }
         toolbar.setNavigationIcon(R.drawable.icon_return)
     }
@@ -330,7 +327,14 @@ class RouterOtaActivity : TelinkBaseActivity() {
     }
 
     override fun onBackPressed() {
-        popFinish.showAtLocation(window.decorView.rootView, Gravity.CENTER, 0, 0)
+        isFinish()
+    }
+
+    private fun isFinish() {
+        if (isOtaing)
+            popFinish.showAtLocation(window.decorView.rootView, Gravity.CENTER, 0, 0)
+        else
+            finish()
     }
 
     override fun onDestroy() {

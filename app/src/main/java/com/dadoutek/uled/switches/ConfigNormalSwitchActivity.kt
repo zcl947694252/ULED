@@ -163,7 +163,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     }
 
     override fun reName() {
-        showRenameDialog(switchDate)
+        showRenameDialog(switchDate, false)
     }
 
     private fun makePop() {
@@ -314,7 +314,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                                         switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo.meshAddress)
                                     ToastUtils.showShort(getString(R.string.config_success))
                                     if (!isReConfig)
-                                        showRenameDialog(switchDate)
+                                        showRenameDialog(switchDate, false)
                                     else
                                         finish()
                                 },
@@ -440,7 +440,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                               GlobalScope.launch(Dispatchers.Main) {
                                   ToastUtils.showShort(getString(R.string.config_success))
                                   if (!isReConfig)
-                                      showRenameDialog(switchDate)
+                                      showRenameDialog(switchDate, false)
                                   else
                                       finish()
                               }

@@ -448,7 +448,7 @@
 
          </android.support.constraint.ConstraintLayout>
 
-        <CheckBox
+        <ImageView
                 android:id="@+id/rgb_switch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

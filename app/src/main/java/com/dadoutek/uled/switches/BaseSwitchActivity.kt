@@ -48,6 +48,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -139,7 +140,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-        if (TelinkLightApplication.getApp().connectDevice != null|| Constants.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE) {
             when (item?.itemId) {
                 R.id.toolbar_f_rename -> reName()
                 R.id.toolbar_fv_change_group -> changeGroup()
@@ -178,14 +179,18 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
 
     @SuppressLint("SetTextI18n")
-    fun showRenameDialog(switchDate: DbSwitch?) {
+    fun showRenameDialog(switchDate: DbSwitch?, isEightsW: Boolean) {
         hideLoadingDialog()
         StringUtils.initEditTextFilter(renameEt)
 
         if (!TextUtils.isEmpty(switchDate?.name))
             renameEt?.setText(switchDate?.name)
         else
-            renameEt?.setText(eight_switch_title.text.toString() + "-" + switchDate?.meshAddr)
+            if (isEightsW)
+                renameEt?.setText(eight_switch_title.text.toString() + "-" + switchDate?.meshAddr)
+            else
+                renameEt?.setText(toolbarTv.text.toString() + "-" + switchDate?.meshAddr)
+
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
@@ -202,13 +207,13 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     sw = DBUtils.getSwitchByMacAddr(macAddress)
                     sw?.let {
-                        if (!Constants.IS_ROUTE_MODE){
+                        if (!Constants.IS_ROUTE_MODE) {
                             showLoadingDialog(getString(R.string.please_wait))
                             Commander.resetDevice(sw!!.meshAddr, true)
                                     .subscribe(
                                             { // deleteData()
                                             }, {
-                                        GlobalScope.launch(Dispatchers.Main){
+                                        GlobalScope.launch(Dispatchers.Main) {
                                             /*    showDialogHardDelete?.dismiss()
                                               showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
                                                       .setPositiveButton(android.R.string.ok) { _, _ ->
@@ -220,7 +225,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                         }
                                     })
                             deleteData()
-                        }else{
+                        } else {
                             routerDeviceResetFactory(sw!!.macAddr, sw!!.meshAddr, 99, "swFactory")
                         }
 
@@ -229,6 +234,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
     }
+
     override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id == "swFactory") {
             LogUtils.v("zcl-----------收到路由恢复出厂得到通知-------$cmdBean")
@@ -240,7 +246,8 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 ToastUtils.showShort(getString(R.string.reset_factory_fail))
         }
     }
-     fun deleteData() {
+
+    fun deleteData() {
         hideLoadingDialog()
         ToastUtils.showShort(getString(R.string.delete_switch_success))
         sw?.let { DBUtils.deleteSwitch(it) }
@@ -259,12 +266,15 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
             isMostNew(mDeviceInfo?.firmwareRevision) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
                 when {
-                    Constants.IS_ROUTE_MODE -> {startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress, "deviceType" to mDeviceInfo.productUUID,
-                            "deviceMac" to mDeviceInfo.macAddress)
-                    finish()}
+                    Constants.IS_ROUTE_MODE -> {
+                        startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress, "deviceType" to mDeviceInfo.productUUID,
+                                "deviceMac" to mDeviceInfo.macAddress)
+                        finish()
+                    }
                     else -> bleOta(mDeviceInfo, type)
                 }
-            }}
+            }
+        }
     }
 
     private fun bleOta(mDeviceInfo: DeviceInfo, type: Int) {
@@ -354,7 +364,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     open fun routerRenameSw(sw: DbSwitch, trim: String) {
         RouterModel.routeUpdateSw(sw.id, trim)?.subscribe({
-           routerRenameSwSuccess(trim)
+            routerRenameSwSuccess(trim)
             SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
         }, {
             ToastUtils.showShort(it.message)
@@ -377,7 +387,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

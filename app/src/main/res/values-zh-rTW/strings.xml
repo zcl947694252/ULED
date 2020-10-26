@@ -153,7 +153,7 @@
     <string name="device_not_connected">未连接设备！</string>
     <string name="connect_fail">设备连接断开</string>
     <string name="delete_group">删除分组</string>
-    <string name="get_version_fail">获取版本号出错</string>
+    <string name="get_version_fail">获取版本号失败</string>
     <string name="the_last_version">当前已经是最新版本！</string>
     <string name="long_click_select_color_tip">*长按保存,单击设置</string>
     <string name="mode_diy">自定义模式</string>

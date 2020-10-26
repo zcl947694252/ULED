@@ -39,7 +39,6 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
-import com.dadoutek.uled.network.RouterDelGpBody
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
@@ -1090,7 +1089,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else {
             showLoadingDialog(getString(R.string.please_wait))
             TelinkLightService.Instance()?.idleMode(true)
-            mConnectDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
+            mConnectDisposable = Observable.timer(8000, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .flatMap {
@@ -1098,8 +1097,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     }?.subscribe({
                         hideLoadingDialog()
                         startOtaAct()
-                    }
-                            , {
+                    }, {
                         hideLoadingDialog()
                         runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
                         LogUtils.d(it)
@@ -2009,11 +2007,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (Constants.IS_ROUTE_MODE) {
             routerDeviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "lightFactory")
         } else {
-            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null) {
+            if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null) {
                 AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))
                         .setPositiveButton(android.R.string.ok) { _, _ ->
 
-                            if (TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight != null && TelinkLightService.Instance()?.adapter!!.mLightCtrl.currentLight.isConnected) {
+                            if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected==true) {
                                 showLoadingDialog(getString(R.string.please_wait))
                                 val disposable = Commander.resetDevice(light!!.meshAddr)
                                         .subscribe(
@@ -2095,8 +2093,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 if (Constants.IS_ROUTE_MODE) {
                     routerSwitchSlowUpSlowDown(1, "slowOpen")
                 } else {
+                    sendSpeedUi(group, 5)
                     slowOrUpOpen()
-                    afterSendSpeed(group, 5)
                 }
             }
             R.id.slow_rg_middle -> {
@@ -2104,8 +2102,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 if (Constants.IS_ROUTE_MODE) {
                     routerSwitchSlowUpSlowDown(1, "slowOpen")
                 } else {
+                    sendSpeedUi(group, 3)
                     slowOrUpOpen()
-                    afterSendSpeed(group, 3)
                 }
             }
             R.id.slow_rg_fast -> {
@@ -2113,8 +2111,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 if (Constants.IS_ROUTE_MODE) {
                     routerSwitchSlowUpSlowDown(1, "slowOpen")
                 } else {
+                    sendSpeedUi(group, 1)
                     slowOrUpOpen()
-                    afterSendSpeed(group, 1)
                 }
             }
             R.id.slow_rg_close -> {
@@ -2126,7 +2124,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
-    private fun afterSendSpeed(group: DbGroup?, speed: Int) {
+    private fun sendSpeedUi(group: DbGroup?, speed: Int) {
         group?.slowUpSlowDownStatus = 1
         group?.slowUpSlowDownSpeed = speed
         var string = when (speed) {
@@ -2216,7 +2214,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             LogUtils.v("zcl-----------收到路由调节速度通知-------$cmdBean")
             hideLoadingDialog()
             when (cmdBean.status) {
-                0 -> afterSendSpeed(group, tempSpeed)
+                0 -> sendSpeedUi(group, tempSpeed)
                 else -> {
                     when (group?.slowUpSlowDownSpeed ?: 1) {
                         1 -> slow_rg_fast.isChecked = true

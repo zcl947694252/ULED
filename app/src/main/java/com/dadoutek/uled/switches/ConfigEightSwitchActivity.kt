@@ -388,7 +388,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             GlobalScope.launch(Dispatchers.Main) {
                 ToastUtils.showShort(getString(R.string.config_success))
                 if (!isReConfig)
-                    showRenameDialog(switchData)
+                    showRenameDialog(switchData, false)
                 else
                     finishAc()
                 hideLoadingDialog()
@@ -678,7 +678,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
 
     override fun reName() {
-        showRenameDialog(switchData)
+        showRenameDialog(switchData, false)
     }
 
     override fun setLayoutId(): Int {
@@ -845,7 +845,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showShort(getString(R.string.config_success))
                     if (!isReConfig)
-                        showRenameDialog(switchData!!)
+                        showRenameDialog(switchData!!,true)
                     else
                         finish()
                 }

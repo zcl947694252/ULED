@@ -94,7 +94,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     private var viewInstall: View? = null
     private var installTitleTv: TextView? = null
     private var netWorkChangReceiver: NetWorkChangReceiver? = null
-    private var isResume: Boolean = false
     var mConnectDisposable: Disposable? = null
     private var changeRecevicer: ChangeRecevicer? = null
     private var mStompListener: Disposable? = null
@@ -177,7 +176,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
+
+//        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
+//            TelinkLightApplication.getApp().initStompClient()
+
         serviceConnection?.mqttService?.init()
+        bindService()
     }
 
     fun isSuportOta(version: String?): Boolean {
@@ -209,7 +213,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun numberCharat(string: String): String {
         val sBuffer = StringBuffer()
         val replace = string.replace(".", "", true)
-     val str = replace.replace("[a-zA-Z]".toRegex(), "")
+        val str = replace.replace("[a-zA-Z]".toRegex(), "")
         str.forEach { i ->
             if (!(48 > i.toInt() || i.toInt() > 57)) {
                 sBuffer.append(i)
@@ -470,12 +474,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     override fun onResume() {
         super.onResume()
-        bindService()
         if (!LeBluetooth.getInstance().enable(applicationContext) && !Constants.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
-        isResume = true
-        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
-            TelinkLightApplication.getApp().initStompClient()
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)//没有上传数据或者当前区域不是自己的区域
@@ -500,6 +500,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     override fun onDestroy() {
         super.onDestroy()
         disableConnectionStatusListener()
+        unbindSe()
         mConnectDisposable?.dispose()
         loadDialog?.dismiss()
         unregisterReceiver(stompRecevice)
@@ -585,11 +586,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     override fun onPause() {
         super.onPause()
-        unbindSe()
         stopTimerUpdate()
         showDialogHardDelete?.dismiss()
         mConnectDisposable?.dispose()
-        isResume = false
     }
 
 
@@ -697,9 +696,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
 
                 initOnLayoutListener()
-                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${true}&&---$isResume")
+                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${true}")
                 try {
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && isResume)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
@@ -1536,7 +1535,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     open fun routeOpenOrCloseBase(meshAddr: Int, productUUID: Int, status: Int, serId: String) {//如果发送后失败则还原 0关1开
-        LogUtils.v("zcl-----------收到路由开关灯指令-------deviceType-------$productUUID")
+        LogUtils.v("zcl-----------收到路由开关灯指令-------deviceType-------$productUUID-----是开--${status == 1}")
         val subscribe = RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
             LogUtils.v("zcl-----------收到路由成功-------$it")
             //    "errorCode": 90018,该设备不存在，请重新刷新数据"   "errorCode": 90008,该设备没有绑定路由，无法操作"
