@@ -881,7 +881,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                         DBUtils.updateLight(light)
                         lights.remove(light)
                         //修改分组成功后删除场景信息。
-                        // deleteAllSceneByLightAddr(light.meshAddr)
+                         deleteAllSceneByLightAddr(light.meshAddr)
                         Thread.sleep(100)
                         if (lights.count() == 0) {
                             //所有灯都删除了分组

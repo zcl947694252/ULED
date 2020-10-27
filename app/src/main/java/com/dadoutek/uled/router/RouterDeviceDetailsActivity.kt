@@ -20,8 +20,6 @@ import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.Constants.*
 import com.dadoutek.uled.model.dbModel.DBUtils
-import com.dadoutek.uled.model.DeviceType
-import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.adapter.RouterDeviceDetailsAdapter
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
@@ -41,8 +39,6 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     private var popupWindow: PopupWindow? = null
     private var popVersion: TextView? = null
     private var views: View? = null
-    private var last_start_time = 0
-    private var debounce_time = 1000
     private var routerData: MutableList<DbRouter> = mutableListOf()
     private var adapter: RouterDeviceDetailsAdapter = RouterDeviceDetailsAdapter(R.layout.template_device_type_item, routerData, this)
     private var currentDevice: DbRouter? = null
@@ -64,6 +60,12 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         makePop()
     }
 
+    override fun skipBatch() {
+        when {
+            IS_ROUTE_MODE -> startActivity(Intent(this@RouterDeviceDetailsActivity, RouterTimerSceneListActivity::class.java))
+            else -> ToastUtils.showShort(getString(R.string.route_cont_support_ble))
+        }
+    }
     override fun editeDeviceAdapter() {
         adapter!!.changeState(isEdite)
         adapter!!.notifyDataSetChanged()
@@ -74,7 +76,8 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     }
 
     override fun batchGpVisible(): Boolean {
-        return false
+        batchGpAll?.title = getString(R.string.timer_scene)
+        return true
     }
 
     override fun setDeletePositiveBtn() {
@@ -163,6 +166,10 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     private fun goConfig() {
         if (isRightPos()) return
+        if (!IS_ROUTE_MODE){
+            ToastUtils.showShort(getString(R.string.route_cont_support_ble))
+            return
+        }
         val intent = Intent(this@RouterDeviceDetailsActivity, RouterDetailActivity::class.java)
         intent.putExtra("routerId", currentDevice?.id)
         startActivity(intent)

@@ -5,12 +5,9 @@
         android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
-
-    <TextView
-            android:id="@+id/router_detail_mac"
+    <include layout="@layout/template_recycleview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textColor="@color/blue_text"
-            android:textSize="26sp" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
 </LinearLayout>

@@ -106,7 +106,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
     }
 
 
-    private fun goOta() {
+    open fun goOta() {
             when (type) {
             Constants.INSTALL_NORMAL_LIGHT -> {
                 when (DBUtils.getAllNormalLight().size) {

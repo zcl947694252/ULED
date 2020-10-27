@@ -171,10 +171,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         getRouterStatus()
         getRegionList()
         getAllStatus()
-        getBin()
         Constants.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)
         LogUtils.v("zcl---获取状态------${Constants.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)}-")
     }
+
 
     @SuppressLint("CheckResult")
     private fun getBin() {
@@ -440,7 +440,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(mReceiver, filter)
-
+        getBin()
 
         Constants.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)
     }
@@ -613,6 +613,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             startScan()
         }
     }
+
 
     private fun login() {
         val account = DBUtils.lastUser?.account

@@ -15,6 +15,7 @@ import com.dadoutek.uled.switches.bean.KeyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import retrofit2.http.Field
 
 
 /**
@@ -55,7 +56,7 @@ object RouterModel {
      */
     fun bindRouter(meshAddrsList: MutableList<Int>, meshType: Int, macAddr: String): Observable<Response<Any>>? {
         return NetworkFactory.getApi()
-                .bindRouter(meshAddrsList, meshType, macAddr).subscribeOn(Schedulers.io())
+                .bindRouter(MeshListTypeMacBody(meshAddrsList, meshType, macAddr)).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
@@ -124,9 +125,9 @@ object RouterModel {
      * 路由批量分组
      */
     fun routeBatchGp(targetGroupMeshAddr: Int, deviceMeshAddrs: List<Int>, meshType: Int, ser_id: String): Observable<Response<RouterBatchGpBean>>? {
-        return NetworkFactory.getApi().routerBatchGp(targetGroupMeshAddr, deviceMeshAddrs, meshType, ser_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+        return NetworkFactory.getApi().routerBatchGp(GPAddrMeshListTypeSerBody(targetGroupMeshAddr, deviceMeshAddrs, meshType, ser_id))
+                ?.subscribeOn(Schedulers.io())
+                ?.observeOn(AndroidSchedulers.mainThread())
     }
 
     fun routeBatchGpNew(bodyBean: GroupBodyBean): Observable<Response<RouterBatchGpBean>>? {
@@ -199,16 +200,17 @@ object RouterModel {
      *获取设备版本号
      */
     fun getDevicesVersion(meshAddrs: MutableList<Int>, meshType: Int, ser_id: String): Observable<Response<RouterVersionsBean>>? {
-        return NetworkFactory.getApi().routerGetDevicesVersion(meshAddrs, meshType, ser_id)
+        val meshAddressTypeBody = MeshAddressTypeBody( meshType,meshAddrs, ser_id)
+        return NetworkFactory.getApi().routerGetDevicesVersion(meshAddressTypeBody)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     /**
-     *获取设备版本号
+     *路由升级
      */
     fun toDevicesOTA(meshAddrs: MutableList<Int>, meshType: Int, currentTimeMillis: Long): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routerToDevicesOta(meshAddrs, meshType, currentTimeMillis)
+        return NetworkFactory.getApi().routerToDevicesOta(MeshAddressTypeTimeBody(meshType,meshAddrs,currentTimeMillis,"routerList"))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -542,6 +544,47 @@ object RouterModel {
 
     fun routeControlCurtain(meshAddr: Int, meshType: Int, controlCmd: Int, value: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
         return NetworkFactory.getApi().routeControlCurtain(meshAddr, meshType, controlCmd, value, ser_id)
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun routeAddTimerScene( name:String , hour:Int, min :Int, week:Int, sid :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeAddTimerScene(name, hour, min , week, sid , ser_id)
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun routeUpdateTimerScene( id:Int , hour:Int, min :Int, week:Int, sid :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeUpdateTimerScene(id, hour, min , week, sid , ser_id)
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+    fun routeDelTimerScene( id:Int ,  ser_id:String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeDelTimerScene(IdSerIdBody(id,ser_id))
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    //1开 0关
+    fun routeTimerSceneStatus( id:Int , status:Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeTimerSceneStatus(id,status,ser_id)
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun routeTimerSceneList(): Observable<Response<MutableList<RouterTimerSceneList>>>? {
+        return NetworkFactory.getApi().routeTimerSceneList()
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun routeUpdateTimerSceneName(id:Int,name: String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routeUpdateTimerSceneName(id,name)
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

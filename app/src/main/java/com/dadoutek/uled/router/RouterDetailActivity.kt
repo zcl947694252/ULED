@@ -1,28 +1,29 @@
 package com.dadoutek.uled.router
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
-import android.util.Log
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.TelinkBaseActivity
+import com.dadoutek.uled.base.RouterOTAingNumBean
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.MacResetBody
-import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
+import kotlinx.android.synthetic.main.activity_router_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
-import org.greenrobot.greendao.DbUtils
+import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 
@@ -37,10 +38,47 @@ import java.util.concurrent.TimeUnit
  */
 class RouterDetailActivity : TelinkBaseToolbarActivity() {
     private var router: DbRouter? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initView()
+        initData()
+        initListener()
+    }
+
+    override fun setLayoutId(): Int {
+        return R.layout.activity_router_detail
+    }
+
+    private fun initListener() {
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun initData() {
+        val routerId = intent.getLongExtra("routerId", 1000000)
+        router = DBUtils.getRouterByID(routerId)
+        if (router == null) {
+            ToastUtils.showShort(getString(R.string.get_router_empty))
+            finish()
+        }
+        bindRouter?.title = router?.version
+        deleteDeviceAll?.title = getString(R.string.delete_device)
+        router_detail_mac.text = "MAC:"+router?.macAddr
+    }
+
+    private fun initView() {
+        type = Constants.INSTALL_ROUTER
+        toolbarTv.text = getString(R.string.router)
+    }
 
     override fun batchGpVisible(): Boolean {
         batchGpAll?.title = getString(R.string.config_WIFI)
         return true
+    }
+
+    override fun goOta() {
+        startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to DeviceType.LIGHT_NORMAL, "deviceMac" to router!!.macAddr)
+        finish()
     }
 
     override fun bindRouterVisible(): Boolean {
@@ -56,11 +94,9 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
         finish()
     }
 
-    override fun setDeletePositiveBtn() {
-    }
+    override fun setDeletePositiveBtn() {}
 
-    override fun editeDeviceAdapter() {
-    }
+    override fun editeDeviceAdapter() {}
 
     override fun setToolbar(): Toolbar {
         return toolbar
@@ -68,37 +104,6 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
 
     override fun setDeviceDataSize(num: Int): Int {
         return 1
-    }
-
-    override fun setLayoutId(): Int {
-        return R.layout.activity_router_detail
-    }
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initView()
-        initData()
-        initListener()
-    }
-
-    private fun initListener() {
-
-    }
-
-    private fun initData() {
-        val routerId = intent.getLongExtra("routerId", 1000000)
-        router = DBUtils.getRouterByID(routerId)
-        if (router==null){
-            ToastUtils.showShort(getString(R.string.get_router_empty))
-            finish()
-        }
-        bindRouter?.title = router?.version
-        deleteDeviceAll?.title = getString(R.string.delete_device)
-    }
-
-    private fun initView() {
-        toolbarTv.text = getString(R.string.router)
     }
 
     @SuppressLint("CheckResult")
@@ -115,7 +120,7 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
                             }
                 }
                 90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

@@ -76,6 +76,10 @@
         <service android:name=".mqtt.MqttService" android:enabled="true" />
         <service android:name="org.eclipse.paho.android.service.MqttService"/>
         <activity
+                android:name=".router.RouterTimerSceneListActivity"
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
+        <activity
                 android:name=".othersview.SelectDeviceTypeActivity"
                 android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity" />

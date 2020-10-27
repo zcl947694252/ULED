@@ -1151,7 +1151,7 @@
     <string name="delete_gp_fail">删除群组失败</string>
     <string name="add_scene_fail">添加场景失败</string>
     <string name="all_gp_cont_del">删除失败,默认组不能删除</string>
-    <string name="route_cant_ota">扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描</string>
+    <string name="route_scan_cant_ota">扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描</string>
     <string name="route_otaing_cont_to_ota">OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA</string>
     <string name="loacal_del">本地删除</string>
     <string name="region_not_router">该账号该区域下没有路由，无法操作</string>
@@ -1226,4 +1226,6 @@
     <string name="ota_all_num">升级总数:</string>
     <string name="ota_success_num">升级成功数:</string>
     <string name="ota_fail_num">升级失败数:</string>
+    <string name="route_cont_support_ble">路由设备不支持蓝牙模式</string>
+    <string name="timer_scene">定时场景</string>
 </resources>

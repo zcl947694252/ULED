@@ -996,7 +996,7 @@
     <string name="delete_gp_fail">Group deletion failed</string>
     <string name="add_scene_fail">Add scene failure</string>
     <string name="all_gp_cont_del">Delete failed. Default group cannot be deleted</string>
-    <string name="route_cant_ota">OTA cannot be used in the scan, please wait.Try to get the status in routing mode to restore the last scan</string>
+    <string name="route_scan_cant_ota">OTA cannot be used in the scan, please wait.Try to get the status in routing mode to restore the last scan</string>
     <string name="route_otaing_cont_to_ota">In OTA, OTA cannot be performed again.Try to get the state in routing mode to restore the last OTA</string>
     <string name="loacal_del">local deletion</string>
     <string name="region_not_router">该账号该区域下没有路由，无法操作</string>
@@ -1071,5 +1071,7 @@
     <string name="ota_all_num">升级总数:</string>
     <string name="ota_success_num">升级成功数:</string>
     <string name="ota_fail_num">升级失败数:</string>
+    <string name="route_cont_support_ble">路由设备不支持蓝牙模式</string>
+    <string name="timer_scene">定时场景</string>
 
 </resources>

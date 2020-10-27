@@ -64,9 +64,7 @@ import java.util.concurrent.TimeUnit
  */
 class GroupOTAListActivity : TelinkBaseActivity() {
     private var currentTime: Long = 0
-    private var getStatusDispose: Disposable? = null
     private var isStartOta: Boolean = false
-    private var disposableTimer: Disposable? = null
     private var deviceType: Int = 0
     private var isGroup: Boolean = false
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -204,11 +202,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun startGetStatus(isFinish: Boolean) {
             RouterModel.routerOTAResult(1, 5000, currentTime)?.subscribe({
                 //status	int	ota结果。-1失败 0成功 1升级中 2已停止 3处理中
-                LogUtils.v("zcl-----------获取路由状态-------$it")
+                LogUtils.v("zcl-----------获取路由状态----$currentTime---$it")
                 val filterSuccess = it.filter { item -> item.status == 0 }
                 val filterFail = it.filter { item -> item.status == -1 }
                 group_ota_success.text = getString(R.string.ota_success_num) + filterSuccess.size
-                group_ota_fail.text = getString(R.string.ota_success_num) + filterFail.size
+                group_ota_fail.text = getString(R.string.ota_fail_num) + filterFail.size
                 filterSuccess.forEach { it1 ->
                     setMostNew(it1)
                 }
@@ -360,7 +358,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 .subscribe {
                     loading_tansform.visibility = View.GONE
                     ota_swipe_refresh_ly.isRefreshing = false
-
                     disposableScan?.dispose()
                 }
         compositeDisposable.add(disposableTimerResfresh!!)

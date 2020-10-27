@@ -1184,4 +1184,13 @@ class NewSceneSetAct : TelinkBaseActivity() {
             sceneGroupAdapter?.notifyItemChanged(currentPosition)
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        try {
+            unregisterReceiver(sceneGroupAdapter?.stompRecevice)
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
+        }
+    }
 }

@@ -58,11 +58,11 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     private fun initListener() {
         router_ota_start.setOnClickListener {
-            if (isOtaing) {
-                clickFinish = false
-                devicesStopOTA()
-            } else
-                devicesToOTA()
+                if (isOtaing) {
+                    clickFinish = false
+                    devicesStopOTA()
+                } else
+                    devicesToOTA()
         }
     }
 
@@ -116,13 +116,14 @@ class RouterOtaActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun routerOtaByself(currentTimeMillis1: Long) {
         RouterModel.routeOtaRouter(deviceMac!!, currentTimeMillis1)?.subscribe({
+            LogUtils.v("zcl--------收到升级路由本身成功----------$it")
+            isOtaing = false
             when (it.errorCode) {
                 0 -> {
+                    isOtaing = true
                     setTimeAndOpenUI(currentTimeMillis1)
                 }
-                90999 -> {
-                    goScanning()
-                }
+                90999 -> goScanning()
                 90998 -> {//OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
                     isOtaing = true
                     ToastUtils.showShort(getString(R.string.ota_update_title))
@@ -189,9 +190,9 @@ class RouterOtaActivity : TelinkBaseActivity() {
         ToastUtils.showShort(getString(R.string.ota_update_title))
         if (!isRouter)
             router_ota_start.text = getString(R.string.stop_ota)
-        else{
+        else {
             router_ota_start.text = getString(R.string.otaing)
-            router_ota_start.isClickable =false
+            router_ota_start.isClickable = false
         }
         otaCount = 0
     }
@@ -315,6 +316,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
             override fun complete() {
                 twoSecondFinish()
             }
+
             override fun error(msg: String?) {
                 twoSecondFinish()
             }
@@ -331,7 +333,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
     }
 
     private fun isFinish() {
-        if (isOtaing)
+        if (isOtaing&&!isRouter)
             popFinish.showAtLocation(window.decorView.rootView, Gravity.CENTER, 0, 0)
         else
             finish()

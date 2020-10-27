@@ -162,7 +162,7 @@ object ServerResultException {
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.all_gp_cont_del))
             }
             NetworkStatusCode.ROUTER_CONT_OTA_TO_GET_LAST_OTA -> {
-                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_cant_ota))
+                throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_scan_cant_ota))
             }
             NetworkStatusCode.ROUTER_OTAING_CONT_OTA -> {//该路由器已被其他人添加
                 throw  ServerException(TelinkLightApplication.getApp().getString(R.string.route_otaing_cont_to_ota))
