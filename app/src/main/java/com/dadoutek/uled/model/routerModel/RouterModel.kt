@@ -15,7 +15,6 @@ import com.dadoutek.uled.switches.bean.KeyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import retrofit2.http.Field
 
 
 /**
@@ -550,7 +549,7 @@ object RouterModel {
     }
 
     fun routeAddTimerScene( name:String , hour:Int, min :Int, week:Int, sid :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeAddTimerScene(name, hour, min , week, sid , ser_id)
+        return NetworkFactory.getApi().routeAddTimerScene(TimerSceneBody(name, hour, min , week, sid , ser_id))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -576,9 +575,9 @@ object RouterModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun routeTimerSceneList(): Observable<Response<MutableList<RouterTimerSceneList>>>? {
+    fun routeTimerSceneList(): Observable<MutableList<RouterTimerSceneBean>>? {
         return NetworkFactory.getApi().routeTimerSceneList()
-                // .compose(NetworkTransformer())
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

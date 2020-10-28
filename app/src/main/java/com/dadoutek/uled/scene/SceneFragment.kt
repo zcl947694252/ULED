@@ -106,7 +106,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 }
                                 90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                                 else-> ToastUtils.showShort(it.message)
                             }
                         }, {
@@ -205,7 +205,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 OK, ROUTER_DEL_SCENE_NOT_EXITE, ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE, ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(list, dbScene)
                                 //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
                                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
-                                ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
+                                ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
                                 ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
                                 else-> ToastUtils.showShort(it.message)
                             }

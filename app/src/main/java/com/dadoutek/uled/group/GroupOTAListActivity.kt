@@ -242,7 +242,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                 else -> ToastUtils.showShort(it.message)
             }
         }, {
@@ -953,7 +953,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                             showLoadingDialog(getString(R.string.please_wait))
                             TelinkLightService.Instance()?.idleMode(true)
                             Thread.sleep(500)
-                            connect(macAddress = dbsw.macAddr, meshAddress = dbsw.meshAddr, connectTimeOutTime = 15)
+                            connect(macAddress = dbsw.macAddr, meshAddress = dbsw.meshAddr, connectTimeOutTime = 12,retryTimes = 2)
                                     ?.subscribeOn(Schedulers.io())
                                     ?.observeOn(AndroidSchedulers.mainThread())
                                     ?.subscribe({

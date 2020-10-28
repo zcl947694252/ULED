@@ -809,7 +809,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
                 NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
+                NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
                 NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
                 else-> ToastUtils.showShort(it.message)
             }
@@ -990,7 +990,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                     initScene()
                 }
-                NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_not_router))
+                NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
                 NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
                 else-> ToastUtils.showShort(it.message)
             }

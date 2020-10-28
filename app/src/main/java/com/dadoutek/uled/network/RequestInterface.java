@@ -1560,14 +1560,8 @@ public interface RequestInterface {
      * sid	是	int	关联场景id
      * {"name": "定时场景测试","hour": 8,"min": 0,"week": 0,"sid": 1, "ser_id": "xxxx"}
      **/
-    @FormUrlEncoded
     @POST("router/add-timer-scene")
-    Observable<Response<RouterTimeoutBean>> routeAddTimerScene(@Field("name") String name,
-                                                               @Field("hour") int hour,
-                                                               @Field("min") int min,
-                                                               @Field("week") int week,
-                                                               @Field("sid") int sid,
-                                                               @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routeAddTimerScene(@Body TimerSceneBody body);
 
     /**
      * 更新定时场景 https://dev.dadoutek.com/xxxx/router/update-timer-scene  PUT
@@ -1611,7 +1605,7 @@ public interface RequestInterface {
 
     //获取路由列表 https://dev.dadoutek.com/xxxx/timer-scene/list GET
     @GET("timer-scene/list")
-    Observable<Response<List<RouterTimerSceneList>>> routeTimerSceneList();
+    Observable<Response<List<RouterTimerSceneBean>>> routeTimerSceneList();
     /**
      * 更新定时场景非协议链路字段 https://dev.dadoutek.com/xxxx/timer-scene/update/{id} PUT
      * name	否	string	名称

@@ -50,6 +50,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_gate_way.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
+import kotlinx.android.synthetic.main.template_repeat_ly.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -435,35 +436,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                 LogUtils.e("zcl-------发送服务器返回-----------${e.message}")
             }
         })
-    }
-
-    private fun getWeek(str: String): Int {
-        var week = 0b00000000
-        when (str) {
-            getString(R.string.only_one) -> {
-                week = 0b00000000
-                return week
-            }
-            getString(R.string.every_day) -> {
-                week = 0b10000000
-                return week
-            }
-            else -> {
-                val split = str.split(",").toMutableList()
-                for (s in split) {
-                    when (s) {//bit位 0-6 周日-周六 7代表当天 0代表仅一次
-                        getString(R.string.sunday) -> week = week or 0b00000001
-                        getString(R.string.monday) -> week = week or 0b00000010
-                        getString(R.string.tuesday) -> week = week or 0b00000100
-                        getString(R.string.wednesday) -> week = week or 0b00001000
-                        getString(R.string.thursday) -> week = week or 0b00010000
-                        getString(R.string.friday) -> week = week or 0b00100000
-                        getString(R.string.saturday) -> week = week or 0b01000000
-                    }
-                }
-                return week
-            }
-        }
     }
 
     fun initListener() {

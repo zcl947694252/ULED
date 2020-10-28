@@ -55,4 +55,8 @@ public class Cmd implements Serializable {
     public static final int tzRouteSlowUPSlowDownSpeed =4020;
     public static final int tzRouteUserReset =4021;
     public static final int tzRouteSafeLock =4022;
+    public static final int tzRouteAddTimerScene =4023;
+    public static final int tzRouteUpdateTimerScene =4024;
+    public static final int tzRouteDelTimerScene =4025;
+    public static final int tzRouteTimerSceneStatus =4026;
 }

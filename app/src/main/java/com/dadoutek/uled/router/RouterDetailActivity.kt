@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
-import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.base.RouterOTAingNumBean
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
@@ -119,7 +117,7 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
                                 ToastUtils.showShort(getString(R.string.delete_device_fail))
                             }
                 }
-                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                 else -> ToastUtils.showShort(it.message)
             }
         }, {

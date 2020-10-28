@@ -35,6 +35,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
+import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
@@ -184,6 +185,65 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         bindService()
     }
 
+    open fun getWeek(str: String): Int {
+        var week = 0b00000000
+        when (str) {
+            getString(R.string.only_one) -> {
+                week = 0b00000000
+                return week
+            }
+            getString(R.string.every_day) -> {
+                week = 0b10000000
+                return week
+            }
+            else -> {
+                val split = str.split(",").toMutableList()
+                for (s in split) {
+                    when (s) {//bit位 0-6 周日-周六 7代表当天 0代表仅一次
+                        getString(R.string.sunday) -> week = week or 0b00000001
+                        getString(R.string.monday) -> week = week or 0b00000010
+                        getString(R.string.tuesday) -> week = week or 0b00000100
+                        getString(R.string.wednesday) -> week = week or 0b00001000
+                        getString(R.string.thursday) -> week = week or 0b00010000
+                        getString(R.string.friday) -> week = week or 0b00100000
+                        getString(R.string.saturday) -> week = week or 0b01000000
+                    }
+                }
+                return week
+            }
+        }
+    }
+
+    open fun getWeekStr(week: Int?): String {
+        var tmpWeek = week
+        if (week == 0b10000000)
+            tmpWeek = Constants.SATURDAY or Constants.FRIDAY or Constants.THURSDAY or Constants.WEDNESDAY or Constants.TUESDAY or Constants.MONDAY or Constants.SUNDAY //每一天
+        if (tmpWeek != null) {
+            val list = mutableListOf(
+                    WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
+                    WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
+                    WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
+                    WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
+                    WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
+                    WeekBean(getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
+                    WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
+                    WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
+            val filter = list.filter { it.selected }
+            return when {
+                filter.size>=7 -> getString(R.string.every_day)
+                else -> {
+                    val sb = StringBuilder()
+                    for (i in filter.indices)
+                        when {
+                            i != list.size - 1 -> sb.append(list[i].week).append(",")
+                            else -> sb.append(list[i].week)
+                        }
+                    sb.toString()
+                }
+            }
+        }
+        return ""
+    }
     fun isSuportOta(version: String?): Boolean {
         version?.let {
             val split = version.split("-")
@@ -818,6 +878,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.tzRouteUserReset -> tzRouteUserReset(cmdBean)
                 Cmd.tzRouteSafeLock -> tzRouterSafeLock(cmdBean)
                 Cmd.tzRouteConfigWhite -> tzRouterConfigWhite(cmdBean)
+                Cmd.tzRouteAddTimerScene -> tzRouterAddTimerScene(cmdBean)
+                Cmd.tzRouteUpdateTimerScene -> tzRouterUpdateTimerScene(cmdBean)
+                Cmd.tzRouteDelTimerScene -> tzRouterDelTimerScene(cmdBean)
+                Cmd.tzRouteTimerSceneStatus -> tzRouterChangeTimerSceneStatus(cmdBean)
             }
 /*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -869,6 +933,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    open fun tzRouterChangeTimerSceneStatus(cmdBean: CmdBodyBean) { }
+    open fun tzRouterDelTimerScene(cmdBean: CmdBodyBean) { }
+    open fun tzRouterUpdateTimerScene(cmdBean: CmdBodyBean) {}
+    open fun tzRouterAddTimerScene(cmdBean: CmdBodyBean) {}
     open fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigEightSwRecevice(cmdBean: CmdBodyBean) {}
@@ -1525,7 +1593,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                 else -> ToastUtils.showShort(it.message)
             }
         }, {
@@ -1613,7 +1681,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                 else -> ToastUtils.showShort(it.message)
             }
         }, {

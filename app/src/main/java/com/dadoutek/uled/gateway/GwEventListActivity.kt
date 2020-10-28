@@ -111,7 +111,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         menuItem.textSize = 20
         menuItem.setBackgroundColor(getColor(R.color.red))
         menuItem.setText(R.string.delete)
-
         rightMenu.addMenuItem(menuItem)//添加进右侧菜单
     }
 

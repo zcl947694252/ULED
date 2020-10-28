@@ -137,10 +137,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                val progress = if (sbBrightnessRGB.progress != 0) sbBrightnessRGB.progress else 1
+                val progress = if (item.brightness != 0) item.brightness else 1
                 helper.setProgress(R.id.rgb_sbBrightness, item.brightness)
                         .setProgress(R.id.rgb_white_seekbar, item.temperature)
                         //.setProgress(R.id.speed_seekbar, item.gradientSpeed)
+                        .setChecked(R.id.color_mode_rb,item.rgbType == 0)
+                        .setChecked(R.id.gradient_mode_rb,item.rgbType == 1)
                         .setText(R.id.sbBrightness_num, "$progress%")
                         .setText(R.id.sb_w_bright_num, sbWhiteLightRGB.progress.toString() + "%")
                         .setText(R.id.speed_seekbar_alg_tv, (speedSeekbar!!.progress + 1).toString() + "%")
@@ -184,7 +186,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             else -> {
-                helper.setProgress(R.id.normal_sbBrightness, item.brightness).setProgress(R.id.normal_temperature, item.temperature)
+                helper.setProgress(R.id.normal_sbBrightness, item.brightness)
+                        .setProgress(R.id.normal_temperature, item.temperature)
                         .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
                         .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)

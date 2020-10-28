@@ -1082,6 +1082,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         finish()
     }
 
+    @SuppressLint("CheckResult")
     private fun transformView() {
         disableConnectionStatusListener()
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == light?.meshAddr) {
@@ -1089,18 +1090,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else {
             showLoadingDialog(getString(R.string.please_wait))
             TelinkLightService.Instance()?.idleMode(true)
-            mConnectDisposable = Observable.timer(8000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .flatMap {
-                        connect(light.meshAddr, macAddress = light.macAddr, fastestMode = true)
-                    }?.subscribe({
+          /*  disposableTimer?.dispose()
+            disposableTimer = Observable.timer(21, TimeUnit.SECONDS)
+                    .subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.connect_fail))
+                    }*/
+            connect(macAddress = light.macAddr, meshAddress = light.meshAddr, connectTimeOutTime = 10, retryTimes = 2)
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({
                         hideLoadingDialog()
                         startOtaAct()
+                        disposableTimer?.dispose()
                     }, {
+                        disposableTimer?.dispose()
                         hideLoadingDialog()
                         runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
-                        LogUtils.d(it)
                     })
         }
     }
@@ -2011,7 +2017,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))
                         .setPositiveButton(android.R.string.ok) { _, _ ->
 
-                            if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected==true) {
+                            if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
                                 showLoadingDialog(getString(R.string.please_wait))
                                 val disposable = Commander.resetDevice(light!!.meshAddr)
                                         .subscribe(

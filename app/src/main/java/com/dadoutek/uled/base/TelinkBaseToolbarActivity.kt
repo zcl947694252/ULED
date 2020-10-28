@@ -155,7 +155,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             Constants.INSTALL_ROUTER -> {
                 when {
                     DBUtils.getAllRouter().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                   Constants.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport))
+                   Constants.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport_gp_ota))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.ROUTER)
                 }
             }

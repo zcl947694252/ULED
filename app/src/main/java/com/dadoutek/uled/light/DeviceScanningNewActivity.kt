@@ -1193,7 +1193,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     finish()
                 }//meshAddr地址不够, 无法再扫描设备
                 90004 -> {
-                    ToastUtils.showShort(getString(R.string.region_not_router))
+                    ToastUtils.showShort(getString(R.string.region_no_router))
                     finish()
                 }//该账号该区域下没有路由
                 90005 -> {

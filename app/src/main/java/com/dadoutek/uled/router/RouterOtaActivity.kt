@@ -13,7 +13,6 @@ import com.dadoutek.uled.base.RouterOTAingNumBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.RouterOTAResultBean
@@ -23,7 +22,6 @@ import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_router_ota.*
-import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
 
@@ -87,7 +85,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_not_router))
+                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                 else -> ToastUtils.showShort(it.message)
             }
         }, {

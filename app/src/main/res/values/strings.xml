@@ -1110,7 +1110,7 @@
     <string name="route_scan_cant_ota">OTA cannot be used in the scan, please wait.Try to get the status in routing mode to restore the last scan</string>
     <string name="route_otaing_cont_to_ota">In OTA, OTA cannot be performed again.Try to get the state in routing mode to restore the last OTA</string>
     <string name="loacal_del">Local deletion</string>
-    <string name="region_not_router">There is no route under this account in this area, so it cannot be operated</string>
+    <string name="region_no_router">There is no route under this account in this area, so it cannot be operated</string>
     <string name="delete_scene_fail">Delete scene failed</string>
     <string name="no_bind_router_cant_version">The selected devices are not bound to the route, so the version number cannot be obtained. Please go to bind the route first</string>
     <string name="get_version_success_num">Gets the device version number. Currently, five devices have refreshed the version number</string>
@@ -1184,4 +1184,12 @@
     <string name="ota_fail_num">升级失败数:</string>
     <string name="route_cont_support_ble">路由设备不支持蓝牙模式</string>
     <string name="timer_scene">定时场景</string>
+    <string name="add_timer_scene">添加定时场景</string>
+    <string name="add_timer_scene_fail">添加定时场景失败</string>
+    <string name="add_timer_scene_success">添加定时场景成功</string>
+    <string name="dissupport_gp_ota">当前设备不支持群组升级</string>
+    <string name="timer_scene_open_faile">定时场景开启失败</string>
+    <string name="timer_scene_close_faile">定时场景关闭失败</string>
+    <string name="delete_timerscne_fail">删除定时场景失败</string>
+    <string name="update_timer_scene">更新定时场景</string>
 </resources>
