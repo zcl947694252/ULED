@@ -12,9 +12,11 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_routing_network.*
@@ -56,10 +58,19 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
             } else {
                 RouterModel.routerAccessInNet(mac!!.toLowerCase(), split[0].toInt(), split[1].toInt(), TAG)
                         ?.subscribe({
-                            showLoadingDialog(getString(R.string.please_wait))
-                            timeOutTimer?.dispose()
-                            timeOutTimer = Observable.timer(it.toLong(), TimeUnit.SECONDS).subscribe {
-                                ToastUtils.showShort(getString(R.string.router_access_in_fail))
+                            LogUtils.v("zcl-----------路由请求入网-------$it")
+                            when (it.errorCode) {
+                                0 -> {
+                                    showLoadingDialog(getString(R.string.please_wait))
+                                    timeOutTimer?.dispose()
+                                    timeOutTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS).subscribe {
+                                        ToastUtils.showShort(getString(R.string.router_access_in_fail))
+                                    }
+                                }
+                                90010 -> ToastUtils.showShort(getString(R.string.route_code_error))
+                                90003 -> ToastUtils.showShort(getString(R.string.route_other_add))
+                                90002 -> ToastUtils.showShort(getString(R.string.router_added))
+                                90001 -> ToastUtils.showShort(getString(R.string.router_offline))
                             }
                         }, {
                             ToastUtils.showShort(it.message)
@@ -87,8 +98,10 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
     }
 
     override fun routerAccessIn(cmdBody: CmdBodyBean) {
+        LogUtils.v("zcl----------收到路由入网通知-------$cmdBody")
         if (cmdBody.ser_id == TAG) {
             if (cmdBody.status == Constants.ALL_SUCCESS) {
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                 ToastUtils.showShort(getString(R.string.router_access_in_success))
                 val intent = Intent(this@RoutingNetworkActivity, GwLoginActivity::class.java)
                 intent.putExtra("is_router", true)

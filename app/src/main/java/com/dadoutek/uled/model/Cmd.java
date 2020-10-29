@@ -40,7 +40,8 @@ public class Cmd implements Serializable {
     public static final int tzRouteConfigEightSw =3016;
     public static final int tzRouteConfigSceneSw =3015;
     public static final int tzRouteConfigEightSesonr =3017;
-    public static final int tzRouteResetFactoryBySelf =3021;
+    public static final int tzRouteResetFactoryBySelf =3020;
+    public static final int tzRouteResetFactoryBySelfphy =3021;
     public static final int tzRouteOpenOrClose =4000;
     public static final int tzRouteConfigBri =4002;
     public static final int tzRouteConfigTem =4004;

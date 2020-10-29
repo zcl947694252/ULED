@@ -1233,6 +1233,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
         DaoSessionInstance.getInstance().dbGatewayDao.deleteAll()
+        DaoSessionInstance.getInstance().dbRouterDao.deleteAll()
     }
 
     fun deleteAllSensorAndSwitch() {
@@ -1256,6 +1257,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
         DaoSessionInstance.getInstance().dbGatewayDao.deleteAll()
+        DaoSessionInstance.getInstance().dbRouterDao.deleteAll()
     }
 
 

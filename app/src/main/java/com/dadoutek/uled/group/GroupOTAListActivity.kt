@@ -200,26 +200,26 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     @SuppressLint("SetTextI18n", "CheckResult")
     private fun startGetStatus(isFinish: Boolean) {
-            RouterModel.routerOTAResult(1, 5000, currentTime)?.subscribe({
-                //status	int	ota结果。-1失败 0成功 1升级中 2已停止 3处理中
-                LogUtils.v("zcl-----------获取路由状态----$currentTime---$it")
-                val filterSuccess = it.filter { item -> item.status == 0 }
-                val filterFail = it.filter { item -> item.status == -1 }
-                group_ota_success.text = getString(R.string.ota_success_num) + filterSuccess.size
-                group_ota_fail.text = getString(R.string.ota_fail_num) + filterFail.size
-                filterSuccess.forEach { it1 ->
-                    setMostNew(it1)
-                }
-                if (isFinish) {
-                    ota_progress.visibility = View.GONE
-                    isStartOta = false
-                    ToastUtils.showShort(getString(R.string.ota_finish))
-                    btn_gp_ota_start.text = getString(R.string.start_update)
-                    btn_gp_ota_start.isClickable = true
-                }
-            }, {
-                ToastUtils.showShort(it.message)
-            })
+        RouterModel.routerOTAResult(1, 5000, currentTime)?.subscribe({
+            //status	int	ota结果。-1失败 0成功 1升级中 2已停止 3处理中
+            LogUtils.v("zcl-----------获取路由状态----$currentTime---$it")
+            val filterSuccess = it.filter { item -> item.status == 0 }
+            val filterFail = it.filter { item -> item.status == -1 }
+            group_ota_success.text = getString(R.string.ota_success_num) + filterSuccess.size
+            group_ota_fail.text = getString(R.string.ota_fail_num) + filterFail.size
+            filterSuccess.forEach { it1 ->
+                setMostNew(it1)
+            }
+            if (isFinish) {
+                ota_progress.visibility = View.GONE
+                isStartOta = false
+                ToastUtils.showShort(getString(R.string.ota_finish))
+                btn_gp_ota_start.text = getString(R.string.start_update)
+                btn_gp_ota_start.isClickable = true
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
     }
 
     @SuppressLint("CheckResult")
@@ -254,7 +254,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         LogUtils.v("zcl-----------收到路由ota停止通知-------$routerOTAFinishBean")
         if (routerOTAFinishBean?.finish == true) {
             if (routerOTAFinishBean.ser_id == "router_ota") {
-                if (routerOTAFinishBean.status == 0 ){
+                if (routerOTAFinishBean.status == 0) {
                     disposableRouteTimer?.dispose()
                     finish()
                 }
@@ -334,7 +334,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         hideLoadingDialog()
         val status = routerOTAingNumBean?.status
         val otaResult = routerOTAingNumBean?.otaResult
-            startGetStatus(routerOTAingNumBean?.finish==true)
+        startGetStatus(routerOTAingNumBean?.finish == true)
 
 //        if (status == 0 && deviceMac == otaResult?.macAddr && otaResult?.failedCode == -1)
 //            afterOtaSuccess()
@@ -953,7 +953,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                             showLoadingDialog(getString(R.string.please_wait))
                             TelinkLightService.Instance()?.idleMode(true)
                             Thread.sleep(500)
-                            connect(macAddress = dbsw.macAddr, meshAddress = dbsw.meshAddr, connectTimeOutTime = 12,retryTimes = 2)
+                            connect(macAddress = dbsw.macAddr, meshAddress = dbsw.meshAddr, connectTimeOutTime = 12, retryTimes = 2)
                                     ?.subscribeOn(Schedulers.io())
                                     ?.observeOn(AndroidSchedulers.mainThread())
                                     ?.subscribe({
@@ -1126,14 +1126,13 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun getDeviceVersionSwitch(dbLight: DbSwitch) {
-        val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
-                { s: String ->
-                    dbLight!!.version = s
-                    DBUtils.saveSwitch(dbLight!!, true)
-                    setLightData()
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.get_version_success))
-                }, {
+        val dispos = Commander.getDeviceVersion(dbLight.meshAddr).subscribe({ s: String ->
+            dbLight!!.version = s
+            DBUtils.saveSwitch(dbLight!!, true)
+            setLightData()
+            hideLoadingDialog()
+            ToastUtils.showShort(getString(R.string.get_version_success))
+        }, {
             hideLoadingDialog()
             ToastUtils.showLong(getString(R.string.get_version_fail))
         })

@@ -1,6 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+            android:id="@+id/toolbar_rename"
+            android:icon="@drawable/ic_launcher"
+            android:orderInCategory="1"
+            android:title="@string/delete_group"
+            android:visible="false"
+            app:showAsAction="never" />
+
+    <item
             android:id="@+id/toolbar_batch_gp"
             android:icon="@drawable/ic_launcher"
             android:orderInCategory="1"

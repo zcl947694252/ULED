@@ -19,10 +19,9 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import org.jetbrains.anko.startActivity
 
 abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
+    private var batchRename: MenuItem? = null
     var bindRouter: MenuItem? = null
-    lateinit var dialogTv: TextView
     var builder: AlertDialog.Builder? = null
-    var dialogDelete: AlertDialog? = null
     open var deleteDeviceAll: MenuItem? = null
     private var onlineUpdateAll: MenuItem? = null
     open var batchGpAll: MenuItem? = null
@@ -43,6 +42,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
         }
 
         toolbar.inflateMenu(R.menu.menu_rgb_group_setting)
+        batchRename = toolbar.menu?.findItem(R.id.toolbar_rename)
         batchGpAll = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
         onlineUpdateAll = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDeviceAll = toolbar.menu?.findItem(R.id.toolbar_delete_device)
@@ -52,6 +52,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
         onlineUpdateAll?.title = getString(R.string.online_upgrade)
         deleteDeviceAll?.title = getString(R.string.edite_device)
 
+        batchRename?.isVisible = batchRenameVisible()
         batchGpAll?.isVisible = batchGpVisible()
         bindRouter?.isVisible = bindRouterVisible()
 
@@ -62,6 +63,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
                     else ->
                         if (setDeviceDataSize(0) > 0)
                             when (itm.itemId) {
+                                R.id.toolbar_rename -> renameDevice()
                                 R.id.toolbar_batch_gp -> skipBatch()
                                 R.id.toolbar_on_line -> goOta()
                                 R.id.toolbar_delete_device -> editeDevice()
@@ -73,6 +75,14 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             }
             true
         }
+    }
+
+    open fun batchRenameVisible(): Boolean {
+        return false
+    }
+
+    open fun renameDevice() {
+
     }
 
     open fun bindDeviceRouter() {

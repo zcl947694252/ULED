@@ -13,10 +13,11 @@ import java.io.Serializable
  * 更新描述
  */
 data class TimerSceneBody(
+        var id: Int = 0,
         var name: String? = null,
         var hour: Int = 0,
         var min: Int = 0,
         var week: Int = 0,
         var sid: Int = 0,
         var ser_id: String? = null
-):Serializable
+) : Serializable

@@ -15,6 +15,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.GwChoseModeActivity
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.RouterTimerSceneBean
@@ -26,6 +27,7 @@ import kotlinx.android.synthetic.main.item_gw_time_scene.*
 import kotlinx.android.synthetic.main.template_repeat_ly.*
 import kotlinx.android.synthetic.main.template_top_three.*
 import kotlinx.android.synthetic.main.template_wheel_container.*
+import org.jetbrains.anko.textColor
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -66,7 +68,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
             when {
                 scene == null -> ToastUtils.showShort(getString(R.string.please_select_scene))
                 mode == "" || mode == null -> ToastUtils.showShort(getString(R.string.select_mode))
-                else -> if (isReConfig) routerAddSceneTimer() else routerUpdateSceneTimer()
+                else -> if (!isReConfig) routerAddSceneTimer() else routerUpdateSceneTimer()
             }
         }
         timer_scene_ly!!.setOnClickListener {
@@ -92,12 +94,16 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
             minuteTime = timerSceneBean?.min ?: minuteTime
             mode = getWeekStr(timerSceneBean?.week)
             gate_way_repete_mode.text = mode
+            scene = DBUtils.getSceneByID((timerSceneBean?.sid ?: 0).toLong())
+            item_gw_timer_scene.text = scene?.name
         }
 
-        toolbar_t_center.text = if (isReConfig)
+        toolbar_t_center.text = if (!isReConfig)
             getString(R.string.add_timer_scene)
         else
             getString(R.string.update_timer_scene)
+
+        toolbar_t_center.textColor = getColor(R.color.gray_3)
         wheel_time_container.addView(timePicker)
     }
 
@@ -197,7 +203,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
             RouterModel.routeUpdateTimerScene(timerSceneBean?.id
                     ?: 0, hourTime, minuteTime, getWeek(mode!!), scene!!.id.toInt(), "updateTimerScene")
                     ?.subscribe({
-                        LogUtils.v("zcl-----------路由请求刷新定时场景$-------")
+                        LogUtils.v("zcl-----------路由请求刷新定时场景$-------$it")
                         when (it.errorCode) {
                             0 -> {
                                 showLoadingDialog(getString(R.string.please_wait))

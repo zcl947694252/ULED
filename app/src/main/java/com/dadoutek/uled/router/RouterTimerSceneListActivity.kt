@@ -146,7 +146,7 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun routerDelTimerScene() {
         RouterModel.routeDelTimerScene(list[currentPostion].id, "delTimerScene")?.subscribe({
-            LogUtils.v("zcl-----------路由请求删除定时场景$currentStatus")
+            LogUtils.v("zcl-----------路由请求删除定时场景$it")
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))

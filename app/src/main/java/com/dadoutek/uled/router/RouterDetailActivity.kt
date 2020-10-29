@@ -51,6 +51,13 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
 
     }
 
+    override fun batchRenameVisible(): Boolean {
+        return true
+    }
+
+    override fun renameDevice() {
+        RouterModel.routeUpdateRouterName((router?.id?:0).toInt(),"hahha")
+    }
     @SuppressLint("SetTextI18n")
     private fun initData() {
         val routerId = intent.getLongExtra("routerId", 1000000)
@@ -107,6 +114,7 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
     @SuppressLint("CheckResult")
     override fun editeDevice() {
         RouterModel.routeResetFactoryBySelf(MacResetBody(router!!.macAddr, 0, 0, "routerFactory"))?.subscribe({
+            LogUtils.v("zcl-----------请求路由恢复出厂-------$it")
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))

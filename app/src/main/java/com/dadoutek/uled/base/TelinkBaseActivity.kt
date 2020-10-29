@@ -235,7 +235,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     val sb = StringBuilder()
                     for (i in filter.indices)
                         when {
-                            i != list.size - 1 -> sb.append(list[i].week).append(",")
+                            i != filter.size - 1 -> sb.append(list[i].week).append(",")
                             else -> sb.append(list[i].week)
                         }
                     sb.toString()
@@ -536,7 +536,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         super.onResume()
         if (!LeBluetooth.getInstance().enable(applicationContext) && !Constants.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
-        val lastUser = DBUtils.lastUser
+        val lastUser = lastUser
         lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)//没有上传数据或者当前区域不是自己的区域
                 startTimerUpdate()
@@ -709,7 +709,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n", "StringFormatInvalid")
-    private fun makeCodeDialog(type: Int, phone: Any, rid: Any, regionName: Any, lastRegionId: Int? = DBUtils.lastUser?.last_region_id?.toInt()) {
+    private fun makeCodeDialog(type: Int, phone: Any, rid: Any, regionName: Any, lastRegionId: Int? = lastUser?.last_region_id?.toInt()) {
         //移交码为0授权码为1
         var title: String? = null
         var recever: String? = null
@@ -805,7 +805,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 Cmd.tzRouteInAccount -> routerAccessIn(cmdBean)
                 Cmd.tzRouteConfigWifi -> routerConfigWIFI(cmdBean)
-                Cmd.tzRouteResetFactoryBySelf -> {
+                Cmd.tzRouteResetFactoryBySelf,Cmd.tzRouteResetFactoryBySelfphy -> {
                     tzRouteResetFactoryBySelf(cmdBean)
                 }
                 Cmd.routeStartScann -> tzStartRouterScan(cmdBean)
@@ -974,7 +974,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
     private fun unbindDialog(codeBean: MqttBodyBean) {
-        val user = DBUtils.lastUser
+        val user = lastUser
         user?.let {
             if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
                     && it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
@@ -993,7 +993,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     private fun singleDialog(codeBean: MqttBodyBean) {
         val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, false)
-        if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
+        if (codeBean.loginStateKey != lastUser?.login_state_key && boolean) //确保登录时成功的
             loginOutMethod()
     }
 
@@ -1113,7 +1113,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         locationServiceDialog?.hide()
     }
 
-    fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
+    fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16), retryTimes: Long = 2,
                 deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
 
@@ -1159,7 +1159,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         if (TelinkLightApplication.getApp().connectDevice == null/*!TelinkLightService.Instance().isLogin*/) {
                             showLoadingDialog(getString(R.string.please_wait))
 
-                            val meshName = DBUtils.lastUser!!.controlMeshName
+                            val meshName = lastUser!!.controlMeshName
 
                             GlobalScope.launch {
                                 //自动重连参数

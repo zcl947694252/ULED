@@ -917,10 +917,10 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @POST("router/access-in")
-    Observable<Response<Integer>> routerAccessIn(@Field("macAddr") String macAddr, @Field(
-            "timeZoneHour")
-            int timeZoneHour, @Field("timeZoneMin") int timeZoneMin,
-                                                 @Field("ser_id") String ser_id);
+    Observable<Response<RouterTimeoutBean>> routerAccessIn(@Field("macAddr") String macAddr,
+                                                           @Field("timeZoneHour") int timeZoneHour,
+                                                           @Field("timeZoneMin") int timeZoneMin,
+                                                           @Field("ser_id") String ser_id);
 
     /**
      * 配置路由wifi信息。路由可以配置wifi也可以接网线  https://dev.dadoutek.com/xxxx/router/wifi-configure  POST
@@ -1068,9 +1068,7 @@ public interface RequestInterface {
                                                            @Field("macAddr") String macAddr);
 
     /**
-     * 获取ota升级结果
-     * 请求URL
-     * https://dev.dadoutek.com/xxxx/ota/result/list  GET
+     * 获取ota升级结果 https://dev.dadoutek.com/xxxx/ota/result/list  GET
      * page	否	int	页码，可能数量过大需要分页查询。默认1
      * size	否	int	当前页数量。默认Integer的最大值，即0x7fffffff（有符号）
      * start	否	long	查询条件: 开始时间戳，单位毫秒
@@ -1079,7 +1077,6 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/smartlight_test/ota/result/list?page=1&size=50&start
      * =1597046991063 #查询#查询第一页数据，每页50条，创建时间为2020-07-20 11:29:20
      */
-
     @GET("ota/result/list")
     Observable<Response<List<RouterOTAResultBean>>> routerGetOTAResult(@Query("page") int page,
                                                                        @Query("size") int size,
@@ -1254,8 +1251,7 @@ public interface RequestInterface {
    int id, @Field("keys") List<KeyBean> keys,  @Field("ser_id") String ser_id*/);
 
     /**
-     * 传感器配置
-     * https://dev.dadoutek.com/xxxx/router/sensor/configure POST
+     * 传感器配置 https://dev.dadoutek.com/xxxx/router/sensor/configure POST
      * ser_id	是	string	app会话id，推送时回传
      * id	是	int	传感器id
      * configuration	是	Configuration	配置数据
@@ -1268,14 +1264,11 @@ public interface RequestInterface {
      * groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
      * sid	否	int	配置场景id。仅在场景模式下需要该配置
      * 群组模式示例
-     * { "ser_id": "app会话id，自己维护", "id": 1,
-     * "configuration": {
-     * "mode": 0,   "condition": 0,  "durationTimeUnit": 0, "durationTimeValue": 10,
-     * "action": 0,"brightness": 0,  "groupMeshAddrs": [32799, 32800]}}
+     * {"ser_id":"app会话id,自己维护","id":1,"configuration":{"mode":0,"condition":0,"durationTimeUnit":
+     * 0, "durationTimeValue": 10"action": 0,"brightness": 0,  "groupMeshAddrs": [32799, 32800]}}
      * 场景模式示例
-     * {"ser_id": "app会话id，自己维护", "id": 1,
-     * "configuration": { "mode": 0, "condition": 0, "durationTimeUnit": 0,
-     * "durationTimeValue": 10,"sid": 1 }}
+     * {"ser_id": "app会话id，自己维护", "id": 1,"configuration": { "mode": 0, "condition": 0,
+     * "durationTimeUnit": 0,"durationTimeValue": 10,"sid": 1 }}
      */
     @POST("router/sensor/configure")
     Observable<Response<RouterTimeoutBean>> configSensor(@Body ConfigSensorBody body/*@Field
@@ -1290,9 +1283,7 @@ public interface RequestInterface {
      * 传感器开关  https://dev.dadoutek.com/xxxx/router/control/sensor/status POST
      * ser_id	是	string	app会话id，推送时回传
      * id	是	int	传感器id  status	是	int	开关状态。1开，0关
-     * "ser_id": "app会话id，自己维护",
-     * "id": 1,
-     * "status": 1
+     * "ser_id": "app会话id，自己维护""id": 1,"status": 1
      */
     @FormUrlEncoded
     @POST("router/control/sensor/status")
@@ -1309,8 +1300,7 @@ public interface RequestInterface {
      * value	否	int	只需在调节窗帘速度时需要
      * { "meshAddr" : 1, "meshType": 4,"controlCmd": 1,"value": 10"ser_id": "app会话id，自己维护"}
      * controlCmd  开 = 0x0a  暂停 = 0x0b  关 = 0x0c  调节速度 = 0x15  恢复出厂 = 0xec   重启 = 0xea
-     * value 调节速度值 = 1~3  其他 = 不填或随意
-     * meshType 窗帘 = 16 组 = 97
+     * value 调节速度值 = 1~3  其他 = 不填或随意   meshType 窗帘 = 16 组 = 97
      */
     @FormUrlEncoded
     @POST("router/control/curtain")
@@ -1332,9 +1322,7 @@ public interface RequestInterface {
     /**
      * 安全锁https://dev.dadoutek.com/xxxx/router/control/device/rgb  POST
      * status	是	int	1开 2关
-     * ser_id	是	string	app会话id，推送时回传
-     * "status" : 2,
-     * "ser_id": "app会话id，自己维护"
+     * ser_id	是	string	app会话id，推送时回传"status" : 2, "ser_id": "app会话id，自己维护"
      */
     @FormUrlEncoded
     @POST("router/control/device/rgb")
@@ -1573,12 +1561,12 @@ public interface RequestInterface {
      * sid	是	int	关联场景id
      * {"id": 1, "hour": 8,"min": 0, "week": 0, "sid": 1, "ser_id": "xxxx"}
      */
-    @FormUrlEncoded
     @PUT("router/update-timer-scene")
-    Observable<Response<RouterTimeoutBean>> routeUpdateTimerScene(@Field("id") int id,
+    Observable<Response<RouterTimeoutBean>> routeUpdateTimerScene(@Body TimerSceneBody body
+            /*@Field("id") int id,
                                                @Field("hour") int hour,  @Field("min") int min,
                                                @Field("week") int week, @Field("sid") int sid,
-                                               @Field("ser_id") String ser_id);
+                                               @Field("ser_id") String ser_id*/);
 
     /**
      * 删除定时场景 https://dev.dadoutek.com/xxxx/router/del-timer-scene  DELETE
@@ -1606,6 +1594,7 @@ public interface RequestInterface {
     //获取路由列表 https://dev.dadoutek.com/xxxx/timer-scene/list GET
     @GET("timer-scene/list")
     Observable<Response<List<RouterTimerSceneBean>>> routeTimerSceneList();
+
     /**
      * 更新定时场景非协议链路字段 https://dev.dadoutek.com/xxxx/timer-scene/update/{id} PUT
      * name	否	string	名称
@@ -1613,5 +1602,14 @@ public interface RequestInterface {
      */
     @FormUrlEncoded
     @PUT("timer-scene/update/{id}")
-    Observable<Response> routeUpdateTimerSceneName(@Path("id") int id,@Field("name") String name);
+    Observable<Response> routeUpdateTimerSceneName(@Path("id") int id, @Field("name") String name);
+
+    /**
+     * 路由更新 https://dev.dadoutek.com/xxxx/router/update/{id} PUT
+     * name	否	string	名称
+     *     "name": "sdasdadas"
+     */
+    @FormUrlEncoded
+    @PUT("router/update/{id}")
+    Observable<Response> routeUpdateRouterName(@Path("id") int id, @Field("name") String name);
 }

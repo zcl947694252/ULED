@@ -337,7 +337,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
                 }
             }
-            notifyDataSetChanged()
         }
         helper.addOnClickListener(R.id.btn_delete)
                 .addOnClickListener(R.id.dot_one)

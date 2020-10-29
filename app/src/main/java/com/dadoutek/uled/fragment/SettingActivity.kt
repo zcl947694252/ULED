@@ -47,13 +47,10 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
-
-
 /**
  * 创建者     ZCL
  * 创建时间   2020/8/17 19:46
  * 描述
- *
  * 更新者     $
  * 更新时间   $
  * 更新描述
@@ -129,7 +126,7 @@ class SettingActivity : TelinkBaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
         list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
         //if (DBUtils.getAllRouter().size > 1)
-            list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
+        //list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
     }
 
     @SuppressLint("StringFormatMatches")
@@ -140,16 +137,16 @@ class SettingActivity : TelinkBaseActivity() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { it1 ->
-
                         var num = Constants.downTime - 1 - it1
-                        if (num == 0L) {
-                            setTimerZero()
-                        } else {
-                            cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.white)
-                            cancel?.isClickable = false
-                            confirm?.isClickable = false
-                            readTimer?.visibility = View.VISIBLE
-                            readTimer?.text = getString(R.string.please_read_carefully, num)
+                        when (num) {
+                            0L -> setTimerZero()
+                            else -> {
+                                cancelConfirmVertical?.backgroundColor = resources.getColor(R.color.white)
+                                cancel?.isClickable = false
+                                confirm?.isClickable = false
+                                readTimer?.visibility = View.VISIBLE
+                                readTimer?.text = getString(R.string.please_read_carefully, num)
+                            }
                         }
                     }
             popUser?.showAtLocation(window?.decorView, Gravity.CENTER, 0, 0)
