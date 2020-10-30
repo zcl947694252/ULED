@@ -56,12 +56,14 @@ public class DbConnector implements Serializable {
     public int rssi =1000;
     public boolean isSupportOta =true;
     public boolean isMostNew =false;
-    @Generated(hash = 924822306)
+    public int belongRegionId =0;
+    public int uid =0;
+    @Generated(hash = 559611387)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
             int index, String groupName, int color, String version, String boundMac,
             String boundMacName, int status, int rssi, boolean isSupportOta,
-            boolean isMostNew) {
+            boolean isMostNew, int belongRegionId, int uid) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -80,6 +82,8 @@ public class DbConnector implements Serializable {
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
         this.isMostNew = isMostNew;
+        this.belongRegionId = belongRegionId;
+        this.uid = uid;
     }
 
     @Generated(hash = 1212725637)
@@ -257,5 +261,21 @@ public class DbConnector implements Serializable {
 
     public void setIsMostNew(boolean isMostNew) {
         this.isMostNew = isMostNew;
+    }
+
+    public int getBelongRegionId() {
+        return this.belongRegionId;
+    }
+
+    public void setBelongRegionId(int belongRegionId) {
+        this.belongRegionId = belongRegionId;
+    }
+
+    public int getUid() {
+        return this.uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 }

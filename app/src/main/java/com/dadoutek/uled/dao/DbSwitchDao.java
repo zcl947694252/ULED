@@ -46,6 +46,9 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         public final static Property IsChecked = new Property(19, Boolean.class, "isChecked", false, "IS_CHECKED");
         public final static Property IsSupportOta = new Property(20, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
         public final static Property Type = new Property(21, int.class, "type", false, "TYPE");
+        public final static Property BelongRegionId = new Property(22, int.class, "belongRegionId", false, "BELONG_REGION_ID");
+        public final static Property Uid = new Property(23, int.class, "uid", false, "UID");
+        public final static Property List = new Property(24, String.class, "list", false, "LIST");
     }
 
 
@@ -82,7 +85,10 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
                 "\"ROUTER_ID\" INTEGER NOT NULL ," + // 18: routerId
                 "\"IS_CHECKED\" INTEGER," + // 19: isChecked
                 "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 20: isSupportOta
-                "\"TYPE\" INTEGER NOT NULL );"); // 21: type
+                "\"TYPE\" INTEGER NOT NULL ," + // 21: type
+                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 22: belongRegionId
+                "\"UID\" INTEGER NOT NULL ," + // 23: uid
+                "\"LIST\" TEXT);"); // 24: list
     }
 
     /** Drops the underlying database table. */
@@ -168,6 +174,13 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         }
         stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
         stmt.bindLong(22, entity.getType());
+        stmt.bindLong(23, entity.getBelongRegionId());
+        stmt.bindLong(24, entity.getUid());
+ 
+        String list = entity.getList();
+        if (list != null) {
+            stmt.bindString(25, list);
+        }
     }
 
     @Override
@@ -247,6 +260,13 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         }
         stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
         stmt.bindLong(22, entity.getType());
+        stmt.bindLong(23, entity.getBelongRegionId());
+        stmt.bindLong(24, entity.getUid());
+ 
+        String list = entity.getList();
+        if (list != null) {
+            stmt.bindString(25, list);
+        }
     }
 
     @Override
@@ -278,7 +298,10 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             cursor.getLong(offset + 18), // routerId
             cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0, // isChecked
             cursor.getShort(offset + 20) != 0, // isSupportOta
-            cursor.getInt(offset + 21) // type
+            cursor.getInt(offset + 21), // type
+            cursor.getInt(offset + 22), // belongRegionId
+            cursor.getInt(offset + 23), // uid
+            cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24) // list
         );
         return entity;
     }
@@ -307,6 +330,9 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         entity.setIsChecked(cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0);
         entity.setIsSupportOta(cursor.getShort(offset + 20) != 0);
         entity.setType(cursor.getInt(offset + 21));
+        entity.setBelongRegionId(cursor.getInt(offset + 22));
+        entity.setUid(cursor.getInt(offset + 23));
+        entity.setList(cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24));
      }
     
     @Override

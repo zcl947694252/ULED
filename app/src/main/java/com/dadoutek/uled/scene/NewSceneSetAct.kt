@@ -352,9 +352,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private fun showPopMode(position: Int) {
         // val itemGroup = showGroupList[position]
         // if (itemGroup.rgbType == 1)
-        //     buildInModeList.forEach {
-        //         it.isSceneModeSelect = it.id == itemGroup.gradientId
-        //     }
+        //     buildInModeList.forEach {  it.isSceneModeSelect = it.id == itemGroup.gradientId }
         // rgbSceneModeAdapter.notifyDataSetChanged()
         // pop?.showAtLocation(window.decorView, Gravity.BOTTOM, 0, 0)
         startActivityForResult(Intent(this@NewSceneSetAct, SelectGradientActivity::class.java), 1000)

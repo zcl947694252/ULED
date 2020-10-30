@@ -1236,4 +1236,6 @@
     <string name="timer_scene_close_faile">定时场景关闭失败</string>
     <string name="delete_timerscne_fail">删除定时场景失败</string>
     <string name="update_timer_scene">更新定时场景</string>
+    <string name="plaese_input_device_name">请输入设备名</string>
+    <string name="rename_success">重命名成功</string>
 </resources>

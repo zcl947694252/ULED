@@ -86,7 +86,7 @@ object RouterModel {
      */
     fun updateRouter(it: DbRouter): Observable<Any>? {
         return NetworkFactory.getApi()
-                .updateRouter(it.id, it.name)
+                .updateRouter(it.id, NameBody(it.name))
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {}
@@ -499,35 +499,35 @@ object RouterModel {
      * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致
      */
     fun routeUpdateLightName(id: Long, name: String): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routeUpdateLight(id, name)
+        return NetworkFactory.getApi().routeUpdateLight(id, NameBody(name))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun routeUpdateRelayName(id: Long, name: String): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routeUpdateLight(id, name)
+        return NetworkFactory.getApi().routeUpdateLight(id, NameBody(name))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun routeUpdateSensorName(id: Long, name: String): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routeUpdateSensor(id, name)
+        return NetworkFactory.getApi().routeUpdateSensor(id, NameBody(name))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun routeUpdateCurtainName(id: Long, name: String): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routeUpdateLight(id, name)
+        return NetworkFactory.getApi().routeUpdateLight(id, NameBody(name))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
     fun routeUpdateSw(id: Long, name: String): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routeUpdateSwitch(id, name)
+        return NetworkFactory.getApi().routeUpdateSwitch(id, NameBody(name))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -583,14 +583,14 @@ object RouterModel {
     }
 
     fun routeUpdateTimerSceneName(id:Int,name: String): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routeUpdateTimerSceneName(id,name)
+        return NetworkFactory.getApi().routeUpdateTimerSceneName(id,NameBody(name))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun routeUpdateRouterName(id:Int,name: String): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routeUpdateRouterName(id,name)
-                // .compose(NetworkTransformer())
+    fun routeUpdateRouterName(id:Long,name: String): Observable<Any>? {
+        return NetworkFactory.getApi().updateRouter(id,NameBody(name))
+                .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

@@ -285,7 +285,65 @@ public interface RequestInterface {
                                           //                                          ("belongGroupId") int belongGroupId,
                                           @Path("lid") int lid);
 
-    //获取灯列表
+    /**
+     *查询灯列表，这个是旧接口，扩展使用
+     * 请求URL
+     * https://dev.dadoutek.com/xxxx/light/list
+     * 正式服 smartlight_java 替换xxxx
+     * 测试服 smartlight_test 替换xxxx
+     * 请求方式
+     * GET
+     * 请求头
+     * content-type : application/text
+     * (从该接口开始未注明这条信息的接口不需要加region-id和authorizer-user-id)
+     * region-id : 1(例)
+     * authorizer-user-id : 300460(例)
+     * token:eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MzAwNzI5fQ.YY-872ZqbqZjvCUxJjLyyBj1kbD-Mu2pgq4_2NS47sg (例)
+     * 请求参数&请求地址示例&传参示例
+     * 扩展如下可选参数(请求参数，不是请求体)
+     *
+     * 参数名	必选	类型	说明
+     * ids	否	string	查询条件: 灯id，多个用,分割
+     * gids	否	string	查询条件: 灯所属组id，多个用,分割
+     * 有其他需要的扩展可再加
+     *
+     * 示例
+     *  - https://dev.dadoutek.com/smartlight_test/light/list  // 原来的使用方式，获取全部灯设备
+     *  - https://dev.dadoutek.com/smartlight_test/light/list?ids=1,2 // 获取id为1和2的灯设备
+     *  - https://dev.dadoutek.com/smartlight_test/light/list?gids=1 // 获取id为1的组下所有灯设备
+     *  - https://dev.dadoutek.com/smartlight_test/light/list?ids=1,2,3&gids=3 // 获取id为3的组下id为1,2,3的灯设备
+     *  - https://dev.dadoutek.com/smartlight_test/light/list?ids=&gids= // 不提供任何值时等同获取全灯设备
+     * 返回示例
+     * 正常返回
+     * {
+     *     "data":
+     *     [
+     *         {
+     *             "belongGroupId": 1,
+     *             "belongRegionId": 1,
+     *             "boundMac": "0102030405", // 新增字段
+     *             "brightness": 100,
+     *             "color": 16777215,
+     *             "colorTemperature": 100,
+     *             "id": 10,
+     *             "index": 10,
+     *             "macAddr": "aabbbccddee",
+     *             "meshAddr": 10,
+     *             "meshUUID": 529,
+     *             "name": "设备:10",
+     *             "productUUID": 4,
+     *             "status": 0,
+     *             "uid": 301333,
+     *             "version": "LCS-3.6.1"
+     *         }
+     *     ],
+     *     "errorCode": 0,
+     *     "message": "get lights succeed!"
+     * }
+     * 新增字段 boundMac	string	设备绑定的路由mac地址，无绑定时为null
+     * //获取灯列表
+     */
+
     @GET("light/list")
     Observable<Response<List<DbLight>>> getLightList(@Header("token") String token);
 
@@ -865,9 +923,8 @@ public interface RequestInterface {
      * name	否	string	名称
      * {"name": "sdasdadas"}
      */
-    @FormUrlEncoded
     @PUT("router/update/{id}")
-    Observable<Response> updateRouter(@Path("id") long id, @Field("name") String name);
+    Observable<Response> updateRouter(@Path("id") long id, @Body NameBody body);
 
     /**
      * 设备绑定路由
@@ -1474,38 +1531,33 @@ public interface RequestInterface {
      * index	否	int	排序值 暂时不用
      * name	否	string	名称
      */
-    @FormUrlEncoded
     @PUT("light/update/{id}")
-    Observable<Response> routeUpdateLight(@Path("id") long id, @Field("name") String name);
+    Observable<Response> routeUpdateLight(@Path("id") long id, @Body NameBody body);
 
     /**
      * 窗帘更新  https://dev.dadoutek.com/xxxx/curtain/update/{id}* PUT
      * https://dev.dadoutek.com/smartlight_test/curtain/update/1
      */
-    @FormUrlEncoded
     @PUT("curtain/update/{id}")
-    Observable<Response> routeUpdateCurtain(@Path("id") long id, @Field("name") String name);
+    Observable<Response> routeUpdateCurtain(@Path("id") long id, @Body NameBody body);
 
     /**
      * 连接器更新*https://dev.dadoutek.com/xxxx/relay/update/{id}
      */
-    @FormUrlEncoded
     @PUT("relay/update/{id}")
-    Observable<Response> routeUpdateRelay(@Path("id") long id, @Field("name") String name);
+    Observable<Response> routeUpdateRelay(@Path("id") long id, @Body NameBody body);
 
     /**
      * 灯更新 https://dev.dadoutek.com/xxxx/sensor/update/{id}
      */
-    @FormUrlEncoded
     @PUT("sensor/update/{id}")
-    Observable<Response> routeUpdateSensor(@Path("id") long id, @Field("name") String name);
+    Observable<Response> routeUpdateSensor(@Path("id") long id, @Body NameBody body);
 
     /**
      * 开关更新  https://dev.dadoutek.com/xxxx/switch/update/{id}
      */
-    @FormUrlEncoded
     @PUT("switch/update/{id}")
-    Observable<Response> routeUpdateSwitch(@Path("id") long id, @Field("name") String name);
+    Observable<Response> routeUpdateSwitch(@Path("id") long id, @Body NameBody body);
 
     /**
      * 应用场景https://dev.dadoutek.com/xxxx/router/control/scene/apply  POST
@@ -1600,16 +1652,21 @@ public interface RequestInterface {
      * name	否	string	名称
      * {"name": "新名字"}
      */
-    @FormUrlEncoded
     @PUT("timer-scene/update/{id}")
-    Observable<Response> routeUpdateTimerSceneName(@Path("id") int id, @Field("name") String name);
+    Observable<Response> routeUpdateTimerSceneName(@Path("id") int id, @Body NameBody body);
 
     /**
-     * 路由更新 https://dev.dadoutek.com/xxxx/router/update/{id} PUT
-     * name	否	string	名称
-     *     "name": "sdasdadas"
+     * 通过路由删除组 https://dev.dadoutek.com/xxxx/app/third-party
+     * {"data":[{"id": 1,"name": "天猫精灵"}],"errorCode": 0,"message": "get third succeed!"}
      */
-    @FormUrlEncoded
-    @PUT("router/update/{id}")
-    Observable<Response> routeUpdateRouterName(@Path("id") int id, @Field("name") String name);
+    @GET("app/third-party")
+    Observable<Response<ThirdPartyBean>> appThirdParty();
+
+    /**
+     * 同步数据至第三方平台 https://dev.dadoutek.com/xxxx/app/third-party/synchronize/{thirdPartyId} GET
+     * { "data": null, "errorCode": 0, "message": "synchronize succeed!"}
+     */
+    @GET("app/third-party/synchronize/{thirdPartyId}")
+    Observable<Response> updateToThirdParty(@Path("thirdPartyId") int thirdPartyId);
+
 }

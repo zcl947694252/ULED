@@ -867,7 +867,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         hideLoadingDialog()
         LogUtils.v("zcl---------收到路由停止请求通知---------")
         if (cmdBean.status == 0) {
-            skipeType()
+            getRouterScanResult()
         } else {
             ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
         }

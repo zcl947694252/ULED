@@ -5,13 +5,13 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbSwitch implements Serializable {
@@ -85,14 +85,18 @@ public class DbSwitch implements Serializable {
      * 2八键单调光
      */
     public int type;
+    public int belongRegionId =0;
+    public int uid =0;
+    public String list ="";
 
-    @Generated(hash = 1636677906)
+    @Generated(hash = 1431548488)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
             Long belongGroupId, int rssi, String keys, String groupIds,
             String sceneIds, String controlGroupAddrs, String version,
             boolean isMostNew, String boundMac, String boundMacName, long routerId,
-            Boolean isChecked, boolean isSupportOta, int type) {
+            Boolean isChecked, boolean isSupportOta, int type, int belongRegionId,
+            int uid, String list) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -115,11 +119,15 @@ public class DbSwitch implements Serializable {
         this.isChecked = isChecked;
         this.isSupportOta = isSupportOta;
         this.type = type;
+        this.belongRegionId = belongRegionId;
+        this.uid = uid;
+        this.list = list;
     }
 
     @Generated(hash = 1179115222)
     public DbSwitch() {
     }
+
 
     public String getBoundMacName() {
         return boundMacName;
@@ -342,5 +350,29 @@ public class DbSwitch implements Serializable {
 
     public void setIsChecked(Boolean isChecked) {
         this.isChecked = isChecked;
+    }
+
+    public int getBelongRegionId() {
+        return this.belongRegionId;
+    }
+
+    public void setBelongRegionId(int belongRegionId) {
+        this.belongRegionId = belongRegionId;
+    }
+
+    public int getUid() {
+        return this.uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
+
+    public String getList() {
+        return this.list;
+    }
+
+    public void setList(String list) {
+        this.list = list;
     }
 }

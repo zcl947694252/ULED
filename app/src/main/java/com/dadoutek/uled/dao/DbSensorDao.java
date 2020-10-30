@@ -43,6 +43,9 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         public final static Property Selected = new Property(16, boolean.class, "selected", false, "SELECTED");
         public final static Property IsMostNew = new Property(17, boolean.class, "isMostNew", false, "IS_MOST_NEW");
         public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property BelongRegionId = new Property(19, int.class, "belongRegionId", false, "BELONG_REGION_ID");
+        public final static Property Uid = new Property(20, int.class, "uid", false, "UID");
+        public final static Property List = new Property(21, String.class, "list", false, "LIST");
     }
 
 
@@ -76,7 +79,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
                 "\"IS_CHECKED\" INTEGER," + // 15: isChecked
                 "\"SELECTED\" INTEGER NOT NULL ," + // 16: selected
                 "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 17: isMostNew
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 18: isSupportOta
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 18: isSupportOta
+                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 19: belongRegionId
+                "\"UID\" INTEGER NOT NULL ," + // 20: uid
+                "\"LIST\" TEXT);"); // 21: list
     }
 
     /** Drops the underlying database table. */
@@ -143,6 +149,13 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         stmt.bindLong(17, entity.getSelected() ? 1L: 0L);
         stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
         stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(20, entity.getBelongRegionId());
+        stmt.bindLong(21, entity.getUid());
+ 
+        String list = entity.getList();
+        if (list != null) {
+            stmt.bindString(22, list);
+        }
     }
 
     @Override
@@ -203,6 +216,13 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         stmt.bindLong(17, entity.getSelected() ? 1L: 0L);
         stmt.bindLong(18, entity.getIsMostNew() ? 1L: 0L);
         stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(20, entity.getBelongRegionId());
+        stmt.bindLong(21, entity.getUid());
+ 
+        String list = entity.getList();
+        if (list != null) {
+            stmt.bindString(22, list);
+        }
     }
 
     @Override
@@ -231,7 +251,10 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             cursor.isNull(offset + 15) ? null : cursor.getShort(offset + 15) != 0, // isChecked
             cursor.getShort(offset + 16) != 0, // selected
             cursor.getShort(offset + 17) != 0, // isMostNew
-            cursor.getShort(offset + 18) != 0 // isSupportOta
+            cursor.getShort(offset + 18) != 0, // isSupportOta
+            cursor.getInt(offset + 19), // belongRegionId
+            cursor.getInt(offset + 20), // uid
+            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21) // list
         );
         return entity;
     }
@@ -257,6 +280,9 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         entity.setSelected(cursor.getShort(offset + 16) != 0);
         entity.setIsMostNew(cursor.getShort(offset + 17) != 0);
         entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
+        entity.setBelongRegionId(cursor.getInt(offset + 19));
+        entity.setUid(cursor.getInt(offset + 20));
+        entity.setList(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
      }
     
     @Override

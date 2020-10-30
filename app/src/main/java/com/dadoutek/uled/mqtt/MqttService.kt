@@ -28,7 +28,7 @@ class MqttService : Service() {
     private var topics = "app/emit/${DBUtils.lastUser?.id}"
     private val host = "${Constants.HOST2}:${Constants.PORT}"
     private val passWord = EncryptUtils.encryptMD5("123456".toByteArray())
-    private val userName="APP_${DBUtils.lastUser?.id ?: 0}"
+    private val userName = "APP_${DBUtils.lastUser?.id ?: 0}"
     private var IGetMessageCallBack: IGetMessageCallBack? = null
 
 
@@ -50,8 +50,8 @@ class MqttService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-      //0  var flag = flags
-       // flag = START_STICKY
+        //0  var flag = flags
+        // flag = START_STICKY
         return super.onStartCommand(intent, flags, startId)
     }
 
@@ -59,7 +59,7 @@ class MqttService : Service() {
     private val mqttCallback = object : MqttCallback {
         override fun messageArrived(topic: String, message: MqttMessage) {
             val data = message.payload
-           // LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message ?.toString()}");
+            // LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message ?.toString()}");
             val intent = Intent()
             intent.action = Constants.LOGIN_OUT
             intent.putExtra(Constants.LOGIN_OUT, message.toString())
@@ -81,7 +81,7 @@ class MqttService : Service() {
             val info = connectivityManager.activeNetworkInfo
             return if (info != null && info.isAvailable) {
                 val name = info.typeName
-                    LogUtils.i(TAG, "MQTT当前网络名称：$name")
+                LogUtils.i(TAG, "MQTT当前网络名称：$name")
                 true
             } else {
                 LogUtils.i(TAG, "MQTT 没有可用网络")
@@ -101,7 +101,7 @@ class MqttService : Service() {
         client = MqttAndroidClient(this, uri, clientId)
         // 设置MQTT监听并且接受消息
         client?.setCallback(mqttCallback)
-       // client?.setManualAcks(false)//为true表示收到ack需要自己手动通知messageArrived
+        // client?.setManualAcks(false)//为true表示收到ack需要自己手动通知messageArrived
 
         conOpt = MqttConnectOptions()
         // 清除缓存
@@ -139,10 +139,12 @@ class MqttService : Service() {
 
 
     override fun onDestroy() {
-        client?.disconnect()
-        client?.unregisterResources()
-        stopSelf()
+        if (client != null) {
+            client?.disconnect()
+            client?.unregisterResources()
+        }
 
+        stopSelf()
         super.onDestroy()
     }
 

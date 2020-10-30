@@ -23,9 +23,9 @@ class RouterDeviceDetailsAdapter(layoutResId: Int, data: MutableList<DbRouter>, 
     fun changeState(isDelete: Boolean) {
         this.isDelete = isDelete
     }
-    override fun convert(helper: BaseViewHolder, DbRouter: DbRouter) {
+    override fun convert(helper: BaseViewHolder, dbRouter: DbRouter) {
         when {
-            DbRouter.name!=null&&DbRouter.name!="" ->helper.setText(R.id.template_device_group_name, DbRouter.name)
+            dbRouter.name!=null&&dbRouter.name!="" ->helper.setText(R.id.template_device_group_name, dbRouter.name)
             else -> helper.setText(R.id.template_device_group_name, helper.position)
         }
 

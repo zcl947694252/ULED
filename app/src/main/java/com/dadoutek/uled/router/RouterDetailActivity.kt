@@ -1,9 +1,11 @@
 package com.dadoutek.uled.router
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
+import android.widget.EditText
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -17,8 +19,10 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.MacResetBody
+import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
+import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.activity_router_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
@@ -56,8 +60,36 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
     }
 
     override fun renameDevice() {
-        RouterModel.routeUpdateRouterName((router?.id?:0).toInt(),"hahha")
+        val textGp = EditText(this)
+        StringUtils.initEditTextFilter(textGp)
+        textGp.hint =getString(R.string.please_rename)
+         AlertDialog.Builder(this)
+                                     .setTitle(R.string.please_rename)
+                                     .setView(textGp)
+                                     .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                                         if (textGp.text.toString().isEmpty()) {
+                                             ToastUtils.showLong(getString(R.string.plaese_input_device_name))
+                                             return@setPositiveButton
+                                         }
+                                         dialog.dismiss()
+                                         routerRenameDevice(textGp.text.toString())
+                                     }
+                                     .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+
     }
+
+    @SuppressLint("CheckResult")
+    private fun routerRenameDevice(toString: String) {
+        RouterModel.routeUpdateRouterName(router?.id ?: 0, toString)?.subscribe({
+            ToastUtils.showShort(getString(R.string.rename_success))
+            router?.name = toString
+            DBUtils.saveRouter(router!!,true)
+            toolbarTv.text = router?.name
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
     @SuppressLint("SetTextI18n")
     private fun initData() {
         val routerId = intent.getLongExtra("routerId", 1000000)
@@ -69,11 +101,11 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
         bindRouter?.title = router?.version
         deleteDeviceAll?.title = getString(R.string.delete_device)
         router_detail_mac.text = "MAC:"+router?.macAddr
+        toolbarTv.text = router?.name
     }
 
     private fun initView() {
         type = Constants.INSTALL_ROUTER
-        toolbarTv.text = getString(R.string.router)
     }
 
     override fun batchGpVisible(): Boolean {

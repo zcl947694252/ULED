@@ -4,12 +4,12 @@ import com.dadoutek.uled.R;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbSensor implements Serializable {
@@ -39,13 +39,17 @@ public class DbSensor implements Serializable {
     public int icon = R.drawable.icon_sensor;//灯状态显示图
     public boolean isMostNew = false;
     public boolean isSupportOta =true;
+    public int belongRegionId =0;
+    public int uid =0;
+    public String list ="";
 
-    @Generated(hash = 1826621490)
+    @Generated(hash = 2030563815)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId,
             String version, int rssi, int openTag, int setType, int sceneId,
             String boundMac, String boundMacName, Boolean isChecked,
-            boolean selected, boolean isMostNew, boolean isSupportOta) {
+            boolean selected, boolean isMostNew, boolean isSupportOta,
+            int belongRegionId, int uid, String list) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -65,6 +69,9 @@ public class DbSensor implements Serializable {
         this.selected = selected;
         this.isMostNew = isMostNew;
         this.isSupportOta = isSupportOta;
+        this.belongRegionId = belongRegionId;
+        this.uid = uid;
+        this.list = list;
     }
 
     @Generated(hash = 295132781)
@@ -274,5 +281,29 @@ public class DbSensor implements Serializable {
 
     public boolean getSelected() {
         return this.selected;
+    }
+
+    public int getBelongRegionId() {
+        return this.belongRegionId;
+    }
+
+    public void setBelongRegionId(int belongRegionId) {
+        this.belongRegionId = belongRegionId;
+    }
+
+    public int getUid() {
+        return this.uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
+    }
+
+    public String getList() {
+        return this.list;
+    }
+
+    public void setList(String list) {
+        this.list = list;
     }
 }

@@ -44,6 +44,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         public final static Property Rssi = new Property(17, int.class, "rssi", false, "RSSI");
         public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
         public final static Property IsMostNew = new Property(19, boolean.class, "isMostNew", false, "IS_MOST_NEW");
+        public final static Property BelongRegionId = new Property(20, int.class, "belongRegionId", false, "BELONG_REGION_ID");
+        public final static Property Uid = new Property(21, int.class, "uid", false, "UID");
     }
 
 
@@ -78,7 +80,9 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
                 "\"BOUND_MAC_NAME\" TEXT," + // 16: boundMacName
                 "\"RSSI\" INTEGER NOT NULL ," + // 17: rssi
                 "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 18: isSupportOta
-                "\"IS_MOST_NEW\" INTEGER NOT NULL );"); // 19: isMostNew
+                "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 19: isMostNew
+                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 20: belongRegionId
+                "\"UID\" INTEGER NOT NULL );"); // 21: uid
     }
 
     /** Drops the underlying database table. */
@@ -142,6 +146,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         stmt.bindLong(18, entity.getRssi());
         stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
         stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(21, entity.getBelongRegionId());
+        stmt.bindLong(22, entity.getUid());
     }
 
     @Override
@@ -199,6 +205,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         stmt.bindLong(18, entity.getRssi());
         stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
         stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
+        stmt.bindLong(21, entity.getBelongRegionId());
+        stmt.bindLong(22, entity.getUid());
     }
 
     @Override
@@ -228,7 +236,9 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
             cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // boundMacName
             cursor.getInt(offset + 17), // rssi
             cursor.getShort(offset + 18) != 0, // isSupportOta
-            cursor.getShort(offset + 19) != 0 // isMostNew
+            cursor.getShort(offset + 19) != 0, // isMostNew
+            cursor.getInt(offset + 20), // belongRegionId
+            cursor.getInt(offset + 21) // uid
         );
         return entity;
     }
@@ -255,6 +265,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         entity.setRssi(cursor.getInt(offset + 17));
         entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
         entity.setIsMostNew(cursor.getShort(offset + 19) != 0);
+        entity.setBelongRegionId(cursor.getInt(offset + 20));
+        entity.setUid(cursor.getInt(offset + 21));
      }
     
     @Override

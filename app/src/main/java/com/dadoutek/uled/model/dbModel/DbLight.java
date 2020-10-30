@@ -5,11 +5,11 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 /**
  * Created by hejiajun on 2018/5/14.
@@ -59,13 +59,16 @@ public class DbLight implements Serializable {
     public int rssi =1000;
     public boolean isSupportOta =true;
     public boolean isMostNew= false;
+    public int belongRegionId =0;
+    public int uid =0;
 
-    @Generated(hash = 595330405)
+    @Generated(hash = 1158977159)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, String sixMac,
             int meshUUID, int productUUID, Long belongGroupId, int index,
             String boundMac, int color, String version, String boundMacName,
-            int status, int rssi, boolean isSupportOta, boolean isMostNew) {
+            int status, int rssi, boolean isSupportOta, boolean isMostNew,
+            int belongRegionId, int uid) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -86,6 +89,8 @@ public class DbLight implements Serializable {
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
         this.isMostNew = isMostNew;
+        this.belongRegionId = belongRegionId;
+        this.uid = uid;
     }
 
     @Generated(hash = 2075223479)
@@ -367,5 +372,21 @@ public class DbLight implements Serializable {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getBelongRegionId() {
+        return this.belongRegionId;
+    }
+
+    public void setBelongRegionId(int belongRegionId) {
+        this.belongRegionId = belongRegionId;
+    }
+
+    public int getUid() {
+        return this.uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 }

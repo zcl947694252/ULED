@@ -24,7 +24,7 @@ public class ItemGroup implements Serializable {
     public long sceneId= 1000000;
     public int rgbType = 0   ;   //rgb 类型 0:颜色模式 1：渐变模式
     public int gradientType = 0 ;//渐变类型 1：自定义渐变  2：内置渐变
-    public int gradientId = 0  ; //渐变id
+    public int gradientId = 1  ; //渐变id
     public int gradientSpeed = 0 ;//渐变速度
     public String gradientName  ;//变速度
     public int icon = R.drawable.icon_group ;//图标

@@ -806,6 +806,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.tzRouteInAccount -> routerAccessIn(cmdBean)
                 Cmd.tzRouteConfigWifi -> routerConfigWIFI(cmdBean)
                 Cmd.tzRouteResetFactoryBySelf,Cmd.tzRouteResetFactoryBySelfphy -> {
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     tzRouteResetFactoryBySelf(cmdBean)
                 }
                 Cmd.routeStartScann -> tzStartRouterScan(cmdBean)

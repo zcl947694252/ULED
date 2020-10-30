@@ -5,12 +5,12 @@ import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
 
 import org.greenrobot.greendao.annotation.Entity;
-import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.NotNull;
 import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.Serializable;
+import org.greenrobot.greendao.annotation.Generated;
 
 @Entity
 public class DbCurtain implements Serializable {
@@ -54,12 +54,15 @@ public class DbCurtain implements Serializable {
     public int rssi =1000;
     public boolean isSupportOta =true;
     public boolean isMostNew = false;
+    public int belongRegionId =0;
+    public int uid =0;
 
-    @Generated(hash = 1311122362)
+    @Generated(hash = 1315904035)
     public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr, String macAddr,
             int productUUID, int status, boolean inverse, boolean closePull, int speed,
             boolean closeSlowStart, int index, Long belongGroupId, String groupName, String version,
-            String boundMac, String boundMacName, int rssi, boolean isSupportOta, boolean isMostNew) {
+            String boundMac, String boundMacName, int rssi, boolean isSupportOta, boolean isMostNew,
+            int belongRegionId, int uid) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -80,6 +83,8 @@ public class DbCurtain implements Serializable {
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
         this.isMostNew = isMostNew;
+        this.belongRegionId = belongRegionId;
+        this.uid = uid;
     }
 
     @Generated(hash = 303143706)
@@ -312,5 +317,21 @@ public class DbCurtain implements Serializable {
 
     public void setIsMostNew(boolean isMostNew) {
         this.isMostNew = isMostNew;
+    }
+
+    public int getBelongRegionId() {
+        return this.belongRegionId;
+    }
+
+    public void setBelongRegionId(int belongRegionId) {
+        this.belongRegionId = belongRegionId;
+    }
+
+    public int getUid() {
+        return this.uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 }

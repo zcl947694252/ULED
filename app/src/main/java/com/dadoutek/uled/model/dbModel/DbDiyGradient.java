@@ -25,19 +25,15 @@ public class DbDiyGradient implements Parcelable {
     private String name;
     private int type=0;
     private int speed=50;
-
     private int index;
-
-    private Long belongRegionId;
-
+    public Long belongRegionId;
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean selected;//选择状态
-
     @Expose(serialize = false, deserialize = false)
     @Transient
     public boolean select = false;//开停状态
-
+    public int uid;
     @ToMany(referencedJoinProperty = "belongDynamicChangeId")
     private List<DbColorNode> colorNodes;
 
@@ -50,16 +46,20 @@ public class DbDiyGradient implements Parcelable {
         name = in.readString();
         type = in.readInt();
         speed = in.readInt();
+        uid = in.readInt();
+        belongRegionId = in.readLong();
     }
 
-    @Generated(hash = 136035107)
-    public DbDiyGradient(Long id, String name, int type, int speed, int index, Long belongRegionId) {
+    @Generated(hash = 1425521857)
+    public DbDiyGradient(Long id, String name, int type, int speed, int index, Long belongRegionId,
+            int uid) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.speed = speed;
         this.index = index;
         this.belongRegionId = belongRegionId;
+        this.uid = uid;
     }
 
     @Generated(hash = 176034366)
@@ -100,6 +100,8 @@ public class DbDiyGradient implements Parcelable {
         dest.writeString(name);
         dest.writeInt(type);
         dest.writeInt(speed);
+        dest.writeInt(uid);
+        dest.writeLong(belongRegionId);
     }
 
     public Long getId() {
@@ -235,5 +237,13 @@ public class DbDiyGradient implements Parcelable {
 
     public void setSelect(boolean select) {
         this.select = select;
+    }
+
+    public int getUid() {
+        return this.uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 }

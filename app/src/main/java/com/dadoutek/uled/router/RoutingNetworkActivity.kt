@@ -61,7 +61,7 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
                             LogUtils.v("zcl-----------路由请求入网-------$it")
                             when (it.errorCode) {
                                 0 -> {
-                                    showLoadingDialog(getString(R.string.please_wait))
+                                   hideLoadingDialog()
                                     timeOutTimer?.dispose()
                                     timeOutTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS).subscribe {
                                         ToastUtils.showShort(getString(R.string.router_access_in_fail))
