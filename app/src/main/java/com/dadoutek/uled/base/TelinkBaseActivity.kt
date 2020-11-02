@@ -230,7 +230,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
             val filter = list.filter { it.selected }
             return when {
-                filter.size>=7 -> getString(R.string.every_day)
+                filter.size >= 7 -> getString(R.string.every_day)
                 else -> {
                     val sb = StringBuilder()
                     for (i in filter.indices)
@@ -244,6 +244,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
         return ""
     }
+
     fun isSuportOta(version: String?): Boolean {
         version?.let {
             val split = version.split("-")
@@ -789,8 +790,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constants.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
-            if (cmdBean.cmd==3025||cmdBean.cmd ==3024)
-            LogUtils.v("zcl-----------收到路由通知-------$msg")
+            LogUtils.v("zcl-----------收到路由通知----${cmdBean.cmd == 3025 || cmdBean.cmd == 3024}---$cmdBean")
             //var jsonObject = JSONObject(msg)
             when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
@@ -806,7 +806,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 Cmd.tzRouteInAccount -> routerAccessIn(cmdBean)
                 Cmd.tzRouteConfigWifi -> routerConfigWIFI(cmdBean)
-                Cmd.tzRouteResetFactoryBySelf,Cmd.tzRouteResetFactoryBySelfphy -> {
+                Cmd.tzRouteResetFactoryBySelf, Cmd.tzRouteResetFactoryBySelfphy -> {
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     tzRouteResetFactoryBySelf(cmdBean)
                 }
@@ -935,8 +935,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
-    open fun tzRouterChangeTimerSceneStatus(cmdBean: CmdBodyBean) { }
-    open fun tzRouterDelTimerScene(cmdBean: CmdBodyBean) { }
+    open fun tzRouterChangeTimerSceneStatus(cmdBean: CmdBodyBean) {}
+    open fun tzRouterDelTimerScene(cmdBean: CmdBodyBean) {}
     open fun tzRouterUpdateTimerScene(cmdBean: CmdBodyBean) {}
     open fun tzRouterAddTimerScene(cmdBean: CmdBodyBean) {}
     open fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {}
