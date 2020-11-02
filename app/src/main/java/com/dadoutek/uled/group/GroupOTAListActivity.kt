@@ -147,8 +147,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
         LogUtils.v("zcl-----------收到路由得到版本的通知-------$routerVersion")
         disposableRouteTimer?.dispose()
-        hideLoadingDialog()
+
         if (routerVersion?.finish == true) {
+            hideLoadingDialog()
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                 override fun start() {}
                 override fun complete() {
@@ -349,6 +350,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             ota_swipe_refresh_ly.isRefreshing = false
             return
         }
+
         loading_tansform.visibility = View.VISIBLE
         findMeshDevice(DBUtils.lastUser?.controlMeshName)
         disposableTimerResfresh?.dispose()
@@ -767,6 +769,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         ota_swipe_refresh_ly.setColorSchemeColors(Color.BLACK, Color.GREEN, Color.RED, Color.YELLOW, Color.BLUE)
         //设置触发刷新的距离
         ota_swipe_refresh_ly.setDistanceToTriggerSync(200)
+        //是否禁止下拉刷新
+        ota_swipe_refresh_ly.isEnabled = !Constants.IS_ROUTE_MODE
     }
 
     private fun isFinish() {
@@ -780,7 +784,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         loading_tansform.setOnClickListener { }
         ota_swipe_refresh_ly.setOnRefreshListener {
             setRefresh()
-            isStartOta = !isStartOta
         }
         btn_gp_ota_start.setOnClickListener {
             if (!isStartOta)

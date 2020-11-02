@@ -789,7 +789,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constants.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
-            //LogUtils.v("zcl-----------收到路由通知-------$msg")
+            if (cmdBean.cmd==3025||cmdBean.cmd ==3024)
+            LogUtils.v("zcl-----------收到路由通知-------$msg")
             //var jsonObject = JSONObject(msg)
             when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {

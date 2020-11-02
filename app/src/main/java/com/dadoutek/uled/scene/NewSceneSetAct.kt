@@ -63,9 +63,7 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity() {
-    private var isFirst: Boolean = false
     private var sceneGroupAdapter: SceneGroupAdapter? = null
-    private lateinit var sceneActions: DbSceneActions
     private lateinit var dbScene: DbScene
     private var disposableTimer: Disposable? = null
     private var rgbGradientId: Int = 1
@@ -96,14 +94,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_scene_set)
         makePop()
-      /*  if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {//获取以保存数据
-            isResult = true
-            val list = savedInstanceState.getSerializable(DATA_LIST_KEY) as ArrayList<ItemGroup>
-            showGroupList.addAll(list)
-            scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
-        } else {
-            isResult = false
-        }*/
+        /*  if (savedInstanceState != null && savedInstanceState.containsKey(DATA_LIST_KEY)) {//获取以保存数据
+              isResult = true
+              val list = savedInstanceState.getSerializable(DATA_LIST_KEY) as ArrayList<ItemGroup>
+              showGroupList.addAll(list)
+              scene = savedInstanceState.getParcelable(SCENE_KEY) as? DbScene
+          } else {
+              isResult = false
+          }*/
 
         select_icon_ly.setOnClickListener {
             startActivityForResult(Intent(this@NewSceneSetAct, SelectSceneIconActivity::class.java), 1100)
@@ -258,6 +256,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val intent = intent
         isReconfig = intent.extras!!.get(Constants.IS_CHANGE_SCENE) as Boolean
         if (isReconfig && !isResult) {
+            showGroupList.clear()
             scene = intent.extras!!.get(Constants.CURRENT_SELECT_SCENE) as DbScene
             edit_name.setText(scene?.name)
             //获取场景具体信息
@@ -372,8 +371,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             cb_white_light.isChecked = false
             cb_white_light.isEnabled = false
             dot_rgb.isEnabled = false
-            brightness = 0
-            temperature = 0
+            // brightness = 0
+            // temperature = 0
         } else {
             if (!Constants.IS_ROUTE_MODE)
                 showGroupList[position].isOn = true
@@ -390,10 +389,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
         if (!Constants.IS_ROUTE_MODE)
             Thread {
                 Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
-                Thread.sleep(300)
-                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, byteArrayOf(brightness.toByte()), true)
-                Thread.sleep(300)
-                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, byteArrayOf(temperature.toByte()), true)
+                /* Thread.sleep(300)
+                 TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, byteArrayOf(brightness.toByte()), true)
+                 Thread.sleep(300)
+                 TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, byteArrayOf(temperature.toByte()), true)*/
             }.start()
         else {
             var status = if (isOpen) 1 else 0
@@ -586,7 +585,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         try {
             unregisterReceiver(sceneGroupAdapter?.stompRecevice)
-        }catch (e:java.lang.Exception){
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
         registerReceiver(sceneGroupAdapter?.stompRecevice, filter)
@@ -774,8 +773,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     setSceneAc(sceneActions, belongSceneId, item, 0x04)
                 }
             }
-                DBUtils.saveSceneActions(sceneActions)
-                actionsList.add(sceneActions)
+            DBUtils.saveSceneActions(sceneActions)
+            actionsList.add(sceneActions)
         }
         if (Constants.IS_ROUTE_MODE)
             routerAddScene(name, sceneIcon, actionsList)
@@ -784,9 +783,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
             GlobalScope.launch {
                 delay(100)
                 addScene(belongSceneId)
+                afterSaveScene()
             }
         }
-        afterSaveScene()
     }
 
     private fun afterSaveScene() {
@@ -803,13 +802,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     LogUtils.v("zcl-----------收到创建场景请求-------$it")
                     showLoadingDialog(getString(R.string.saving))
                     startAddSceneTimeOut(it.t)
+                    afterSaveScene()
                 }
                 //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
                 NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
                 NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -837,7 +837,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 sceneActions.gradientType = itemGroup.gradientType
                 sceneActions.gradientId = itemGroup.gradientId
                 sceneActions.gradientSpeed = itemGroup.gradientSpeed
-                sceneActions.gradientName = itemGroup.gradientName//
+                sceneActions.gradientName = itemGroup.gradientName
             }
         } else {
             sceneActions.setIsEnableBright(item.isEnableBright)
@@ -971,7 +971,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
         }
 //this@NewSceneSetAct.runOnUiThread {  hideLoadingDialog() }
-
     }
 
     @SuppressLint("CheckResult")
@@ -990,7 +989,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 }
                 NetworkStatusCode.ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
                 NetworkStatusCode.ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -1124,7 +1123,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     disposableTimer?.dispose()
                     hideLoadingDialog()
                     getNewScenes()
-
                 }
                 else -> ToastUtils.showShort(routerScene?.msg)
             }
@@ -1156,10 +1154,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     for (item in it) {
                         DBUtils.saveScene(item, true)
                         DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(item?.id!!))
-                        for (i in item.actions.indices) {
-                            //("是不是空的2"+item.id)
+                        for (i in item.actions.indices)
                             DBUtils.saveSceneActions(item.actions[i], item.id)
-                        }
+                        LogUtils.v("zcl--------获取服务器场景---$item------${DBUtils.getActionsBySceneId(scene!!.id)}-")
                     }
                     finish()
                 }, {
@@ -1187,7 +1184,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         super.onDestroy()
         try {
             unregisterReceiver(sceneGroupAdapter?.stompRecevice)
-        }catch (e:java.lang.Exception){
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
     }

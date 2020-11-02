@@ -498,6 +498,7 @@ class SyncDataPutOrGetUtils {
                                 //("是不是空的2"+item.id)
                                 DBUtils.saveSceneActions(item.actions[i], item.id)
                             }
+                            LogUtils.v("zcl--------获取服务器场景---${item.name}----------${item.actions}------${DBUtils.getActionsBySceneId(item!!.id)}-")
                         }
                     }
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(

@@ -370,7 +370,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
                                 android:layout_marginEnd="10dp"
-                                android:background="@drawable/less_enabled" />
+                                android:padding="@dimen/dp_8"
+                                android:src="@drawable/less_enabled" />
 
                         <View
                                 android:layout_width="0dp"
@@ -383,7 +384,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="12dp"
                                 android:layout_marginEnd="8dp"
-                                android:background="@drawable/add_enabled" />
+                                android:padding="@dimen/dp_8"
+                                android:src="@drawable/add_enabled" />
 
                     </LinearLayout>
 
@@ -490,8 +492,8 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="7dp"
                                 android:layout_marginEnd="10dp"
-                                android:background="@drawable/less_enabled"
-                                android:padding="3dp" />
+                                android:padding="@dimen/dp_8"
+                                android:src="@drawable/less_enabled" />
 
                         <View
                                 android:layout_width="0dp"
@@ -503,7 +505,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="9dp"
-                                android:background="@drawable/add_enabled" />
+                                android:padding="@dimen/dp_8"
+                                android:src="@drawable/add_enabled" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -615,7 +618,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:background="@drawable/less_enabled" />
+                        android:padding="@dimen/dp_8"
+                        android:src="@drawable/less_enabled" />
 
                 <View
                         android:layout_width="0dp"
@@ -627,7 +631,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:background="@drawable/add_enabled" />
+                        android:padding="@dimen/dp_8"
+                        android:src="@drawable/add_enabled" />
             </LinearLayout>
 
             <LinearLayout
@@ -691,7 +696,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:background="@drawable/less_enabled" />
+                        android:padding="@dimen/dp_8"
+                        android:src="@drawable/less_enabled" />
 
                 <View
                         android:layout_width="0dp"
@@ -703,7 +709,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:background="@drawable/add_enabled" />
+                        android:padding="@dimen/dp_8"
+                        android:src="@drawable/add_enabled" />
             </LinearLayout>
         </android.support.constraint.ConstraintLayout>
         <!--开关场景-->

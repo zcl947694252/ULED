@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -20,8 +21,9 @@ import com.dadoutek.uled.model.dbModel.DbLight
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>,var isRouterBind: Boolean = false) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
-    var isRgb:Boolean = false
+class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRouterBind: Boolean = false) : BaseQuickAdapter<DbLight, BaseViewHolder>(layoutResId, data) {
+    var isRgb: Boolean = false
+
     // -70 至 -80一般  >=-65 很好
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbLight?) {
@@ -31,9 +33,9 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>,var isRoute
         helper.setText(R.id.template_device_batch_title, item?.name)
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
         if (isRgb)
-        icon.setImageResource(R.drawable.icon_rgb_n)
+            icon.setImageResource(R.drawable.icon_rgb_n)
         else
-        icon.setImageResource(R.drawable.icon_light_n)
+            icon.setImageResource(R.drawable.icon_light_n)
 
 
 
@@ -61,15 +63,16 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>,var isRoute
         }
 
         if (isRouterBind) {
-            groupName.text = item?.boundMacName
-            if (TextUtils.isEmpty(item?.boundMacName))
-                groupName.visibility = View.GONE
-            else
+            val routerByMac = DBUtils.getRouterByMac(item!!.boundMac)
+            LogUtils.v("zcl-----------获取路由名称---${item!!.boundMac}----${routerByMac}")
+            if (routerByMac != null && routerByMac.size >= 1) {
+                groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE
+            } else groupName.visibility = View.GONE
         }
     }
 
-    open fun setIsRgb(boolean: Boolean){
+    open fun setIsRgb(boolean: Boolean) {
         isRgb = boolean
     }
 }

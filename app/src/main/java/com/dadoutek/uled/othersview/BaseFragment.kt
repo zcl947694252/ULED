@@ -41,7 +41,10 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.runOnUiThread
+import org.jetbrains.anko.support.v4.runOnUiThread
 import org.json.JSONException
+import java.lang.Exception
 
 open class BaseFragment : Fragment() {
 
@@ -105,15 +108,16 @@ open class BaseFragment : Fragment() {
                         val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
                         tzRouterDelGroupResult(routerGroup)
                     }
-                    Cmd.routeDeleteScenes ->{
+                    Cmd.routeDeleteScenes -> {
                         tzRouterDelSceneResult(cmdBean)
                     }
-                    Cmd.routeUpdateScenes ->{}
+                    Cmd.routeUpdateScenes -> {
+                    }
 
                     /**
                      * 控制指令下的通知
                      */
-                    Cmd.tzRouteOpenOrClose  -> tzRouterOpenOrCloseFragment(cmdBean)
+                    Cmd.tzRouteOpenOrClose -> tzRouterOpenOrCloseFragment(cmdBean)
 
                     Cmd.routeApplyScenes -> tzRouterApplyScenes(cmdBean)
                 }
@@ -345,16 +349,18 @@ open class BaseFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         disableConnectionStatusListener()
-
     }
-
 
     fun hideLoadingDialog() {
         if (loadDialog != null) {
-            loadDialog!!.dismiss()
+            runOnUiThread {
+                try {
+                    loadDialog!!.dismiss()
+                } catch (e: Exception) {
+                }
+            }
         }
     }
-
 
     open fun endCurrentGuide() {}
     inner class ChangeRecevicer : BroadcastReceiver() {

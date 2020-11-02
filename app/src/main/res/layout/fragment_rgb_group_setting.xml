@@ -256,7 +256,7 @@
 
             <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent">
 
@@ -264,8 +264,9 @@
                         android:id="@+id/sb_w_bright_less"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:background="@drawable/less_enabled" />
+                        android:layout_marginStart="10dp"
+                        android:padding="8dp"
+                        android:src="@drawable/icon_minus" />
 
                <View
                         android:layout_width="0dp"
@@ -277,7 +278,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="9dp"
-                        android:background="@drawable/add_enabled" />
+                        android:padding="8dp"
+                        android:src="@drawable/add_enabled" />
 
                 <TextView
                         android:id="@+id/sb_w_bright_num"
@@ -338,7 +340,7 @@
 
             <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="20dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent">
 
@@ -347,7 +349,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:background="@drawable/less_enabled" />
+                        android:padding="@dimen/dp_8"
+                        android:src="@drawable/less_enabled" />
 
                <View
                         android:layout_width="0dp"
@@ -359,7 +362,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="9dp"
-                        android:background="@drawable/add_enabled" />
+                        android:padding="@dimen/dp_8"
+                        android:src="@drawable/add_enabled" />
 
                 <TextView
                         android:id="@+id/sbBrightness_num"

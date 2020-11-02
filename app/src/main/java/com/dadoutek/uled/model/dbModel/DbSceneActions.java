@@ -33,7 +33,6 @@ public class DbSceneActions {
     private int circleThree;
     private int circleFour;
 
-
     public int rgbType = 0   ;   //rgb 类型 0:颜色模式 1：渐变模式
     public int gradientType = 0 ;//渐变类型 1：自定义渐变  2：内置渐变
     public int gradientId = 0  ; //渐变id
@@ -226,29 +225,6 @@ public class DbSceneActions {
         isEnableWhiteBright = enableWhiteBright;
     }
 
-    @Override
-    public String toString() {
-        return "DbSceneActions{" +
-                "id=" + id +
-                ", belongSceneId=" + belongSceneId +
-                ", groupAddr=" + groupAddr +
-                ", colorTemperature=" + colorTemperature +
-                ", brightness=" + brightness +
-                ", color=" + color +
-                ", isOn=" + isOn +
-                ", deviceType=" + deviceType +
-                ", circleOne=" + circleOne +
-                ", circleTwo=" + circleTwo +
-                ", circleThree=" + circleThree +
-                ", circleFour=" + circleFour +
-                ", rgbType=" + rgbType +
-                ", gradientType=" + gradientType +
-                ", gradientId=" + gradientId +
-                ", gradientSpeed=" + gradientSpeed +
-                ", gradientName='" + gradientName + '\'' +
-                '}';
-    }
-
     public boolean getIsEnableBright() {
         return this.isEnableBright;
     }
@@ -264,4 +240,30 @@ public class DbSceneActions {
     public void setIsEnableWhiteBright(boolean isEnableWhiteBright) {
         this.isEnableWhiteBright = isEnableWhiteBright;
     }
+
+    @Override
+    public String toString() {
+        return "DbSceneActions{" +
+                "id=" + id +
+                ", belongSceneId=" + belongSceneId +
+                ", groupAddr=" + groupAddr +
+                ", colorTemperature=" + colorTemperature +
+                ", brightness=" + brightness +
+                ", color=" + color +
+                ", isOn=" + isOn +
+                ", isEnableBright=" + isEnableBright +
+                ", isEnableWhiteBright=" + isEnableWhiteBright +
+                ", deviceType=" + deviceType +
+                ", circleOne=" + circleOne +
+                ", circleTwo=" + circleTwo +
+                ", circleThree=" + circleThree +
+                ", circleFour=" + circleFour +
+                ", rgbType=" + rgbType +
+                ", gradientType=" + gradientType +
+                ", gradientId=" + gradientId +
+                ", gradientSpeed=" + gradientSpeed +
+                ", gradientName='" + gradientName + '\'' +
+                '}';
+    }
+
 }

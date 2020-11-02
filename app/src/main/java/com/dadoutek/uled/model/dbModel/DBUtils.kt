@@ -419,6 +419,10 @@ object DBUtils {
     fun getRouterByID(id: Long): DbRouter? {
         return DaoSessionInstance.getInstance().dbRouterDao.load(id)
     }
+    fun getRouterByMac(macAddr: String): MutableList<DbRouter>? {
+        return DaoSessionInstance.getInstance().dbRouterDao.queryBuilder()
+                .where(DbRouterDao.Properties.MacAddr.eq(macAddr)).list()
+    }
 
     fun getGatewayByID(id: Long): DbRouter? {
         return DaoSessionInstance.getInstance().dbRouterDao.load(id)
@@ -972,12 +976,16 @@ object DBUtils {
         actions.color = sceneActions.color
         actions.deviceType = sceneActions.deviceType
         actions.isOn = sceneActions.isOn
+        actions.rgbType = sceneActions.rgbType
+        actions.gradientId = sceneActions.gradientId
+        actions.gradientType = sceneActions.gradientType
+        actions.gradientName = sceneActions.gradientName
+        actions.gradientSpeed = sceneActions.gradientSpeed
 
         DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(actions)
     }
 
-    fun saveColorNodes(colorNode: DbColorNode, id: Long?,
-                       gradientId: Long) {
+    fun saveColorNodes(colorNode: DbColorNode, id: Long?, gradientId: Long) {
         val colorNodeNew = DbColorNode()
 
         colorNodeNew.belongDynamicChangeId = gradientId

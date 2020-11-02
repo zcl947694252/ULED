@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -51,11 +52,12 @@ class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>,var isR
         }
 
         if (isRouterBind) {
-            groupName.text = item?.boundMacName
-            if (TextUtils.isEmpty(item?.boundMacName))
-                groupName.visibility = View.GONE
-            else
+            val routerByMac = DBUtils.getRouterByMac(item!!.boundMac)
+            LogUtils.v("zcl-----------获取路由名称---${item!!.boundMac}----${routerByMac!![0].name}")
+            if (routerByMac != null && routerByMac.size >= 1) {
+                groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE
+            } else groupName.visibility = View.GONE
         }
     }
 }
