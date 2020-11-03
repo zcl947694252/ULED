@@ -63,8 +63,8 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRout
         }
 
         if (isRouterBind) {
-            val routerByMac = DBUtils.getRouterByMac(item!!.boundMac)
-            LogUtils.v("zcl-----------获取路由名称---${item!!.boundMac}----${routerByMac}")
+            val routerByMac = DBUtils.getRouterByMac(item?.boundMac?:"")
+            LogUtils.v("zcl-----------获取路由名称---${item?.boundMac?:""}----${routerByMac}")
             if (routerByMac != null && routerByMac.size >= 1) {
                 groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE

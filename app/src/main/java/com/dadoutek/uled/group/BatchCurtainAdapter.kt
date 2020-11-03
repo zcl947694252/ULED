@@ -20,7 +20,7 @@ import com.dadoutek.uled.model.dbModel.DbCurtain
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
  */
-class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>,var isRouterBind: Boolean = false) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
+class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>, var isRouterBind: Boolean = false) : BaseQuickAdapter<DbCurtain, BaseViewHolder>(layoutResId, data) {
     private val allLightId: Long = 1
     override fun convert(helper: BaseViewHolder?, item: DbCurtain?) {
         helper ?: return
@@ -35,7 +35,7 @@ class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>,var isR
             helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
-            icon.setImageResource(R.drawable.icon_curtain_s)
+        icon.setImageResource(R.drawable.icon_curtain_s)
 
         if (item?.belongGroupId != allLightId) {
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))
@@ -52,8 +52,8 @@ class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>,var isR
         }
 
         if (isRouterBind) {
-            val routerByMac = DBUtils.getRouterByMac(item!!.boundMac)
-            LogUtils.v("zcl-----------获取路由名称---${item!!.boundMac}----${routerByMac!![0].name}")
+            val routerByMac = DBUtils.getRouterByMac(item?.boundMac ?: "")
+            LogUtils.v("zcl-----------获取路由名称---${item?.boundMac ?: ""}----${routerByMac!![0].name}")
             if (routerByMac != null && routerByMac.size >= 1) {
                 groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE

@@ -334,6 +334,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun onDestroy() {
         super.onDestroy()
+            if (Constants.IS_ROUTE_MODE)
+                currentSensor?.let {
+                    routerConnectSensor(it, 1, "connectSensor")
+                }
         disposableReset?.dispose()
         TelinkLightApplication.getApp().removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)

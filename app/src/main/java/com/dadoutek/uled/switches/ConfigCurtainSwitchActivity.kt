@@ -70,7 +70,6 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private var mConfigFailSnackbar: Snackbar? = null
     private var isGlassSwitch = false
     private var groupName: String? = null
-    private var switchDate: DbSwitch? = null
     override fun setToolBar(): android.support.v7.widget.Toolbar {
         return toolbar
     }

@@ -53,7 +53,6 @@ import java.util.concurrent.TimeUnit
 
 class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var disposableTimer: Disposable? = null
-    private var switchDate: DbSwitch? = null
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
     private lateinit var mDeviceInfo: DeviceInfo
@@ -388,7 +387,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     @SuppressLint("CheckResult")
-    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id=="retryConnectSw")
             if (cmdBean.finish) {
                 if (cmdBean.status == 0) {

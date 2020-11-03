@@ -705,6 +705,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     override fun onDestroy() {
         super.onDestroy()
+        if (Constants.IS_ROUTE_MODE)
+            currentSensor?.let {
+                routerConnectSensor(it, 1, "connectSensor")
+            }
         TelinkLightApplication.getApp().removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)
         disposableReset?.dispose()

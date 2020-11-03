@@ -31,6 +31,7 @@ import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.network.RouterOTAResultBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
@@ -109,10 +110,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun getMostNewVersion() {
-        RouterModel.getDevicesVersion(meshAddrList, deviceType, "gpOta")?.subscribe({
+        RouterModel.getDevicesVersionNew(meshAddrList, deviceType, "gpOta")?.subscribe({
             LogUtils.v("zcl-----------收到路由请求版本申请-------$it")
             when (it.errorCode) {
-                NetworkStatusCode.OK -> startGetVersionTimer(it.t.timeout + 1L)
+                NetworkStatusCode.OK -> startGetVersionTimer(it.t.timeout.toLong())
                 //全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由 DEVICE_NOT_BINDROUTER 90008
                 // 以下路由没有上线，无法删获取版本  ROUTER_ALL_OFFLINE= 90005
                 NetworkStatusCode.DEVICE_NOT_BINDROUTER -> {
@@ -134,7 +135,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun startGetVersionTimer(t: Long) {
         showLoadingDialog(getString(R.string.please_wait))
         disposableRouteTimer?.dispose()
-        disposableRouteTimer = Observable.timer(t, TimeUnit.SECONDS)
+        disposableRouteTimer = Observable.timer(t+1L, TimeUnit.SECONDS)
                 .subscribe {
                     LogUtils.v("zcl-----------执行路由获取版本超时-------")
                     hideLoadingDialog()
@@ -162,6 +163,78 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             })
         } else {
             ToastUtils.showShort(getString(R.string.get_version_success_num, routerVersion?.succeedTotal?.size))
+        }
+    }
+
+    override fun tzRouteGetVersioningNum(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由gpOta通知-------$cmdBean")
+        if (cmdBean.ser_id == "gpOta") {
+            if (cmdBean.status == 0) {
+                disposableRouteTimer?.dispose()
+                startGetVersionTimer(cmdBean.timeout.toLong())
+            }
+        }
+    }
+
+    override fun tzRouteSendVersioning(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由gpOta上报通知-------$cmdBean")
+        if (cmdBean.ser_id == "gpOta") {
+            if (cmdBean.status != -1 && cmdBean.success) {
+                val meshAddr = cmdBean.meshAddr
+                when (deviceType) {
+                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                        val device = DBUtils.getLightMeshAddr(meshAddr)
+                        if (device.size > 0) {
+                            device[0].version = cmdBean.version
+                            DBUtils.saveLight(device[0], true)
+                        }
+                    }
+                    DeviceType.SMART_CURTAIN -> {
+                        val device = DBUtils.getCurtainMeshAddr(meshAddr)
+                        if (device.size > 0) {
+                            device[0].version = cmdBean.version
+                            DBUtils.saveCurtain(device[0], true)
+                        }
+                    }
+                    DeviceType.SMART_RELAY -> {
+                        val device = DBUtils.getRelyByMeshAddr(meshAddr)
+                        device?.version = cmdBean.version
+                        device?.let {
+                            DBUtils.saveConnector(device, true)
+                        }
+                    }
+                    DeviceType.NORMAL_SWITCH -> {
+                        val device = DBUtils.getSwitchByMeshAddr(meshAddr)
+                        device?.version = cmdBean.version
+                        device?.let {
+
+                            DBUtils.saveSwitch(device, true)
+                        }
+                    }
+                    DeviceType.SENSOR -> {
+                        val device = DBUtils.getSensorByMeshAddr(meshAddr)
+                        device?.version = cmdBean.version
+                        device?.let {
+
+                            DBUtils.saveSensor(device, true)
+                        }
+                    }
+                    DeviceType.GATE_WAY -> {
+                        val device = DBUtils.getGatewayByMeshAddr(meshAddr)
+                        device?.version = cmdBean.version
+                        device?.let {
+                            DBUtils.saveGateWay(device, true)
+                        }
+                    }
+                }
+                updataDevice()
+                if (cmdBean.finish) {
+                    hideLoadingDialog()
+                    disposableRouteTimer?.dispose()
+                } else {
+                    startGetVersionTimer(cmdBean.timeout.toLong())
+                }
+            }
         }
     }
 

@@ -23,6 +23,7 @@ import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.InputRGBColorDialog
 import com.dadoutek.uled.util.OtherUtils
 import io.reactivex.Observable
+import io.reactivex.Observer
 import kotlinx.android.synthetic.main.activity_select_color.*
 import kotlinx.android.synthetic.main.activity_select_color.color_b
 import kotlinx.android.synthetic.main.activity_select_color.color_g
@@ -48,6 +49,8 @@ import java.util.concurrent.TimeUnit
  */
 
 class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
+    private var lastTime: Long = 0
+    private var thisTime: Long = 0
     private var color: Int = 0
     private var itemGroup: ItemGroup? = null
     private var presetColors: MutableList<ItemColorPreset>? = null
@@ -197,17 +200,14 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
 
-        GlobalScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 if (w!! > Constants.MAX_VALUE)
                     w = Constants.MAX_VALUE
-
                 if (ws > Constants.MAX_VALUE)
                     ws = Constants.MAX_VALUE
-
                 if (ws == -1)
                     ws = 0
-
                 delay(80)
                 changeColor(red, green, blue, true)
             } catch (e: InterruptedException) {
@@ -242,19 +242,18 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         val color: Int = (r shl 16) or (g shl 8) or b
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
-            if (r == 0 && g == 0 && b == 0) {
-            } else {
+            if (r != 0 || g != 0 || b != 0) {
                 Thread {
                     itemGroup!!.color = color
-
                     changeColor(r, g, b, false)
-
                 }.start()
             }
         }
     }
 
     private fun changeColor(r: Int, G: Int, B: Int, isOnceSet: Boolean) {
+        thisTime = System.currentTimeMillis()
+
         var red = r.toByte()
         var green = G.toByte()
         var blue = B.toByte()
@@ -265,16 +264,20 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         var white = itemGroup!!.color and 0xff000000.toInt() shr 24
         color = (white shl 24) or (r shl 16) or (G shl 8) or B
 
-        if (Constants.IS_ROUTE_MODE)//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
-            routerConfigRGBNum(itemGroup!!.groupAddress, 97, color)
-        else {
-
-            if (isOnceSet) {
-                Thread.sleep(50)
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
-            } else {
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
+        if (thisTime - lastTime >= 200) {
+            when {
+                Constants.IS_ROUTE_MODE//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
+                -> routerConfigRGBNum(itemGroup!!.groupAddress, 97, color)
+                else -> {
+                    if (isOnceSet) {
+                        Thread.sleep(50)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
+                    } else {
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, itemGroup!!.groupAddress, params)
+                    }
+                }
             }
+            lastTime = thisTime
         }
     }
 
@@ -299,7 +302,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)

@@ -34,7 +34,7 @@ public class Cmd implements Serializable {
     public static final int tzRouteAddGradient =3009;
     public static final int tzRouteDelGradient =3010;
     public static final int tzRouteUpdateGradient =3011;
-    public static final int tzRouteConnectSwSe =3012;
+    public static final int tzRouteConnectOrDisConnectSwSe =3012;
     public static final int tzRouteConfigDoubleSw =3014;
     public static final int tzRouteConfigNormalSw =3013;
     public static final int tzRouteConfigEightSw =3016;
@@ -42,6 +42,8 @@ public class Cmd implements Serializable {
     public static final int tzRouteConfigEightSesonr =3017;
     public static final int tzRouteResetFactoryBySelf =3020;
     public static final int tzRouteResetFactoryBySelfphy =3021;
+    public static final int tzRouteGetVersioning =3025;
+    public static final int tzRouteGetVersionSend =3026;
     public static final int tzRouteOpenOrClose =4000;
     public static final int tzRouteConfigBri =4002;
     public static final int tzRouteConfigTem =4004;

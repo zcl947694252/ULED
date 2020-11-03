@@ -1173,7 +1173,7 @@
     <string name="ota_stop_fail">OTA停止升级失败</string>
     <string name="no_get_version">设备未获取版本号</string>
     <string name="version_error">版本异常</string>
-    <string name="router_ota_faile">路由回复失败</string>
+    <string name="router_ota_faile">路由升级失败</string>
     <string name="router_load_bin_faile">路由下载bin文件失败</string>
     <string name="router_time_out">路由回复超时</string>
     <string name="startTime_not_exit">该start对应的记录不存在</string>
@@ -1194,4 +1194,5 @@
     <string name="update_timer_scene">更新定时场景</string>
     <string name="plaese_input_device_name">请输入设备名</string>
     <string name="rename_success">重命名成功</string>
+    <string name="get_versioning">获取版本号中，请稍后</string>
 </resources>

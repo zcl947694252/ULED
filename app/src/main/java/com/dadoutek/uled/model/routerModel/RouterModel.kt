@@ -204,6 +204,15 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+    /**
+     *获取设备版本号  新版 类似扫描流程  http请求-》回复收到请求-》等待上传数据
+     */
+    fun getDevicesVersionNew(meshAddrs: MutableList<Int>, meshType: Int, ser_id: String): Observable<Response<RouterVersionsBean>>? {
+        val meshAddressTypeBody = MeshAddressTypeBody( meshType,meshAddrs, ser_id)
+        return NetworkFactory.getApi().routerGetDevicesVersionNew(meshAddressTypeBody)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
     /**
      *路由升级
@@ -281,9 +290,10 @@ object RouterModel {
 
     /**
      * 直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+     * op	否	int	0连接，1断开。默认0
      */
-    fun routerConnectSwOrSe(id: Long, meshType: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerConnectSwOrSensor(id.toInt(), meshType, ser_id)
+    fun routerConnectSwOrSe(id: Long, meshType: Int,op:Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerConnectSwOrSensor(id.toInt(), meshType,op, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

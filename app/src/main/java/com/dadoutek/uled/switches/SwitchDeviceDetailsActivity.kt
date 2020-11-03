@@ -249,34 +249,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableRouteTimer?.dispose()
             if (IS_ROUTE_MODE) {
-                RouterModel.routerConnectSwOrSe(currentDevice?.id ?: 0, 99, "connectSw")?.subscribe({
-                    LogUtils.v("zcl-----------收到路由请求连接成功-------$it")
-                    when (it.errorCode) {
-                        0 -> {
-                            disposableRouteTimer?.dispose()
-                            disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                    .subscribe {
-                                        hideLoadingDialog()
-                                        ToastUtils.showShort(getString(R.string.connect_fail))
-                                    }
-                        }
-                        90018 -> {
-                            ToastUtils.showShort(getString(R.string.device_not_exit))
-                            hideLoadingDialog()
-                        }
-                        90008 -> {
-                            ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                            hideLoadingDialog()
-                        }
-                        90005 -> {
-                            ToastUtils.showShort(getString(R.string.router_offline))
-                            hideLoadingDialog()
-                        }
-                        else-> ToastUtils.showShort(it.message)
-                    }
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
+                routerConnectSw(currentDevice!!,0,"connectSw")
             } else {
                 val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
                         ?.subscribe({
@@ -583,6 +556,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         disposableRouteTimer?.dispose()
         mConnectDeviceDisposable?.toString()
         acitivityIsAlive = false
+//        if (IS_ROUTE_MODE&&currentDevice!=null)
+//            routerConnectSw(currentDevice!!,1,"connectSw")
         //移除事件
     }
 
@@ -629,7 +604,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     }
 
     @SuppressLint("CheckResult")
-    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl-----------收到连接开关通知-------$cmdBean")
         if (cmdBean.ser_id == "connectSw") {
             disposableRouteTimer?.dispose()
@@ -650,7 +625,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         LogUtils.v("zcl-----------收到路由获取开关版本号通知-------$routerVersion")
         if (routerVersion?.ser_id == "switchVersion") {
             disposableRouteTimer?.dispose()
-            hideLoadingDialog()
             if (routerVersion.finish) {
                 if (routerVersion.status == 0) {
                     disposableRouteTimer?.dispose()
@@ -665,6 +639,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
                         override fun complete() {
                             val switchByID = DBUtils.getSwitchByID(currentDevice!!.id)
+                            hideLoadingDialog()
                             if (switchByID?.version == "" || switchByID?.version == null)
                                 ToastUtils.showShort(getString(R.string.get_version_fail))
                             else
@@ -672,6 +647,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                         }
 
                         override fun error(msg: String?) {
+                            hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.get_version_fail))
                         }
                     })

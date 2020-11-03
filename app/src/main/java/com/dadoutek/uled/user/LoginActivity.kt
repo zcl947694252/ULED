@@ -188,7 +188,6 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         DBUtils.deleteAllData()
                         //创建数据库
                         AccountModel.initDatBase(lastUser)
-
                         //判断是否用户是首次在这个手机登录此账号，是则同步数据
                         SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
 

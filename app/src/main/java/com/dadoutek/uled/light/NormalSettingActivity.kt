@@ -62,6 +62,7 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.lang.Float
 import java.util.*
@@ -307,12 +308,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     }
 
                     device_light_add.setOnTouchListener { _, event ->
-                        batchedAction(event, handlerAddBtn)
+                        batchedAction(event, handlerAddBtn, true)
                         true
                     }
 
                     device_light_minus.setOnTouchListener { v, event ->
-                        batchedAction(event, handlerMinusBtn)
+                        batchedAction(event, handlerMinusBtn, false)
 
                         true
                     }
@@ -374,14 +375,15 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         light_sbBrightness.isEnabled = true
         setAddOrminsIcon(light!!.brightness, light!!.colorTemperature)
         device_light_add.setOnTouchListener { _, event ->
-            batchedAction(event, handlerAddBtn)
+            batchedAction(event, handlerAddBtn, true)
             true
         }
 
         device_light_minus.setOnTouchListener { v, event ->
-            batchedAction(event, handlerMinusBtn)
+            batchedAction(event, handlerMinusBtn, false)
             true
         }
+        DBUtils.updateLight(light)
     }
 
     private fun afterCloseGp() {
@@ -407,16 +409,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             when {
                 currentShowPageGroup -> {
                     when {
-                        isBri -> group?.brightness = sendProgress
-                        else -> group?.colorTemperature = sendProgress
+                        isBri -> group?.brightness = light_sbBrightness.progress
+                        else -> group?.colorTemperature = light_sbBrightness.progress
                     }
                     if (group != null)
                         DBUtils.saveGroup(group!!, false)
                 }
                 else -> {
                     when {
-                        isBri -> light?.brightness = sendProgress
-                        else -> light?.colorTemperature = sendProgress
+                        isBri -> light?.brightness = light_sbBrightness.progress
+                        else -> light?.colorTemperature = light_sbBrightness.progress
                     }
                     DBUtils.saveLight(light, false)
                 }
@@ -552,7 +554,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         @SuppressLint("SetTextI18n")
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-
             minusBtnUi()
         }
     }
@@ -561,10 +562,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (isProcessChange == 0) {
             if (light_sbBrightness.progress > 1)
                 light_sbBrightness.progress--
-            when {
-                light_sbBrightness.progress <= 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
-                else -> tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-            }
+            setAddMinusIcon()
             if (light_sbBrightness.progress < 100)
                 device_light_add.setImageResource(R.drawable.icon_puls)
         } else {
@@ -612,7 +610,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                 }
                             } else {
-                                if (light != null && !Constants.IS_ROUTE_MODE) {
+                                if (light != null) {
                                     light.brightness = light_sbBrightness.progress
                                     DBUtils.updateLight(light)
                                 }
@@ -682,6 +680,18 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
+    private fun setAddMinusIcon() {
+        when {
+            light_sbBrightness.progress <= 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
+            light_sbBrightness.progress >= 100 -> device_light_add.setImageResource(R.drawable.icon_puls_no)
+            else -> {
+                device_light_minus.setImageResource(R.drawable.icon_minus)
+                device_light_add.setImageResource(R.drawable.icon_puls)
+                tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
+            }
+        }
+    }
+
     @SuppressLint("HandlerLeak")
     private val handlerAddBtn = object : Handler() {
         override fun handleMessage(msg: Message) {
@@ -693,12 +703,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun addBtnUi() {
         when (isProcessChange) {
             0 -> {
-                light_sbBrightness.progress++
-                if (light_sbBrightness.progress >= 100)
-                    device_light_add.setImageResource(R.drawable.icon_puls_no)
-                else
-                    tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
-
+                if (light_sbBrightness.progress < 100)
+                    light_sbBrightness.progress++
+                setAddMinusIcon()
                 if (light_sbBrightness.progress > 1)
                     device_light_minus.setImageResource(R.drawable.icon_minus)
             }
@@ -1090,12 +1097,12 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else {
             showLoadingDialog(getString(R.string.please_wait))
             TelinkLightService.Instance()?.idleMode(true)
-          /*  disposableTimer?.dispose()
-            disposableTimer = Observable.timer(21, TimeUnit.SECONDS)
-                    .subscribe {
-                        hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.connect_fail))
-                    }*/
+            /*  disposableTimer?.dispose()
+              disposableTimer = Observable.timer(21, TimeUnit.SECONDS)
+                      .subscribe {
+                          hideLoadingDialog()
+                          ToastUtils.showShort(getString(R.string.connect_fail))
+                      }*/
             connect(macAddress = light.macAddr, meshAddress = light.meshAddr, connectTimeOutTime = 10, retryTimes = 2)
                     ?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())
@@ -1283,7 +1290,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 }
             }
             device_light_add.setOnTouchListener { _, event ->
-                batchedAction(event, handlerAddBtn)
+                batchedAction(event, handlerAddBtn, true)
 /*
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
@@ -1316,7 +1323,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
 
             device_light_minus.setOnTouchListener { _, event ->
-                batchedAction(event, handlerMinusBtn)
+                batchedAction(event, handlerMinusBtn, false)
 /*
                 when (event.action) {
                     MotionEvent.ACTION_DOWN -> {
@@ -1609,7 +1616,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             light_sbBrightness.isEnabled = true
             setAddAndMinusIcon(light!!.brightness)
             device_light_add.setOnTouchListener { _, event ->
-                batchedAction(event, handlerAddBtn)
+                batchedAction(event, handlerAddBtn, true)
                 true
             }
             device_light_minus.setOnTouchListener { _, event ->
@@ -1623,7 +1630,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 }
                 light_sbBrightness.progress = progress
                 if (progress > 1)
-                    batchedAction(event, handlerMinusBtn)
+                    batchedAction(event, handlerMinusBtn, false)
                 true
             }
         }
@@ -1633,7 +1640,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         light_sbBrightness?.setOnSeekBarChangeListener(barChangeListener)
     }
 
-    private fun batchedAction(event: MotionEvent, handlerMinusOrAddBtn: Handler) {
+    private fun batchedAction(event: MotionEvent, handlerMinusOrAddBtn: Handler, isAdd: Boolean) {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 downTime = System.currentTimeMillis()
@@ -1642,8 +1649,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
-                            if (Constants.IS_ROUTE_MODE)
+                            if (Constants.IS_ROUTE_MODE) {
+                                if (isAdd)
+                                    sendProgress++
+                                else
+                                    sendProgress--
                                 routerConfigBrightnesssOrColorTemp(isBrightness)
+                            }
                             handlerMinusOrAddBtn.sendMessage(Message())
                             delay(100)
                         }
@@ -1795,10 +1807,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            sendProgress = seekBar.progress
             if (Constants.IS_ROUTE_MODE) {
                 sendProgress = seekBar.progress
                 routerConfigBrightnesssOrColorTemp(isBrightness)
+
             } else {
                 onValueChange(seekBar, seekBar.progress, true)
             }
@@ -1830,6 +1842,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 onValueChange(seekBar, progress, false)
                 preTime = currentTime
             }
+            setAddMinusIcon()
         }
 
         @SuppressLint("SetTextI18n")
@@ -1846,21 +1859,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 if (isBrightness) {
                     if (view == light_sbBrightness) {
                         opcode = Opcode.SET_LUM
-                        params = if (progress < 1)
-                            byteArrayOf(1.toByte())
-                        else
-                            byteArrayOf(progress.toByte())
-
+                        params = when {
+                            progress < 1 -> byteArrayOf(1.toByte())
+                            else -> byteArrayOf(progress.toByte())
+                        }
 
                         if (currentShowPageGroup) {
                             if (group?.brightness != progress) {
-                                if (progress > Constants.MAX_VALUE) {
-                                    params = byteArrayOf(Constants.MAX_VALUE.toByte())
-                                    setLightGUIImg(progress = Constants.MAX_VALUE)
-                                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
-                                } else {
-                                    setLightGUIImg(progress = progress)
-                                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                                when {
+                                    progress > Constants.MAX_VALUE -> {
+                                        params = byteArrayOf(Constants.MAX_VALUE.toByte())
+                                        setLightGUIImg(progress = Constants.MAX_VALUE)
+                                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                                    }
+                                    else -> {
+                                        setLightGUIImg(progress = progress)
+                                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                                    }
                                 }
                             }
                         } else {

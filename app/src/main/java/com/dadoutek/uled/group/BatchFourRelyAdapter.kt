@@ -54,8 +54,8 @@ class BatchRelayAdapter(layoutResId: Int, data: MutableList<DbConnector>, var is
         }
 
         if (isRouterBind) {
-            val routerByMac = DBUtils.getRouterByMac(item!!.boundMac)
-            LogUtils.v("zcl-----------获取路由名称---${item!!.boundMac}----${routerByMac!![0].name}")
+            val routerByMac = DBUtils.getRouterByMac(item?.boundMac?:"")
+            LogUtils.v("zcl-----------获取路由名称---${item?.boundMac?:""}----${routerByMac!![0].name}")
             if (routerByMac != null && routerByMac.size >= 1) {
                 groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE

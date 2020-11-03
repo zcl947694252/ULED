@@ -449,8 +449,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
                 } else {
                     ToastUtils.showLong(getString(R.string.connect_fail))
-                    if (!Constants.IS_ROUTE_MODE)
-                        routerConnectSensor(currentSensor!!, "retryConnectSensor")
+                    if (Constants.IS_ROUTE_MODE)
+                        routerConnectSensor(currentSensor!!, 0, "retryConnectSensor")
                     else autoConnect()
                     timeDispsable = Observable.timer(10000, TimeUnit.MILLISECONDS).subscribe {
                         runOnUiThread {
@@ -480,7 +480,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("CheckResult")
-    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id == "retryConnectSensor")
             if (cmdBean.finish) {
                 disposableRouteTimer?.dispose()
@@ -666,11 +666,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             !isSuportOta(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
             isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
-                if (Constants.IS_ROUTE_MODE){
+                if (Constants.IS_ROUTE_MODE) {
                     startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
                             "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
-                finish()}
-                else {
+                    finish()
+                } else {
                     val intent = Intent(this@PirConfigActivity, OTAUpdateActivity::class.java)
                     intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
                     intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
@@ -873,6 +873,10 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         allDispoables()
+        if (Constants.IS_ROUTE_MODE)
+            currentSensor?.let {
+                routerConnectSensor(it, 1,"connectSensor")
+            }
         TelinkLightService.Instance()?.idleMode(true)
     }
 

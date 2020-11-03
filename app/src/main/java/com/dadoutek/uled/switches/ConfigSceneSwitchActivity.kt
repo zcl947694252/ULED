@@ -50,7 +50,6 @@ import kotlin.collections.ArrayList
 private const val CONNECT_TIMEOUT = 20
 
 class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, View.OnClickListener {
-    private var disposableTimer: Disposable? = null
     private val requestCodes: Int = 1000
     private var version: String = ""
     private var newMeshAddr: Int = 0
@@ -60,7 +59,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private lateinit var mAdapter: SwitchSceneGroupAdapter
     private var mConfigFailSnackbar: Snackbar? = null
     private var groupName: String? = null
-    private var switchDate: DbSwitch? = null
     private var mDisconnectSnackBar: Snackbar? = null
     private var mConnectedSnackBar: Snackbar? = null
     private var mConnectingSnackBar: Snackbar? = null
@@ -78,7 +76,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
         if (TextUtils.isEmpty(version))
             version = getString(R.string.get_version_fail)
         else {
-            if (version.contains("BTS")||version.contains("SS-2.1.0")) {
+            if (version.contains("BTS") || version.contains("SS-2.1.0")) {
                 scene_switch_cw.visibility = View.GONE
                 scene_switch_touch.visibility = View.VISIBLE
                 toolbarTv.text = getString(R.string.touch_sw)
@@ -153,7 +151,7 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
 
     @SuppressLint("CheckResult")
     private fun confirmSceneSw() {
-        if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
             if (mConnectingSnackBar?.isShown != true) {
                 mConfigFailSnackbar?.dismiss()
                 showDisconnectSnackBar()
@@ -175,8 +173,8 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                     val mesh = mApp?.mesh
                     val params = Parameters.createUpdateParameters()
                     when {
-                        BuildConfig.DEBUG ->  params.setOldMeshName(Constants.PIR_SWITCH_MESH_NAME)
-                        else ->  params.setOldMeshName(mesh?.factoryName)
+                        BuildConfig.DEBUG -> params.setOldMeshName(Constants.PIR_SWITCH_MESH_NAME)
+                        else -> params.setOldMeshName(mesh?.factoryName)
                     }
                     params.setOldPassword(mesh?.factoryPassword)
                     params.setNewMeshName(mesh?.name)
@@ -234,35 +232,38 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                         90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                         90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                         90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                        else-> ToastUtils.showShort(it.message)
+                        else -> ToastUtils.showShort(it.message)
                     }
                 }, { ToastUtils.showShort(it.message) })
     }
 
     override fun tzRouterConfigSceneSwRecevice(cmdBean: CmdBodyBean) {
-              LogUtils.v("zcl-----------收到路由配置场景开关通知-------$cmdBean")
-                      if (cmdBean.ser_id=="configSceneSw"){
-                          disposableRouteTimer?.dispose()
-                          hideLoadingDialog()
-                          if (cmdBean.status==0){
-                              GlobalScope.launch(Dispatchers.Main) {
-                                  ToastUtils.showShort(getString(R.string.config_success))
-                                  if (!isReConfig)
-                                      showRenameDialog(switchDate, false)
-                                  else
-                                      finish()
-                              }
-                          }else{
-                              ToastUtils.showShort(getString(R.string.config_fail))
-                          }
-                      }
+        LogUtils.v("zcl-----------收到路由配置场景开关通知-------$cmdBean")
+        if (cmdBean.ser_id == "configSceneSw") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    if (!isReConfig)
+                        showRenameDialog(switchDate, false)
+                    else
+                        finish()
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.config_fail))
+            }
+        }
     }
 
     override fun routerRenameSwSuccess(trim: String) {
-
+        toolbarTv.text = trim
+        switchDate?.name =trim
+        DBUtils.updateSwicth(switchDate!!)
     }
+
     private fun updateMesh() {
-        newMeshAddr =if (isReConfig) mDeviceInfo?.meshAddress else MeshAddressGenerator().meshAddress.get()
+        newMeshAddr = if (isReConfig) mDeviceInfo?.meshAddress else MeshAddressGenerator().meshAddress.get()
         LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
         Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
             mDeviceInfo.meshAddress = newMeshAddr
@@ -277,7 +278,6 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 showRenameDialog(switchDate, false)
             else
                 finish()
-
         }, failedCallback = {
             mConfigFailSnackbar = snackbar(config_scene_switch, getString(R.string.config_fail))
             GlobalScope.launch(Dispatchers.Main) {
@@ -627,10 +627,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
                 switchDate?.name = trim
                 if (switchDate != null) {
                     if (Constants.IS_ROUTE_MODE)
-                        routerRenameSw(switchDate!!,trim)
-                    else{
-                    toolbarTv.text = switchDate?.name
-                    DBUtils.updateSwicth(switchDate!!)
+                        routerRenameSw(switchDate!!, trim)
+                    else {
+                        toolbarTv.text = switchDate?.name
+                        DBUtils.updateSwicth(switchDate!!)
                     }
                 } else
                     ToastUtils.showLong(getString(R.string.rename_faile))

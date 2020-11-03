@@ -1095,6 +1095,19 @@ public interface RequestInterface {
                                                                      meshType,
                                                                      @Field("ser_id") String
                                                                      ser_id*/);
+    /**
+     * 路由器获取版本号新版   https://dev.dadoutek.com/xxxx/router/device-version-new  POST
+     * "meshAddrs" : [1, 2, 3],
+     * "meshType": 4,
+     * "ser_id": "app会话id，自己维护"
+     * meshType
+     * 普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
+     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
+     *
+     *
+     */
+    @POST("router/device-version-new")
+    Observable<Response<RouterVersionsBean>> routerGetDevicesVersionNew(@Body MeshAddressTypeBody body);
 
     /**
      * 创建ota升级任务  https://dev.dadoutek.com/xxxx/router/device-ota POST
@@ -1246,12 +1259,16 @@ public interface RequestInterface {
      * ser_id	是	string	app会话id，推送时回传
      * id	是	int 	开关or传感器id
      * meshType	是	int	设备类型
+     * op	否	int	0连接，1断开。默认0
      * meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+     *断开meshType
+     *      * 组 = 97
+     *      * meshType = 97时表示断开与当前设备的连接，随机找一个信号ok的设备当做直连灯。此时id随便填，但不能不填
      */
     @FormUrlEncoded
     @POST("router/device-connect")
     Observable<Response<RouterTimeoutBean>> routerConnectSwOrSensor(@Field("id") int id, @Field(
-            "meshType") Integer meshType, @Field("ser_id") String ser_id);
+            "meshType") Integer meshType, @Field("op") int op ,@Field("ser_id") String ser_id);
 
     /**
      * 普通开关配置。触摸&太阳能的调光调色&单调光 https://dev.dadoutek.com/xxxx/router/normal-switch/configure  POST

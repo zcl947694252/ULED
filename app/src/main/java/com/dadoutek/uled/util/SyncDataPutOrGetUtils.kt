@@ -480,9 +480,7 @@ class SyncDataPutOrGetUtils {
                         NetworkFactory.getApi()
                                 .getGroupList(token)
                                 .compose(NetworkTransformer())
-                    }
-
-                    .flatMap {
+                    }.flatMap {
                         for (item in it) {
                             DBUtils.saveGroup(item, true)
                         }
@@ -494,6 +492,7 @@ class SyncDataPutOrGetUtils {
                     .doOnNext {
                         for (item in it) {
                             DBUtils.saveScene(item, true)
+                            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(item?.id!!))
                             for (i in item.actions.indices) {
                                 //("是不是空的2"+item.id)
                                 DBUtils.saveSceneActions(item.actions[i], item.id)

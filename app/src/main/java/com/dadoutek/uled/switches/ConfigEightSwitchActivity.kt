@@ -59,7 +59,6 @@ import java.util.concurrent.TimeUnit
 class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private var newMeshAddr: Int = 0
     private lateinit var listKeysBean: JSONArray
-    private var switchData: DbSwitch? = null
     private var groupName: String? = null
     private var version: String? = null
     private var mDeviceInfo: DeviceInfo? = null
@@ -94,16 +93,16 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         fiRename?.isVisible = isReConfig
 
         if (isReConfig) {
-            switchData = this.intent.extras!!.get("switch") as DbSwitch
-            toolbarTv.text = switchData?.name
-            switchData?.keys?.let {
+            switchDate = this.intent.extras!!.get("switch") as DbSwitch
+            toolbarTv.text = switchDate?.name
+            switchDate?.keys?.let {
                 listKeysBean = JSONArray(it)
-                toolbarTv.text = switchData?.name
+                toolbarTv.text = switchDate?.name
                 //eight_switch_mode.visibility = View.VISIBLE
                 //eight_switch_config.visibility = View.VISIBLE
                 // eight_switch_banner_ly.visibility = View.GONE
 
-                val type = switchData!!.type
+                val type = switchDate!!.type
                 configSwitchType = type//赋值选择的模式
                 clickType = 1//代表跳过选择模式
 
@@ -388,7 +387,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             GlobalScope.launch(Dispatchers.Main) {
                 ToastUtils.showShort(getString(R.string.config_success))
                 if (!isReConfig)
-                    showRenameDialog(switchData, false)
+                    showRenameDialog(switchDate, false)
                 else
                     finishAc()
                 hideLoadingDialog()
@@ -417,7 +416,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     version = mDeviceInfo!!.firmwareRevision
                 dbEightSwitch.version = version
                 DBUtils.updateSwicth(dbEightSwitch)
-                switchData = dbEightSwitch
+                switchDate = dbEightSwitch
             } else {
                 var eightSwitch = DbSwitch()
                 DBUtils.saveSwitch(eightSwitch, isFromServer = false, type = eightSwitch.type, keys = eightSwitch.keys)
@@ -440,14 +439,14 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
                 DBUtils.recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename,
                         Constants.DB_ADD, eightSwitch.type, eightSwitch.keys)
-                switchData = eightSwitch
+                switchDate = eightSwitch
             }
         } else {
-            switchData!!.type = configGroup
-            switchData!!.keys = listKeysBean.toString()
-            switchData?.meshAddr = mDeviceInfo?.meshAddress ?: 0
+            switchDate!!.type = configGroup
+            switchDate!!.keys = listKeysBean.toString()
+            switchDate?.meshAddr = mDeviceInfo?.meshAddress ?: 0
             //解析出來他的keys 重新賦值
-            DBUtils.updateSwicth(switchData!!)
+            DBUtils.updateSwicth(switchDate!!)
         }
     }
 
@@ -678,7 +677,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
 
     override fun reName() {
-        showRenameDialog(switchData, false)
+        showRenameDialog(switchDate, false)
     }
 
     override fun setLayoutId(): Int {
@@ -780,7 +779,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 if (!Constants.IS_ROUTE_MODE)
                     renameSw(trim)
                 else
-                    routerRenameSw(switchData!!, trim)
+                    routerRenameSw(switchDate!!, trim)
 
                 if (this != null && !this.isFinishing)
                     renameDialog?.dismiss()
@@ -797,13 +796,18 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         }
     }
 
+
+    override fun routerRenameSwSuccess(trim: String) {
+        renameSw(trim = trim)
+    }
+
     private fun renameSw(trim: String) {
-        switchData?.name = trim
-        if (switchData == null)
-            switchData = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
-        toolbarTv.text = switchData?.name
-        if (switchData != null)
-            DBUtils.updateSwicth(switchData!!)
+        switchDate?.name = trim
+        if (switchDate == null)
+            switchDate = DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)
+        toolbarTv.text = switchDate?.name
+        if (switchDate != null)
+            DBUtils.updateSwicth(switchDate!!)
         else
             ToastUtils.showLong(getString(R.string.rename_faile))
     }
@@ -845,7 +849,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showShort(getString(R.string.config_success))
                     if (!isReConfig)
-                        showRenameDialog(switchData!!,true)
+                        showRenameDialog(switchDate!!,true)
                     else
                         finish()
                 }

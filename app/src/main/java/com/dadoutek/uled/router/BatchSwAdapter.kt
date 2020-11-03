@@ -33,8 +33,8 @@ class BatchSwAdapter(layoutResId: Int, data: MutableList<DbSwitch>) : BaseQuickA
 
         groupName.text = item?.boundMacName
 
-        val routerByMac = DBUtils.getRouterByMac(item!!.boundMac)
-        LogUtils.v("zcl-----------获取路由名称---${item!!.boundMac}----${routerByMac!![0].name}")
+        val routerByMac = DBUtils.getRouterByMac(item?.boundMac?:"")
+        LogUtils.v("zcl-----------获取路由名称---${item?.boundMac?:""}----${routerByMac!![0].name}")
         if (routerByMac != null && routerByMac.size >= 1) {
             groupName.text = routerByMac[0].name
             groupName.visibility = View.VISIBLE

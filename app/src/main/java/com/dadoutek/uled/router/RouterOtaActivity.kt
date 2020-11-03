@@ -56,11 +56,11 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     private fun initListener() {
         router_ota_start.setOnClickListener {
-                if (isOtaing) {
-                    clickFinish = false
-                    devicesStopOTA()
-                } else
-                    devicesToOTA()
+            if (isOtaing) {
+                clickFinish = false
+                devicesStopOTA()
+            } else
+                devicesToOTA()
         }
     }
 
@@ -146,6 +146,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     isOtaing = true
                     ToastUtils.showShort(getString(R.string.ota_update_title))
                     router_ota_start.text = getString(R.string.stop_ota)
+                    router_ota_warm.text = getString(R.string.ota_update_title)
                     otaCount = 0
                     router_ota_wave_progress_bar?.value = 0f
                 } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
@@ -186,6 +187,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
             }
         }
         ToastUtils.showShort(getString(R.string.ota_update_title))
+        router_ota_warm.text = getString(R.string.ota_update_title)
         if (!isRouter)
             router_ota_start.text = getString(R.string.stop_ota)
         else {
@@ -245,12 +247,13 @@ class RouterOtaActivity : TelinkBaseActivity() {
         if (status == 0 && deviceMac == otaResult?.macAddr && otaResult?.failedCode == -1)
             afterOtaSuccess()
         else
-            if (status == -1 || status == 1)
+            if (status == -1 || status == 1)//ota结果。-1失败 0成功 1升级中 2已停止 3处理中
                 afterOtaFail()
     }
 
     private fun afterOtaFail() {
         router_ota_start.text = getString(R.string.retry_ota)
+        router_ota_warm.text = getString(R.string.router_ota_faile)
         ToastUtils.showShort(getString(R.string.router_ota_faile))
         isOtaing = false
     }
@@ -271,6 +274,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         disposableRouteTimer?.dispose()
         hideLoadingDialog()
         router_ota_start.text = getString(R.string.start_update)
+        router_ota_warm.text = getString(R.string.ota_prepare_title)
         router_ota_wave_progress_bar.value = 0f
         Thread.sleep(100)
         router_ota_wave_progress_bar.value = 0f
@@ -278,7 +282,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     private fun afterOtaFailState(resultBean: RouterOTAResultBean) {
         //失败原因。-1没有失败 0设备未绑定路由  1设备未获取版本号 2设备未绑定路由且未获取版本号  3设备绑定的路由没上线
-        // 4版本号异常 5已是最新版本，无需升级 6路由回复失败 7路由蓝牙连接失败 8路由下载bin文件失败 99路由回复超时
+        // 4版本号异常 5已是最新版本，无需升级 6路由升级失败 7路由蓝牙连接失败 8路由下载bin文件失败 99路由回复超时
         isOtaing = false
         when (resultBean.failedCode) {
             -1 -> afterOtaSuccess()
@@ -298,6 +302,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         }
         if (resultBean.failedCode != -1) {
             router_ota_start.text = getString(R.string.retry_ota)
+            router_ota_warm.text = getString(R.string.router_ota_faile)
             router_ota_wave_progress_bar.value = 0f
             disposableRouteTimer?.dispose()
         }
@@ -306,6 +311,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
     private fun afterOtaSuccess() {
         ToastUtils.showShort(getString(R.string.ota_success))
         router_ota_start.text = getString(R.string.ota_success)
+        router_ota_warm.text = getString(R.string.ota_success)
         router_ota_start.isClickable = false
         initUi()
         router_ota_num.text = "1"
@@ -331,7 +337,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
     }
 
     private fun isFinish() {
-        if (isOtaing&&!isRouter)
+        if (isOtaing && !isRouter)
             popFinish.showAtLocation(window.decorView.rootView, Gravity.CENTER, 0, 0)
         else
             finish()

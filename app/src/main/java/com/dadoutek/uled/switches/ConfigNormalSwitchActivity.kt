@@ -65,7 +65,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
     private var localVersion: String = ""
     private var isGlassSwitch = false
-    private var switchDate: DbSwitch? = null
     override fun setLayoutId(): Int {
         return R.layout.activity_switch_group
     }
@@ -188,9 +187,14 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         }
 
         renameDialog?.setOnDismissListener {
+
             if (!isReConfig)
                 finish()
         }
+    }
+
+    override fun routerRenameSwSuccess(trim: String) {
+        renameSw(trim = trim)
     }
 
     private fun renameSw(trim: String) {
@@ -264,7 +268,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 return@setOnClickListener
             }
 
-            if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
+            if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
                 if (mConnectingSnackBar?.isShown != true) {
                     showDisconnectSnackBar()
                 }
@@ -272,17 +276,21 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 // (mAdapter.selectedPos != -1) {
                 sw_progressBar.visibility = View.VISIBLE
                 if (Constants.IS_ROUTE_MODE)
-                    RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr,"configNormalSw")
+                    RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr, "configNormalSw")
                             ?.subscribe({
                                 //    "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
                                 //    "errorCode": 90007,"该组不存在，刷新组列表"   "errorCode": 90005,"以下路由没有上线，无法配置"
+                                LogUtils.v("zcl-----------收到路由配置请求-------$it")
                                 when (it.errorCode) {
                                     0 -> {
+                                        showLoadingDialog(getString(R.string.please_wait))
                                         disposableRouteTimer?.dispose()
                                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                                                 .subscribe {
-                                                    sw_progressBar.visibility = View.GONE
-                                                    ToastUtils.showShort(getString(R.string.config_fail))
+                                                    runOnUiThread {
+                                                        ToastUtils.showShort(getString(R.string.config_fail))
+                                                        hideLoadingDialog()
+                                                    }
                                                 }
                                     }
                                     90021 -> {
@@ -293,7 +301,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                                     90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                     90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                                    else-> ToastUtils.showShort(it.message)
+                                    else -> ToastUtils.showShort(it.message)
                                 }
                             }, { ToastUtils.showShort(it.message) })
                 else
@@ -418,36 +426,36 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
 
     @SuppressLint("CheckResult")
-    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
-        if (cmdBean.ser_id=="retryConnectSw")
-        if (cmdBean.finish) {
-            if (cmdBean.status == 0) {
-                ToastUtils.showShort(getString(R.string.connect_success))
-                image_bluetooth.setImageResource(R.drawable.icon_cloud)
-            } else {
-                image_bluetooth.setImageResource(R.drawable.bluetooth_no)
-                ToastUtils.showShort(getString(R.string.connect_fail))
+    override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        if (cmdBean.ser_id == "retryConnectSw")
+            if (cmdBean.finish) {
+                if (cmdBean.status == 0) {
+                    ToastUtils.showShort(getString(R.string.connect_success))
+                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                } else {
+                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                }
             }
-        }
     }
 
     override fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {
-              LogUtils.v("zcl-----------收到路由配置普通开关通知-------$cmdBean")
-                      if (cmdBean.ser_id=="configNormalSw"){
-                          disposableRouteTimer?.dispose()
-                          hideLoadingDialog()
-                          if (cmdBean.status==0){
-                              GlobalScope.launch(Dispatchers.Main) {
-                                  ToastUtils.showShort(getString(R.string.config_success))
-                                  if (!isReConfig)
-                                      showRenameDialog(switchDate, false)
-                                  else
-                                      finish()
-                              }
-                          }else{
-                              ToastUtils.showShort(getString(R.string.config_fail))
-                          }
-                      }
+        LogUtils.v("zcl-----------收到路由配置普通开关通知-------$cmdBean")
+        if (cmdBean.ser_id == "configNormalSw") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    if (!isReConfig)
+                        showRenameDialog(switchDate, false)
+                    else
+                        finish()
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.config_fail))
+            }
+        }
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {

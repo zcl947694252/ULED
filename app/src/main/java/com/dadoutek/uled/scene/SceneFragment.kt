@@ -84,51 +84,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    internal var onItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
-        try {
-            if (position < adapter.data.size) {
-                val dbScene = scenesListData[position]
-                when {
-                    Constants.IS_ROUTE_MODE -> {
-                        RouterModel.routeApplyScene(dbScene.id, "applyScene")?.subscribe({
-                            //    "errorCode": 90011,message": "场景不存在，请刷新场景数据"
-                            LogUtils.v("zcl-----------收到路由场景应用请求-------$dbScene")
-                            when (it.errorCode) {
-                                0 -> {
-                                    showLoadingDialog(getString(R.string.please_wait))
-                                    disposableRouteTimer?.dispose()
-                                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                            .subscribe {
-                                                hideLoadingDialog()
-                                                ToastUtils.showShort(getString(R.string.scene_apply_fail))
-                                            }
-                                }
-                                90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
-                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
-                                else-> ToastUtils.showShort(it.message)
-                            }
-                        }, {
-                            ToastUtils.showShort(it.message)
-                        })
-                    }
-                    else -> {
-                        when (TelinkLightApplication.getApp().connectDevice) {
-                            null -> {
-                                sendToGw(dbScene)
-                            }
-                            else -> setScene(dbScene.id!!)
-                        }
-                    }
-                }
-
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     override fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id=="applyScene"){
             LogUtils.v("zcl-----------收到路由场景应用通知-------$cmdBean")
@@ -174,16 +129,60 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
                 R.id.template_device_icon -> {
                     Log.e("zcl场景", "zcl场景******scene_apply")
-                    if (TelinkLightApplication.getApp().connectDevice == null) {
-                        //ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                        sendToGw(scenesListData!![position])
-                    } else {
+                    if (Constants.IS_ROUTE_MODE){
                         try {
-                            if (position < adapter.data.size) {
-                                setScene(scenesListData!![position].id!!)
+                            when {position < adapter.data.size -> {
+                                    val dbScene = scenesListData[position]
+                                    when {
+                                        Constants.IS_ROUTE_MODE -> {
+                                            RouterModel.routeApplyScene(dbScene.id, "applyScene")?.subscribe({
+                                                //    "errorCode": 90011,message": "场景不存在，请刷新场景数据"
+                                                LogUtils.v("zcl-----------收到路由场景应用请求-------$dbScene")
+                                                when (it.errorCode) {
+                                                    0 -> {
+                                                        showLoadingDialog(getString(R.string.please_wait))
+                                                        disposableRouteTimer?.dispose()
+                                                        disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                                                .subscribe {
+                                                                    hideLoadingDialog()
+                                                                    ToastUtils.showShort(getString(R.string.scene_apply_fail))
+                                                                }
+                                                    }
+                                                    90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
+                                                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                                                    90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
+                                                    else-> ToastUtils.showShort(it.message)
+                                                }
+                                            }, {
+                                                ToastUtils.showShort(it.message)
+                                            })
+                                        }
+                                        else -> {
+                                            when (TelinkLightApplication.getApp().connectDevice) {
+                                                null -> {
+                                                    sendToGw(dbScene)
+                                                }
+                                                else -> setScene(dbScene.id!!)
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         } catch (e: Exception) {
                             e.printStackTrace()
+                        }
+                    }else{
+                        when (TelinkLightApplication.getApp().connectDevice) {
+                            null ->  sendToGw(scenesListData!![position])
+                            else -> {
+                                try {
+                                    if (position < adapter.data.size) {
+                                        setScene(scenesListData!![position].id!!)
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
                         }
                     }
                 }
@@ -438,7 +437,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         recyclerView!!.layoutManager = GridLayoutManager(activity, 2)
 
         adaper = SceneRecycleListAdapter(R.layout.template_device_type_item, scenesListData, isDelete)
-        adaper!!.onItemClickListener = onItemClickListener
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.onItemLongClickListener = onItemChildLongClickListener
         adaper!!.bindToRecyclerView(recyclerView)
@@ -446,14 +444,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         isDelete = false
         adaper!!.changeState(isDelete)
         for (i in scenesListData.indices) {
-            if (scenesListData[i].isSelected) {
+            if (scenesListData[i].isSelected)
                 scenesListData[i].isSelected = false
-            }
         }
         adaper!!.notifyDataSetChanged()
     }
 
-    var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
+    private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)

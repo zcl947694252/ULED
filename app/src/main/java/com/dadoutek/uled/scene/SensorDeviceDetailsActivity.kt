@@ -202,7 +202,10 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             popupWindow!!.dismiss()
         compositeDisposable.dispose()
         isClick = 5
-
+//        if (IS_ROUTE_MODE)
+//            currentDevice?.let {
+//                routerConnectSensor(it, 1,"connectSensor")
+//            }
         this.mApplication?.removeEventListener(this)
     }
 
@@ -346,7 +349,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
         if (IS_ROUTE_MODE)
             currentDevice?.let {
-                routerConnectSensor(it, "connectSensor")
+                routerConnectSensor(it, 0,"connectSensor")
             }
         else {
             showLoadingDialog(getString(R.string.please_wait))
@@ -816,7 +819,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
     @SuppressLint("CheckResult")
-    override fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {
+    override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id == "connectSensor")
             if (cmdBean.finish) {
                 disposableRouteTimer?.dispose()

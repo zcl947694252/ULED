@@ -48,7 +48,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_batch_group_four.*
+import kotlinx.android.synthetic.main.activity_batch_group_four.toolbarTv
 import kotlinx.android.synthetic.main.eight_switch.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -61,10 +61,10 @@ private var last_start_time = 0
 private var debounce_time = 1000
 
 abstract class BaseSwitchActivity : TelinkBaseActivity() {
-    private var sw: DbSwitch? = null
+    open var currentSw: DbSwitch? = null
     private var deviceType: Int = DeviceType.NORMAL_SWITCH
     var isReConfig: Boolean = false
-
+    open var switchDate: DbSwitch? = null
     private var mConnectDeviceDisposable: Disposable? = null
     private lateinit var otaDeviceInfo: DeviceInfo
     var fiDelete: MenuItem? = null
@@ -205,11 +205,11 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(/*R.string.delete_switch_confirm*/getString(R.string.sure_delete_device2))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    sw = DBUtils.getSwitchByMacAddr(macAddress)
-                    sw?.let {
+                    currentSw = DBUtils.getSwitchByMacAddr(macAddress)
+                    currentSw?.let {
                         if (!Constants.IS_ROUTE_MODE) {
                             showLoadingDialog(getString(R.string.please_wait))
-                            Commander.resetDevice(sw!!.meshAddr, true)
+                            Commander.resetDevice(currentSw!!.meshAddr, true)
                                     .subscribe(
                                             { // deleteData()
                                             }, {
@@ -226,7 +226,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                     })
                             deleteData()
                         } else {
-                            routerDeviceResetFactory(sw!!.macAddr, sw!!.meshAddr, 99, "swFactory")
+                            routerDeviceResetFactory(currentSw!!.macAddr, currentSw!!.meshAddr, 99, "swFactory")
                         }
 
                     }
@@ -250,10 +250,10 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     fun deleteData() {
         hideLoadingDialog()
         ToastUtils.showShort(getString(R.string.delete_switch_success))
-        sw?.let { DBUtils.deleteSwitch(it) }
+        currentSw?.let { DBUtils.deleteSwitch(it) }
         TelinkLightService.Instance()?.idleMode(true)
 
-        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(sw?.meshAddr ?: 0))
+        if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentSw?.meshAddr ?: 0))
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
         finish()
     }
@@ -344,6 +344,10 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        if (Constants.IS_ROUTE_MODE)
+            switchDate?.let {
+                routerConnectSw(it, 1, "connectSensor")
+            }
         TelinkLightService.Instance()?.idleMode(true)
     }
 
@@ -373,8 +377,16 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     @SuppressLint("CheckResult")
+    override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到连接开关通知-------$cmdBean")
+        if (cmdBean.ser_id == "isDisConnect") {
+            disposableRouteTimer?.dispose()
+        }
+    }
+
+    @SuppressLint("CheckResult")
     open fun routerRetrySw(id: Long) {
-        RouterModel.routerConnectSwOrSe(id, 99, "retryConnectSw")?.subscribe({
+        RouterModel.routerConnectSwOrSe(id, 99, 1,"retryConnectSw")?.subscribe({
             when (it.errorCode) {
                 0 -> {
                     disposableRouteTimer?.dispose()

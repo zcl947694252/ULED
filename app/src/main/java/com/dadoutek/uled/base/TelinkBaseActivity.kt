@@ -45,6 +45,7 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.mqtt.IGetMessageCallBack
@@ -790,7 +791,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constants.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
-            LogUtils.v("zcl-----------收到路由通知----${cmdBean.cmd == 3025 || cmdBean.cmd == 3024}---$cmdBean")
             //var jsonObject = JSONObject(msg)
             when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
@@ -830,6 +830,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     tzRouterUpdateVersionRecevice(routerVersion)
                 }
 
+                Cmd.tzRouteGetVersioning -> tzRouteGetVersioningNum(cmdBean)
+                Cmd.tzRouteGetVersionSend -> tzRouteSendVersioning(cmdBean)
+
                 Cmd.tzRouteConfigDoubleSw -> {//配置双组开关
                     tzRouterConfigDoubleSwRecevice(cmdBean)
                 }
@@ -857,7 +860,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     tzRouterOTAStopRecevice(routerOTAFinishBean)
                 }
                 Cmd.tzRouteAddGradient, Cmd.tzRouteDelGradient, Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean)
-                Cmd.tzRouteConnectSwSe -> tzRouterConnectSwSeRecevice(cmdBean)
+                Cmd.tzRouteConnectOrDisConnectSwSe -> tzRouterConnectOrDisconnectSwSeRecevice(cmdBean)
                 Cmd.routeDeleteGroup -> {
                     val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
                     tzRouterDelGroupResult(routerGroup)
@@ -935,6 +938,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    open fun tzRouteSendVersioning(cmdBean: CmdBodyBean) {}
+    open fun tzRouteGetVersioningNum(cmdBean: CmdBodyBean) {}
     open fun tzRouterChangeTimerSceneStatus(cmdBean: CmdBodyBean) {}
     open fun tzRouterDelTimerScene(cmdBean: CmdBodyBean) {}
     open fun tzRouterUpdateTimerScene(cmdBean: CmdBodyBean) {}
@@ -961,7 +966,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {}
     open fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {}
     open fun tzRouteStopScan(cmdBean: CmdBodyBean) {}
-    open fun tzRouterConnectSwSeRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterOTAStopRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {}
     open fun tzRouterOTAingNumRecevice(routerOTAingNumBean: RouterOTAingNumBean?) {}
@@ -1633,12 +1638,43 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         })
     }
 
+    @SuppressLint("CheckResult")//op	否	int	0连接，1断开。默认0
+    open fun routerConnectSw(it: DbSwitch, op: Int, ser_id: String) {  //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+        RouterModel.routerConnectSwOrSe(it?.id ?: 0, 99, op, ser_id)?.subscribe({
+            LogUtils.v("zcl-----------收到路由请求连接成功是否是连接--${op==0}-----$it")
+            when (it.errorCode) {
+                0 -> {
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.connect_fail))
+                            }
+                }
+                90018 -> {
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    hideLoadingDialog()
+                }
+                90008 -> {
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                    hideLoadingDialog()
+                }
+                90005 -> {
+                    ToastUtils.showShort(getString(R.string.router_offline))
+                    hideLoadingDialog()
+                }
+                else -> ToastUtils.showShort(it.message)
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
     @SuppressLint("CheckResult")
-    open fun routerConnectSensor(it: DbSensor, ser_id: String) {
-        //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
-        RouterModel.routerConnectSwOrSe(it.id, it.productUUID, ser_id)
+    open fun routerConnectSensor(it: DbSensor, op: Int, ser_id: String) {  //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+        RouterModel.routerConnectSwOrSe(it.id, it.productUUID, op, ser_id)
                 ?.subscribe({ response ->
-                    LogUtils.v("zcl-----------收到路由请求连接开关或者传感器-------$response")
+                    LogUtils.v("zcl-----------收到路由请求连接开关或者传感器是否是连接--${op==0}-------$response")
                     when (response.errorCode) {
                         0 -> {
                             disposableRouteTimer?.dispose()
@@ -1678,6 +1714,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                                 ToastUtils.showShort(getString(R.string.get_version_fail))
                             }
                 }
+                90997 -> ToastUtils.showShort(getString(R.string.get_versioning))
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
