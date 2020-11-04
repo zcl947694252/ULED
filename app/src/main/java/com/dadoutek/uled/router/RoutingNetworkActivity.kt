@@ -10,17 +10,19 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.gateway.GwLoginActivity
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
-import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.RouteInAccountBean
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_routing_network.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 
@@ -97,16 +99,18 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
         imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    override fun routerAccessIn(cmdBody: CmdBodyBean) {
-        LogUtils.v("zcl----------收到路由入网通知-------$cmdBody")
-        if (cmdBody.ser_id == TAG) {
-            if (cmdBody.status == Constants.ALL_SUCCESS) {
+    override fun routerAccessIn(routerGroup: RouteInAccountBean) {
+        LogUtils.v("zcl----------收到路由入网通知-------$routerGroup")
+        if (routerGroup.ser_id == TAG) {
+            if (routerGroup.status == Constants.ALL_SUCCESS) {
                 SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                 ToastUtils.showShort(getString(R.string.router_access_in_success))
-                val intent = Intent(this@RoutingNetworkActivity, GwLoginActivity::class.java)
+               /* val intent = Intent(this@RoutingNetworkActivity, GwLoginActivity::class.java)
                 intent.putExtra("is_router", true)
                 intent.putExtra("mac", mac?.toLowerCase())
                 startActivity(intent)
+                finish()*/
+                startActivity<RouterDetailActivity>("routerId" to routerGroup?.router.id.toLong())
                 finish()
             } else {
                 ToastUtils.showShort(getString(R.string.router_access_in_fail))

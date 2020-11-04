@@ -1103,8 +1103,6 @@ public interface RequestInterface {
      * meshType
      * 普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16 传感器 = 98 或 0x23 或 0x24n
      * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25
-     *
-     *
      */
     @POST("router/device-version-new")
     Observable<Response<RouterVersionsBean>> routerGetDevicesVersionNew(@Body MeshAddressTypeBody body);

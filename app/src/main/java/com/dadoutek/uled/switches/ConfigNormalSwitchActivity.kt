@@ -429,6 +429,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
         if (cmdBean.ser_id == "retryConnectSw")
             if (cmdBean.finish) {
+                hideLoadingDialog()
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.connect_success))
                     image_bluetooth.setImageResource(R.drawable.icon_cloud)

@@ -114,6 +114,10 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         return false
     }
 
+    override fun onlineUpdateAllVisible(): Boolean {
+        return false
+    }
+
     override fun bindDeviceRouter() {
         val dbGroup = DbGroup()
         dbGroup.brightness=10000
@@ -605,7 +609,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     @SuppressLint("CheckResult")
     override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl-----------收到连接开关通知-------$cmdBean")
+        LogUtils.v("zcl-----------收到路由连接开关通知-------$cmdBean")
         if (cmdBean.ser_id == "connectSw") {
             disposableRouteTimer?.dispose()
             if (cmdBean.finish) {
@@ -616,6 +620,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                 } else {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
+                    hideLoadingDialog()
                 }
             }
         }

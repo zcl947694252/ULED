@@ -492,6 +492,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 } else {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
+                    hideLoadingDialog()
                 }
             }
     }
@@ -766,8 +767,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             // 例如，配置是触发开灯、延时时间是秒钟，则17位发送1。如果配置是触发关灯、延时时间是秒钟，则17位发送0x02
             // 触发功能选择功能
             var triggerSet = if (triggerAfterShow == 2) 0 else (timeUnitType shl 1) or triggerAfterShow
-            val paramsSetSHow = byteArrayOf(1, 0, 0, durationTime.toByte(), customBrightnessNum.toByte(),
-                    triggerKey.toByte(), triggerSet.toByte(), 0)
+            val paramsSetSHow = byteArrayOf(1, 0, 0, durationTime.toByte(), customBrightnessNum.toByte(), triggerKey.toByte(), triggerSet.toByte(), 0)
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_LIGHT_LIGHT, mDeviceInfo!!.meshAddress, paramsSetSHow)
 
             Thread.sleep(200)

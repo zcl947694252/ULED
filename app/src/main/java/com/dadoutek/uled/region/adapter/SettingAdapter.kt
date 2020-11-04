@@ -13,7 +13,7 @@ class SettingAdapter(layoutResId: Int, data: MutableList<SettingItemBean>, var i
 
         if (!isSetting) {
             if (Constants.IS_ROUTE_MODE) {
-                if (helper?.adapterPosition == 0 || helper?.adapterPosition == 2)
+                if (helper?.adapterPosition == 0 || helper?.adapterPosition == 3)
                     helper?.setTextColor(R.id.item_setting_text, mContext.getColor(R.color.gray))
             }
         } else {//如果是settingActivity

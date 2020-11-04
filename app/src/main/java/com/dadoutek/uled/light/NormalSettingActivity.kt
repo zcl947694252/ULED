@@ -2257,6 +2257,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 0 -> {
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     val light = DBUtils.getLightByMeshAddr(light.meshAddr)
+                    if (routerVersion.succeedNow.isNotEmpty()) {
+                        light?.version = routerVersion.succeedNow[0].version
+                    }
                     updateVersion(light?.version)
                 }
                 else -> {

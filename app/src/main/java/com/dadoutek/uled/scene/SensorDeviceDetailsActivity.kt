@@ -137,6 +137,10 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         return false
     }
 
+    override fun onlineUpdateAllVisible(): Boolean {
+        return false
+    }
+
     //显示路由
     override fun bindRouterVisible(): Boolean {
         return true
@@ -344,14 +348,14 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun connectAndConfig() {
-        TelinkLightService.Instance()?.idleMode(true)
-        Thread.sleep(200)
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
         if (IS_ROUTE_MODE)
             currentDevice?.let {
                 routerConnectSensor(it, 0,"connectSensor")
             }
         else {
+            TelinkLightService.Instance()?.idleMode(true)
+            Thread.sleep(200)
             showLoadingDialog(getString(R.string.please_wait))
             connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
                 relocationSensor()
@@ -823,7 +827,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         if (cmdBean.ser_id == "connectSensor")
             if (cmdBean.finish) {
                 disposableRouteTimer?.dispose()
-                hideLoadingDialog()
                 LogUtils.v("zcl-----------收到路由连接传感器成功-------$cmdBean")
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.connect_success))
@@ -832,6 +835,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 } else {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
+                    hideLoadingDialog()
                 }
             }
     }

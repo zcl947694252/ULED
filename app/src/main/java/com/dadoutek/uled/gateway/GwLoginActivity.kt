@@ -29,6 +29,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.receiver.GwBrocasetReceiver
 import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.RouteInAccountBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.NetWorkUtils
@@ -408,7 +409,7 @@ class GwLoginActivity : TelinkBaseActivity() {
         disposableTimer?.dispose()
     }
 
-    override fun routerAccessIn(cmdBody: CmdBodyBean) {
+    override fun routerAccessIn(cmdBody: RouteInAccountBean) {
         LogUtils.v("zcl-----------路由配置网络成功-------${cmdBody.status == 0}")
         hideLoadingDialog()
         disposableTimer?.dispose()

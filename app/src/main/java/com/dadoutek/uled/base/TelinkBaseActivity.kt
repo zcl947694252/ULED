@@ -54,10 +54,8 @@ import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
-import com.dadoutek.uled.router.bean.CmdBodyBean
-import com.dadoutek.uled.router.bean.MacResetBody
-import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
-import com.dadoutek.uled.router.bean.RouteSceneBean
+import com.dadoutek.uled.router.RouterOtaActivity
+import com.dadoutek.uled.router.bean.*
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.switches.ScanningSwitchActivity
@@ -222,7 +220,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         if (tmpWeek != null) {
             val list = mutableListOf(
                     WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
-                    WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
                     WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
                     WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
                     WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
@@ -236,8 +233,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     val sb = StringBuilder()
                     for (i in filter.indices)
                         when {
-                            i != filter.size - 1 -> sb.append(list[i].week).append(",")
-                            else -> sb.append(list[i].week)
+                            i != filter.size - 1 -> sb.append(filter[i].week).append(",")
+                            else -> sb.append(filter[i].week)
                         }
                     sb.toString()
                 }
@@ -536,6 +533,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     override fun onResume() {
         super.onResume()
+        unbindSe()
+        bindService()
         if (!LeBluetooth.getInstance().enable(applicationContext) && !Constants.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         val lastUser = lastUser
@@ -649,6 +648,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     override fun onPause() {
         super.onPause()
         stopTimerUpdate()
+        unbindSe()
         showDialogHardDelete?.dismiss()
         mConnectDisposable?.dispose()
     }
@@ -804,7 +804,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
                     }
                 }
-                Cmd.tzRouteInAccount -> routerAccessIn(cmdBean)
+                Cmd.tzRouteInAccount -> {
+                    val routerGroup = Gson().fromJson(msg, RouteInAccountBean::class.java)
+                    routerAccessIn(routerGroup)
+                }
                 Cmd.tzRouteConfigWifi -> routerConfigWIFI(cmdBean)
                 Cmd.tzRouteResetFactoryBySelf, Cmd.tzRouteResetFactoryBySelfphy -> {
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
@@ -976,7 +979,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun tzRouteUpdateScene(cmdBodyBean: CmdBodyBean) {}
     open fun tzStartRouterScan(cmdBodyBean: CmdBodyBean) {}
     open fun routerConfigWIFI(cmdBody: CmdBodyBean) {}
-    open fun routerAccessIn(cmdBody: CmdBodyBean) {}
+    open fun routerAccessIn(cmdBody: RouteInAccountBean) {}
     open fun tzRouteDeviceNum(scanResultBean: CmdBodyBean) {}
 
     @androidx.annotation.RequiresApi(Build.VERSION_CODES.O)
@@ -1610,7 +1613,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     open fun routeOpenOrCloseBase(meshAddr: Int, productUUID: Int, status: Int, serId: String) {//如果发送后失败则还原 0关1开
-        LogUtils.v("zcl-----------收到路由开关灯指令-------deviceType-------$productUUID-----是开--${status == 1}")
+        LogUtils.v("zcl-----------收到路由开关灯指令---meshAddr-----$meshAddr----deviceType-------$productUUID-----是开--${status == 1}")
         val subscribe = RouterModel.routeOpenOrClose(meshAddr, productUUID, status, serId)?.subscribe({
             LogUtils.v("zcl-----------收到路由成功-------$it")
             //    "errorCode": 90018,该设备不存在，请重新刷新数据"   "errorCode": 90008,该设备没有绑定路由，无法操作"
@@ -1671,6 +1674,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     @SuppressLint("CheckResult")
+    //否	int	0连接，1断开。默认0
     open fun routerConnectSensor(it: DbSensor, op: Int, ser_id: String) {  //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
         RouterModel.routerConnectSwOrSe(it.id, it.productUUID, op, ser_id)
                 ?.subscribe({ response ->
@@ -1678,7 +1682,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     when (response.errorCode) {
                         0 -> {
                             disposableRouteTimer?.dispose()
-                            disposableRouteTimer = Observable.timer((response.t.timeout).toLong() + 1, TimeUnit.MILLISECONDS)
+                            disposableRouteTimer = Observable.timer((response.t.timeout).toLong() + 1, TimeUnit.SECONDS)
                                     .subscribe {
                                         showLoadingDialog(getString(R.string.please_wait))
                                         hideLoadingDialog()
@@ -1721,11 +1725,25 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
+                90999 -> goScanning()//扫描中，不能再次进行扫描。请尝试获取路由模式下状态以恢复上次扫描
+                90998 -> {
+                    ToastUtils.showShort(getString(R.string.otaing_to_ota_activity))
+                    startActivity(Intent(this@TelinkBaseActivity, RouterOtaActivity::class.java))
+                    finish()
+                }//OTA中不能扫描，请稍后。请尝试获取路由模式下状态以恢复上次OTA
                 else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
         })
+    }
+    @SuppressLint("CheckResult")
+    private fun goScanning() {
+        ToastUtils.showShort(getString(R.string.sanning_to_scan_activity))
+        Observable.timer(2000, TimeUnit.MILLISECONDS).subscribe {
+            startActivity(Intent(this@TelinkBaseActivity, DeviceScanningNewActivity::class.java))
+            finish()
+        }
     }
 
     @SuppressLint("CheckResult")

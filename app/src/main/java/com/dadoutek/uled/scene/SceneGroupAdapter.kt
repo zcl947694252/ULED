@@ -676,7 +676,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         7, 8 -> {
                             seekBar = getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
                             sendNum = seekBar.progress
-                            showLoadingDialog(mContext.getString(R.string.please_wait))
                             routeConfigWhiteGpOrLight(group.groupAddress, 97, sendNum, "gpRgbWhite")
                         }
                         else -> {
@@ -688,7 +687,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
     private fun configTempOrBri(seekBar: SeekBar, group: ItemGroup, serId: String) {
         sendNum = seekBar.progress
-        showLoadingDialog(mContext.getString(R.string.please_wait))
+       // showLoadingDialog(mContext.getString(R.string.please_wait))
         routeConfigTempGpOrLight(group.groupAddress, 97, sendNum, "gpTem")
     }
 
@@ -738,7 +737,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private fun configBriOrColorTempResult(it: Response<RouterTimeoutBean>) {
         when (it.errorCode) {
             0 -> {
-                showLoadingDialog(mContext.getString(R.string.please_wait))
+                //showLoadingDialog(mContext.getString(R.string.please_wait))
                 disposableRouteTimer?.dispose()
                 disposableRouteTimer = io.reactivex.Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                         .subscribe {

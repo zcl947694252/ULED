@@ -368,7 +368,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             checkNetworkAndSync()
         }
         updateList.clear()
-
+        routerStopScan(false)
         disposeAllSubscribe()
 
         mApplication?.removeEventListener(this)
@@ -398,30 +398,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         mApplication?.removeEventListener(this)
     }
 
-
-    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    private fun sureGroups() {
-        if (isSelectLight && TelinkLightApplication.getApp().connectDevice != null) {
-            //进行分组操作
-            //获取当前选择的分组
-            val group = currentGroup
-            if (group != null) {
-                if (group.meshAddr == 0xffff) {
-                    ToastUtils.showLong(R.string.tip_add_gp)
-                    return
-                }
-                //获取当前勾选灯的列表
-                val selectLights = mAddedDevices.filter { it.isSelected }
-
-                showLoadingDialog(getString(R.string.grouping_wait_tip, selectLights.size.toString()))
-                //将灯列表的灯循环设置分组
-                testId = group
-                setGroups(group, selectLights)
-            }
-        } else {
-            showToast(getString(R.string.selected_lamp_tip))
-        }
-    }
 
     //等待解决无法加入窗帘如组
     private fun setGroupOneByOne(dbGroup: DbGroup, selectLights: List<ScannedDeviceItem>, index: Int) {
@@ -583,6 +559,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun addGw(dbGw: DbGateway) {
         GwModel.add(dbGw)?.subscribe({
             LogUtils.v("zcl-----网关失添成功返回-------------$it")
@@ -611,30 +588,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-
-    private fun showGroupForUpdateNameDialog(position: Int) {
-        val textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setText(groups[position].name)
-        textGp.singleLine = true
-        //        //设置光标默认在最后
-        textGp.setSelection(textGp.text.toString().length)
-        AlertDialog.Builder(this)
-                .setTitle(getString(R.string.update_group))
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        groups!![position].name = textGp.text.toString().trim { it <= ' ' }
-                        DBUtils.updateGroup(groups!![position])
-                        groupsRecyclerViewAdapter.notifyItemChanged(position)
-                        mAddedDevicesAdapter!!.notifyDataSetChanged()
-                    }
-                }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-    }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -775,13 +728,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             addNewGroup()
         }
         btn_stop_scan?.setOnClickListener {//停止扫描
-            closeAnimation()
-            list_devices.visibility = View.GONE
-            scanning_num.visibility = View.GONE
-            btn_stop_scan.visibility = View.GONE
             if (Constants.IS_ROUTE_MODE) {
-                routerStopScan()
+                routerStopScan(false)
             } else {
+                closeAnimation()
+                list_devices.visibility = View.GONE
+                scanning_num.visibility = View.GONE
+                btn_stop_scan.visibility = View.GONE
                 stopScan()
             }
         }
@@ -843,7 +796,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     @SuppressLint("CheckResult")
-    private fun routerStopScan() {
+    private fun routerStopScan(isFinisAc: Boolean) {
         RouterModel.routeStopScan(TAG, Constants.SCAN_SERID)
                 ?.subscribe({ itr ->
                     LogUtils.v("zcl-----------收到路由停止请求-------$itr")
@@ -853,10 +806,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             disposableTimer?.dispose()
                             disposableTimer = Observable.timer(itr.t.timeout + 3L, TimeUnit.SECONDS)
                                     .subscribe {
+                                        hideLoadingDialog()
+                                        if (!isFinisAc)
                                         ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
+                                        finish()
                                     }
                         }
-                        NetworkStatusCode.ROUTER_STOP -> skipeType()//路由停止
+                        NetworkStatusCode.ROUTER_STOP -> if (!isFinisAc) skipeType()//路由停止
                     }
                 }, {
                     ToastUtils.showShort(it.message)
@@ -867,6 +823,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         hideLoadingDialog()
         LogUtils.v("zcl---------收到路由停止请求通知---------")
         if (cmdBean.status == 0) {
+            closeAnimation()
+            list_devices.visibility = View.GONE
+            scanning_num.visibility = View.GONE
+            btn_stop_scan.visibility = View.GONE
             getRouterScanResult()
         } else {
             ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
@@ -1163,8 +1123,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             LogUtils.v("zcl-----------收到路由h扫描开始-------$it")
             when (it.errorCode) {
                 0 -> {
-                    scanRouterTimeoutTime = it.t.timeout.toLong()
-                    routeStartTimerOut()
+                    routeStartTimerOut(it.t.timeout.toLong())
                     startAnimation()
                 }
                 90025 -> {
@@ -1201,7 +1160,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     scanFail()
                     stopScanTimer()
                 }//该账号该区域下没有可用的路由，请检查路由是否上电联网
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
 
         }, {
@@ -1219,6 +1178,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 Constants.SCAN_SERID = cmdBodyBean.scanSerId
             } else {
                 ToastUtils.showShort(cmdBodyBean.msg)
+                if (cmdBodyBean.cmd ==3001)//路由没有进行扫描，请重试
+                    finish()
                 closeAnimation()
             }
         }
@@ -1252,10 +1213,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         })
     }
 
-    private fun routeStartTimerOut() {
+    private fun routeStartTimerOut(toLong: Long) {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+        disposableTimer = Observable.timer(toLong + 1L, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
+                    stopScan()
                     ToastUtils.showShort(getString(R.string.router_scan_faile))
                 }
     }
@@ -1878,6 +1842,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         disposableFind?.dispose()
         disposableTimer?.dispose()
         mConnectDisposal?.dispose()
+        routerStopScan(true)
         disposeAllSubscribe()
         mApplication?.removeEventListener(this)
         SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)

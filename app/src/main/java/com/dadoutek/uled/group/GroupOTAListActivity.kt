@@ -64,6 +64,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GroupOTAListActivity : TelinkBaseActivity() {
+    private var isOtaing: Boolean = false
     private var currentTime: Long = 0
     private var isStartOta: Boolean = false
     private var deviceType: Int = 0
@@ -113,7 +114,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         RouterModel.getDevicesVersionNew(meshAddrList, deviceType, "gpOta")?.subscribe({
             LogUtils.v("zcl-----------收到路由请求版本申请-------$it")
             when (it.errorCode) {
-                NetworkStatusCode.OK -> startGetVersionTimer(it.t.timeout.toLong())
+                NetworkStatusCode.OK ->{
+                    showLoadingDialog(getString(R.string.please_wait))
+                    startGetVersionTimer(it.t.timeout.toLong())
+                }
                 //全部选择的设备都未绑定路由，无法获取版本号, 请先去绑定路由 DEVICE_NOT_BINDROUTER 90008
                 // 以下路由没有上线，无法删获取版本  ROUTER_ALL_OFFLINE= 90005
                 NetworkStatusCode.DEVICE_NOT_BINDROUTER -> {
@@ -133,18 +137,16 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun startGetVersionTimer(t: Long) {
-        showLoadingDialog(getString(R.string.please_wait))
         disposableRouteTimer?.dispose()
-        disposableRouteTimer = Observable.timer(t+1L, TimeUnit.SECONDS)
+        disposableRouteTimer = Observable.timer(t + 1L, TimeUnit.SECONDS)
                 .subscribe {
                     LogUtils.v("zcl-----------执行路由获取版本超时-------")
                     hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.get_version_fail))
-                    //finish()
                 }
     }
 
-    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
+/*    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
         LogUtils.v("zcl-----------收到路由得到版本的通知-------$routerVersion")
         disposableRouteTimer?.dispose()
@@ -164,7 +166,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         } else {
             ToastUtils.showShort(getString(R.string.get_version_success_num, routerVersion?.succeedTotal?.size))
         }
-    }
+    }*/
 
     override fun tzRouteGetVersioningNum(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl-----------收到路由gpOta通知-------$cmdBean")
@@ -247,6 +249,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             isStartOta = false
             when (it.errorCode) {
                 0 -> {
+                    SharedPreferencesUtils.setLastOtaTime(time)
+                    if (isGroup)
+                        SharedPreferencesUtils.setLastOtaType(2)
+                    else
+                        SharedPreferencesUtils.setLastOtaType(0)
                     ota_progress.visibility = View.VISIBLE
                     currentTime = time
                     SharedPreferencesUtils.setLastOtaTime(currentTime)
@@ -593,7 +600,15 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var emptyView = View.inflate(this, R.layout.empty_view, null)
         val addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
         addBtn.visibility = View.INVISIBLE
-        getIntentData()
+
+        val serializableExtra = intent.getSerializableExtra("group")//如果不是群组不传dbgroup
+        if (serializableExtra != null)
+            dbGroup = serializableExtra as DbGroup
+        deviceType = intent.getIntExtra("DeviceType", 0)
+        isGroup = dbGroup != null
+        isOtaing = intent.getIntExtra("isOTAing", 3)== 1
+        currentTime = SharedPreferencesUtils.getLastOtaTime()
+
         setAllAdapter(emptyView)
         updataDevice()
     }
@@ -632,15 +647,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 gwAdaper.emptyView = emptyView
             }
         }
-    }
-
-    private fun getIntentData() {
-        val serializableExtra = intent.getSerializableExtra("group")//如果不是群组不传dbgroup
-        if (serializableExtra != null)
-            dbGroup = serializableExtra as DbGroup
-        deviceType = intent.getIntExtra("DeviceType", 0)
-        isGroup = dbGroup != null
-        currentTime = SharedPreferencesUtils.getLastOtaTime()
     }
 
     private fun setRelayData() {
@@ -860,13 +866,13 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         }
         btn_gp_ota_start.setOnClickListener {
             if (!isStartOta)
-                routerStartOrStop()
+                routerStart()
             else
                 ToastUtils.showShort(getString(R.string.otaing))
         }
     }
 
-    private fun routerStartOrStop() {
+    private fun routerStart() {
         val meshList = mutableListOf<Int>()
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
@@ -923,6 +929,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             DeviceType.SENSOR -> setSensorData()
             DeviceType.GATE_WAY -> setGwData()
         }
+
+        if (isOtaing)
+            routerStart()
     }
 
     @SuppressLint("CheckResult")
@@ -1117,7 +1126,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun bleOTALight(dbLight: DbLight) {
         when {
-            Constants.IS_ROUTE_MODE -> routerStartOrStop()
+            Constants.IS_ROUTE_MODE -> routerStart()
             dbLight.isMostNew -> ToastUtils.showShort(getString(R.string.the_last_version))
             dbLight.isSupportOta -> {
                 when {

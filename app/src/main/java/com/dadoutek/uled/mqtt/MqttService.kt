@@ -140,7 +140,7 @@ class MqttService : Service() {
 
     override fun onDestroy() {
         if (client != null) {
-            client?.disconnect()
+            //client!!.disconnect()
             client?.unregisterResources()
         }
 

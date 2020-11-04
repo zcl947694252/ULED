@@ -143,4 +143,15 @@ public class SharedPreferencesUtils {
        return SharedPreferencesHelper.getLong(TelinkLightApplication.Companion.getApp(),
                 Constants.OTA_TIME, 0);
     }
+
+    //0设备类型  1单灯  2群组  3 ota Router本身
+    public static void setLastOtaType(int type) {
+        SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
+                Constants.OTA_TYPE, type);
+    }
+
+    public static int getLastOtaType() {
+        return SharedPreferencesHelper.getInt(TelinkLightApplication.Companion.getApp(),
+                Constants.OTA_TYPE, 1);
+    }
 }

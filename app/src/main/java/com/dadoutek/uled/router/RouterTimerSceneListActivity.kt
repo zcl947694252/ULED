@@ -116,7 +116,7 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
     }
 
     @SuppressLint("CheckResult")
-    private fun initData() {
+    private fun initData() {// LogUtils.v("zcl-----------获取路由定时列表-------$it")
         RouterModel.routeTimerSceneList()?.subscribe({
             list.clear()
             list.addAll(it)

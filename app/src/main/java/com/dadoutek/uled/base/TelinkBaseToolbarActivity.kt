@@ -23,7 +23,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
     var bindRouter: MenuItem? = null
     var builder: AlertDialog.Builder? = null
     open var deleteDeviceAll: MenuItem? = null
-    private var onlineUpdateAll: MenuItem? = null
+    open var onlineUpdateAll: MenuItem? = null
     open var batchGpAll: MenuItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +54,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
 
         batchRename?.isVisible = batchRenameVisible()
         batchGpAll?.isVisible = batchGpVisible()
+        onlineUpdateAll?.isVisible = onlineUpdateAllVisible()
         bindRouter?.isVisible = bindRouterVisible()
 
         toolbar.setOnMenuItemClickListener { itm ->
@@ -75,6 +76,10 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             }
             true
         }
+    }
+
+    open fun onlineUpdateAllVisible(): Boolean {
+        return true
     }
 
     open fun batchRenameVisible(): Boolean {

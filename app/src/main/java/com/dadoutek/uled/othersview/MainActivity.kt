@@ -35,6 +35,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.DeviceFragment
 import com.dadoutek.uled.fragment.MeFragment
 import com.dadoutek.uled.group.GroupListFragment
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
@@ -78,9 +79,12 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main_content.*
 import kotlinx.android.synthetic.main.fragment_me.*
+import kotlinx.android.synthetic.main.popwindown_switch.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
+import org.jetbrains.anko.startActivity
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
@@ -162,7 +166,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener {  getBin()}
+        main_toast.setOnClickListener { getBin() }
         initBottomNavigation()
         checkVersionAvailable()
         getScanResult()
@@ -184,12 +188,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({ it ->
                     LogUtils.v("zcl获取服务器bin-----------$it-------")
                     hideLoadingDialog()
-                    TelinkLightApplication.mapBin =it
-                  /*  it.forEach {
-                        val split = it.split("=")
-                        if (split.size >= 2 && !TextUtils.isEmpty(split[0]) && !TextUtils.isEmpty(split[1]))
-                            mapBin[split[0]] = split[1].toInt()
-                    }*/
+                    TelinkLightApplication.mapBin = it
+                    /*  it.forEach {
+                          val split = it.split("=")
+                          if (split.size >= 2 && !TextUtils.isEmpty(split[0]) && !TextUtils.isEmpty(split[1]))
+                              mapBin[split[0]] = split[1].toInt()
+                      }*/
                 }, {
                     hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.get_bin_fail))
@@ -204,8 +208,56 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     ?.subscribe({
                         when (it.data.status) {
                             Constants.ROUTER_OTA_ING -> {
+                                val otaData = it.data.data.otaData
+                                if (otaData.isNotEmpty()) {
+                                    val otaDataOne = otaData[0]
+                                    val lastOtaType = SharedPreferencesUtils.getLastOtaType()
+                                    val productUUID = otaDataOne.productUUID
+                                    LogUtils.v("zcl-----------收到路由状态-------$otaData")
+                                    when {
+                                        otaData.size <= 1 -> {
+                                            when (lastOtaType) {
+                                                3 -> startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to
+                                                        productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1)
+                                                1 -> {
+                                                    var meshAddr = when (productUUID) {
+                                                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByID(otaDataOne.id.toLong())?.meshAddr
+                                                        DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByID(otaDataOne.id.toLong())?.meshAddr
+                                                        DeviceType.SMART_RELAY -> DBUtils.getConnectorByID(otaDataOne.id.toLong())?.meshAddr
+                                                        else -> DBUtils.getLightByID(otaDataOne.id.toLong())?.meshAddr
+                                                    }
+                                                    startActivity<RouterOtaActivity>("deviceMeshAddress" to meshAddr, "deviceType" to
+                                                            productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1)
+                                                }
+                                            }
+                                        }
+                                        else -> {
+                                            val productUUID = productUUID
+                                            when (lastOtaType) {
+                                                0 -> startActivity<GroupOTAListActivity>("DeviceType" to productUUID, "isOTAing" to 1)
+                                                2 -> {
+                                                    var gpId = when (productUUID) {
+                                                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                                                            DBUtils.getLightByID(otaDataOne.id.toLong())?.belongGroupId
+                                                        }
+                                                        DeviceType.SMART_CURTAIN -> {
+                                                            DBUtils.getCurtainByID(otaDataOne.id.toLong())?.belongGroupId
+                                                        }
+                                                        DeviceType.SMART_RELAY -> {
+                                                            DBUtils.getConnectorByID(otaDataOne.id.toLong())?.belongGroupId
+                                                        }
+                                                        else -> DBUtils.getLightByID(otaDataOne.id.toLong())?.belongGroupId
+                                                    }
+                                                    val groupByID = DBUtils.getGroupByID(gpId ?: 0)
+                                                    startActivity<GroupOTAListActivity>("group" to groupByID!!, "DeviceType" to DeviceType.LIGHT_RGB, "isOTAing" to 1)
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
                             }
-                            Constants.ROUTER_SCANNING -> {
+                            Constants.ROUTER_SCANNING, Constants.ROUTER_SCAN_END -> {
                                 val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
                                 intent.putExtra(Constants.DEVICE_TYPE, it.data.data.scanType)
                                 startActivity(intent)

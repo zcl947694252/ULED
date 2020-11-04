@@ -390,8 +390,8 @@ public class Constants
     public static final int THURSDAY = 1 << 4;
     public static final int WEDNESDAY = 1 << 3;
     public static final int TUESDAY = 1 << 2;
-    public static final int MONDAY = 1 << 1;
-    public static final int SUNDAY = 1 << 0;
+    public static final int MONDAY = 1 << 1;//1左移1位 0x0000 0010 就是2
+    public static final int SUNDAY = 1 << 0;//1左移0位还是1
     /**
      * 通过服务器转发命令到网关CMD
      */

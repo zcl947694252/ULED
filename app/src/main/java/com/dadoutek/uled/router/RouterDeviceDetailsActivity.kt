@@ -75,6 +75,10 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         return toolbar
     }
 
+    override fun onlineUpdateAllVisible(): Boolean {
+        return false
+    }
+
     override fun batchGpVisible(): Boolean {
         batchGpAll?.title = getString(R.string.timer_scene)
         return true

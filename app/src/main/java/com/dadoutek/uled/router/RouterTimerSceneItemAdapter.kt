@@ -19,9 +19,15 @@ import com.dadoutek.uled.network.RouterTimerSceneBean
  */
 class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerSceneBean>) : BaseQuickAdapter<RouterTimerSceneBean, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: RouterTimerSceneBean?) {
+        val min = item?.min?:0
+        val hour = item?.hour?:0
+        var minStr = if (min<10) "0$min" else min.toString()
+        var hourStr = if (hour<10) "0$hour" else hour.toString()
+
+        val value ="${hourStr ?:0}:${minStr ?:0}"
         helper?.addOnClickListener(R.id.item_event_ly)
                 ?.addOnClickListener(R.id.item_event_switch)
-                ?.setText(R.id.item_event_title, item?.name)
+                ?.setText(R.id.item_event_title, value)
                 ?.setText(R.id.item_event_week, getWeekStr(item?.week))
                 ?.setText(R.id.item_event_name, item?.sname)
                 ?.setVisible(R.id.item_event_name, true)
@@ -41,14 +47,19 @@ class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerScene
                     WeekBean(mContext.getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
                     WeekBean(mContext.getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
                     WeekBean(mContext.getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
-            val sb = StringBuilder()
-            for (i in 0 until list.size) {
-                when {
-                    i != list.size - 1 -> sb.append(list[i].week).append(",")
-                    else -> sb.append(list[i].week)
+            val filter = list.filter { it.selected }
+            return when {
+                filter.size >= 7 -> mContext.getString(R.string.every_day)
+                else -> {
+                    val sb = StringBuilder()
+                    for (i in filter.indices)
+                        when {
+                            i != filter.size - 1 -> sb.append(filter[i].week).append(",")
+                            else -> sb.append(filter[i].week)
+                        }
+                    sb.toString()
                 }
             }
-            return sb.toString()
         }
         return ""
     }

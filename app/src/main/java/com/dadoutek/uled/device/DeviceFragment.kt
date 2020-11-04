@@ -185,7 +185,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         startActivityForResult(intent, Activity.RESULT_OK)
     }
 
-
     /**
      * 初始化RecyclerView的Adapter
      */
