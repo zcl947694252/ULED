@@ -1115,6 +1115,7 @@ public interface RequestInterface {
      * "meshAddrs" : [1, 2, 3],"meshType": 4, "start": 1597046661669
      * meshType 普通灯 = 4 彩灯 = 6 蓝牙连接器 = 5 窗帘 = 16
      * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25  传感器 = 98 或 0x23 或 0x24
+     * op	否	int	获取路由状态且为ota状态时回传。默认回传0
      */
     @POST("router/device-ota")
     Observable<Response> routerToDevicesOta(@Body MeshAddressTypeTimeBody body/*@Field

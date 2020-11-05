@@ -26,6 +26,8 @@ data class DataX(
     var endTime: String = "",
     var scanSerId: Int = 0,
     var scanType: Int = 0,
+    var productUUID: Int = 0,
+    var op: Int = 0,
     var scanedData: List<ScanedData> = listOf(),
     var otaData: List<OtaData> = listOf(),
     var startTime: String = ""

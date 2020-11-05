@@ -34,7 +34,9 @@ import com.google.gson.Gson
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -740,6 +742,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 //showLoadingDialog(mContext.getString(R.string.please_wait))
                 disposableRouteTimer?.dispose()
                 disposableRouteTimer = io.reactivex.Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                         .subscribeOn(Schedulers.io())
+                                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             hideLoadingDialog()
                             when (clickType) {//普通色温亮度 彩灯亮度白光

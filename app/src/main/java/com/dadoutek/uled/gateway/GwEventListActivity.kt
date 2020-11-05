@@ -303,6 +303,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private fun hardTimer() {
         disposableFactoryTimer?.dispose()
         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
                     CoroutineScope(Dispatchers.Main).launch {
@@ -357,6 +359,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     disposableFactoryTimer?.dispose()
                     disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.user_reset_faile))
@@ -880,6 +884,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         disposableTimer?.dispose()
         connectCount++
         disposableTimer = Observable.timer(20000, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (connectCount < 3)
                         sendOpenOrCloseGw(dbGwTag, isMutex)
@@ -992,6 +998,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setTimerDelay(gwTagBean: GwTagBean, currentTime: Long, delay: Long) {
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (connectCount < 3)
                         deleteTimerLable(gwTagBean, currentTime)

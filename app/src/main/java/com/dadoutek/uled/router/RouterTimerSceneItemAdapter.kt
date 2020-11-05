@@ -19,12 +19,12 @@ import com.dadoutek.uled.network.RouterTimerSceneBean
  */
 class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerSceneBean>) : BaseQuickAdapter<RouterTimerSceneBean, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: RouterTimerSceneBean?) {
-        val min = item?.min?:0
-        val hour = item?.hour?:0
-        var minStr = if (min<10) "0$min" else min.toString()
-        var hourStr = if (hour<10) "0$hour" else hour.toString()
+        val min = item?.min ?: 0
+        val hour = item?.hour ?: 0
+        var minStr = if (min < 10) "0$min" else min.toString()
+        var hourStr = if (hour < 10) "0$hour" else hour.toString()
 
-        val value ="${hourStr ?:0}:${minStr ?:0}"
+        val value = "${hourStr ?: 0}:${minStr ?: 0}"
         helper?.addOnClickListener(R.id.item_event_ly)
                 ?.addOnClickListener(R.id.item_event_switch)
                 ?.setText(R.id.item_event_title, value)
@@ -35,33 +35,32 @@ class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerScene
     }
 
     private fun getWeekStr(week: Int?): String {
-        var tmpWeek = week
-        if (week == 0b10000000)
-            tmpWeek = Constants.SATURDAY or Constants.FRIDAY or Constants.THURSDAY or Constants.WEDNESDAY or Constants.TUESDAY or Constants.MONDAY or Constants.SUNDAY //每一天
-        if (tmpWeek != null) {
-            val list = mutableListOf(
-                    WeekBean(mContext.getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
-                    WeekBean(mContext.getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
-                    WeekBean(mContext.getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
-                    WeekBean(mContext.getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
-                    WeekBean(mContext.getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
-                    WeekBean(mContext.getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
-                    WeekBean(mContext.getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
-            val filter = list.filter { it.selected }
-            return when {
-                filter.size >= 7 -> mContext.getString(R.string.every_day)
-                else -> {
-                    val sb = StringBuilder()
-                    for (i in filter.indices)
-                        when {
-                            i != filter.size - 1 -> sb.append(filter[i].week).append(",")
-                            else -> sb.append(filter[i].week)
-                        }
-                    sb.toString()
+        val sb = StringBuilder()
+        var tmpWeek = week ?: 0
+        when (tmpWeek) {
+            0b01111111 -> sb.append(mContext.getString(R.string.every_day))
+            0b00000000 -> sb.append(mContext.getString(R.string.only_one))
+            else -> {
+                var list = mutableListOf(
+                        WeekBean(mContext.getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
+                        WeekBean(mContext.getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
+                        WeekBean(mContext.getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
+                        WeekBean(mContext.getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
+                        WeekBean(mContext.getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
+                        WeekBean(mContext.getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
+                        WeekBean(mContext.getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
+                for (i in 0 until list!!.size) {
+                    var weekBean = list!![i]
+                    if (weekBean.selected) {
+                        if (i == list!!.size - 1)
+                            sb.append(weekBean.week)
+                        else
+                            sb.append(weekBean.week).append(",")
+                    }
                 }
             }
         }
-        return ""
+        return sb.toString()
     }
 
 

@@ -58,6 +58,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_lights_of_group.*
 import kotlinx.android.synthetic.main.activity_sensor_device_details.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
@@ -380,7 +381,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
             if (!TelinkLightApplication.getApp().offLine) {
                 disposableTimer?.dispose()
-                disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS) .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread()).subscribe {
                     hideLoadingDialog()
                     runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                 }
@@ -525,7 +527,10 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
         //确保上一个订阅被取消了
         connectSensorTimeoutDisposable?.dispose()
-        connectSensorTimeoutDisposable = Observable.timer(CONNECT_SENSOR_TIMEOUT, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        connectSensorTimeoutDisposable = Observable.timer(CONNECT_SENSOR_TIMEOUT, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()
@@ -588,7 +593,9 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         when (isClick) {//重新配置
                             RECOVER_SENSOR -> {
                                 disposable?.dispose()
-                                disposable = Observable.timer(2, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                                disposable = Observable.timer(2, TimeUnit.SECONDS)
+                                         .subscribeOn(Schedulers.io())
+                                                         .observeOn(AndroidSchedulers.mainThread())
                                         .subscribe {
                                             relocationSensor()
                                         }

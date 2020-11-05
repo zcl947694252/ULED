@@ -57,6 +57,7 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
@@ -703,7 +704,9 @@ class GroupListFragment : BaseFragment() {
 
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
-        updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
+        updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     var lightList: MutableList<DbLight> = ArrayList()
 

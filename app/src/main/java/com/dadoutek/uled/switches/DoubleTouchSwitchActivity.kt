@@ -31,7 +31,9 @@ import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_switch_double_touch.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -251,6 +253,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                             showLoadingDialog(getString(R.string.please_wait))
                                             disposableTimer?.dispose()
                                             disposableTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                                     .subscribeOn(Schedulers.io())
+                                                                     .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe {
                                                         hideLoadingDialog()
                                                         ToastUtils.showShort(getString(R.string.config_fail))

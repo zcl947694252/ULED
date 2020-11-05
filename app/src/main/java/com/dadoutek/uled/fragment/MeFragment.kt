@@ -528,10 +528,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         SyncDataPutOrGetUtils.syncPutDataStart(activity!!, object : SyncCallback {
             override fun complete() {
                 hideLoadingDialog()
-                disposable?.dispose()
-                disposable = Observable.timer(500, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {}
                 if (compositeDisposable.isDisposed) {
                     compositeDisposable = CompositeDisposable()
                 }

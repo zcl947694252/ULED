@@ -206,13 +206,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (Constants.IS_ROUTE_MODE)
             RouterModel.routerStatus()
                     ?.subscribe({
+                        LogUtils.v("zcl-----------收到路由总状态-------$it")
                         when (it.data.status) {
                             Constants.ROUTER_OTA_ING -> {
-                                val otaData = it.data.data.otaData
+                                val data = it.data.data
+                                val productUUID = data.productUUID
+                                val lastOtaType = data.op
+                                val otaData = data.otaData
                                 if (otaData.isNotEmpty()) {
                                     val otaDataOne = otaData[0]
-                                    val lastOtaType = SharedPreferencesUtils.getLastOtaType()
-                                    val productUUID = otaDataOne.productUUID
                                     LogUtils.v("zcl-----------收到路由状态-------$otaData")
                                     when {
                                         otaData.size <= 1 -> {

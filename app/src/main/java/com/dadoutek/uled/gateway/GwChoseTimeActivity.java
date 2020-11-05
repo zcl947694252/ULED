@@ -24,10 +24,10 @@ import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.dadoutek.uled.gateway.bean.GwTagBean;
 import com.dadoutek.uled.gateway.bean.GwTasksBean;
 import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbScene;
 import com.dadoutek.uled.model.httpModel.GwModel;
-import com.dadoutek.uled.model.Opcode;
 import com.dadoutek.uled.network.GwGattBody;
 import com.dadoutek.uled.network.NetworkObserver;
 import com.dadoutek.uled.switches.SelectSceneListActivity;
@@ -53,7 +53,9 @@ import butterknife.Unbinder;
 import cn.qqtheme.framework.picker.DateTimePicker;
 import cn.qqtheme.framework.picker.TimePicker;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * 设置网关时间与场景传递进配config界面
@@ -196,6 +198,8 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void setHeadTimerDelay(long delay) {
         disposableHeadTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> runOnUiThread(() -> {
                     if (sendCount < 2)
                         sendLabelHeadParams();
@@ -254,7 +258,9 @@ public class GwChoseTimeActivity extends TelinkBaseActivity implements EventList
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void sendTimeTimerDelay(GwTasksBean tasks, long delay) {
-        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS).subscribe(aLong -> {
+        disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
             if (sendCount < 3) {
                 sendTime(tasks);
             } else {

@@ -19,7 +19,9 @@ import com.dadoutek.uled.router.bean.RouteInAccountBean
 import com.dadoutek.uled.util.NetWorkUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_routing_network.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
@@ -65,7 +67,9 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
                                 0 -> {
                                    hideLoadingDialog()
                                     timeOutTimer?.dispose()
-                                    timeOutTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS).subscribe {
+                                    timeOutTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                             .subscribeOn(Schedulers.io())
+                                                             .observeOn(AndroidSchedulers.mainThread()).subscribe {
                                         ToastUtils.showShort(getString(R.string.router_access_in_fail))
                                     }
                                 }

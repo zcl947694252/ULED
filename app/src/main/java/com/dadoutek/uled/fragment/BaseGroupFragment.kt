@@ -63,6 +63,7 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -450,6 +451,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.open_faile))
@@ -690,6 +693,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                     if (it.errorCode==0){
                         disposableRouteTimer?.dispose()
                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                 .subscribeOn(Schedulers.io())
+                                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(getString(R.string.delete_gp_fail))
@@ -788,7 +793,9 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
-        updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
+        updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     var lightList: MutableList<DbLight> = ArrayList()
                     when (group.meshAddr) {

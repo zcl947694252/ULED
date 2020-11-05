@@ -615,7 +615,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         if (mScanDisposal != null) {
             mScanDisposal.dispose();
         }
-        mScanDisposal = Observable.timer(TIME_OUT_SCAN, TimeUnit.SECONDS).subscribe(aLong -> {
+        mScanDisposal = Observable.timer(TIME_OUT_SCAN, TimeUnit.SECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
             onScanTimeout();
         });
     }

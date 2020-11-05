@@ -33,7 +33,6 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.router.BindRouterActivity
-import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
@@ -50,7 +49,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -76,9 +74,9 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private var canBeRefresh = true
     private val REQ_LIGHT_SETTING: Int = 0x01
     private var acitivityIsAlive = true
-    private var install_device: TextView? = null
-    private var create_group: TextView? = null
-    private var create_scene: TextView? = null
+    private var installDevice: TextView? = null
+    private var createGroup: TextView? = null
+    private var createScene: TextView? = null
 
 
     private var lastOffset: Int = 0//距离
@@ -100,8 +98,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     override fun bindDeviceRouter() {
         val dbGroup = DbGroup()
         dbGroup.brightness = 10000
-        dbGroup.deviceType =  when (type) {
-            Constants.INSTALL_NORMAL_LIGHT ->DeviceType.LIGHT_NORMAL.toLong()
+        dbGroup.deviceType = when (type) {
+            Constants.INSTALL_NORMAL_LIGHT -> DeviceType.LIGHT_NORMAL.toLong()
             Constants.INSTALL_RGB_LIGHT -> DeviceType.LIGHT_RGB.toLong()
             else -> DeviceType.LIGHT_NORMAL.toLong()
         }
@@ -166,12 +164,12 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
         listAdapter!!.bindToRecyclerView(recycleView)
 
-        install_device = findViewById(R.id.install_device)
-        create_group = findViewById(R.id.create_group)
-        create_scene = findViewById(R.id.create_scene)
-        install_device?.setOnClickListener(onClick)
-        create_group?.setOnClickListener(onClick)
-        create_scene?.setOnClickListener(onClick)
+        installDevice = findViewById(R.id.install_device)
+        createGroup = findViewById(R.id.create_group)
+        createScene = findViewById(R.id.create_scene)
+        installDevice?.setOnClickListener(onClick)
+        createGroup?.setOnClickListener(onClick)
+        createScene?.setOnClickListener(onClick)
         add_device_btn.setOnClickListener(this)
         search_clear.setOnClickListener { clearSearch() }
         search_btn.setOnClickListener { clearSearch() }
@@ -226,7 +224,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    val onItemChildClickListener = OnItemChildClickListener { adapter, view, position ->
+    val onItemChildClickListener = OnItemChildClickListener { _, view, position ->
         if (position < lightsData.size) {
             currentDevice = lightsData[position]
             positionCurrent = position
@@ -394,27 +392,28 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private fun openOrClose(currentLight: DbLight) {
         LogUtils.v("zcl点击后的灯$currentLight")
         this.currentDevice = currentLight
-        when (currentLight!!.connectionStatus) {
+        when (currentLight.connectionStatus) {
             ConnectionStatus.OFF.value -> {
                 if (Constants.IS_ROUTE_MODE)// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                     routeOpenOrCloseBase(currentLight.meshAddr, currentLight.productUUID, 1, "deng")
                 else {
-                    when (currentLight!!.productUUID) {
-                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = true, isPause = false)//开窗
-                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)//开灯
+                    when (currentLight.productUUID) {
+                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight.meshAddr, isOpen = true, isPause = false)//开窗
+                        else -> Commander.openOrCloseLights(currentLight.meshAddr, true)//开灯
                     }
                     this.currentDevice!!.connectionStatus = ConnectionStatus.ON.value
                 }
             }
             else -> {
-                if (Constants.IS_ROUTE_MODE)
-                    routeOpenOrCloseBase(currentLight.meshAddr, currentLight.productUUID, 0, "deng")
-                else {
-                    when (currentLight!!.productUUID) {
-                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, isOpen = false, isPause = false)//关窗
-                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)//关灯
+                when {
+                    Constants.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight.meshAddr, currentLight.productUUID, 0, "deng")
+                    else -> {
+                        when (currentLight.productUUID) {
+                            DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight.meshAddr, isOpen = false, isPause = false)//关窗
+                            else -> Commander.openOrCloseLights(currentLight.meshAddr, false)//关灯
+                        }
+                        this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
                     }
-                    this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
                 }
             }
         }
@@ -424,11 +423,13 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         hideLoadingDialog()
         disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "deng") {
-        LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
+            LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
             when (this.currentDevice!!.connectionStatus) {
                 ConnectionStatus.OFF.value -> this.currentDevice!!.connectionStatus = ConnectionStatus.ON.value
                 else -> this.currentDevice!!.connectionStatus = ConnectionStatus.OFF.value
             }
+
+
             when (cmdBean.status) {
                 0 -> sendAfterUpdate()
                 else -> ToastUtils.showShort(getString(R.string.open_faile))
@@ -485,12 +486,9 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     private fun addDeviceLight() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-
         when (type) {
-            Constants.INSTALL_NORMAL_LIGHT ->
-                intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-            Constants.INSTALL_RGB_LIGHT ->
-                intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+            Constants.INSTALL_NORMAL_LIGHT -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+            Constants.INSTALL_RGB_LIGHT -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
         }
         startActivityForResult(intent, 0)
     }
@@ -511,6 +509,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                         lightsData.add(allLightData[i])
                     }
                     lightsData = sortList(lightsData)
+                    lightsData.sortBy { it.belongGroupId }
                 }
             }
             Constants.INSTALL_RGB_LIGHT -> {//全彩灯
@@ -555,8 +554,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         notifyData()
-        GlobalScope.launch {
-            //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
+        GlobalScope.launch {  //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2000)
             if (TelinkLightApplication.getApp().connectDevice == null)
                 autoConnectAll()
@@ -664,10 +662,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             for (j in i + 1 until arr.size) {//until不 不包括结束区间
                 val jLight = arr[j]
                 val mLight = arr[min]
-                if (jLight != null && mLight != null)
-                    if (jLight.belongGroupId < mLight.belongGroupId)
-                        min = j
-
+                if (jLight.belongGroupId < mLight.belongGroupId)
+                    min = j
             }
             if (arr[i].belongGroupId > arr[min].belongGroupId) {
                 temp = arr[i]

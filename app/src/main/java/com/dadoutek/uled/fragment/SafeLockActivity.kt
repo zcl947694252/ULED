@@ -18,7 +18,9 @@ import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_save_lock.*
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.concurrent.TimeUnit
@@ -134,6 +136,8 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 if (status == 1)

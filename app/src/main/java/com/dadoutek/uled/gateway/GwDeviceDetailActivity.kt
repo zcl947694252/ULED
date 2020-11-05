@@ -303,10 +303,6 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
                 adaper!!.notifyDataSetChanged()
             } else {
-                disposableTimer?.dispose()
-                disposableTimer = Observable.timer(6500, TimeUnit.MILLISECONDS).subscribe {
-                }
-
                 var labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
                     byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
                 else
@@ -376,6 +372,8 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         disposableFactoryTimer?.dispose()
                         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                                 .subscribeOn(Schedulers.io())
+                                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(getString(R.string.user_reset_faile))
@@ -553,6 +551,8 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     private fun connectGw(configType: Int) {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(20, TimeUnit.SECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
                     if (configType != 3)

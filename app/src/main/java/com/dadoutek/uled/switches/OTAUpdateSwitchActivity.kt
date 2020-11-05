@@ -598,7 +598,8 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
         if (mScanDisposal != null) {
             mScanDisposal!!.dispose()
         }
-        mScanDisposal = Observable.timer(TIME_OUT_SCAN.toLong(), TimeUnit.SECONDS).subscribe { onScanTimeout() }
+        mScanDisposal = Observable.timer(TIME_OUT_SCAN.toLong(), TimeUnit.SECONDS) .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe { onScanTimeout() }
     }
 
     private fun stopScanTimer() {
@@ -738,7 +739,8 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
             if (mSendataDisposal != null) {
                 mSendataDisposal!!.dispose()
             }
-            mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA, TimeUnit.SECONDS).subscribe { aLong ->
+            mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA, TimeUnit.SECONDS) .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe { aLong ->
                 if (progress_view.progress <= 0) {
                     showUpdateFailView()
                 }

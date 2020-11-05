@@ -62,6 +62,7 @@ import com.telink.util.EventListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.huuman_body_sensor.*
 import kotlinx.android.synthetic.main.template_loading_progress.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -1382,7 +1383,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             TelinkLightService.Instance()?.autoConnect(connectParams)
         }
         disposable?.dispose()
-        disposable = Observable.timer(15000, TimeUnit.MILLISECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe({
+        disposable = Observable.timer(15000, TimeUnit.MILLISECONDS) .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe({
             LeBluetooth.getInstance().stopScan()
             TelinkLightService.Instance()?.idleMode(true)
             hideLoadingDialog()

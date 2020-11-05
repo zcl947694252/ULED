@@ -43,6 +43,7 @@ import com.dadoutek.uled.router.bean.RouteSceneBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
@@ -819,6 +820,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private fun startAddSceneTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
         disposableTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong(), TimeUnit.SECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     showLoadingDialog(getString(R.string.add_scene_fail))
                 }

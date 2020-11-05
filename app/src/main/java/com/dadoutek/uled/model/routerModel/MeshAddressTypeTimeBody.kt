@@ -12,4 +12,4 @@ import java.io.Serializable
  * 更新时间   $
  * 更新描述
  */
-class MeshAddressTypeTimeBody(var meshType: Int, var meshAddrs:List<Int>,var  start:Long,var ser_id: String) :Serializable
+class MeshAddressTypeTimeBody(var meshType: Int, var meshAddrs:List<Int>,var  start:Long,op :Int ,var ser_id: String) :Serializable

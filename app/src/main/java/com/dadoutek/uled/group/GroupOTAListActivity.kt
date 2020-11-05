@@ -139,6 +139,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun startGetVersionTimer(t: Long) {
         disposableRouteTimer?.dispose()
         disposableRouteTimer = Observable.timer(t + 1L, TimeUnit.SECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     LogUtils.v("zcl-----------执行路由获取版本超时-------")
                     hideLoadingDialog()
@@ -244,7 +246,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun routerOtaDevice(meshList: MutableList<Int>) {
         val time = System.currentTimeMillis()
         startGetStatus(false)
-        RouterModel.toDevicesOTA(meshList, deviceType, time)?.subscribe({
+        ////0设备类型  1单灯  2群组  3 ota Router本身
+      var op =   if (isGroup) 2 else 0
+        RouterModel.toDevicesOTA(meshList, deviceType, time,op,"otaList")?.subscribe({
             LogUtils.v("zcl-----------收到路由升级请求---deviceMeshAddress$meshList---time$time-------deviceTye${deviceType}----$it")
             isStartOta = false
             when (it.errorCode) {
@@ -312,6 +316,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.ota_stop_fail))
@@ -937,7 +943,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun goScanning() {
         ToastUtils.showShort(getString(R.string.sanning_to_scan_activity))
-        Observable.timer(2000, TimeUnit.MILLISECONDS).subscribe {
+        Observable.timer(2000, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread()).subscribe {
             startActivity(Intent(this@GroupOTAListActivity, DeviceScanningNewActivity::class.java))
             finish()
         }

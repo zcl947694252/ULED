@@ -16,6 +16,8 @@ import com.dadoutek.uled.util.DensityUtil
 import com.yanzhenjie.recyclerview.SwipeMenu
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
 import kotlinx.android.synthetic.main.template_swipe_recycleview.*
@@ -64,9 +66,9 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
             if (view.id == R.id.item_event_switch) {
                 currentPostion = position
                 routerChangeTimerSceneStatus()
-            }else{
+            } else {
                 val intent = Intent(this@RouterTimerSceneListActivity, AddTimerSceneActivity::class.java)
-                intent.putExtra("timerScene",list[position])
+                intent.putExtra("timerScene", list[position])
                 startActivity(intent)
             }
         }
@@ -84,6 +86,8 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 if (currentStatus == 1)
@@ -152,6 +156,8 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.delete_timerscne_fail))
@@ -167,18 +173,18 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
     }
 
     override fun tzRouterDelTimerScene(cmdBean: CmdBodyBean) {
-              LogUtils.v("zcl-----------收到路由delTimerScene通知-------$cmdBean")
-                      if (cmdBean.ser_id=="delTimerScene"){
-                          disposableRouteTimer?.dispose()
-                          hideLoadingDialog()
-                          when (cmdBean.status) {
-                              0 -> {
-                                  list.removeAt(currentPostion)
-                                  adapter.notifyDataSetChanged()
-                              }
-                              else -> ToastUtils.showShort(getString(R.string.delete_timerscne_fail))
-                          }
-                      }
+        LogUtils.v("zcl-----------收到路由delTimerScene通知-------$cmdBean")
+        if (cmdBean.ser_id == "delTimerScene") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            when (cmdBean.status) {
+                0 -> {
+                    list.removeAt(currentPostion)
+                    adapter.notifyDataSetChanged()
+                }
+                else -> ToastUtils.showShort(getString(R.string.delete_timerscne_fail))
+            }
+        }
     }
 
     override fun onResume() {

@@ -215,10 +215,10 @@ object RouterModel {
     }
 
     /**
-     *路由升级
+     *路由升级 //0设备类型  1单灯  2群组  3 ota Router本身
      */
-    fun toDevicesOTA(meshAddrs: MutableList<Int>, meshType: Int, currentTimeMillis: Long): Observable<Response<Any>>? {
-        return NetworkFactory.getApi().routerToDevicesOta(MeshAddressTypeTimeBody(meshType,meshAddrs,currentTimeMillis,"routerList"))
+    fun toDevicesOTA(meshAddrs: MutableList<Int>, meshType: Int, currentTimeMillis: Long,op: Int,ser_id: String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routerToDevicesOta(MeshAddressTypeTimeBody(meshType,meshAddrs,currentTimeMillis,op,ser_id))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

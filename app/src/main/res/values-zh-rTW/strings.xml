@@ -1139,7 +1139,7 @@
     <string name="please_config_all">请完成所有按键配置</string>
     <string name="right_phone_num">请填写正确的手机号码</string>
     <string name="submit_error_code">用户提交校验的验证码错误</string>
-    <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
+    <string name="verification_code_invalid">验证3次失败，验证码无效，请再次请求</string>
     <string name="salt_error">请先获取盐值或盐值错误或盐值已过期</string>
     <string name="input_rgb_num">输入RGB值</string>
     <string name="router_grouping">分组中，请稍后。已成功分组%1$s个设备</string>

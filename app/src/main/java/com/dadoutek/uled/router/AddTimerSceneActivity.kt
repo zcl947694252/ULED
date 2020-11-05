@@ -15,6 +15,8 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.GwChoseModeActivity
+import com.dadoutek.uled.gateway.bean.WeekBean
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.routerModel.RouterModel
@@ -23,6 +25,8 @@ import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.switches.SelectSceneListActivity
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.item_gw_time_scene.*
 import kotlinx.android.synthetic.main.template_repeat_ly.*
 import kotlinx.android.synthetic.main.template_top_three.*
@@ -107,6 +111,35 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
         wheel_time_container.addView(timePicker)
     }
 
+    private  fun getWeekStr(week: Int?): String {
+        var tmpWeek = week ?: 0
+        val sb = StringBuilder()
+        when (tmpWeek) {
+            0b01111111 -> sb.append(getString(R.string.every_day))
+            0b00000000 -> sb.append(getString(R.string.only_one))
+            else -> {
+                var list = mutableListOf(
+                        WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
+                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
+                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
+                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
+                        WeekBean(getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
+                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
+                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
+                for (i in 0 until list.size) {
+                    var weekBean = list[i]
+                    if (weekBean.selected) {
+                        when (i) {
+                            list.size - 1 -> sb.append(weekBean.week)
+                            else -> sb.append(weekBean.week).append(",")
+                        }
+                    }
+                }
+            }
+        }
+                return sb.toString()
+    }
+
     private fun initView() {
         gate_way_repete_mode.text = ""
     }
@@ -168,6 +201,8 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong() + 2L, TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.add_timer_scene_fail))

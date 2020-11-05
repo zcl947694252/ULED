@@ -268,6 +268,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     var lightList: MutableList<DbLight> = ArrayList()
 
@@ -2166,6 +2168,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 if (status == 2)
@@ -2217,6 +2221,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.slow_speed_faile))

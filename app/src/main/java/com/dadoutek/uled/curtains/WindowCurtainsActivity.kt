@@ -575,6 +575,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                             showLoadingDialog(getString(R.string.please_wait))
                             disposableRouteTimer?.dispose()
                             disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                     .subscribeOn(Schedulers.io())
+                                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe {
                                         hideLoadingDialog()
                                         when (opcode) {

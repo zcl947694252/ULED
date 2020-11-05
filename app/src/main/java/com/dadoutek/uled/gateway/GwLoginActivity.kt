@@ -176,6 +176,8 @@ class GwLoginActivity : TelinkBaseActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(it.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
                                 hideLoadingDialog()

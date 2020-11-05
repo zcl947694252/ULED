@@ -154,7 +154,9 @@ class DeveloperActivity : BaseActivity() {
         }
 
         LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
-        disposableTimer = Observable.timer(13, TimeUnit.SECONDS).subscribe {
+        disposableTimer = Observable.timer(13, TimeUnit.SECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread()).subscribe {
             hideLoadingDialog()
             disposableFind?.dispose()
             ToastUtils.showShort(getString(R.string.find_device_num) + 0)
@@ -480,6 +482,8 @@ class DeveloperActivity : BaseActivity() {
                         showLoadingDialog(getString(R.string.please_wait))
                         disposableRouteTimer?.dispose()
                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                 .subscribeOn(Schedulers.io())
+                                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(getString(R.string.user_reset_faile))

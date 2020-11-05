@@ -374,6 +374,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     private fun sendLabelHeadParams() {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     GlobalScope.launch(Dispatchers.Main) {
                         ToastUtils.showShort(getString(R.string.send_gate_way_label_head_fail))

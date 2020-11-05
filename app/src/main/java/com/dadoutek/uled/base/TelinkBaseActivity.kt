@@ -192,7 +192,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 return week
             }
             getString(R.string.every_day) -> {
-                week = 0b10000000
+                week = 0b01111111
                 return week
             }
             else -> {
@@ -213,35 +213,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
-    open fun getWeekStr(week: Int?): String {
-        var tmpWeek = week
-        if (week == 0b10000000)
-            tmpWeek = Constants.SATURDAY or Constants.FRIDAY or Constants.THURSDAY or Constants.WEDNESDAY or Constants.TUESDAY or Constants.MONDAY or Constants.SUNDAY //每一天
-        if (tmpWeek != null) {
-            val list = mutableListOf(
-                    WeekBean(getString(R.string.monday), 1, (tmpWeek and Constants.MONDAY) != 0),
-                    WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constants.TUESDAY) != 0),
-                    WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constants.WEDNESDAY) != 0),
-                    WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constants.THURSDAY) != 0),
-                    WeekBean(getString(R.string.friday), 5, (tmpWeek and Constants.FRIDAY) != 0),
-                    WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constants.SATURDAY) != 0),
-                    WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constants.SUNDAY) != 0))
-            val filter = list.filter { it.selected }
-            return when {
-                filter.size >= 7 -> getString(R.string.every_day)
-                else -> {
-                    val sb = StringBuilder()
-                    for (i in filter.indices)
-                        when {
-                            i != filter.size - 1 -> sb.append(filter[i].week).append(",")
-                            else -> sb.append(filter[i].week)
-                        }
-                    sb.toString()
-                }
-            }
-        }
-        return ""
-    }
 
     fun isSuportOta(version: String?): Boolean {
         version?.let {
@@ -738,9 +709,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         runOnUiThread {
             popView?.let {
                 it.findViewById<TextView>(R.id.code_warm_title).text = title
-
                 it.findViewById<TextView>(R.id.code_warm_context).text = recever + phone
-
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
                     PopUtil.dismiss(pop)
 //                    if (type == 0)

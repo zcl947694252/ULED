@@ -47,7 +47,9 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.GuideUtils
 import com.dadoutek.uled.util.StringUtils
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
@@ -143,6 +145,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                                         showLoadingDialog(getString(R.string.please_wait))
                                                         disposableRouteTimer?.dispose()
                                                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                                                 .subscribeOn(Schedulers.io())
+                                                                                 .observeOn(AndroidSchedulers.mainThread())
                                                                 .subscribe {
                                                                     hideLoadingDialog()
                                                                     ToastUtils.showShort(getString(R.string.scene_apply_fail))
@@ -229,6 +233,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer((it?.timeout ?: 0).toLong(), TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     showLoadingDialog(getString(R.string.delete_scene_fail))
                 }
@@ -255,7 +261,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
                 if (!TelinkLightApplication.getApp().offLine) {
                     disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread()).subscribe {
                         hideLoadingDialog()
                         ToastUtils.showShort(getString(R.string.gate_way_offline))
                     }

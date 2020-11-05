@@ -1192,9 +1192,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             R.id.main_go_help -> {
                 seeHelpe("#color-light")
             }
-            R.id.btnAdd, R.id.main_add_device -> {
-                transAddAct()
-            }
+            R.id.btnAdd-> transAddAct()
+            R.id.main_add_device -> transAddAct()
+
             R.id.ll_g -> {
                 var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
                     redColor = red.toInt()
@@ -1848,6 +1848,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         ll_b.setOnClickListener(this.clickListener)
         normal_rgb.setOnClickListener(this.clickListener)
         btnAdd.setOnClickListener(this.clickListener)
+        main_add_device?.setOnClickListener(clickListener)
         mode_preset_layout.setOnClickListener(this.clickListener)
         mode_diy_layout.setOnClickListener(this.clickListener)
         cb_white_enable.setOnClickListener(cbOnClickListener)

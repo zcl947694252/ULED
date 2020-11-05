@@ -284,7 +284,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun startTimer() {
         stopScanTimer()
         LogUtils.d("startTimer")
-        mTimer = Observable.timer(scanTimeoutTime, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        mTimer = Observable.timer(scanTimeoutTime, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     LogUtils.d("onLeScanTimeout")
                     onLeScanTimeout()
@@ -333,6 +335,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         disposableConnectTimer?.dispose()
         disposableConnectTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     autoConnect(mutableListOf(mAddDeviceType))
@@ -805,10 +808,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             showLoadingDialog(getString(R.string.please_wait))
                             disposableTimer?.dispose()
                             disposableTimer = Observable.timer(itr.t.timeout + 3L, TimeUnit.SECONDS)
+                                     .subscribeOn(Schedulers.io())
+                                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe {
                                         hideLoadingDialog()
                                         if (!isFinisAc)
-                                        ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
+                                            ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
                                         finish()
                                     }
                         }
@@ -1082,7 +1087,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun routeTimerOut() {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(scanRouterTimeoutTime, TimeUnit.SECONDS).subscribe {
+        disposableTimer = Observable.timer(scanRouterTimeoutTime, TimeUnit.SECONDS) .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe {
             //  skipeType()
         }
     }
@@ -1178,7 +1184,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 Constants.SCAN_SERID = cmdBodyBean.scanSerId
             } else {
                 ToastUtils.showShort(cmdBodyBean.msg)
-                if (cmdBodyBean.cmd ==3001)//路由没有进行扫描，请重试
+                if (cmdBodyBean.cmd == 3001)//路由没有进行扫描，请重试
                     finish()
                 closeAnimation()
             }
@@ -1574,7 +1580,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun startToRecoverDevices() {
         LogUtils.v("zcl------找回controlMeshName:${lastUser?.controlMeshName}")
-        disposableTimer = Observable.timer(10, TimeUnit.SECONDS).subscribe {
+        disposableTimer = Observable.timer(10, TimeUnit.SECONDS) .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe {
             hideLoadingDialog()
             disposableFind?.dispose()
             skipeType()
@@ -1851,6 +1858,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun startMeshTimeoutTimer() {
         disposableUpMeshTimer?.dispose()
         disposableUpMeshTimer = Observable.timer(12000, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (meshUpdateType == 0L)
                         runOnUiThread {

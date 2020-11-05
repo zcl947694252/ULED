@@ -22,6 +22,8 @@ import com.dadoutek.uled.router.bean.MacResetBody
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.activity_router_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -152,6 +154,8 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.delete_device_fail))

@@ -871,7 +871,10 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
         if (mScanDisposal != null) {
             mScanDisposal.dispose();
         }
-        mScanDisposal=Observable.timer(TIME_OUT_SCAN,TimeUnit.SECONDS).subscribe(aLong -> {
+        mScanDisposal=Observable.timer(TIME_OUT_SCAN,TimeUnit.SECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> {
             onScanTimeout();
         });
     }
@@ -1044,7 +1047,9 @@ public class OTAUpdateCurtuinActivity extends TelinkMeshErrorDealActivity implem
             if (mSendataDisposal != null) {
                 mSendataDisposal.dispose();
             }
-            mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA, TimeUnit.SECONDS).subscribe(aLong -> {
+            mSendataDisposal = Observable.timer(TIME_OUT_SENDDATA, TimeUnit.SECONDS)
+                     .subscribeOn(Schedulers.io())
+                                     .observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
                 if (progress_view.getProgress() <= 0) {
                     showUpdateFailView();
                 }

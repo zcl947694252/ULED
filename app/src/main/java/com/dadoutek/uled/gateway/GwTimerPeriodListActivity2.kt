@@ -339,6 +339,8 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     private fun setTimerDelay(delay: Long) {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
                     runOnUiThread { ToastUtils.showLong(getString(R.string.config_gate_way_tp_task_fail)) }

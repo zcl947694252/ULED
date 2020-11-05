@@ -302,7 +302,9 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
 
 
     private Disposable createConnectTimeout() {
-        return Observable.timer(60, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        return Observable.timer(60, TimeUnit.SECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(aLong -> {
 //                    Toast.makeText(mApplication, getString(R.string.connect_fail), Toast.LENGTH_SHORT).show();
                     hideLoadingDialog();

@@ -68,7 +68,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun devicesStopOTA() {
-        RouterModel.routerStopOTA(currentTimeMillis, "router_ota")?.subscribe({
+        RouterModel.routerStopOTA(currentTimeMillis, "router_stop_ota")?.subscribe({
             LogUtils.v("zcl-----------收到路由停止升级请求---time$currentTimeMillis----$it")
             when (it.errorCode) {
                 0 -> {
@@ -77,6 +77,8 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.ota_stop_fail))
@@ -151,7 +153,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun otaDevice(currentTimeMillis1: Long) {
-        RouterModel.toDevicesOTA(mutableListOf(deviceMeshAddress), deviceType, currentTimeMillis1)?.subscribe({
+        RouterModel.toDevicesOTA(mutableListOf(deviceMeshAddress), deviceType, currentTimeMillis1,1,"routerSingle")?.subscribe({
             LogUtils.v("zcl-----------收到路由升级请求---deviceMeshAddress$deviceMeshAddress---time$currentTimeMillis1-------deviceTye${deviceType}----$it")
             when (it.errorCode) {
                 0 -> {
@@ -183,7 +185,9 @@ class RouterOtaActivity : TelinkBaseActivity() {
     private fun goScanning() {
         isOtaing = false
         ToastUtils.showShort(getString(R.string.sanning_to_scan_activity))
-        Observable.timer(2000, TimeUnit.MILLISECONDS).subscribe {
+        Observable.timer(2000, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread()).subscribe {
             startActivity(Intent(this@RouterOtaActivity, DeviceScanningNewActivity::class.java))
             finish()
         }
@@ -259,7 +263,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         hideLoadingDialog()
         val status = routerOTAingNumBean?.status
         val otaResult = routerOTAingNumBean?.otaResult
-        if (status == 0 && deviceMac == otaResult?.macAddr && otaResult?.failedCode == -1)
+        if (status == 0 )
             afterOtaSuccess()
         else
             if (status == -1 || status == 1)//ota结果。-1失败 0成功 1升级中 2已停止 3处理中
@@ -276,7 +280,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
     override fun tzRouterOTAStopRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
         LogUtils.v("zcl-----------收到路由ota停止通知-------$routerOTAFinishBean")
         if (routerOTAFinishBean?.finish == true) {
-            if (routerOTAFinishBean.ser_id == "router_ota") {
+            if (routerOTAFinishBean.ser_id == "router_stop_ota") {
                 initUi()
                 if (routerOTAFinishBean.status == 0 && clickFinish)
                     finish()

@@ -28,6 +28,7 @@ import com.dadoutek.uled.model.ItemRgbGradient
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.util.SpeedDialog
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_rgb_gradient.*
@@ -278,6 +279,8 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                 //应用内置渐变
                 applyDisposable?.dispose()
                 applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
+                         .subscribeOn(Schedulers.io())
+                                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             for (i in 0..2) {
                                 stopGradient()

@@ -942,6 +942,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.SECONDS)
+                             .subscribeOn(Schedulers.io())
+                                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.group_timeout))
