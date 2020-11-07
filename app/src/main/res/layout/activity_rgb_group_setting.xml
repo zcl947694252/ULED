@@ -241,7 +241,7 @@
                                  android:layout_marginStart="10dp"
                                  android:layout_marginTop="2dp"
                                  android:layout_weight="1"
-                                 android:max="100"
+                                 android:max="101"
                                  android:min="1"
                                  android:progress="99" />
 
@@ -347,7 +347,7 @@
                                  android:layout_marginStart="10dp"
                                  android:layout_marginTop="2dp"
                                  android:layout_weight="1"
-                                 android:max="100"
+                                 android:max="102"
                                  android:min="1"
                                  android:progress="99" />
 

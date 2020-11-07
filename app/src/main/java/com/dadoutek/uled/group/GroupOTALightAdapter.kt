@@ -5,6 +5,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -53,16 +54,28 @@ class GroupOTALightAdapter(resId: Int, data: MutableList<DbLight>) : BaseQuickAd
             helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_n)
 
         if (item?.isSupportOta == true && !item.isMostNew) {
-            if (isRgb)
-                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_no_circle)
-            else
-                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_no_circle)
-            helper.setImageResource(R.id.group_ota_update, R.drawable.uparrow)
+            when {
+                Constants.IS_ROUTE_MODE && item.isGetVersion -> {
+                    when {
+                        isRgb -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_no_circle)
+                        else -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_no_circle)
+                    }
+                    helper.setImageResource(R.id.group_ota_update, R.drawable.uparrow)
+                }
+                else -> {
+                    when {
+                        isRgb -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_close)
+                        else -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_close_g)
+                    }
+                    helper.setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
+
+                }
+            }
         } else {
-            if (isRgb)
-                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_close)
-            else
-                helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_close_g)
+            when {
+                isRgb -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_close)
+                else -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_close_g)
+            }
             helper.setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
         }
     }

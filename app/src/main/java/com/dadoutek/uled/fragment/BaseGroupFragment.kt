@@ -557,7 +557,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 lastUser?.let {
                     val isLight = groupType == Constants.DEVICE_TYPE_LIGHT_NORMAL || groupType == Constants.DEVICE_TYPE_LIGHT_RGB
                     when {
-                        isLight && position == 0 -> {//进入所有灯
+                        isLight && position == 0 -> {//进入所有灯    meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                             if (TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE) {
                                 val intentSetting = Intent(context, NormalSettingActivity::class.java)
                                 intentSetting.putExtra(Constants.TYPE_VIEW, Constants.TYPE_GROUP)
@@ -728,7 +728,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     0 -> {
                         DBUtils.deleteGroupOnly(gp!!)
                         deleteComplete()
-                        ToastUtils.showShort(getString(R.string.delete_group_success))
+                        ToastUtils.showShort(getString(R.string.delete_group_success,routerGroup.succeedNow.size))
                     }
                     1 -> ToastUtils.showShort(getString(R.string.delete_group_some_fail))
                     -1 -> ToastUtils.showShort(getString(R.string.delete_gp_fail))

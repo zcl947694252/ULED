@@ -16,137 +16,140 @@ class RGBLightFragmentList : BaseGroupFragment() {
 
     override fun getGroupData(): Collection<DbGroup> {
         val list = mutableListOf<DbGroup>()
-        list.add(0,DBUtils.allGroups[0])
-        list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_RGB))
+        val allGroups = DBUtils.allGroups
+        if (allGroups.size > 0) {
+            list.add(0, allGroups[0])
+        }
+        list.addAll(DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_RGB))
         return list
     }
 
-   /* private var lin: View? = null
-    private var inflater: LayoutInflater? = null
+    /* private var lin: View? = null
+     private var inflater: LayoutInflater? = null
 
-    private var recyclerView: RecyclerView? = null
+     private var recyclerView: RecyclerView? = null
 
-    private var no_group: ConstraintLayout? = null
+     private var no_group: ConstraintLayout? = null
 
-    private var groupAdapter: GroupListAdapter? = null
+     private var groupAdapter: GroupListAdapter? = null
 
-    private lateinit var groupList: ArrayList<DbGroup>
+     private lateinit var groupList: ArrayList<DbGroup>
 
-    private var isFristUserClickCheckConnect = true
+     private var isFristUserClickCheckConnect = true
 
-    private var updateLightDisposal: Disposable? = null
+     private var updateLightDisposal: Disposable? = null
 
-    private var mContext: Activity? = null
+     private var mContext: Activity? = null
 
-    private var addGroupBtn: ConstraintLayout? = null
+     private var addGroupBtn: ConstraintLayout? = null
 
-    private var viewLine: View? = null
+     private var viewLine: View? = null
 
-    private var viewLineRecycler: View? = null
+     private var viewLineRecycler: View? = null
 
-    private var isDelete = false
+     private var isDelete = false
 
-    private var groupListGroup: GroupListFragment? = null
+     private var groupListGroup: GroupListFragment? = null
 
-    private var groupMesher: ArrayList<String>? = null
+     private var groupMesher: ArrayList<String>? = null
 
-    private lateinit var localBroadcastManager: LocalBroadcastManager
+     private lateinit var localBroadcastManager: LocalBroadcastManager
 
-    private lateinit var br: BroadcastReceiver
+     private lateinit var br: BroadcastReceiver
 
-    private lateinit var deleteList: ArrayList<DbGroup>
+     private lateinit var deleteList: ArrayList<DbGroup>
 
-    private var addNewGroup: Button? = null
+     private var addNewGroup: Button? = null
 
-    private var isDeleteTrue: Boolean = true
+     private var isDeleteTrue: Boolean = true
 
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        this.mContext = this.activity
-        setHasOptionsMenu(true)
-        localBroadcastManager = LocalBroadcastManager
-                .getInstance(this!!.mContext!!)
-        val intentFilter = IntentFilter()
-        intentFilter.addAction("back")
-        intentFilter.addAction("delete")
-        intentFilter.addAction("switch")
-        intentFilter.addAction("switch_here")
-        br = object : BroadcastReceiver() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         this.mContext = this.activity
+         setHasOptionsMenu(true)
+         localBroadcastManager = LocalBroadcastManager
+                 .getInstance(this!!.mContext!!)
+         val intentFilter = IntentFilter()
+         intentFilter.addAction("back")
+         intentFilter.addAction("delete")
+         intentFilter.addAction("switch")
+         intentFilter.addAction("switch_here")
+         br = object : BroadcastReceiver() {
 
-            override fun onReceive(context: Context, intent: Intent) {
-                val key = intent.getStringExtra("back")
-                val str = intent.getStringExtra("delete")
-                val switch = intent.getStringExtra("switch")
-                val lightStatus = intent.getStringExtra("switch_here")
-                if (key == "true") {
-                    isDelete = false
-                    groupAdapter!!.changeState(isDelete)
-                    groupList.let {
-                        for (i in it.indices)
-                            if (it[i].isSelected)
-                                it[i].isSelected = false
-                    }
-                    refreshData()
-                }
-                if (str == "true") {
-                    deleteList = ArrayList()
-                    for (i in groupList.indices) {
-                        if (groupList[i].isSelected)
-                            deleteList.add(groupList[i])
-                    }
+             override fun onReceive(context: Context, intent: Intent) {
+                 val key = intent.getStringExtra("back")
+                 val str = intent.getStringExtra("delete")
+                 val switch = intent.getStringExtra("switch")
+                 val lightStatus = intent.getStringExtra("switch_here")
+                 if (key == "true") {
+                     isDelete = false
+                     groupAdapter!!.changeState(isDelete)
+                     groupList.let {
+                         for (i in it.indices)
+                             if (it[i].isSelected)
+                                 it[i].isSelected = false
+                     }
+                     refreshData()
+                 }
+                 if (str == "true") {
+                     deleteList = ArrayList()
+                     for (i in groupList.indices) {
+                         if (groupList[i].isSelected)
+                             deleteList.add(groupList[i])
+                     }
 
-                    for (j in deleteList.indices) {
-                        showLoadingDialog(getString(R.string.deleting))
-                        Thread.sleep(300)
-                        deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
-                                successCallback = {
-                                    hideLoadingDialog()
-                                    isDelete = false
-                                    sendDeleteBrocastRecevicer(300)
-                                    refreshData()
-                                },
-                                failedCallback = {
-                                    hideLoadingDialog()
-                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
-                                    sendDeleteBrocastRecevicer(0)
-                                })
-                    }
-                    Log.e("TAG_DELETE", deleteList.size.toString())
-                }
+                     for (j in deleteList.indices) {
+                         showLoadingDialog(getString(R.string.deleting))
+                         Thread.sleep(300)
+                         deleteGroup(DBUtils.getLightByGroupID(deleteList[j].id), deleteList[j]!!,
+                                 successCallback = {
+                                     hideLoadingDialog()
+                                     isDelete = false
+                                     sendDeleteBrocastRecevicer(300)
+                                     refreshData()
+                                 },
+                                 failedCallback = {
+                                     hideLoadingDialog()
+                                     ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
+                                     sendDeleteBrocastRecevicer(0)
+                                 })
+                     }
+                     Log.e("TAG_DELETE", deleteList.size.toString())
+                 }
 
-                if (switch == "true") {
-                    for (i in groupList.indices) {
-                        if (groupList[i].isSelected) {
-                            groupList[i].isSelected = false
-                        }
-                    }
-                }
+                 if (switch == "true") {
+                     for (i in groupList.indices) {
+                         if (groupList[i].isSelected) {
+                             groupList[i].isSelected = false
+                         }
+                     }
+                 }
 
-                if (lightStatus == "on") {
-                    for (i in groupList.indices) {
-                        groupList[i].connectionStatus = ConnectionStatus.ON.value
-                        DBUtils.updateGroup(groupList[i])
-                        groupAdapter!!.notifyDataSetChanged()
-                    }
-                } else if (lightStatus == "false") {
-                    for (i in groupList.indices) {
-                        groupList[i].connectionStatus = ConnectionStatus.OFF.value
-                        DBUtils.updateGroup(groupList[i])
-                        groupAdapter!!.notifyDataSetChanged()
-                    }
-                }
-            }
-        }
-        localBroadcastManager.registerReceiver(br, intentFilter)
-    }
+                 if (lightStatus == "on") {
+                     for (i in groupList.indices) {
+                         groupList[i].connectionStatus = ConnectionStatus.ON.value
+                         DBUtils.updateGroup(groupList[i])
+                         groupAdapter!!.notifyDataSetChanged()
+                     }
+                 } else if (lightStatus == "false") {
+                     for (i in groupList.indices) {
+                         groupList[i].connectionStatus = ConnectionStatus.OFF.value
+                         DBUtils.updateGroup(groupList[i])
+                         groupAdapter!!.notifyDataSetChanged()
+                     }
+                 }
+             }
+         }
+         localBroadcastManager.registerReceiver(br, intentFilter)
+     }
 
-    private fun sendDeleteBrocastRecevicer(delayTime: Long) {
-        Thread.sleep(delayTime)
-        val intent = Intent("delete_true")
-        intent.putExtra("delete_true", "true")
-        LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
-        *//* isDeleteTrue = false
+     private fun sendDeleteBrocastRecevicer(delayTime: Long) {
+         Thread.sleep(delayTime)
+         val intent = Intent("delete_true")
+         intent.putExtra("delete_true", "true")
+         LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
+         *//* isDeleteTrue = false
          refreshView()*//*
     }
 
@@ -401,7 +404,8 @@ class RGBLightFragmentList : BaseGroupFragment() {
     }
 
 
-    *//**
+    */
+    /**
      * 删除组，并且把组里的灯的组也都删除。
      *//*
     private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,

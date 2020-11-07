@@ -46,6 +46,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         public final static Property BelongRegionId = new Property(19, int.class, "belongRegionId", false, "BELONG_REGION_ID");
         public final static Property Uid = new Property(20, int.class, "uid", false, "UID");
         public final static Property List = new Property(21, String.class, "list", false, "LIST");
+        public final static Property IsGetVersion = new Property(22, boolean.class, "isGetVersion", false, "IS_GET_VERSION");
     }
 
 
@@ -82,7 +83,8 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
                 "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 18: isSupportOta
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 19: belongRegionId
                 "\"UID\" INTEGER NOT NULL ," + // 20: uid
-                "\"LIST\" TEXT);"); // 21: list
+                "\"LIST\" TEXT," + // 21: list
+                "\"IS_GET_VERSION\" INTEGER NOT NULL );"); // 22: isGetVersion
     }
 
     /** Drops the underlying database table. */
@@ -156,6 +158,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (list != null) {
             stmt.bindString(22, list);
         }
+        stmt.bindLong(23, entity.getIsGetVersion() ? 1L: 0L);
     }
 
     @Override
@@ -223,6 +226,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         if (list != null) {
             stmt.bindString(22, list);
         }
+        stmt.bindLong(23, entity.getIsGetVersion() ? 1L: 0L);
     }
 
     @Override
@@ -254,7 +258,8 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             cursor.getShort(offset + 18) != 0, // isSupportOta
             cursor.getInt(offset + 19), // belongRegionId
             cursor.getInt(offset + 20), // uid
-            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21) // list
+            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // list
+            cursor.getShort(offset + 22) != 0 // isGetVersion
         );
         return entity;
     }
@@ -283,6 +288,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         entity.setBelongRegionId(cursor.getInt(offset + 19));
         entity.setUid(cursor.getInt(offset + 20));
         entity.setList(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
+        entity.setIsGetVersion(cursor.getShort(offset + 22) != 0);
      }
     
     @Override

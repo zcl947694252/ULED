@@ -46,6 +46,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         public final static Property IsMostNew = new Property(19, boolean.class, "isMostNew", false, "IS_MOST_NEW");
         public final static Property BelongRegionId = new Property(20, int.class, "belongRegionId", false, "BELONG_REGION_ID");
         public final static Property Uid = new Property(21, int.class, "uid", false, "UID");
+        public final static Property IsGetVersion = new Property(22, boolean.class, "isGetVersion", false, "IS_GET_VERSION");
     }
 
 
@@ -82,7 +83,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
                 "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 18: isSupportOta
                 "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 19: isMostNew
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 20: belongRegionId
-                "\"UID\" INTEGER NOT NULL );"); // 21: uid
+                "\"UID\" INTEGER NOT NULL ," + // 21: uid
+                "\"IS_GET_VERSION\" INTEGER NOT NULL );"); // 22: isGetVersion
     }
 
     /** Drops the underlying database table. */
@@ -148,6 +150,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
         stmt.bindLong(21, entity.getBelongRegionId());
         stmt.bindLong(22, entity.getUid());
+        stmt.bindLong(23, entity.getIsGetVersion() ? 1L: 0L);
     }
 
     @Override
@@ -207,6 +210,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         stmt.bindLong(20, entity.getIsMostNew() ? 1L: 0L);
         stmt.bindLong(21, entity.getBelongRegionId());
         stmt.bindLong(22, entity.getUid());
+        stmt.bindLong(23, entity.getIsGetVersion() ? 1L: 0L);
     }
 
     @Override
@@ -238,7 +242,8 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
             cursor.getShort(offset + 18) != 0, // isSupportOta
             cursor.getShort(offset + 19) != 0, // isMostNew
             cursor.getInt(offset + 20), // belongRegionId
-            cursor.getInt(offset + 21) // uid
+            cursor.getInt(offset + 21), // uid
+            cursor.getShort(offset + 22) != 0 // isGetVersion
         );
         return entity;
     }
@@ -267,6 +272,7 @@ public class DbCurtainDao extends AbstractDao<DbCurtain, Long> {
         entity.setIsMostNew(cursor.getShort(offset + 19) != 0);
         entity.setBelongRegionId(cursor.getInt(offset + 20));
         entity.setUid(cursor.getInt(offset + 21));
+        entity.setIsGetVersion(cursor.getShort(offset + 22) != 0);
      }
     
     @Override

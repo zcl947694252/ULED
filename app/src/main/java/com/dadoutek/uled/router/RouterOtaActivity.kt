@@ -334,7 +334,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         router_ota_warm.text = getString(R.string.ota_success)
         router_ota_start.isClickable = false
         router_ota_wave_progress_bar.value = 180f
-        initUi()
+        //initUi()
         SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
         twoSecondFinish()
     }

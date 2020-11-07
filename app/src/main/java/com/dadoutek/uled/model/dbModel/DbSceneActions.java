@@ -21,7 +21,7 @@ public class DbSceneActions {
     private int colorTemperature;
     @NotNull
     private int brightness;
-    public int color=0xffffff;//颜色;
+    public int color=0;//颜色;
 
     private boolean isOn = true;
     private boolean isEnableBright = true;

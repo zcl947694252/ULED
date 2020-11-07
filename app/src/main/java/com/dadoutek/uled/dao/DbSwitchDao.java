@@ -44,11 +44,12 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         public final static Property BoundMacName = new Property(17, String.class, "boundMacName", false, "BOUND_MAC_NAME");
         public final static Property RouterId = new Property(18, long.class, "routerId", false, "ROUTER_ID");
         public final static Property IsChecked = new Property(19, Boolean.class, "isChecked", false, "IS_CHECKED");
-        public final static Property IsSupportOta = new Property(20, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
-        public final static Property Type = new Property(21, int.class, "type", false, "TYPE");
-        public final static Property BelongRegionId = new Property(22, int.class, "belongRegionId", false, "BELONG_REGION_ID");
-        public final static Property Uid = new Property(23, int.class, "uid", false, "UID");
-        public final static Property List = new Property(24, String.class, "list", false, "LIST");
+        public final static Property IsGetVersion = new Property(20, boolean.class, "isGetVersion", false, "IS_GET_VERSION");
+        public final static Property IsSupportOta = new Property(21, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property Type = new Property(22, int.class, "type", false, "TYPE");
+        public final static Property BelongRegionId = new Property(23, int.class, "belongRegionId", false, "BELONG_REGION_ID");
+        public final static Property Uid = new Property(24, int.class, "uid", false, "UID");
+        public final static Property List = new Property(25, String.class, "list", false, "LIST");
     }
 
 
@@ -84,11 +85,12 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
                 "\"BOUND_MAC_NAME\" TEXT," + // 17: boundMacName
                 "\"ROUTER_ID\" INTEGER NOT NULL ," + // 18: routerId
                 "\"IS_CHECKED\" INTEGER," + // 19: isChecked
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 20: isSupportOta
-                "\"TYPE\" INTEGER NOT NULL ," + // 21: type
-                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 22: belongRegionId
-                "\"UID\" INTEGER NOT NULL ," + // 23: uid
-                "\"LIST\" TEXT);"); // 24: list
+                "\"IS_GET_VERSION\" INTEGER NOT NULL ," + // 20: isGetVersion
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL ," + // 21: isSupportOta
+                "\"TYPE\" INTEGER NOT NULL ," + // 22: type
+                "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 23: belongRegionId
+                "\"UID\" INTEGER NOT NULL ," + // 24: uid
+                "\"LIST\" TEXT);"); // 25: list
     }
 
     /** Drops the underlying database table. */
@@ -172,14 +174,15 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (isChecked != null) {
             stmt.bindLong(20, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(22, entity.getType());
-        stmt.bindLong(23, entity.getBelongRegionId());
-        stmt.bindLong(24, entity.getUid());
+        stmt.bindLong(21, entity.getIsGetVersion() ? 1L: 0L);
+        stmt.bindLong(22, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(23, entity.getType());
+        stmt.bindLong(24, entity.getBelongRegionId());
+        stmt.bindLong(25, entity.getUid());
  
         String list = entity.getList();
         if (list != null) {
-            stmt.bindString(25, list);
+            stmt.bindString(26, list);
         }
     }
 
@@ -258,14 +261,15 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         if (isChecked != null) {
             stmt.bindLong(20, isChecked ? 1L: 0L);
         }
-        stmt.bindLong(21, entity.getIsSupportOta() ? 1L: 0L);
-        stmt.bindLong(22, entity.getType());
-        stmt.bindLong(23, entity.getBelongRegionId());
-        stmt.bindLong(24, entity.getUid());
+        stmt.bindLong(21, entity.getIsGetVersion() ? 1L: 0L);
+        stmt.bindLong(22, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(23, entity.getType());
+        stmt.bindLong(24, entity.getBelongRegionId());
+        stmt.bindLong(25, entity.getUid());
  
         String list = entity.getList();
         if (list != null) {
-            stmt.bindString(25, list);
+            stmt.bindString(26, list);
         }
     }
 
@@ -297,11 +301,12 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
             cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // boundMacName
             cursor.getLong(offset + 18), // routerId
             cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0, // isChecked
-            cursor.getShort(offset + 20) != 0, // isSupportOta
-            cursor.getInt(offset + 21), // type
-            cursor.getInt(offset + 22), // belongRegionId
-            cursor.getInt(offset + 23), // uid
-            cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24) // list
+            cursor.getShort(offset + 20) != 0, // isGetVersion
+            cursor.getShort(offset + 21) != 0, // isSupportOta
+            cursor.getInt(offset + 22), // type
+            cursor.getInt(offset + 23), // belongRegionId
+            cursor.getInt(offset + 24), // uid
+            cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25) // list
         );
         return entity;
     }
@@ -328,11 +333,12 @@ public class DbSwitchDao extends AbstractDao<DbSwitch, Long> {
         entity.setBoundMacName(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
         entity.setRouterId(cursor.getLong(offset + 18));
         entity.setIsChecked(cursor.isNull(offset + 19) ? null : cursor.getShort(offset + 19) != 0);
-        entity.setIsSupportOta(cursor.getShort(offset + 20) != 0);
-        entity.setType(cursor.getInt(offset + 21));
-        entity.setBelongRegionId(cursor.getInt(offset + 22));
-        entity.setUid(cursor.getInt(offset + 23));
-        entity.setList(cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24));
+        entity.setIsGetVersion(cursor.getShort(offset + 20) != 0);
+        entity.setIsSupportOta(cursor.getShort(offset + 21) != 0);
+        entity.setType(cursor.getInt(offset + 22));
+        entity.setBelongRegionId(cursor.getInt(offset + 23));
+        entity.setUid(cursor.getInt(offset + 24));
+        entity.setList(cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25));
      }
     
     @Override

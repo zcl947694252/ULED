@@ -56,13 +56,14 @@ public class DbCurtain implements Serializable {
     public boolean isMostNew = false;
     public int belongRegionId =0;
     public int uid =0;
+    public boolean isGetVersion= false;
 
-    @Generated(hash = 1315904035)
+    @Generated(hash = 1065028366)
     public DbCurtain(Long id, int meshAddr, String name, int belongGroupAddr, String macAddr,
             int productUUID, int status, boolean inverse, boolean closePull, int speed,
             boolean closeSlowStart, int index, Long belongGroupId, String groupName, String version,
             String boundMac, String boundMacName, int rssi, boolean isSupportOta, boolean isMostNew,
-            int belongRegionId, int uid) {
+            int belongRegionId, int uid, boolean isGetVersion) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -85,10 +86,27 @@ public class DbCurtain implements Serializable {
         this.isMostNew = isMostNew;
         this.belongRegionId = belongRegionId;
         this.uid = uid;
+        this.isGetVersion = isGetVersion;
     }
 
     @Generated(hash = 303143706)
     public DbCurtain() {
+    }
+
+    public boolean isMostNew() {
+        return isMostNew;
+    }
+
+    public void setMostNew(boolean mostNew) {
+        isMostNew = mostNew;
+    }
+
+    public boolean isGetVersion() {
+        return isGetVersion;
+    }
+
+    public void setGetVersion(boolean getVersion) {
+        isGetVersion = getVersion;
     }
 
     public String getBoundMacName() {
@@ -333,5 +351,13 @@ public class DbCurtain implements Serializable {
 
     public void setUid(int uid) {
         this.uid = uid;
+    }
+
+    public boolean getIsGetVersion() {
+        return this.isGetVersion;
+    }
+
+    public void setIsGetVersion(boolean isGetVersion) {
+        this.isGetVersion = isGetVersion;
     }
 }

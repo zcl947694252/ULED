@@ -5,6 +5,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import org.jetbrains.anko.padding
@@ -42,8 +43,17 @@ class GroupOTASwitchAdapter(resId: Int, data: MutableList<DbSwitch>) : BaseQuick
         }
 
         if (item?.isSupportOta == true && !item.isMostNew) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_switch)
-                    .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
+
+            when {
+                Constants.IS_ROUTE_MODE && item.isGetVersion -> {
+                    helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_switch)
+                            .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
+                }
+                else -> {
+                    helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_switch_off)
+                            .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
+                }
+            }
         } else {
             helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_switch_off)
                     .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)

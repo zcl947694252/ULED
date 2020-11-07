@@ -61,7 +61,7 @@ public class DbGateway implements Parcelable {
     @Transient
     public int icon = R.drawable.icon_gateway;//灯状态显示图
     public boolean isMostNew = false;
-
+    public boolean isGetVersion= false;
     public int getRssi() {
         return rssi;
     }
@@ -105,9 +105,8 @@ public class DbGateway implements Parcelable {
         icon = in.readInt();
     }
 
-
-    @Generated(hash = 1702964759)
-    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr, int type, int productUUID, String version, int belongRegionId, int pos, int uid, String tags, String timePeriodTags, int addTag, int state, int openTag, boolean isMostNew, int rssi, boolean isSupportOta) {
+    @Generated(hash = 1679831171)
+    public DbGateway(Long id, int meshAddr, String name, String macAddr, String sixByteMacAddr, int type, int productUUID, String version, int belongRegionId, int pos, int uid, String tags, String timePeriodTags, int addTag, int state, int openTag, boolean isMostNew, boolean isGetVersion, int rssi, boolean isSupportOta) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -125,12 +124,33 @@ public class DbGateway implements Parcelable {
         this.state = state;
         this.openTag = openTag;
         this.isMostNew = isMostNew;
+        this.isGetVersion = isGetVersion;
         this.rssi = rssi;
         this.isSupportOta = isSupportOta;
     }
 
     @Generated(hash = 1696080529)
     public DbGateway() {
+    }
+
+    public boolean isMostNew() {
+        return isMostNew;
+    }
+
+    public void setMostNew(boolean mostNew) {
+        isMostNew = mostNew;
+    }
+
+    public boolean isGetVersion() {
+        return isGetVersion;
+    }
+
+    public void setGetVersion(boolean getVersion) {
+        isGetVersion = getVersion;
+    }
+
+    public static Creator<DbGateway> getCREATOR() {
+        return CREATOR;
     }
 
     @Override
@@ -339,5 +359,13 @@ public class DbGateway implements Parcelable {
 
     public void setIsMostNew(boolean isMostNew) {
         this.isMostNew = isMostNew;
+    }
+
+    public boolean getIsGetVersion() {
+        return this.isGetVersion;
+    }
+
+    public void setIsGetVersion(boolean isGetVersion) {
+        this.isGetVersion = isGetVersion;
     }
 }

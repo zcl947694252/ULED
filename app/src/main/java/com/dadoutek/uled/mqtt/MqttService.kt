@@ -59,7 +59,7 @@ class MqttService : Service() {
     private val mqttCallback = object : MqttCallback {
         override fun messageArrived(topic: String, message: MqttMessage) {
             val data = message.payload
-            // LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message ?.toString()}");
+             LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message ?.toString()}");
             val intent = Intent()
             intent.action = Constants.LOGIN_OUT
             intent.putExtra(Constants.LOGIN_OUT, message.toString())

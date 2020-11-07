@@ -1,101 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:background="@color/black_ee">
 
     <include
             android:id="@+id/topView"
-            layout="@layout/toolbar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-
-    <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/view12"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.42"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/topView">
-
-        <android.support.constraint.ConstraintLayout
-                android:id="@+id/layout_03"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
+            layout="@layout/toolbar" />
 
             <android.support.v7.widget.RecyclerView
                     android:id="@+id/recyclerView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-            <include layout="@layout/template_add_help"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/dp_10"
-                    android:background="@drawable/add_device_bt"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/recyclerView"/>
-
-            <LinearLayout
-                    android:id="@+id/no_scene"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/gray_e"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:visibility="visible">
-
-
-                <ImageView
-                        android:id="@+id/image_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="80dp"
-                        android:src="@drawable/no_device" />
-
-                <TextView
-                        android:id="@+id/scene_see_helpe"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="70dp"
-                        android:gravity="center"
-                        android:padding="@dimen/dp_10"
-                        android:text="@string/see_help"
-                        android:textColor="@color/black_three"
-                        android:textSize="17sp" />
-
-
-                <Button
-                        android:id="@+id/add_scenes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="50dp"
-                        android:padding="@dimen/dp_5"
-                        android:layout_marginBottom="@dimen/dp_30"
-                        android:background="@drawable/add_device_bt"
-                        android:stateListAnimator="@null"
-                        android:text="@string/create_scene"
-                        android:textColor="@color/blue_background"
-                        android:textSize="18sp" />
-
-            </LinearLayout>
-        </android.support.constraint.ConstraintLayout>
-
-    </ScrollView>
+                    android:layout_height="match_parent"/>
 
     <include
             android:id="@+id/dialog_pop"
@@ -110,7 +29,5 @@
             android:id="@+id/view12"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#00000000"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="65dp" />
-</android.support.constraint.ConstraintLayout>
+            android:background="#00000000"/>
+</LinearLayout>

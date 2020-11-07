@@ -43,7 +43,7 @@ public class DbSwitch implements Serializable {
     @Nullable
     public  long routerId = 1;
     public Boolean isChecked;
-
+    public boolean isGetVersion= false;
     public String getBoundMac() {
         return boundMac;
     }
@@ -88,15 +88,14 @@ public class DbSwitch implements Serializable {
     public int belongRegionId =0;
     public int uid =0;
     public String list ="";
-
-    @Generated(hash = 1431548488)
+    @Generated(hash = 1276577829)
     public DbSwitch(Long id, int meshAddr, String name, int controlGroupAddr,
             String macAddr, int productUUID, String controlSceneId, int index,
             Long belongGroupId, int rssi, String keys, String groupIds,
             String sceneIds, String controlGroupAddrs, String version,
             boolean isMostNew, String boundMac, String boundMacName, long routerId,
-            Boolean isChecked, boolean isSupportOta, int type, int belongRegionId,
-            int uid, String list) {
+            Boolean isChecked, boolean isGetVersion, boolean isSupportOta, int type,
+            int belongRegionId, int uid, String list) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -117,6 +116,7 @@ public class DbSwitch implements Serializable {
         this.boundMacName = boundMacName;
         this.routerId = routerId;
         this.isChecked = isChecked;
+        this.isGetVersion = isGetVersion;
         this.isSupportOta = isSupportOta;
         this.type = type;
         this.belongRegionId = belongRegionId;
@@ -128,6 +128,29 @@ public class DbSwitch implements Serializable {
     public DbSwitch() {
     }
 
+    public boolean isMostNew() {
+        return isMostNew;
+    }
+
+    public void setMostNew(boolean mostNew) {
+        isMostNew = mostNew;
+    }
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
+    }
+
+    public boolean isGetVersion() {
+        return isGetVersion;
+    }
+
+    public void setGetVersion(boolean getVersion) {
+        isGetVersion = getVersion;
+    }
 
     public String getBoundMacName() {
         return boundMacName;
@@ -374,5 +397,13 @@ public class DbSwitch implements Serializable {
 
     public void setList(String list) {
         this.list = list;
+    }
+
+    public boolean getIsGetVersion() {
+        return this.isGetVersion;
+    }
+
+    public void setIsGetVersion(boolean isGetVersion) {
+        this.isGetVersion = isGetVersion;
     }
 }

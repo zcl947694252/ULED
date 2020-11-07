@@ -370,29 +370,35 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     private fun routerConfigRGBNum(meshAddr: Int, deviceType: Int, color: Int) {
-        RouterModel.routeConfigRGBNum(meshAddr, deviceType, color, "setDiyRGB")?.subscribe({
-            LogUtils.v("zcl-----------收到路由调节色盘成功-------")
-            when (it.errorCode) {
-                0 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
-                            }
-                }
-                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
-                else-> ToastUtils.showShort(it.message)
+        thisTime = System.currentTimeMillis()
+        synchronized(this@SelectColorGradientAct){
+            if (thisTime - lastTime >= 500) {
+                lastTime = System.currentTimeMillis()
+                LogUtils.v("zcl-----------收到路由调节色盘成功---$thisTime----$lastTime------${thisTime - lastTime >= 500}")
+                RouterModel.routeConfigRGBNum(meshAddr, deviceType, color, "setDiyRGB")?.subscribe({
+                    when (it.errorCode) {
+                        0 -> {
+                            //showLoadingDialog(getString(R.string.please_wait))
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
+                                    }
+                        }
+                        90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                        90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                        90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
+                        else -> ToastUtils.showShort(it.message)
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
             }
-        }, {
-            ToastUtils.showShort(it.message)
-        })
+        }
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
@@ -506,13 +512,18 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
     }
 
-    private fun routerConfigBriOrWhite(isBrightness: Boolean) = when {
-        isBrightness -> {//亮度
-            routeConfigBriGpOrLight(colorNode!!.dstAddress, 6, rgb_sbBrightness.progress, "diyBri")
-        }
-        else -> {
-            routeConfigWhiteGpOrLight(colorNode!!.dstAddress, 6, rgb_white_seekbar.progress, "diywhite")
-        }
+    private fun routerConfigBriOrWhite(isBrightness: Boolean) {
+        thisTime = System.currentTimeMillis()
+        if (thisTime - lastTime >= 300)
+            when {
+                isBrightness -> {//亮度
+                    routeConfigBriGpOrLight(colorNode!!.dstAddress, 6, rgb_sbBrightness.progress, "diyBri")
+                }
+                else -> {
+                    routeConfigWhiteGpOrLight(colorNode!!.dstAddress, 6, rgb_white_seekbar.progress, "diywhite")
+                }
+            }
+
     }
 
     @SuppressLint("CheckResult")
@@ -530,7 +541,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             when (it.errorCode) {
                 0 -> {
-                    showLoadingDialog(getString(R.string.please_wait))
+                    //showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                             .subscribe {
@@ -545,7 +556,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }) {
             ToastUtils.showShort(it.message)
@@ -583,7 +594,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {
+    override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Int) {
         LogUtils.v("zcl------收到路由配置白光灯通知------------$cmdBean------$sendProgress")
         disposableRouteTimer?.dispose()
         when (cmdBean.status) {

@@ -5,6 +5,7 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -43,8 +44,16 @@ class GroupOTARelayAdapter(resId: Int, data: MutableList<DbConnector>) : BaseQui
         }
 
         if (item?.isSupportOta == true && !item.isMostNew) {
-            helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller)
-                    .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
+            when {
+                Constants.IS_ROUTE_MODE && item.isGetVersion -> {
+                    helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller)
+                            .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
+                }
+                else -> {
+                    helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller_off)
+                            .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)
+                }
+            }
         } else {
             helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_controller_off)
                     .setImageResource(R.id.group_ota_update, R.drawable.up_arrow_g)

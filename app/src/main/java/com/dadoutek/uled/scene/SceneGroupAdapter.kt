@@ -139,9 +139,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                val progress = if (item.brightness != 0) item.brightness else 1
-                helper.setProgress(R.id.rgb_sbBrightness, item.brightness)
-                        .setProgress(R.id.rgb_white_seekbar, item.temperature)
+                val progress = if (item.brightness != 0) item.brightness else 50
+                val temper = if (item.temperature != 0) item.temperature else 50
+                helper.setProgress(R.id.rgb_sbBrightness, progress)
+                        .setProgress(R.id.rgb_white_seekbar, temper)
                         //.setProgress(R.id.speed_seekbar, item.gradientSpeed)
                         .setChecked(R.id.color_mode_rb,item.rgbType == 0)
                         .setChecked(R.id.gradient_mode_rb,item.rgbType == 1)
@@ -200,6 +201,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.cw_scene, false)
+                        .setGone(R.id.tv_select_color, true)
                         .setGone(R.id.top_rg_ly, true)
                         .setGone(R.id.switch_scene, false)
                         .setGone(R.id.scene_curtain, false)
@@ -665,32 +667,24 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     when (clickType) {//普通色温亮度 彩灯亮度白光
                         1, 2 -> {
                             seekBar = getViewByPosition(currentPostion, R.id.normal_temperature) as SeekBar
-                            configTempOrBri(seekBar, group, "gpTem")
+                            routeConfigTempGpOrLight(group.groupAddress, 97, seekBar.progress, "gpTem")
                         }
                         3, 4 -> {
                             seekBar = getViewByPosition(currentPostion, R.id.normal_sbBrightness) as SeekBar
-                            configTempOrBri(seekBar, group, "gpBri")
+                            routeConfigBriGpOrLight(group!!.groupAddress, 97, seekBar.progress,"gpBri")
                         }
                         5, 6 -> {
                             seekBar = getViewByPosition(currentPostion, R.id.rgb_sbBrightness) as SeekBar
-                            configTempOrBri(seekBar, group, "gpRgbBri")
+                            routeConfigBriGpOrLight(group!!.groupAddress, 97, seekBar.progress,"gpBri")
                         }
                         7, 8 -> {
                             seekBar = getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
-                            sendNum = seekBar.progress
-                            routeConfigWhiteGpOrLight(group.groupAddress, 97, sendNum, "gpRgbWhite")
+                            routeConfigWhiteGpOrLight(group.groupAddress, 97, seekBar.progress, "gpRgbWhite")
                         }
-                        else -> {
-                        }
+                        else -> {}
                     }
                 }
         }
-    }
-
-    private fun configTempOrBri(seekBar: SeekBar, group: ItemGroup, serId: String) {
-        sendNum = seekBar.progress
-       // showLoadingDialog(mContext.getString(R.string.please_wait))
-        routeConfigTempGpOrLight(group.groupAddress, 97, sendNum, "gpTem")
     }
 
 
@@ -763,7 +757,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     }
 
     fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl------收到路由配置亮度灯通知------------$cmdBean---$clickType")
+        LogUtils.v("zcl------收到路由配置亮度色温白光灯通知------------$cmdBean---$clickType")
         val group = data[currentPostion]
         disposableRouteTimer?.dispose()
         when (cmdBean.status) {
@@ -1642,15 +1636,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         val pos = seekBar.tag as Int
 
         val address = if (pos < data.size) data[pos].groupAddress else 0
-        val opcode: Byte
+        var opcode: Byte = Opcode.SET_LUM
         val itemGroup = data[pos]
         when (seekBar.id) {
             R.id.normal_sbBrightness -> {
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.cw_brightness_num)) as TextView).text = seekBar.progress.toString() + "%"
                 itemGroup.brightness = seekBar.progress
                 opcode = Opcode.SET_LUM
-                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
-
+                clickType = 3
                 when {
                     seekBar.progress <= 0 -> {
                         addBrightnessCW!!.isEnabled = true
@@ -1670,7 +1663,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.temperature_num)) as TextView).text = seekBar.progress.toString() + "%"
                 itemGroup.temperature = seekBar.progress
                 opcode = Opcode.SET_TEMPERATURE
-                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
+                clickType = 1
+                //Thread { sendCmd(opcode, address, seekBar.progress) }.start()
 
                 when {
                     seekBar.progress <= 0 -> {
@@ -1694,8 +1688,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sbBrightness_num)) as TextView).text = "$progress%"
                 itemGroup.brightness = seekBar.progress
                 opcode = Opcode.SET_LUM
-                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
-
+                clickType = 5
                 when {
                     seekBar.progress <= 0 -> {
                         addBrightnessRGB!!.isEnabled = true
@@ -1716,8 +1709,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sb_w_bright_num)) as TextView).text = seekBar.progress.toString() + "%"
                 itemGroup.temperature = seekBar.progress
                 opcode = Opcode.SET_W_LUM
-                Thread { sendCmd(opcode, address, seekBar.progress) }.start()
-
+                clickType = 7
                 when {
                     seekBar.progress <= 0 -> {
                         addWhiteLightRGB!!.isEnabled = true
@@ -1733,6 +1725,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     }
                 }
             }
+        }
+        when {
+            Constants.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp()
+            else -> GlobalScope.launch { sendCmd(opcode, address, seekBar.progress) }
         }
         notifyItemChanged(seekBar.tag as Int)
     }

@@ -62,7 +62,6 @@ import jp.co.cyberagent.android.gpuimage.filter.GPUImageWhiteBalanceFilter
 import kotlinx.android.synthetic.main.activity_device_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.lang.Float
 import java.util.*
@@ -404,22 +403,22 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         updateLights(false, group!!)
     }
 
-    override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {
+    override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Int) {
         LogUtils.v("zcl------收到路由配置亮度灯通知------------$cmdBean")
         disposableRouteTimer?.dispose()
         if (cmdBean.status == 0) {
             when {
                 currentShowPageGroup -> {
                     when {
-                        isBri -> group?.brightness = light_sbBrightness.progress
+                        isBri==0 -> group?.brightness = light_sbBrightness.progress
                         else -> group?.colorTemperature = light_sbBrightness.progress
                     }
                     if (group != null)
                         DBUtils.saveGroup(group!!, false)
                 }
                 else -> {
-                    when {
-                        isBri -> light?.brightness = light_sbBrightness.progress
+                    when (isBri) {
+                        0 -> light?.brightness = light_sbBrightness.progress
                         else -> light?.colorTemperature = light_sbBrightness.progress
                     }
                     DBUtils.saveLight(light, false)
@@ -431,19 +430,19 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             when {
                 currentShowPageGroup -> {
                     when {
-                        isBri -> light_sbBrightness.progress = group?.brightness ?: 1
+                        isBri==0 -> light_sbBrightness.progress = group?.brightness ?: 1
                         else -> light_sbBrightness.progress = group?.colorTemperature ?: 1
                     }
                 }
                 else -> {
                     when {
-                        isBri -> light_sbBrightness.progress = light?.brightness
+                        isBri==0 -> light_sbBrightness.progress = light?.brightness
                         else -> light_sbBrightness.progress = light?.colorTemperature
                     }
                 }
             }
             when {
-                isBri -> ToastUtils.showShort(getString(R.string.config_bri_fail))
+                isBri==0 -> ToastUtils.showShort(getString(R.string.config_bri_fail))
                 else -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
             }
         }
@@ -1434,7 +1433,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             slow_ly.visibility = GONE
 
         if (Constants.IS_ROUTE_MODE) {
+            sendProgress = group?.brightness?:50
             routerConfigBrightnesssOrColorTemp(true)
+            sendProgress = group?.colorTemperature?:50
             routerConfigBrightnesssOrColorTemp(false)
         } else {
             setLightBrightnessNum(group?.brightness ?: 1, group?.meshAddr!!)
@@ -1574,7 +1575,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
             val brightnes = if (light!!.brightness < 1) 1 else light!!.brightness
             light_sbBrightness?.progress = brightnes
+            sendProgress = brightnes
             tv_Brightness.text = "$brightnes%"
+            LogUtils.v("zcl---------路由发送亮度---$sendProgress------$brightnes")
             when {
                 Constants.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(true)
                 else -> setLightBrightnessNum(brightnes, light?.meshAddr)
@@ -1590,6 +1593,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             val brightnes = if (light!!.colorTemperature < 1) 1 else light!!.colorTemperature
             light_sbBrightness?.progress = brightnes
             tv_Brightness.text = "$brightnes%"
+            sendProgress = brightnes
+            LogUtils.v("zcl---------路由发送色温---$sendProgress------$brightnes")
             when {
                 Constants.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(false)
                 else -> setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)

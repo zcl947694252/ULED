@@ -77,8 +77,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private var installDevice: TextView? = null
     private var createGroup: TextView? = null
     private var createScene: TextView? = null
-
-
     private var lastOffset: Int = 0//距离
     private var lastPosition: Int = 0//第几个item
     private var sharedPreferences: SharedPreferences? = null

@@ -64,6 +64,8 @@ import kotlin.collections.ArrayList
  * 更新描述   ${设置场景颜色盘}$
  */
 class NewSceneSetAct : TelinkBaseActivity() {
+    private var brightness: Int = 0
+    private var whiteLight: Int = 0
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private lateinit var dbScene: DbScene
     private var disposableTimer: Disposable? = null
@@ -280,9 +282,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 itemGroup.gradientType = actions[i].gradientType
                 itemGroup.gradientName = actions[i].gradientName
                 itemGroup.gradientSpeed = actions[i].gradientSpeed
+                val groupByID = DBUtils.getGroupByID(actions[i].groupAddr.toLong())
+               // if (groupByID != null) {
+                    showGroupList.add(itemGroup)
 
-                showGroupList.add(itemGroup)
-                groupMeshAddrArrayList.add(item.meshAddr)
+                    groupMeshAddrArrayList.add(item.meshAddr)
 
                 //sceneGroupAdapter?.notifyDataSetChanged()
             }
@@ -404,7 +408,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun switchBright(position: Int) {
-        val brightness: Int
         when {
             showGroupList[position].isEnableBright -> {//  enableBright(false)
                 showGroupList[position].isEnableBright = false
@@ -412,31 +415,38 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
             else -> {//  enableBright(true)
                 showGroupList[position].isEnableBright = true
-                brightness = rgb_sbBrightness.progress
+                brightness = showGroupList[position].brightness
             }
         }
+
         val addr = showGroupList[position].groupAddress
-        val params: ByteArray = byteArrayOf(brightness.toByte())
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
+        if (Constants.IS_ROUTE_MODE) {
+            routeConfigBriGpOrLight(addr, 97, brightness, "configBri")
+        } else {
+            val params: ByteArray = byteArrayOf(brightness.toByte())
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
+        }
         sceneGroupAdapter?.notifyItemChanged(position)
     }
 
     private fun switchWhiteLight(position: Int) {
-        val whiteLight: Int
         when {
             showGroupList[position].isEnableWhiteLight -> {//enableWhiteLight(false)
                 whiteLight = 0
                 showGroupList[position].isEnableWhiteLight = false
             }
             else -> {//enableWhiteLight(true)
-                whiteLight = rgb_white_seekbar.progress
+                whiteLight = showGroupList[position].color and 0xff000000.toInt() shr 24
                 showGroupList[position].isEnableWhiteLight = true
             }
         }
-
         val addr = showGroupList[position].groupAddress
-        val params: ByteArray = byteArrayOf(whiteLight.toByte())
-        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
+        if (Constants.IS_ROUTE_MODE) {
+            routeConfigWhiteGpOrLight(addr, 97, whiteLight, "configWhite")
+        } else {
+            val params: ByteArray = byteArrayOf(whiteLight.toByte())//设置白色
+            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
+        }
         sceneGroupAdapter?.notifyItemChanged(position)
     }
 
@@ -474,6 +484,54 @@ class NewSceneSetAct : TelinkBaseActivity() {
             Commander.openOrCloseLights(showGroupList[position].groupAddress, true)
         }
     }
+
+    @SuppressLint("CheckResult")
+    open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int, serId: String) {
+        LogUtils.v("zcl----------- zcl-----------发送路由调白色参数-------$white-------")
+        val group = DBUtils.getGroupByID(meshAddr.toLong())
+        var gpColor = group?.color ?: 0
+        val red = (gpColor and 0xff0000) shr 16
+        val green = (gpColor and 0x00ff00) shr 8
+        val blue = gpColor and 0x0000ff
+        var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, serId)?.subscribe({
+            //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
+            configBriOrColorTempResult(it, 2)
+        }) {
+            ToastUtils.showShort(it.message)
+        }
+    }
+
+    override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Int) {
+        LogUtils.v("zcl-----------收到路由亮度色温白光通知-------$cmdBean---$isBri")
+        disposableRouteTimer?.dispose()
+        hideLoadingDialog()
+
+        disposableRouteTimer?.dispose()
+        hideLoadingDialog()
+        when (cmdBean.status) {
+            0 -> { //成功则不需处理
+            }
+            else -> {//失败则还原
+                when (isBri) {
+                    0 -> {
+                        ToastUtils.showShort(getString(R.string.config_bri_fail))
+                    }
+                    1 -> {
+                        showGroupList[currentPosition].isEnableBright = whiteLight == 0
+                        ToastUtils.showShort(getString(R.string.config_color_temp_fail))
+                    }
+                    2 -> {
+                        showGroupList[currentPosition].isEnableWhiteLight = whiteLight == 0
+                        ToastUtils.showShort(getString(R.string.config_white_fail))
+                    }
+                }
+                sceneGroupAdapter?.notifyDataSetChanged()
+            }
+        }
+    }
+
 
     private fun changeToColorSelect(position: Int) {
         val intent = Intent(this, SelectColorAct::class.java)
@@ -820,8 +878,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private fun startAddSceneTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
         disposableTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong(), TimeUnit.SECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     showLoadingDialog(getString(R.string.add_scene_fail))
                 }

@@ -18,11 +18,11 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
+import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.dadoutek.uled.model.DadouDeviceInfo;
 import com.dadoutek.uled.model.Light;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.network.NetworkFactory;
-import com.dadoutek.uled.base.TelinkBaseActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
 import com.dadoutek.uled.util.MeshAddressGenerator;
@@ -65,6 +65,7 @@ public final class DeviceBatchScanningActivity extends TelinkBaseActivity implem
                 finish();
                 //stopScanAndUpdateMesh();
             } else if (v.getId() == R.id.btn_log) {
+
             }
         }
     };

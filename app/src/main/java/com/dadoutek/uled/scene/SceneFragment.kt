@@ -24,11 +24,11 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
-import com.dadoutek.uled.model.httpModel.GwModel
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DbSceneActions
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkStatusCode.OK
@@ -52,7 +52,9 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -64,6 +66,9 @@ import kotlin.collections.ArrayList
  */
 
 class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnClickListener {
+    private var viewBottom12: View? = null
+    private var addNewScene: TextView? = null
+    private var emptyAdd: Button? = null
     private var disposableRouteTimer: Disposable? = null
     private var currentDbScene: DbScene? = null
     private var goHelp: TextView? = null
@@ -77,31 +82,30 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private var isDelete = false
     internal var builder: Builder? = null
     private var recyclerView: RecyclerView? = null
-    private var no_scene: LinearLayout? = null
     private var isGuide = false
     private var isRgbClick = false
-    private var add_scenes: Button? = null
-    private var addNewScene: TextView? = null
     private var install_device: TextView? = null
     private var create_group: TextView? = null
     private var create_scene: TextView? = null
 
     override fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {
-        if (cmdBean.ser_id=="applyScene"){
+        if (cmdBean.ser_id == "applyScene") {
             LogUtils.v("zcl-----------收到路由场景应用通知-------$cmdBean")
             disposableRouteTimer?.dispose()
-         runOnUiThread {
-             hideLoadingDialog()
-             when (cmdBean.status) {
-                 0 ->ToastUtils.showShort(getString(R.string.scene_apply_success))
-                 else -> ToastUtils.showShort(getString(R.string.scene_apply_fail))
-             }
-         }
+            runOnUiThread {
+                hideLoadingDialog()
+                when (cmdBean.status) {
+                    0 -> ToastUtils.showShort(getString(R.string.scene_apply_success))
+                    else -> ToastUtils.showShort(getString(R.string.scene_apply_fail))
+                }
+            }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
+        if (position>scenesListData.size)
+            return@OnItemChildClickListener
         currentDbScene = scenesListData!![position]
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
             Log.e("zcl场景", "zcl场景******onItemChildClickListener")
@@ -111,7 +115,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }//scenesListData!![position].isSelected = !scenesListData!![position].isSelected
 
                 R.id.template_device_setting -> {
-                    if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
+                    if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
                         ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     } else {
                         val lastUser = DBUtils.lastUser
@@ -131,9 +135,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
                 R.id.template_device_icon -> {
                     Log.e("zcl场景", "zcl场景******scene_apply")
-                    if (Constants.IS_ROUTE_MODE){
+                    if (Constants.IS_ROUTE_MODE) {
                         try {
-                            when {position < adapter.data.size -> {
+                            when {
+                                position < adapter.data.size -> {
                                     val dbScene = scenesListData[position]
                                     when {
                                         Constants.IS_ROUTE_MODE -> {
@@ -145,8 +150,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                                         showLoadingDialog(getString(R.string.please_wait))
                                                         disposableRouteTimer?.dispose()
                                                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                                                 .subscribeOn(Schedulers.io())
-                                                                                 .observeOn(AndroidSchedulers.mainThread())
+                                                                .subscribeOn(Schedulers.io())
+                                                                .observeOn(AndroidSchedulers.mainThread())
                                                                 .subscribe {
                                                                     hideLoadingDialog()
                                                                     ToastUtils.showShort(getString(R.string.scene_apply_fail))
@@ -155,7 +160,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                                     90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                                                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                                                     90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
-                                                    else-> ToastUtils.showShort(it.message)
+                                                    else -> ToastUtils.showShort(it.message)
                                                 }
                                             }, {
                                                 ToastUtils.showShort(it.message)
@@ -175,9 +180,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
-                    }else{
+                    } else {
                         when (TelinkLightApplication.getApp().connectDevice) {
-                            null ->  sendToGw(scenesListData!![position])
+                            null -> sendToGw(scenesListData!![position])
                             else -> {
                                 try {
                                     if (position < adapter.data.size) {
@@ -210,7 +215,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
                                 ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
                                 ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                                else-> ToastUtils.showShort(it.message)
+                                else -> ToastUtils.showShort(it.message)
                             }
 
                         }, {
@@ -233,8 +238,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer((it?.timeout ?: 0).toLong(), TimeUnit.MILLISECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     showLoadingDialog(getString(R.string.delete_scene_fail))
                 }
@@ -243,8 +248,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun deleteSceneSuccess(list: ArrayList<DbSceneActions>, dbScene: DbScene) {
         DBUtils.deleteSceneActionsList(list)
         DBUtils.deleteScene(dbScene)
-        refreshAllData()
-        refreshView()
+        adaper?.data?.remove(dbScene)
+        adaper?.notifyDataSetChanged()
+        //refreshAllData()
+       // refreshView()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -262,11 +269,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 if (!TelinkLightApplication.getApp().offLine) {
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread()).subscribe {
-                        hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.gate_way_offline))
-                    }
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.gate_way_offline))
+                            }
                     var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
                             dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
@@ -304,23 +311,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         this.inflater = inflater
         viewContent = inflater.inflate(R.layout.fragment_scene, null)
         recyclerView = viewContent.findViewById(R.id.recyclerView)
-        no_scene = viewContent.findViewById(R.id.no_scene)
-        add_scenes = viewContent.findViewById(R.id.add_scenes)
+        viewBottom12 = viewContent.findViewById(R.id.view12)
 
         install_device = viewContent.findViewById(R.id.install_device)
         create_group = viewContent.findViewById(R.id.create_group)
         create_scene = viewContent.findViewById(R.id.create_scene)
-        addNewScene = viewContent.findViewById(R.id.main_add_device)
-        goHelp = viewContent.findViewById(R.id.main_go_help)
-        var seehelp = viewContent.findViewById<TextView>(R.id.scene_see_helpe)
-        seehelp?.setOnClickListener { seeHelpe() }
-        addNewScene?.text = getString(R.string.create_scene)
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
         create_scene?.setOnClickListener(onClick)
-        add_scenes!!.setOnClickListener(this)
-        addNewScene!!.setOnClickListener(this)
-        goHelp!!.setOnClickListener(this)
 
         initToolBar(viewContent)
         initData()
@@ -344,18 +342,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
             }
             R.id.create_scene -> {
-                val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                } else {
-                    if (nowSize >= SCENE_MAX_COUNT) {
-                        ToastUtils.showLong(R.string.scene_16_tip)
-                    } else {
-                        val intent = Intent(activity, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
-                        startActivityForResult(intent, 3)
-                    }
-                }
+                addNewScenes()
             }
         }
     }
@@ -398,13 +385,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         toolbar = view.findViewById(R.id.toolbar)
         toolbarTv?.setText(R.string.scene_name)
 
-        val btn_add = toolbar?.findViewById<ImageView>(R.id.img_function1)
-        val btn_delete = toolbar?.findViewById<ImageView>(R.id.img_function2)
+        val btnAdd = toolbar?.findViewById<ImageView>(R.id.img_function1)
+        val btnDelete = toolbar?.findViewById<ImageView>(R.id.img_function2)
 
-        btn_add?.visibility = View.GONE
+        btnAdd?.visibility = View.GONE
 
-        btn_add?.setOnClickListener(this)
-        btn_delete?.setOnClickListener(this)
+        btnAdd?.setOnClickListener(this)
+        btnDelete?.setOnClickListener(this)
     }
 
 
@@ -432,22 +419,25 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun initView() {
-        if (scenesListData.size > 0) {
-            recyclerView!!.visibility = View.VISIBLE
-            no_scene!!.visibility = View.GONE
-            addNewScene!!.visibility = View.VISIBLE
-        } else {
-            recyclerView!!.visibility = View.GONE
-            no_scene!!.visibility = View.VISIBLE
-            addNewScene!!.visibility = View.GONE
-        }
-        //recyclerView!!.layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         recyclerView!!.layoutManager = GridLayoutManager(activity, 2)
 
         adaper = SceneRecycleListAdapter(R.layout.template_device_type_item, scenesListData, isDelete)
         adaper!!.onItemChildClickListener = onItemChildClickListener
         adaper!!.onItemLongClickListener = onItemChildLongClickListener
         adaper!!.bindToRecyclerView(recyclerView)
+
+        var footer = View.inflate(context, R.layout.template_add_help, null)
+        addNewScene = footer.findViewById(R.id.main_add_device)
+        addNewScene?.text = getString(R.string.create_scene)
+        goHelp = footer.findViewById(R.id.main_go_help)
+        addNewScene!!.setOnClickListener(this)
+        goHelp!!.setOnClickListener(this)
+
+
+        var emptyView = View.inflate(context, R.layout.empty_view, null)
+         emptyAdd = emptyView.findViewById(R.id.add_device_btn)
+        emptyAdd?.setOnClickListener(this)
+        adaper?.addFooterView(footer)
 
         isDelete = false
         adaper!!.changeState(isDelete)
@@ -456,6 +446,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 scenesListData[i].isSelected = false
         }
         adaper!!.notifyDataSetChanged()
+        recyclerView?.scrollToPosition(scenesListData.size)
+        viewBottom12?.requestFocus()
+        LogUtils.v("zcl-----------滑动到-------${scenesListData.size}")
     }
 
     private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
@@ -464,7 +457,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
-                isDelete = true
+                isDelete = !isDelete
                 adaper!!.changeState(isDelete)
                 img_function1?.visibility = View.GONE
                 img_function2?.visibility = View.GONE
@@ -556,20 +549,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         if (activity != null) {
             scenesListData = DBUtils.sceneList
 
-            if (scenesListData.size > 0) {
-                if (recyclerView != null) {
-                    recyclerView!!.visibility = View.VISIBLE
-                    no_scene!!.visibility = View.GONE
-                    addNewScene!!.visibility = View.VISIBLE
-                }
-            } else {
-                if (recyclerView != null) {
-                    recyclerView!!.visibility = View.GONE
-                    no_scene!!.visibility = View.VISIBLE
-                    addNewScene!!.visibility = View.GONE
-                }
-            }
-
             toolbar?.let {
                 it.navigationIcon = null
                 toolbarTv?.setText(R.string.scene_name)
@@ -647,60 +626,43 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     override fun onClick(v: View) {
         val lastUser = DBUtils.lastUser
         lastUser?.let {
-            if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showLong(getString(R.string.author_region_warm))
-            else {
-
-                when (v.id) {
-                    R.id.img_function2 -> {
-                        showDeleteDialog()
-                    }
-                    R.id.img_function1 -> {
-                        if (it.id.toString() != it.last_authorizer_user_id)
-                            ToastUtils.showLong(getString(R.string.author_region_warm))
-                        else {
-                            isGuide = false
-                            if (dialog_pop?.visibility == View.GONE) {
-                                showPopupMenu()
-                            } else {
-                                hidePopupMenu()
+            when {
+                it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
+                else -> {
+                    when (v.id) {
+                        R.id.img_function2 -> showDeleteDialog()
+                        R.id.img_function1 -> {
+                            when {
+                                it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
+                                else -> {
+                                    isGuide = false
+                                    when (dialog_pop?.visibility) {
+                                        View.GONE -> showPopupMenu()
+                                        else -> hidePopupMenu()
+                                    }
+                                }
                             }
                         }
+                        R.id.add_device_btn , R.id.main_add_device -> addNewScenes()
+                        R.id.main_go_help -> seeHelpe()
                     }
-
-                    R.id.add_scenes -> {
-
-                        val nowSize = DBUtils.sceneList.size
-
-                        if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
-                            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                        } else {
-                            if (nowSize >= SCENE_MAX_COUNT) {
-                                ToastUtils.showLong(R.string.scene_16_tip)
-                            } else {
-                                val intent = Intent(activity, NewSceneSetAct::class.java)
-                                intent.putExtra(Constants.IS_CHANGE_SCENE, false)
-                                startActivityForResult(intent, 3)
-                            }
-                        }
-                    }
-
-                    R.id.main_add_device -> {
-                        val nowSize = DBUtils.sceneList.size
-                        if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
-                            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                        } else {
-                            if (nowSize >= SCENE_MAX_COUNT) {
-                                ToastUtils.showLong(R.string.scene_16_tip)
-                            } else {
-                                val intent = Intent(activity, NewSceneSetAct::class.java)
-                                intent.putExtra(Constants.IS_CHANGE_SCENE, false)
-                                startActivityForResult(intent, 3)
-                            }
-                        }
-                    }
-                    R.id.main_go_help -> seeHelpe()
                 }
+            }
+        }
+    }
+
+    private fun addNewScenes() {
+        val nowSize = DBUtils.sceneList.size
+
+        if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
+            ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+        } else {
+            if (nowSize >= SCENE_MAX_COUNT) {
+                ToastUtils.showLong(R.string.scene_16_tip)
+            } else {
+                val intent = Intent(activity, NewSceneSetAct::class.java)
+                intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                startActivityForResult(intent, 3)
             }
         }
     }

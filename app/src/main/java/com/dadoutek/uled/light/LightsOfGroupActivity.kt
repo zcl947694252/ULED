@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
 import android.view.MenuItem
 import android.view.View
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -29,6 +30,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.router.BindRouterActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.telink.bluetooth.LeBluetooth
@@ -50,6 +52,7 @@ import java.util.*
  */
 
 class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListener {
+    private var isOpen: Int = 0
     private var bindRouter: MenuItem? = null
     private var deviceType: Int? = 0
     private var deleteDevice: MenuItem? = null
@@ -106,7 +109,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> {
                 when {
                     DBUtils.getAllNormalLight().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    TelinkLightApplication.getApp().connectDevice != null||Constants.IS_ROUTE_MODE ->
+                    TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE ->
                         startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.LIGHT_NORMAL, "gp" to group?.meshAddr)
                     else -> ToastUtils.showShort(getString(R.string.connect_fail))
                 }
@@ -115,7 +118,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             DeviceType.LIGHT_RGB -> {
                 when {
                     DBUtils.getAllRGBLight().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    TelinkLightApplication.getApp().connectDevice != null -> startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.LIGHT_RGB, "gp" to group?.meshAddr)
+                    TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE ->
+                        startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.LIGHT_RGB, "gp" to group?.meshAddr)
                     else -> ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }
@@ -365,24 +369,29 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         when (view.id) {
             R.id.template_device_icon -> {
                 canBeRefresh = true
+
                 when (currentLight!!.connectionStatus) {
                     ConnectionStatus.OFF.value -> {
-                        Commander.openOrCloseLights(lightList[position]!!.meshAddr, true)
-                        lightList[position]!!.connectionStatus = ConnectionStatus.ON.value
+                        isOpen = 1
+                        if (Constants.IS_ROUTE_MODE)
+                            routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 1, "lightSw")
+                        else {
+                            Commander.openOrCloseLights(lightList[position]!!.meshAddr, true)
+                            lightList[position]!!.connectionStatus = ConnectionStatus.ON.value
+                            afterLightIcon(position)
+                        }
                     }
                     else -> {
-                        Commander.openOrCloseLights(lightList[position]!!.meshAddr, false)
-                        lightList[position]!!.connectionStatus = ConnectionStatus.OFF.value
+                        isOpen = 0
+                        if (Constants.IS_ROUTE_MODE)
+                            routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 0, "lightSw")
+                        else {
+                            Commander.openOrCloseLights(lightList[position]!!.meshAddr, false)
+                            lightList[position]!!.connectionStatus = ConnectionStatus.OFF.value
+                            afterLightIcon(position)
+                        }
                     }
                 }
-
-                when (deviceType) {
-                    DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> lightList[position]!!.updateIcon()
-                    DeviceType.LIGHT_RGB -> lightList[position]!!.updateRgbIcon()
-                }
-
-                DBUtils.updateLight(lightList[position]!!)
-                deviceAdapter?.notifyDataSetChanged()
             }
             R.id.template_device_setting -> {
                 if (scanPb.visibility != View.VISIBLE) {
@@ -403,6 +412,33 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             }
             R.id.template_device_card_delete -> showDeleteSingleDialog(currentLight!!)
         }
+    }
+
+    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由lightSw通知-------$cmdBean")
+        if (cmdBean.ser_id == "lightSw") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                currentLight!!.connectionStatus = isOpen
+                afterLightIcon(positionCurrent)
+            } else {
+                if (isOpen==1)
+                    ToastUtils.showShort(getString(R.string.open_faile))
+                else
+                    ToastUtils.showShort(getString(R.string.close_faile))
+            }
+        }
+    }
+
+    private fun afterLightIcon(position: Int) {
+        when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> lightList[position]!!.updateIcon()
+            DeviceType.LIGHT_RGB -> lightList[position]!!.updateRgbIcon()
+        }
+
+        DBUtils.updateLight(lightList[position]!!)
+        deviceAdapter?.notifyDataSetChanged()
     }
 
     private fun showDeleteSingleDialog(dbLight: DbLight) {

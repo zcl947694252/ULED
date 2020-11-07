@@ -49,7 +49,6 @@ import java.util.concurrent.TimeUnit
  */
 
 class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
-    private var lastTime: Long = 0
     private var thisTime: Long = 0
     private var color: Int = 0
     private var itemGroup: ItemGroup? = null

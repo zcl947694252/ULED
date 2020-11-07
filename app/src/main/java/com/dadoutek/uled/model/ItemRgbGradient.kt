@@ -7,7 +7,7 @@ import java.io.Serializable
 class ItemRgbGradient :Serializable{
     var name: String? = null
     var position: Int = 100
-    var speed: Int = 0
+    var speed: Int = 1
     var select: Boolean = false//开停状态
     var id: Int = 0
     var isDiy = false

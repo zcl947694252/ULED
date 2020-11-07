@@ -32,6 +32,9 @@ import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.mqtt.IGetMessageCallBack
+import com.dadoutek.uled.mqtt.MqttService
+import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -61,7 +64,8 @@ import java.util.concurrent.TimeUnit
  * 更新描述   ${//GlobalScope.launch { delay(1000) } // 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程}$
  */
 
-abstract class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    private var serviceConnection: MyServiceConnection? = null
     private var upDateTimer: Disposable? = null
     private var isResume: Boolean = false
     private lateinit var stompRecevice: StompReceiver
@@ -89,6 +93,24 @@ abstract class BaseActivity : AppCompatActivity() {
         initListener()
         initOnLayoutListener()
         initStompReceiver()
+        bindService()
+    }
+
+    fun bindService() {
+        serviceConnection = MyServiceConnection()
+        serviceConnection?.setIGetMessageCallBack(this)
+        val intent = Intent(this, MqttService::class.java)
+        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    open fun unbindSe() { //解绑服务
+        try {
+            serviceConnection?.let {
+                unbindService(it)
+            }
+        } catch (e: java.lang.Exception) {
+            LogUtils.v("zcl-----------${e.message}-------${e.printStackTrace()}")
+        }
     }
 
     private fun makeDialogAndPop() {
@@ -96,9 +118,7 @@ abstract class BaseActivity : AppCompatActivity() {
                 .setTitle(R.string.other_device_login)
                 .setMessage(getString(R.string.single_login_warm))
                 .setCancelable(false)
-                .setOnDismissListener {
-                    restartApplication()
-                }.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
                     restartApplication()
                 }.create()
@@ -112,13 +132,12 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-
     abstract fun initListener()
     abstract fun initData()
     abstract fun initView()
     abstract fun setLayoutID(): Int
     open fun notifyWSData(type: Int, rid: Int) {}
-    fun startTimerUpdate() {
+    private fun startTimerUpdate() {
         upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
             SyncDataPutOrGetUtils.syncPutDataStart(this@BaseActivity, object : SyncCallback {
                 override fun start() {}
@@ -131,7 +150,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun stopTimerUpdate() {
+    private fun stopTimerUpdate() {
         upDateTimer?.dispose()
         upDateTimer = null
     }
@@ -197,10 +216,11 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        isResume = true
+        isResume = false
         foreground = false
         PopUtil.dismiss(pop)
         stopTimerUpdate()
+        unbindSe()
     }
 
     internal var syncCallbackGet: SyncCallback = object : SyncCallback {
@@ -235,7 +255,10 @@ abstract class BaseActivity : AppCompatActivity() {
      */
     private var syncCallback: SyncCallback = object : SyncCallback {
         override fun error(msg: String?) {
-            restartApplication()
+            if (!this@BaseActivity.isResume && !singleLogin?.isShowing!!) {
+                singleLogin?.dismiss()
+                singleLogin?.show()
+            }
         }
 
         override fun start() {
@@ -245,9 +268,10 @@ abstract class BaseActivity : AppCompatActivity() {
         override fun complete() {
             hideLoadingDialog()
             TelinkLightService.Instance()?.idleMode(true)
-            if (!this@BaseActivity.isFinishing && !singleLogin?.isShowing!!)
-                singleLogin!!.show()
-            restartApplication()
+            if (this@BaseActivity.isResume && !singleLogin?.isShowing!!) {
+                singleLogin?.dismiss()
+                singleLogin?.show()
+            }
         }
     }
 
@@ -464,9 +488,12 @@ abstract class BaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        unbindSe()
         isResume = true
         startTimerUpdate()
+        bindService()
     }
+
 
     open fun receviedGwCmd2000(serId: String) {
 
@@ -495,5 +522,9 @@ abstract class BaseActivity : AppCompatActivity() {
                 //ignore
             }
         }
+    }
+
+    override fun setMessage(cmd: Int, extCmd: Int, message: String) {
+
     }
 }

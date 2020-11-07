@@ -396,8 +396,7 @@ object DBUtils {
 
 
     fun getGroupByID(id: Long): DbGroup? {
-        val group: DbGroup? = DaoSessionInstance.getInstance().dbGroupDao.load(id)
-        return group
+        return DaoSessionInstance.getInstance().dbGroupDao.load(id)
     }
 
     fun getUserPhone(phone: String): DbUser? {

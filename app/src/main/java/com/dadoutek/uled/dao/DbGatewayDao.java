@@ -41,8 +41,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         public final static Property State = new Property(14, int.class, "state", false, "STATE");
         public final static Property OpenTag = new Property(15, int.class, "openTag", false, "OPEN_TAG");
         public final static Property IsMostNew = new Property(16, boolean.class, "isMostNew", false, "IS_MOST_NEW");
-        public final static Property Rssi = new Property(17, int.class, "rssi", false, "RSSI");
-        public final static Property IsSupportOta = new Property(18, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
+        public final static Property IsGetVersion = new Property(17, boolean.class, "isGetVersion", false, "IS_GET_VERSION");
+        public final static Property Rssi = new Property(18, int.class, "rssi", false, "RSSI");
+        public final static Property IsSupportOta = new Property(19, boolean.class, "isSupportOta", false, "IS_SUPPORT_OTA");
     }
 
 
@@ -75,8 +76,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
                 "\"STATE\" INTEGER NOT NULL ," + // 14: state
                 "\"OPEN_TAG\" INTEGER NOT NULL ," + // 15: openTag
                 "\"IS_MOST_NEW\" INTEGER NOT NULL ," + // 16: isMostNew
-                "\"RSSI\" INTEGER NOT NULL ," + // 17: rssi
-                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 18: isSupportOta
+                "\"IS_GET_VERSION\" INTEGER NOT NULL ," + // 17: isGetVersion
+                "\"RSSI\" INTEGER NOT NULL ," + // 18: rssi
+                "\"IS_SUPPORT_OTA\" INTEGER NOT NULL );"); // 19: isSupportOta
     }
 
     /** Drops the underlying database table. */
@@ -133,8 +135,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         stmt.bindLong(15, entity.getState());
         stmt.bindLong(16, entity.getOpenTag());
         stmt.bindLong(17, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(18, entity.getRssi());
-        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsGetVersion() ? 1L: 0L);
+        stmt.bindLong(19, entity.getRssi());
+        stmt.bindLong(20, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -185,8 +188,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         stmt.bindLong(15, entity.getState());
         stmt.bindLong(16, entity.getOpenTag());
         stmt.bindLong(17, entity.getIsMostNew() ? 1L: 0L);
-        stmt.bindLong(18, entity.getRssi());
-        stmt.bindLong(19, entity.getIsSupportOta() ? 1L: 0L);
+        stmt.bindLong(18, entity.getIsGetVersion() ? 1L: 0L);
+        stmt.bindLong(19, entity.getRssi());
+        stmt.bindLong(20, entity.getIsSupportOta() ? 1L: 0L);
     }
 
     @Override
@@ -214,8 +218,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
             cursor.getInt(offset + 14), // state
             cursor.getInt(offset + 15), // openTag
             cursor.getShort(offset + 16) != 0, // isMostNew
-            cursor.getInt(offset + 17), // rssi
-            cursor.getShort(offset + 18) != 0 // isSupportOta
+            cursor.getShort(offset + 17) != 0, // isGetVersion
+            cursor.getInt(offset + 18), // rssi
+            cursor.getShort(offset + 19) != 0 // isSupportOta
         );
         return entity;
     }
@@ -239,8 +244,9 @@ public class DbGatewayDao extends AbstractDao<DbGateway, Long> {
         entity.setState(cursor.getInt(offset + 14));
         entity.setOpenTag(cursor.getInt(offset + 15));
         entity.setIsMostNew(cursor.getShort(offset + 16) != 0);
-        entity.setRssi(cursor.getInt(offset + 17));
-        entity.setIsSupportOta(cursor.getShort(offset + 18) != 0);
+        entity.setIsGetVersion(cursor.getShort(offset + 17) != 0);
+        entity.setRssi(cursor.getInt(offset + 18));
+        entity.setIsSupportOta(cursor.getShort(offset + 19) != 0);
      }
     
     @Override

@@ -35,7 +35,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
-import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
@@ -89,6 +88,8 @@ import java.util.concurrent.TimeUnit
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    open var lastTime: Long = 0
+    private var isShow: Boolean = false
     private var showTime: Long = 0
     private var serviceConnection: MyServiceConnection? = null
     private var viewInstall: View? = null
@@ -312,9 +313,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 .setTitle(R.string.other_device_login)
                 .setMessage(getString(R.string.single_login_warm))
                 .setCancelable(false)
-                .setOnDismissListener {
-                    restartApplication()
-                }.setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+               .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     dialog.dismiss()
                     restartApplication()
                 }.create()
@@ -504,6 +503,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     override fun onResume() {
         super.onResume()
+        isShow = true
         unbindSe()
         bindService()
         if (!LeBluetooth.getInstance().enable(applicationContext) && !Constants.IS_ROUTE_MODE)
@@ -620,6 +620,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         super.onPause()
         stopTimerUpdate()
         unbindSe()
+        isShow = false
         showDialogHardDelete?.dismiss()
         mConnectDisposable?.dispose()
     }
@@ -729,7 +730,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 initOnLayoutListener()
                 LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${true}")
                 try {
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing&&isShow)
                         pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
@@ -760,6 +761,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constants.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
+
             //var jsonObject = JSONObject(msg)
             when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
@@ -843,8 +845,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.tzRouteOpenOrClose -> tzRouterOpenOrClose(cmdBean)
                 Cmd.tzRouteContorlCurtain -> tzRouteContorlCurtaine(cmdBean)
                 Cmd.tzRouteConfigRgb -> tzRouterConfigRGB(cmdBean)
-                Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean, true)
-                Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean, false)
+                Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean, 0)
+                Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean, 1)
                 Cmd.tzRouteSysGradientApply -> tzRouterSysGradientApply(cmdBean)
                 Cmd.tzRouteGradientApply -> tzRouterGradientApply(cmdBean)
                 Cmd.tzRouteGradientStop -> tzRouterGradientStop(cmdBean)
@@ -859,6 +861,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.tzRouteUpdateTimerScene -> tzRouterUpdateTimerScene(cmdBean)
                 Cmd.tzRouteDelTimerScene -> tzRouterDelTimerScene(cmdBean)
                 Cmd.tzRouteTimerSceneStatus -> tzRouterChangeTimerSceneStatus(cmdBean)
+                Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean,0)
+                Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean,1)
+                Cmd.tzRouteConfigWhite -> tzRouterConfigBriOrTemp(cmdBean,2)
             }
 /*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -876,7 +881,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     LogUtils.e("zcl_baseMe___________收到登出消息")
                     loginOutMethod()
                 }
-                Constant.CANCEL_CODE -> {
+                Constant.CANCEL_CODE -> {`
                     val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
                     var cancelBean: CancelAuthorMsg? = null
                     if (extra != null)
@@ -935,7 +940,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun tzRouterResetFactory(cmdBean: CmdBodyBean) {}
     open fun tzRouterSSSpeed(cmdBean: CmdBodyBean) {}
     open fun tzRouterSSSW(cmdBean: CmdBodyBean, b: Boolean) {}
-    open fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Boolean) {}
+    open fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Int) {}
     open fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {}
     open fun tzRouteStopScan(cmdBean: CmdBodyBean) {}
     open fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {}
@@ -1009,8 +1014,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     val b = this@TelinkBaseActivity.isFinishing
                     val showing = singleLogin?.isShowing
                     SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, false)
-                    if (!b && showing != null && !showing) {
-                        singleLogin!!.show()
+                    if (!b && showing != null && !showing&&isShow) {
+                        singleLogin?.dismiss()
+                        singleLogin?.show()
                     }
                 }
 
@@ -1479,7 +1485,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据
             //    "errorCode": 90005"message": "该设备绑定的路由没在线"
-            configBriOrColorTempResult(it, true)
+            configBriOrColorTempResult(it, 0)
+
         }) {
             ToastUtils.showShort(it.message)
         }
@@ -1493,25 +1500,29 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据
             //    "errorCode": 90005"message": "该设备绑定的路由没在线"
-            configBriOrColorTempResult(it, false)
+            configBriOrColorTempResult(it, 1)
+
         }) {
             ToastUtils.showShort(it.message)
         }
     }
 
-    open fun configBriOrColorTempResult(it: Response<RouterTimeoutBean>, isBri: Boolean) {
+    open fun configBriOrColorTempResult(it: Response<RouterTimeoutBean>, isBri: Int) {
         LogUtils.v("zcl-----------收到配置亮度-------$isBri")
         when (it.errorCode) {
             0 -> {
+                lastTime = System.currentTimeMillis()
                 //showLoadingDialog(getString(R.string.please_wait))
                 disposableRouteTimer?.dispose()
                 disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                         .subscribe {
                             hideLoadingDialog()
-                            if (isBri)
-                                ToastUtils.showShort(getString(R.string.config_bri_fail))
-                            else
-                                ToastUtils.showShort(getString(R.string.config_color_temp_fail))
+                            when (isBri) {
+                                0 -> ToastUtils.showShort(getString(R.string.config_bri_fail))
+                                1 -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
+                                2 -> ToastUtils.showShort(getString(R.string.config_white_fail))
+                                else -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
+                            }
                         }
             }
             90018 -> {
@@ -1650,10 +1661,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     LogUtils.v("zcl-----------收到路由请求连接开关或者传感器是否是连接--${op==0}-------$response")
                     when (response.errorCode) {
                         0 -> {
+                            showLoadingDialog(getString(R.string.please_wait))
                             disposableRouteTimer?.dispose()
                             disposableRouteTimer = Observable.timer((response.t.timeout).toLong() + 1, TimeUnit.SECONDS)
                                     .subscribe {
-                                        showLoadingDialog(getString(R.string.please_wait))
                                         hideLoadingDialog()
                                         ToastUtils.showShort(getString(R.string.connect_fail))
                                     }

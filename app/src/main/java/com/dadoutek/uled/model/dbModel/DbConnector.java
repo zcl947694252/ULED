@@ -58,12 +58,13 @@ public class DbConnector implements Serializable {
     public boolean isMostNew =false;
     public int belongRegionId =0;
     public int uid =0;
-    @Generated(hash = 559611387)
+    public boolean isGetVersion= false;
+    @Generated(hash = 195619549)
     public DbConnector(Long id, int meshAddr, String name, boolean open,
             String macAddr, int meshUUID, int productUUID, Long belongGroupId,
             int index, String groupName, int color, String version, String boundMac,
             String boundMacName, int status, int rssi, boolean isSupportOta,
-            boolean isMostNew, int belongRegionId, int uid) {
+            boolean isMostNew, int belongRegionId, int uid, boolean isGetVersion) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -84,10 +85,32 @@ public class DbConnector implements Serializable {
         this.isMostNew = isMostNew;
         this.belongRegionId = belongRegionId;
         this.uid = uid;
+        this.isGetVersion = isGetVersion;
     }
 
     @Generated(hash = 1212725637)
     public DbConnector() {
+    }
+
+
+    public boolean isOpen() {
+        return open;
+    }
+
+    public boolean isMostNew() {
+        return isMostNew;
+    }
+
+    public void setMostNew(boolean mostNew) {
+        isMostNew = mostNew;
+    }
+
+    public boolean isGetVersion() {
+        return isGetVersion;
+    }
+
+    public void setGetVersion(boolean getVersion) {
+        isGetVersion = getVersion;
     }
 
     public String getBoundMacName() {
@@ -277,5 +300,13 @@ public class DbConnector implements Serializable {
 
     public void setUid(int uid) {
         this.uid = uid;
+    }
+
+    public boolean getIsGetVersion() {
+        return this.isGetVersion;
+    }
+
+    public void setIsGetVersion(boolean isGetVersion) {
+        this.isGetVersion = isGetVersion;
     }
 }

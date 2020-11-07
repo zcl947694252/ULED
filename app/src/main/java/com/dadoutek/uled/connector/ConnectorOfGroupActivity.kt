@@ -20,6 +20,7 @@ import android.view.View
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -38,6 +39,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -78,6 +80,7 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener, View.OnClickListener {
+    private var isOpen: Int = 0
     private var bindRouter: MenuItem? = null
     private val REQ_LIGHT_SETTING: Int = 0x01
     private lateinit var group: DbGroup
@@ -398,23 +401,35 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         when (view.id) {
             R.id.template_device_icon -> {
                 canBeRefresh = true
-                if (currentLight!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    when (currentLight!!.productUUID) {
-                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
-                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, true)
+                when (currentLight!!.connectionStatus) {
+                    ConnectionStatus.OFF.value -> {
+                        isOpen = 1
+                        when {
+                            Constants.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 1, "relaySw")
+                            else -> {
+                                Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                                currentLight!!.connectionStatus = ConnectionStatus.ON.value
+                                afterClickIcon()
+                            }
+                        }
                     }
-                    currentLight!!.connectionStatus = ConnectionStatus.ON.value
-                } else {
-                    when (currentLight!!.productUUID) {
-                        DeviceType.SMART_CURTAIN -> Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
-                        else -> Commander.openOrCloseLights(currentLight!!.meshAddr, false)
+                    else -> {
+                        isOpen = 0
+                        when {
+                            Constants.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 0, "relaySw")
+                            else -> {
+                                Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                                currentLight!!.connectionStatus = ConnectionStatus.OFF.value
+                                afterClickIcon()
+                            }
+                        }
+
+
+
                     }
-                    currentLight!!.connectionStatus = ConnectionStatus.OFF.value
                 }
 
-                currentLight!!.updateIcon()
-                DBUtils.updateConnector(currentLight!!)
-                adapterDevice?.notifyDataSetChanged()
+
             }
             R.id.template_device_setting -> {
                 val lastUser = DBUtils.lastUser
@@ -442,6 +457,29 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
             R.id.template_device_card_delete -> showDeleteSingleDialog(currentLight!!)
         }
+    }
+
+    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由relaySw通知-------$cmdBean")
+        if (cmdBean.ser_id == "relaySw") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                currentLight!!.connectionStatus = isOpen
+                afterClickIcon()
+            } else {
+                if (isOpen==1)
+                    ToastUtils.showShort(getString(R.string.open_faile))
+                else
+                    ToastUtils.showShort(getString(R.string.close_faile))
+            }
+        }
+    }
+
+    private fun afterClickIcon() {
+        currentLight!!.updateIcon()
+        DBUtils.updateConnector(currentLight!!)
+        adapterDevice?.notifyDataSetChanged()
     }
 
     private fun showDeleteSingleDialog(dbLight: DbConnector) {

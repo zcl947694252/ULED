@@ -407,55 +407,62 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 return
             }
             else -> {//符合所有条件
-                if (currentSensor != null) {
-                    if (Constants.IS_ROUTE_MODE) {
-                        //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
-                        // triggerKey: Int = 0//0全天    1白天   2夜晚
-                        //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
-                        //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
-                        //action	否	int	触发时执行逻辑。0开，1关，2自定义亮度。仅在群组模式下需要该配置
-                        //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
-                        //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
-                        //sid	否	int	配置场景id。仅在场景模式下需要该配置
-                        var mode = if (isGroupMode) 0 else 1
-                        var condition = triggerKey
-                        val mutableListOf = mutableListOf<Int>()
-                        showGroupList.forEach { mutableListOf.add(it.groupAddress) }
-                        routerConfigSensor(currentSensor!!.id, ConfigurationBean(triggerAfterShow, condition, customBrightnessNum, timeUnitType,
-                                durationTimeValue.toInt(), mutableListOf, mode, (currentScene?.id ?: 0).toInt()), "ConfigNpr")
-                    } else {
-                        GlobalScope.launch {
-                            setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
-                            sendCommandOpcode(durationTimeValue.toInt())
-                            delay(300)
-                            //if (!isConfirm)//不是冲洗创建 更新mesh
-                            mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
-                            Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
-                                    successCallback = {
-                                        setLoadingVisbiltyOrGone()
-                                        GlobalScope.launch {
-                                            delay(timeMillis = 500)
-                                            saveSensor()
-                                        }
-                                    },
-                                    failedCallback = {
-                                        snackbar(sensor_root, getString(R.string.config_fail))
-                                        setLoadingVisbiltyOrGone()
-                                        TelinkLightService.Instance()?.idleMode(true)
-                                    })
+                when {
+                    currentSensor != null -> {
+                        when {
+                            Constants.IS_ROUTE_MODE -> {
+                                //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
+                                // triggerKey: Int = 0//0全天    1白天   2夜晚
+                                //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
+                                //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
+                                //action	否	int	触发时执行逻辑。0开，1关，2自定义亮度。仅在群组模式下需要该配置
+                                //brightness	否	int	自定义亮度值。仅在群组模式下需要该配置
+                                //groupMeshAddrs	否	list	配置组meshAddr，可多个。仅在群组模式下需要该配置
+                                //sid	否	int	配置场景id。仅在场景模式下需要该配置
+                                var mode = if (isGroupMode) 0 else 1
+                                var condition = triggerKey
+                                val mutableListOf = mutableListOf<Int>()
+                                showGroupList.forEach { mutableListOf.add(it.groupAddress) }
+                                routerConfigSensor(currentSensor!!.id, ConfigurationBean(triggerAfterShow, condition, customBrightnessNum, timeUnitType,
+                                        durationTimeValue.toInt(), mutableListOf, mode, (currentScene?.id ?: 0).toInt()), "ConfigNpr")
+                            }
+                            else -> {
+                                GlobalScope.launch {
+                                    setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
+                                    sendCommandOpcode(durationTimeValue.toInt())
+                                    delay(300)
+                                    //if (!isConfirm)//不是冲洗创建 更新mesh
+                                    mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
+                                    Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
+                                            successCallback = {
+                                                setLoadingVisbiltyOrGone()
+                                                GlobalScope.launch {
+                                                    delay(timeMillis = 500)
+                                                    saveSensor()
+                                                }
+                                            },
+                                            failedCallback = {
+                                                snackbar(sensor_root, getString(R.string.config_fail))
+                                                setLoadingVisbiltyOrGone()
+                                                TelinkLightService.Instance()?.idleMode(true)
+                                            })
 
+                                }
+                            }
                         }
-                    }
 
-                } else {
-                    ToastUtils.showLong(getString(R.string.connect_fail))
-                    if (Constants.IS_ROUTE_MODE)
-                        routerConnectSensor(currentSensor!!, 0, "retryConnectSensor")
-                    else autoConnect()
-                    timeDispsable = Observable.timer(10000, TimeUnit.MILLISECONDS).subscribe {
-                        runOnUiThread {
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.connect_fail))
+                    }
+                    else -> {
+                        ToastUtils.showLong(getString(R.string.connect_fail))
+                        when {
+                            Constants.IS_ROUTE_MODE -> routerConnectSensor(currentSensor!!, 0, "retryConnectSensor")
+                            else -> autoConnect()
+                        }
+                        timeDispsable = Observable.timer(10000, TimeUnit.MILLISECONDS).subscribe {
+                            runOnUiThread {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.connect_fail))
+                            }
                         }
                     }
                 }

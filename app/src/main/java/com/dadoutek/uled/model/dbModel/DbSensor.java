@@ -42,14 +42,16 @@ public class DbSensor implements Serializable {
     public int belongRegionId =0;
     public int uid =0;
     public String list ="";
+    public boolean isGetVersion= false;
 
-    @Generated(hash = 2030563815)
+
+    @Generated(hash = 1466174835)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId,
             String version, int rssi, int openTag, int setType, int sceneId,
             String boundMac, String boundMacName, Boolean isChecked,
             boolean selected, boolean isMostNew, boolean isSupportOta,
-            int belongRegionId, int uid, String list) {
+            int belongRegionId, int uid, String list, boolean isGetVersion) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -72,10 +74,20 @@ public class DbSensor implements Serializable {
         this.belongRegionId = belongRegionId;
         this.uid = uid;
         this.list = list;
+        this.isGetVersion = isGetVersion;
     }
 
     @Generated(hash = 295132781)
     public DbSensor() {
+    }
+
+
+    public boolean isGetVersion() {
+        return isGetVersion;
+    }
+
+    public void setGetVersion(boolean getVersion) {
+        isGetVersion = getVersion;
     }
 
     public String getBoundMac() {
@@ -305,5 +317,13 @@ public class DbSensor implements Serializable {
 
     public void setList(String list) {
         this.list = list;
+    }
+
+    public boolean getIsGetVersion() {
+        return this.isGetVersion;
+    }
+
+    public void setIsGetVersion(boolean isGetVersion) {
+        this.isGetVersion = isGetVersion;
     }
 }

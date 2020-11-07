@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -107,21 +108,34 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
         LogUtils.v("zcl----------收到路由入网通知-------$routerGroup")
         if (routerGroup.ser_id == TAG) {
             if (routerGroup.status == Constants.ALL_SUCCESS) {
-                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
-                ToastUtils.showShort(getString(R.string.router_access_in_success))
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() { }
+
+                    override fun complete() {
+                        startToDetail(routerGroup)
+                    }
+
+                    override fun error(msg: String?) {
+                        startToDetail(routerGroup)
+                    }
+                })
                /* val intent = Intent(this@RoutingNetworkActivity, GwLoginActivity::class.java)
                 intent.putExtra("is_router", true)
                 intent.putExtra("mac", mac?.toLowerCase())
                 startActivity(intent)
                 finish()*/
-                startActivity<RouterDetailActivity>("routerId" to routerGroup?.router.id.toLong())
-                finish()
             } else {
                 ToastUtils.showShort(getString(R.string.router_access_in_fail))
             }
             hideLoadingDialog()
             timeOutTimer?.dispose()
         }
+    }
+
+    private fun startToDetail(routerGroup: RouteInAccountBean) {
+        startActivity<RouterDetailActivity>("routerId" to routerGroup?.router.id.toLong())
+        ToastUtils.showShort(getString(R.string.router_access_in_success))
+        finish()
     }
 }
 

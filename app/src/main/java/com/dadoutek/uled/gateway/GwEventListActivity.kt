@@ -100,7 +100,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private var listTwo = mutableListOf<GwTagBean>()
     private var checkedIdType: Int = 0
     private var dbGw: DbGateway? = null
-    private var lastTime: Long = 0
     var renameEditText: EditText? = null
     val adapter = GwEventItemAdapter(R.layout.event_item, listOne)
     private val adapter2 = GwEventItemAdapter(R.layout.event_item, listTwo)
