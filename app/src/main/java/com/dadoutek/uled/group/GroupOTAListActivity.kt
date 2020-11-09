@@ -894,6 +894,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         ota_swipe_refresh_ly.setDistanceToTriggerSync(200)
         //是否禁止下拉刷新
         ota_swipe_refresh_ly.isEnabled = !Constants.IS_ROUTE_MODE
+
+        if (TelinkLightApplication.mapBin.isEmpty())
+            ToastUtils.showShort(getString(R.string.get_bin_fail))
     }
 
     private fun isFinish() {

@@ -10,6 +10,7 @@ import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
+import org.greenrobot.greendao.DbUtils
 import kotlin.collections.ArrayList
 
 /**
@@ -986,14 +987,18 @@ object DBUtils {
 
     fun saveColorNodes(colorNode: DbColorNode, id: Long?, gradientId: Long) {
         val colorNodeNew = DbColorNode()
-
         colorNodeNew.belongDynamicChangeId = gradientId
         colorNodeNew.index = colorNode.index
         colorNodeNew.brightness = colorNode.brightness
         colorNodeNew.colorTemperature = colorNode.colorTemperature
         colorNodeNew.rgbw = colorNode.rgbw
-
+        //getColorNodeListByIndex()
         DaoSessionInstance.getInstance().dbColorNodeDao.insertOrReplace(colorNodeNew)
+    }
+
+    private fun getColorNodeListByIndex(index:Int): ArrayList<DbColorNode> {
+        val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().where(DbColorNodeDao.Properties.Index.eq(index)).build()
+        return ArrayList(query.list())
     }
 
     /********************************************更改 */

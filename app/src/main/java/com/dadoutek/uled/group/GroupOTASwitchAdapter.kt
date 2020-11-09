@@ -42,7 +42,7 @@ class GroupOTASwitchAdapter(resId: Int, data: MutableList<DbSwitch>) : BaseQuick
             version.textColor = mContext.getColor(R.color.gray_3)
         }
 
-        if (item?.isSupportOta == true && !item.isMostNew) {
+        if (item?.isSupportOta == true && !item.isMostNew&&TelinkLightApplication.mapBin.isNotEmpty()) {
 
             when {
                 Constants.IS_ROUTE_MODE && item.isGetVersion -> {

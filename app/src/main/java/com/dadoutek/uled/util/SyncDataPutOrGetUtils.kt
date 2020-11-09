@@ -36,6 +36,7 @@ class SyncDataPutOrGetUtils {
         /********************************同步数据之上传数据 */
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
+
             Thread {
                 val dbDataChangeList = DBUtils.dataChangeAll
                 val dbUser = DBUtils.lastUser
@@ -308,7 +309,6 @@ class SyncDataPutOrGetUtils {
                             body.speed = gradient.speed
                             body.belongRegionId = gradient.belongRegionId
                             body.colorNodes = DBUtils.getColorNodeListByDynamicModeId(changeId)
-
                             postInfoStr = gson.toJson(body)
 
                             bodyGradient = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
@@ -366,6 +366,7 @@ class SyncDataPutOrGetUtils {
         fun syncGetDataStart(dbUser: DbUser, syncCallBack: SyncCallback) {
             val token = dbUser.token
             DBUtils.saveUser(dbUser)
+            DBUtils.deleteLocalData()
             startGet(token, dbUser.account, syncCallBack)
         }
 
@@ -473,8 +474,10 @@ class SyncDataPutOrGetUtils {
                             DBUtils.saveGradient(item, true)
                             for (i in item.colorNodes.indices) {
                                 //("是不是空的"+item.id)
-                                val k = i + 1
-                                DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
+                                if (i < 8) {
+                                    val k = i + 1
+                                    DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
+                                }
                             }
                         }
                         NetworkFactory.getApi()

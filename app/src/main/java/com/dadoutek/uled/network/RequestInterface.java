@@ -1676,7 +1676,7 @@ public interface RequestInterface {
      * {"data":[{"id": 1,"name": "天猫精灵"}],"errorCode": 0,"message": "get third succeed!"}
      */
     @GET("app/third-party")
-    Observable<Response<ThirdPartyBean>> appThirdParty();
+    Observable<Response<List<ThirdPartyBean>>> appThirdParty();
 
     /**
      * 同步数据至第三方平台 https://dev.dadoutek.com/xxxx/app/third-party/synchronize/{thirdPartyId} GET

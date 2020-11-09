@@ -41,7 +41,7 @@ class GroupOTAGwAdapter(resId: Int, data: MutableList<DbGateway>) : BaseQuickAda
             version.textColor = mContext.getColor(R.color.gray_3)
         }
 
-        if (item?.isSupportOta == true && !item.isMostNew ) {
+        if (item?.isSupportOta == true && !item.isMostNew &&TelinkLightApplication.mapBin.isNotEmpty()) {
             when {
                 Constants.IS_ROUTE_MODE && item.isGetVersion -> {
                     helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_gateway)

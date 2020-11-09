@@ -43,7 +43,7 @@ class GroupOTACurtainAdapter(resId: Int, data: MutableList<DbCurtain>) : BaseQui
             groupName.textColor = mContext.getColor(R.color.gray_3)
             version.textColor = mContext.getColor(R.color.gray_3)
         }
-        if (item?.isSupportOta == true && !item.isMostNew) {
+        if (item?.isSupportOta == true && !item.isMostNew&&TelinkLightApplication.mapBin.isNotEmpty()) {
 
             when {
                 Constants.IS_ROUTE_MODE && item.isGetVersion -> {

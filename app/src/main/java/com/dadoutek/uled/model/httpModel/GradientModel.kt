@@ -55,9 +55,12 @@ object GradientModel {
                 .doOnNext {
                     for(item in it){
                         DBUtils.saveGradient(item,true)
-                        for(node in item.colorNodes){
+                       /* for(node in item.colorNodes){
                             DBUtils.saveColorNode(node)
-                        }
+                        }*/
+                        for (i in 0..7)
+                            DBUtils.saveColorNode(item.colorNodes[i])
+
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())

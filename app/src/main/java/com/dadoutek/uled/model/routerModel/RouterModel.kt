@@ -604,6 +604,20 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+    fun appThirdParty(): Observable<MutableList<ThirdPartyBean>>? {
+        return NetworkFactory.getApi().appThirdParty()
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun updateToThirdParty(thirdPartyId:Int): Observable<Any>? {
+        return NetworkFactory.getApi().updateToThirdParty(thirdPartyId)
+                .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 }
 
 

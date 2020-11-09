@@ -181,7 +181,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     private fun getBin() {
-        showLoadingDialog(getString(R.string.please_wait))
+        //showLoadingDialog(getString(R.string.please_wait))
         NetworkFactory.getApi().binList
                 .subscribeOn(Schedulers.io())
                 .compose(NetworkTransformer())
@@ -196,8 +196,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                       }*/
                 }, {
                     hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.get_bin_fail))
-                    finish()
+                    //ToastUtils.showShort(getString(R.string.get_bin_fail))
+                    //finish()
                 })
     }
 
@@ -266,7 +266,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             }
                         }
                     }, {
-                        getScanResult()
+                        ToastUtils.showShort(it.message)
                     })
     }
 
@@ -297,7 +297,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 startActivity(intent)
             }
         }, {
-            getScanResult()
+            ToastUtils.showShort(it.message)
             timeDisposable?.dispose()
         })
     }

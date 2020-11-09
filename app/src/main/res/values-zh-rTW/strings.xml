@@ -1239,4 +1239,5 @@
     <string name="plaese_input_device_name">请输入设备名</string>
     <string name="rename_success">重命名成功</string>
     <string name="get_versioning">获取版本号中，请稍后</string>
+    <string name="cloud_assistant">云助手</string>
 </resources>

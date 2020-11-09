@@ -36,6 +36,7 @@ import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.DelGradientBodyBean
 import com.dadoutek.uled.router.RouterOtaActivity
@@ -473,6 +474,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             Constants.IS_OPEN_AUXFUN -> rgbVisiblity(View.VISIBLE)
             else -> rgbVisiblity(View.GONE)
         }
+
+
         /*--------------------群组与灯具分支-------------*/
         currentShowGroupSetPage = typeStr == Constants.TYPE_GROUP
         when {
@@ -574,10 +577,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        swLight(false)
-    }
 
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun initView() {
@@ -717,6 +716,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         color_picker.setInitialColor((light?.color ?: 1 and 0xffffff) or 0xff000000.toInt())
         rgb_sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         rgb_white_seekbar.setOnSeekBarChangeListener(barChangeListener)
+
+        swLight(false)
     }
 
     private fun setDiyColorMode() {
@@ -1338,6 +1339,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
             var group = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
             if (light != null)
+                if (Constants.IS_ROUTE_MODE){
+                    val bodyBean = GroupBodyBean(mutableListOf(light!!.meshAddr), light!!.productUUID, "rgbGp", group.meshAddr)
+                    routerChangeGpDevice(bodyBean)
+                }
+                    else
                 updateGroupResult(light!!, group)
         } else {
             diyGradientList.clear()
@@ -1370,6 +1376,28 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     Commander.applyDiyGradient(dstAddress, diyGradientList!![diyPosition].id.toInt(),
                             diyGradientList!![diyPosition].speed, firstLightAddress)
                 }
+        }
+    }
+
+    @SuppressLint("StringFormatMatches")
+    override fun tzRouterGroupResult(bean: RouteGroupingOrDelBean?) {
+        if (bean?.ser_id == "rgbGp") {
+            LogUtils.v("zcl-----------收到路由普通灯分组通知-------$bean")
+            disposableRouteTimer?.dispose()
+            if (bean?.finish) {
+                hideLoadingDialog()
+                when (bean?.status) {
+                    -1 -> ToastUtils.showShort(getString(R.string.group_failed))
+                    0, 1 -> {
+                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, object : SyncCallback {
+                            override fun start() {}
+                            override fun complete() {}
+                            override fun error(msg: String?) {}
+                        })
+                    }
+                }
+            }
         }
     }
 
@@ -1961,6 +1989,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         color_picker.subscribe(colorObserver)
         color_picker.setInitialColor((group?.color ?: 0 and 0xffffff) or 0xff000000.toInt())
         checkGroupIsSystemGroup()
+        swLight(false)
     }
 
     private fun setDIyModeData() {

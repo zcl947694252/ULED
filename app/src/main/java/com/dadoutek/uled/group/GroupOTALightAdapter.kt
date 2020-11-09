@@ -53,7 +53,7 @@ class GroupOTALightAdapter(resId: Int, data: MutableList<DbLight>) : BaseQuickAd
         else
             helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_n)
 
-        if (item?.isSupportOta == true && !item.isMostNew) {
+        if (item?.isSupportOta == true && !item.isMostNew&& TelinkLightApplication.mapBin.isNotEmpty()) {
             when {
                 Constants.IS_ROUTE_MODE && item.isGetVersion -> {
                     when {

@@ -355,17 +355,20 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             DBUtils.updateGradient(diyGradient!!)
             val belongDynamicModeId = diyGradient?.id!!
             DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(belongDynamicModeId))
-
-            for (item in colorNodeList!!) {
+          /*  for (item in colorNodeList!!) {
                 item.belongDynamicChangeId = belongDynamicModeId
                 DBUtils.saveColorNode(item)
+            }*/
+            for (i in 0..7){
+                colorNodeList!![i].belongDynamicChangeId = belongDynamicModeId
+                DBUtils.saveColorNode(colorNodeList!![i])
             }
 
             deleteGradient(belongDynamicModeId)
             delay(200)
-            if (Constants.IS_ROUTE_MODE)
+            if (Constants.IS_ROUTE_MODE) {
                 diyGradient?.let {
-                    RouterModel.routerUpdateGradient(UpdateGradientBean(it.id.toInt(), it.type, it.colorNodes,dstAddress, deviceType,"updateGradient"))?.subscribe({ response ->
+                    RouterModel.routerUpdateGradient(UpdateGradientBean(it.id.toInt(), it.type, it.colorNodes, dstAddress, deviceType, "updateGradient"))?.subscribe({ response ->
                         //"errorCode": 90020, "该自定义渐变不存在，请重新刷新数据"     "errorCode": 90018,"该设备不存在，请重新刷新数据"
                         //"errorCode": 90008,"该设备没有绑定路由，无法添加自定义渐变"  "errorCode": 90007,"该组不存在，无法操作"
                         //"errorCode": 90005,"以下路由没有上线，无法更新自定义渐变"    "errorCode": 90004, "账号下区域下没有路由，无法操作"
@@ -389,8 +392,8 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showShort(it1.message)
                     })
                 }
-            else{
-            startSendCmdToAddDiyGradient(diyGradient!!)
+            } else {
+                startSendCmdToAddDiyGradient(diyGradient!!)
                 hidAndResultAndFinish()
             }
         }
@@ -414,29 +417,23 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             DBUtils.saveGradient(diyGradient!!, false)
 
             val belongDynamicModeId = diyGradient!!.id
-            for (item in colorNodeList!!) {
+          /*  for (item in colorNodeList!!) {
                 item.belongDynamicChangeId = belongDynamicModeId
                 DBUtils.saveColorNode(item)
+            }*/
+            for (i in 0..7){
+                colorNodeList!![i].belongDynamicChangeId = belongDynamicModeId
+                DBUtils.saveColorNode(colorNodeList!![i])
             }
 
             Thread.sleep(100)
-            if (Constants.IS_ROUTE_MODE)
+            if (Constants.IS_ROUTE_MODE) {
                 diyGradient?.let {
-                    /**
-                     * @Field("name") String name,
-                    @Field("type") int type,
-                    @Field("speed") int speed,
-                    @Field("colorNodes") List<DbColorNode> colorNodes,
-                    @Field("meshAddr") int meshAddr,
-                    @Field("meshType") int meshType,
-                    @Field("ser_id") String ser_id
-                     */
-                    RouterModel.routerAddGradient(AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType,"addGra"))?.subscribe({ response ->
-                        //    "errorCode": 90018,该设备不存在，请重新刷新数据"
-                        //    "errorCode": 90008,该设备没有绑定路由，无法添加自定义渐变"
-                        //    "errorCode": 90004 账号下区域下没有路由，无法操作"
-                        //    "errorCode": 90007,该组不存在，无法操作"
-                        //    "errorCode": 90005,以下路由没有上线，无法添加自定义渐变"
+                    //@Field("name") String name,Field("type") int type,@Field("speed") int speed,Field("colorNodes") List<DbColorNode> colorNodes,
+                    // @Field("meshAddr") int meshAddr, @Field("meshType") int meshType,@Field("ser_id") String ser_id
+                    RouterModel.routerAddGradient(AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra"))?.subscribe({ response ->
+                        //    "errorCode": 90018,该设备不存在，请重新刷新数据"  "errorCode": 90008,该设备没有绑定路由，无法添加自定义渐变"
+                        //    "errorCode": 90004 账号下区域下没有路由，无法操作""errorCode": 90007,该组不存在，无法操作" "errorCode": 90005,以下路由没有上线，无法添加自定义渐变"
                         when (response.errorCode) {
                             0 -> {
                                 disposableTimer?.dispose()
@@ -455,7 +452,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                         ToastUtils.showShort(it1.message)
                     })
                 }
-            else {
+            } else {
                 startSendCmdToAddDiyGradient(diyGradient!!)
                 hidAndResultAndFinish()
             }
@@ -479,11 +476,11 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         var nodeId = 0
         var nodeMode = diyGradient.type
         var brightness = 0
-        var r = 0
-        var g = 0
-        var b = 0
+        var r: Int
+        var g: Int
+        var b: Int
         var c = 0
-        var w = 0
+        var w: Int
 
         var temperature = 0
         if (nodeMode < 3) {
@@ -627,6 +624,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         super.onDestroy()
         disposableTimer?.dispose()
     }
+
     override fun tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean: CmdBodyBean) {
         hideLoadingDialog()
         if (cmdBean.status == 0) {
@@ -634,9 +632,9 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             setResult(Activity.RESULT_OK)
             finish()
         } else when (cmdBean.cmd) {
-                Cmd.tzRouteAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
-                Cmd.tzRouteUpdateGradient  -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
-            }
+            Cmd.tzRouteAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
+            Cmd.tzRouteUpdateGradient -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
+        }
 
     }
 

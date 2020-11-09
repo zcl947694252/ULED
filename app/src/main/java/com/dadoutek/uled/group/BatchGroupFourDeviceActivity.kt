@@ -237,7 +237,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         swipe_refresh_ly.setDistanceToTriggerSync(200)
         setAdapterAndSubscribleData()
         autoConnect()
-        if (Constants.IS_ROUTE_MODE){
+        if (Constants.IS_ROUTE_MODE) {
             disposableIntervalTime?.dispose()
             disposableIntervalTime = Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
                     .subscribe {
@@ -942,8 +942,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.SECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.group_timeout))
@@ -1411,13 +1411,16 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val successCallback: () -> Unit = {
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                    deviceDataLightAll.filter { it.isSelected }[index].groupName = currentGroup?.name
+                    if (index < deviceDataLightAll.size)
+                        deviceDataLightAll.filter { it.isSelected }[index].groupName = currentGroup?.name
                 }
                 DeviceType.SMART_CURTAIN -> {
-                    deviceDataCurtainAll.filter { it.isSelected }[index].groupName = currentGroup?.name
+                    if (index < deviceDataCurtainAll.size)
+                        deviceDataCurtainAll.filter { it.isSelected }[index].groupName = currentGroup?.name
                 }
                 DeviceType.SMART_RELAY -> {
-                    deviceDataRelayAll.filter { it.isSelected }[index].groupName = currentGroup?.name
+                    if (index < deviceDataRelayAll.size)
+                        deviceDataRelayAll.filter { it.isSelected }[index].groupName = currentGroup?.name
                 }
             }
 

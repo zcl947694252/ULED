@@ -35,6 +35,7 @@ import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.ChooseModeActivity
+import com.dadoutek.uled.router.CloudAssistantActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
@@ -102,8 +103,8 @@ class SettingActivity : TelinkBaseActivity() {
                             var intent = Intent(this, ChooseModeActivity::class.java)
                             startActivity(intent)
                         }
-                        list.size - 1 -> {
-                            var intent = Intent(this, BindRouterActivity::class.java)
+                        4-> {
+                            var intent = Intent(this, CloudAssistantActivity::class.java)
                             startActivity(intent)
                         }
                         else->{}

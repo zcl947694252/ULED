@@ -31,13 +31,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.StringBuilder
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
 import kotlin.Unit as Unit1
 
 object Commander : EventListener<String> {
-    private lateinit var isSucess: ObservableEmitter<Boolean>
     private var mConnectObservable: Observable<DeviceInfo>? = null
     private var mConnectEmitter: ObservableEmitter<DeviceInfo>? = null
     private var mGetVersionObservable: ObservableEmitter<String>? = null
@@ -266,12 +266,15 @@ object Commander : EventListener<String> {
 
                     override fun onNext(t: Long) {
                         val timeOut = 10
-                        if (t >= timeOut) {   //10次 * 200 = 2000, 也就是超过了2s就超时
-                            onComplete()
-                            failedCallback.invoke()
-                        } else if (mGroupSuccess) {
-                            onComplete()
-                            successCallback.invoke()
+                        when {
+                            t >= timeOut -> {   //10次 * 200 = 2000, 也就是超过了2s就超时
+                                onComplete()
+                                failedCallback.invoke()
+                            }
+                            mGroupSuccess -> {
+                                onComplete()
+                                successCallback.invoke()
+                            }
                         }
                     }
 
@@ -290,9 +293,9 @@ object Commander : EventListener<String> {
 
         mTargetGroupAddr = groupAddr
         mGroupSuccess = false
-        val opcode = Opcode.SET_GROUP          //0xD7 代表添加组的指令
-        val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), //0x01 代表添加组
-                (groupAddr shr 8 and 0xFF).toByte())
+        val opcode = Opcode.SET_GROUP
+        //0xD7 代表添加组的指令   //0x01 代表添加组
+        val params = byteArrayOf(0x01, (groupAddr and 0xFF).toByte(), (groupAddr shr 8 and 0xFF).toByte())
 
         GlobalScope.launch {
             delay(200)
@@ -330,6 +333,7 @@ object Commander : EventListener<String> {
                         onComplete()
                         failedCallback.invoke()
                         LogUtils.e("addGroup error: ${e.message}")
+                        LogUtils.v("zcl------------------${e.message}------${e.printStackTrace()}")
                     }
                 })
     }
@@ -536,11 +540,16 @@ object Commander : EventListener<String> {
 
         for (j in 0 until len) {
             mGotGroupAddr = (params[j].toInt() and 0xFFFF)
+            LogUtils.v("zcl----mTargetGroupAddr$mTargetGroupAddr------mGotGroupAddr$mGotGroupAddr---${params[j].toInt()}")
             if (mTargetGroupAddr != 0xFFFF && mGotGroupAddr != 0xFFFF) {
                 mGotGroupAddr = mGotGroupAddr or 0x8000
+                LogUtils.v("zcl----------mGotGroupAddr$mGotGroupAddr---${params[j].toInt()}")
             }
+            var sb = StringBuilder()
+            for (i in params.indices)
+                sb.append((params[i])).append(" ")
 
-            LogUtils.v("zcl------分组关键-------$mTargetGroupAddr == $mGotGroupAddr---------------${mTargetGroupAddr == mGotGroupAddr}")
+            LogUtils.v("zcl------分组关键--$sb----$mTargetGroupAddr--mgot${mGotGroupAddr or 0x8000}--$mGotGroupAddr---${mTargetGroupAddr == mGotGroupAddr}")
             if (mTargetGroupAddr == mGotGroupAddr) {
                 LogUtils.d("mGroupSuccess = true")
                 mGroupSuccess = true
