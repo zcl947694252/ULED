@@ -165,6 +165,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.setOnClickListener { getBin() }
         initBottomNavigation()
         checkVersionAvailable()
+        if (Constant.IS_ROUTE_MODE)
         getScanResult()
 
         getRouterStatus()
@@ -268,6 +269,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     private fun getAllStatus() {
+        if (Constant.IS_ROUTE_MODE)
         UserModel.getModeStatus()?.subscribe({
             LogUtils.v("zcl-----------获取状态服务器返回-------$it")
             Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
@@ -748,8 +750,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         //ToastUtils.showLong(R.string.connecting_tip)
                                         mConnectDisposable?.dispose()
                                         mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
-                                                ?.subscribe(
-                                                        {//找回有效设备
+                                                ?.subscribe({//找回有效设备
                                                             //RecoverMeshDeviceUtil.addDevicesToDb(it)
                                                             onLogin()
                                                         },

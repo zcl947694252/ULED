@@ -368,7 +368,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             var jsonObject = JSONObject(msg)
-            when (val cmd = jsonObject.getInt("cmd")) {
+            when (val cmd = jsonObject.optInt("cmd")) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
                     val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
                     when (cmd) {
@@ -390,53 +390,53 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
 
             }
-
-
-            /*        when (intent?.action) {
-                        Constant.GW_COMMEND_CODE -> {
-                            val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
-                            when (gwStompBean.cmd) {
-                                700 -> TelinkLightApplication.getApp().offLine = false
-                                701 -> TelinkLightApplication.getApp().offLine = true
-                                2000 -> receviedGwCmd2000(gwStompBean.ser_id)
-                                2500 -> receviedGwCmd2500(gwStompBean)
-                            }
-                        }
-                        Constant.LOGIN_OUT -> {
-                            checkNetworkAndSync(this@BaseActivity)
-                            LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
-                        }
-                        Constant.CANCEL_CODE -> {
-                            val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
-                            var cancelBean: CancelAuthorMsg? = null
-                            if (extra != null)
-                                cancelBean = extra as CancelAuthorMsg
-                            val user = DBUtils.lastUser
-                            user?.let {
-                                if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
-                                        && user.last_region_id == cancelBean?.rid.toString()) {
-                                    user.last_region_id = 1.toString()
-                                    user.last_authorizer_user_id = user.id.toString()
-                                    DBUtils.deleteAllData()
-                                    AccountModel.initDatBase(it)
-                                    //更新last—region-id
-                                    DBUtils.saveUser(user)
-                                    Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
-                                    SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
-                                }
-                            }
-
-                            LogUtils.e("zcl_baseMe_______取消授权$cancelBean")
-                            cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean?.region_name, cancelBean.rid) }//2代表解除授权信息type
-
-                        }
-                        Constant.PARSE_CODE -> {
-                            val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
-        //                    LogUtils.e("zcl_baseMe___________解析二维码")
-                            makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
-                        }
-                    }*/
         }
+
+
+        /*        when (intent?.action) {
+                    Constant.GW_COMMEND_CODE -> {
+                        val gwStompBean = intent.getSerializableExtra(Constant.GW_COMMEND_CODE) as GwStompBean
+                        when (gwStompBean.cmd) {
+                            700 -> TelinkLightApplication.getApp().offLine = false
+                            701 -> TelinkLightApplication.getApp().offLine = true
+                            2000 -> receviedGwCmd2000(gwStompBean.ser_id)
+                            2500 -> receviedGwCmd2500(gwStompBean)
+                        }
+                    }
+                    Constant.LOGIN_OUT -> {
+                        checkNetworkAndSync(this@BaseActivity)
+                        LogUtils.e("zcl_baseMe___________收到登出消息${intent.getBooleanExtra(Constant.LOGIN_OUT, false)}")
+                    }
+                    Constant.CANCEL_CODE -> {
+                        val extra = intent.getSerializableExtra(Constant.CANCEL_CODE)
+                        var cancelBean: CancelAuthorMsg? = null
+                        if (extra != null)
+                            cancelBean = extra as CancelAuthorMsg
+                        val user = DBUtils.lastUser
+                        user?.let {
+                            if (user.last_authorizer_user_id == cancelBean?.authorizer_user_id.toString()
+                                    && user.last_region_id == cancelBean?.rid.toString()) {
+                                user.last_region_id = 1.toString()
+                                user.last_authorizer_user_id = user.id.toString()
+                                DBUtils.deleteAllData()
+                                AccountModel.initDatBase(it)
+                                //更新last—region-id
+                                DBUtils.saveUser(user)
+                                Log.e("zclbaseActivity", "zcl******" + DBUtils.lastUser)
+                                SyncDataPutOrGetUtils.syncGetDataStart(user, syncCallbackGet)
+                            }
+                        }
+
+                        LogUtils.e("zcl_baseMe_______取消授权$cancelBean")
+                        cancelBean?.let { makeCodeDialog(2, it.authorizer_user_phone, cancelBean?.region_name, cancelBean.rid) }//2代表解除授权信息type
+
+                    }
+                    Constant.PARSE_CODE -> {
+                        val codeBean: QrCodeTopicMsg = intent.getSerializableExtra(Constant.PARSE_CODE) as QrCodeTopicMsg
+    //                    LogUtils.e("zcl_baseMe___________解析二维码")
+                        makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)
+                    }
+                }*/
     }
 
     private fun getCmdBean(intent: Intent?): CmdBodyBean {

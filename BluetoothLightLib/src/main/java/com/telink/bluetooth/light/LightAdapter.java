@@ -346,6 +346,7 @@ public class LightAdapter {
             return false;
 
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
+       // light.refreshDeviceCache();
         if (light == null || !light.isConnected()) {
             return false;
         }

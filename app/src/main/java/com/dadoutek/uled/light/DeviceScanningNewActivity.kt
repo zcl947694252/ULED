@@ -800,28 +800,29 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun routerStopScan(isFinisAc: Boolean) {
-        RouterModel.routeStopScan(TAG, Constant.SCAN_SERID)
-                ?.subscribe({ itr ->
-                    LogUtils.v("zcl-----------收到路由停止请求-------$itr")
-                    when (itr.errorCode) {
-                        0 -> {
-                            showLoadingDialog(getString(R.string.please_wait))
-                            disposableTimer?.dispose()
-                            disposableTimer = Observable.timer(itr.t.timeout + 3L, TimeUnit.SECONDS)
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe {
-                                        hideLoadingDialog()
-                                        if (!isFinisAc)
-                                            ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
-                                        finish()
-                                    }
+        if (Constant.IS_ROUTE_MODE)
+            RouterModel.routeStopScan(TAG, Constant.SCAN_SERID)
+                    ?.subscribe({ itr ->
+                        LogUtils.v("zcl-----------收到路由停止请求-------$itr")
+                        when (itr.errorCode) {
+                            0 -> {
+                                showLoadingDialog(getString(R.string.please_wait))
+                                disposableTimer?.dispose()
+                                disposableTimer = Observable.timer(itr.t.timeout + 3L, TimeUnit.SECONDS)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe {
+                                            hideLoadingDialog()
+                                            if (!isFinisAc)
+                                                ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
+                                            finish()
+                                        }
+                            }
+                            NetworkStatusCode.ROUTER_STOP -> if (!isFinisAc) skipeType()//路由停止
                         }
-                        NetworkStatusCode.ROUTER_STOP -> if (!isFinisAc) skipeType()//路由停止
-                    }
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
+                    }, {
+                        ToastUtils.showShort(it.message)
+                    })
     }
 
     override fun tzRouteStopScan(cmdBean: CmdBodyBean) {
@@ -1056,6 +1057,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         LogUtils.e("read login data 没有收到response")
                     }
                     ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
+
+
                         LogUtils.e("write login data 没有收到response")
                     }
                 }
@@ -1105,21 +1108,22 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             isScanning = true
             if (mRxPermission != null)
                 mRxPermission!!.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                        Manifest.permission.BLUETOOTH_ADMIN)?.subscribe { granted ->
-                    if (granted!!) {
-                        oldStartScan()
-                    } else {
-                        DialogUtils.showNoBlePermissionDialog(this, {
-                            startScan()
-                            null
-                        }, {
-                            doFinish()
-                            null
-                        })
-                    }
-                }?.let {
-                    mDisposable.add(it)
-                }
+                        Manifest.permission.BLUETOOTH_ADMIN)?.subscribeOn(Schedulers.io())
+                        ?.observeOn(AndroidSchedulers.mainThread())?.subscribe { granted ->
+                            if (granted!!) {
+                                oldStartScan()
+                            } else {
+                                DialogUtils.showNoBlePermissionDialog(this, {
+                                    startScan()
+                                    null
+                                }, {
+                                    doFinish()
+                                    null
+                                })
+                            }
+                        }?.let {
+                            mDisposable.add(it)
+                        }
         }
     }
 

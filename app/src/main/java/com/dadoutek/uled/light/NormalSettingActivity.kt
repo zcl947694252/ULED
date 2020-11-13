@@ -1432,7 +1432,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else
             slow_ly.visibility = GONE
 
-        if (Constant.IS_ROUTE_MODE) {
+ /*       if (Constant.IS_ROUTE_MODE) {
             sendProgress = group?.brightness?:50
             routerConfigBrightnesssOrColorTemp(true)
             sendProgress = group?.colorTemperature?:50
@@ -1440,7 +1440,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else {
             setLightBrightnessNum(group?.brightness ?: 1, group?.meshAddr!!)
             setLightTemperatureValue(group?.colorTemperature ?: 1, group?.meshAddr ?: 0)
-        }
+        }*/
     }
 
     private fun setLightTemperatureValue(colorNum: Int, meshAddr: Int) {
@@ -1579,10 +1579,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             sendProgress = brightnes
             tv_Brightness.text = "$brightnes%"
             LogUtils.v("zcl---------路由发送亮度---$sendProgress------$brightnes")
-            when {
+        /*    when {
                 Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(true)
                 else -> setLightBrightnessNum(brightnes, light?.meshAddr)
-            }
+            }*/
             isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
@@ -1596,10 +1596,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             tv_Brightness.text = "$brightnes%"
             sendProgress = brightnes
             LogUtils.v("zcl---------路由发送色温---$sendProgress------$brightnes")
-            when {
+         /*   when {
                 Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(false)
                 else -> setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)
-            }
+            }*/
             isBrightness = false
         }
 

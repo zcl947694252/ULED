@@ -61,6 +61,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GroupOTAListActivity : TelinkBaseActivity() {
+    private var disposableTimer: Disposable? = null
     private var isOtaing: Boolean = false
     private var currentTime: Long = 0
     private var isStartOta: Boolean = false
@@ -1238,20 +1239,30 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     TextUtils.isEmpty(dbLight.version) -> {
                         showLoadingDialog(getString(R.string.please_wait))
                         when {
-                            TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr || Constant.IS_ROUTE_MODE -> {
+                            TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr  -> {
                                 getDeviceVersionLight(dbLight)
                             }
                             else -> {
                                 showLoadingDialog(getString(R.string.please_wait))
                                 val idleMode = TelinkLightService.Instance()?.idleMode(true)
                                 Thread.sleep(500)
-                                connect(macAddress = dbLight.macAddr, meshAddress = dbLight.meshAddr, connectTimeOutTime = 15)
+                                disposableTimer?.dispose()
+                                disposableTimer = Observable.timer(30000, TimeUnit.MILLISECONDS)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe {
+                                            ToastUtils.showShort(getString(R.string.connect_fail))
+                                            hideLoadingDialog()
+                                        }
+                                connect(macAddress = dbLight.macAddr, meshAddress = dbLight.meshAddr, fastestMode = true, connectTimeOutTime = 15)
                                         ?.subscribeOn(Schedulers.io())
                                         ?.observeOn(AndroidSchedulers.mainThread())
                                         ?.subscribe({
+                                            disposableTimer?.dispose()
                                             hideLoadingDialog()
                                             getDeviceVersionLight(dbLight)
                                         }, {
+                                            disposableTimer?.dispose()
                                             hideLoadingDialog()
                                             runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
                                         })
@@ -1272,7 +1283,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun getDeviceVersionLight(dbLight: DbLight) {
-        if (Constant.IS_ROUTE_MODE)
             Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
                     { s: String ->
                         dbLight!!.version = s
@@ -1354,6 +1364,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     setDevice()
                     updataDevice()
                     hideLoadingDialog()
+                    bleOTAGw(dbLight)
                     ToastUtils.showShort(getString(R.string.get_version_success))
                 }, {
             hideLoadingDialog()
@@ -1420,6 +1431,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        disposableTimer?.dispose()
         dispose?.dispose()
     }
 

@@ -411,7 +411,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             else -> {//符合所有条件
                 when {
-                    currentSensor != null -> {
+                    currentSensor != null ||mDeviceInfo!=null-> {
                         when {
                             Constant.IS_ROUTE_MODE -> {
                                 //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
@@ -434,7 +434,6 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                     setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
                                     sendCommandOpcode(durationTimeValue.toInt())
                                     delay(300)
-                                    //if (!isConfirm)//不是冲洗创建 更新mesh
                                     mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
                                     Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                             successCallback = {
