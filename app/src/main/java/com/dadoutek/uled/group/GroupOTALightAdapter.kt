@@ -5,7 +5,6 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -55,7 +54,7 @@ class GroupOTALightAdapter(resId: Int, data: MutableList<DbLight>) : BaseQuickAd
 
         if (item?.isSupportOta == true && !item.isMostNew&& TelinkLightApplication.mapBin.isNotEmpty()) {
             when {
-                Constants.IS_ROUTE_MODE && item.isGetVersion -> {
+                item.isGetVersion -> {
                     when {
                         isRgb -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_rgb_no_circle)
                         else -> helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_light_no_circle)

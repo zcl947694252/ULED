@@ -38,7 +38,7 @@ import com.dadoutek.uled.communicate.Commander;
 import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbGroup;
 import com.dadoutek.uled.model.dbModel.DbLight;
@@ -316,11 +316,11 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                 //进入分组
                 startGrouping();
             } else if (mConnectTimer == null) {
-                if (Constants.IS_ROUTE_MODE) return;
+                if (Constant.IS_ROUTE_MODE) return;
                 autoConnect();
                 mConnectTimer = createConnectTimeout();
             } else {    //正在连接中
-                if (Constants.IS_ROUTE_MODE) return;
+                if (Constant.IS_ROUTE_MODE) return;
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
 
             }
@@ -738,7 +738,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             }
             groupsRecyclerViewAdapter.notifyDataSetChanged();
             SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                    Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                    Constant.DEFAULT_GROUP_ID, currentGroupIndex);
         }
     };
 
@@ -751,7 +751,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
      * 此处用作设备登录
      */
     private void autoConnect() {
-        if (Constants.IS_ROUTE_MODE) return;
+        if (Constant.IS_ROUTE_MODE) return;
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().getMode() != LightAdapter.MODE_AUTO_CONNECT_MESH) {
                 showLoadingDialog(getResources().getString(R.string.connecting_tip));
@@ -949,7 +949,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 
     private void initData() {
         Intent intent = getIntent();
-        scanCURTAIN = intent.getBooleanExtra(Constants.IS_SCAN_CURTAIN, false);
+        scanCURTAIN = intent.getBooleanExtra(Constant.IS_SCAN_CURTAIN, false);
         lightType = intent.getStringExtra("lightType");
         switch (lightType) {
             case "cw_light":
@@ -987,7 +987,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }
@@ -1011,7 +1011,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }
@@ -1026,7 +1026,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
                         groups.get(i).checked = true;
                         currentGroupIndex = i;
                         SharedPreferencesHelper.putInt(TelinkLightApplication.Companion.getApp(),
-                                Constants.DEFAULT_GROUP_ID, currentGroupIndex);
+                                Constant.DEFAULT_GROUP_ID, currentGroupIndex);
                     } else {
                         groups.get(i).checked = false;
                     }

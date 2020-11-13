@@ -27,8 +27,8 @@ import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.PhysicalRecoveryActivity
-import com.dadoutek.uled.model.Constants
-import com.dadoutek.uled.model.Constants.downTime
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.downTime
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.model.Opcode
@@ -57,6 +57,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.backgroundColor
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -138,7 +139,7 @@ class DeveloperActivity : BaseActivity() {
     }
 
     private fun physicalRecovery() {  //恢复非本账户的灯
-        if (Constants.IS_ROUTE_MODE){
+        if (Constant.IS_ROUTE_MODE){
             ToastUtils.showShort(getString(R.string.router_mode_cant_perform))
             return
         }
@@ -148,7 +149,7 @@ class DeveloperActivity : BaseActivity() {
     }
 
     private fun startToRecoverDevices() {
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             ToastUtils.showShort(getString(R.string.router_mode_cant_perform))
             return
         }
@@ -343,7 +344,7 @@ class DeveloperActivity : BaseActivity() {
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe({
             LogUtils.e("zcl-----------$it")
-            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constants.IS_LOGIN, false)
+            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.IS_LOGIN, false)
             DBUtils.deleteAllData()
             CleanUtils.cleanInternalSp()
             CleanUtils.cleanExternalCache()
@@ -366,7 +367,7 @@ class DeveloperActivity : BaseActivity() {
     @SuppressLint("CheckResult")
     private fun updateLastMeshZero() {
         var dbRegion = DbRegion()
-        dbRegion.installMesh = /*"dadousmart"*/Constants.DEFAULT_MESH_FACTORY_NAME
+        dbRegion.installMesh = /*"dadousmart"*/Constant.DEFAULT_MESH_FACTORY_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.lastGenMeshAddr = 0
         DBUtils.lastUser?.lastGenMeshAddr = 0
@@ -418,8 +419,8 @@ class DeveloperActivity : BaseActivity() {
             override fun onClick(widget: View) {
                 var intent = Intent(this@DeveloperActivity, InstructionsForUsActivity::class.java)
                 when (isResetFactory) {
-                    2 -> intent.putExtra(Constants.WB_TYPE, "#user-reset")
-                    3 -> intent.putExtra(Constants.WB_TYPE, "#light-reset")
+                    2 -> intent.putExtra(Constant.WB_TYPE, "#user-reset")
+                    3 -> intent.putExtra(Constant.WB_TYPE, "#light-reset")
                 }
 
                 startActivity(intent)
@@ -454,9 +455,9 @@ class DeveloperActivity : BaseActivity() {
     private fun resetAllLights() {
         showLoadingDialog(getString(R.string.reset_all_now))
 
-        val lightList = allLights
-        val curtainList = allCutain
-        val relyList = allRely
+        val lightList = DBUtils.allLight
+        val curtainList =DBUtils.getAllCurtains()
+        val relyList = DBUtils.allRely
 
         var meshAdre = ArrayList<Int>()
         if (lightList.isNotEmpty()) {
@@ -474,7 +475,7 @@ class DeveloperActivity : BaseActivity() {
                 meshAdre.add(relyList[k].meshAddr)
         }
 
-        if (Constants.IS_ROUTE_MODE) {//todo 暂时没有一键恢复的接口看看怎么用 是否用单个的
+        if (Constant.IS_ROUTE_MODE) {//todo 暂时没有一键恢复的接口看看怎么用 是否用单个的 窗帘 = 0x10
             RouterModel.routeResetFactory(MacResetBody("",0,100,"allFactory"))?.subscribe({
                 LogUtils.v("zcl-----------发送路由一键物理恢复-------")
                 when (it.errorCode) {

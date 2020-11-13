@@ -19,7 +19,6 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
-import cn.smssdk.gui.util.Const
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -175,7 +174,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                     if (currentSensor == null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
                     else {
-                        if (Constants.IS_ROUTE_MODE)
+                        if (Constant.IS_ROUTE_MODE)
                             routerDeviceResetFactory(currentSensor!!.macAddr, currentSensor!!.meshAddr, 98, "deleteHum")
                         else {
                             showLoadingDialog(getString(R.string.please_wait))
@@ -223,8 +222,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun goOta() {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-        if (isBoolean||Constants.IS_ROUTE_MODE) {
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        if (isBoolean|| Constant.IS_ROUTE_MODE) {
             transformView()
         } else {
             if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
@@ -269,16 +268,17 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             !isSuportOta(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
             isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
-        if (Constants.IS_ROUTE_MODE){
+        if (Constant.IS_ROUTE_MODE){
             startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
-                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr,
+                    "version" to currentSensor!!.version )
         finish()}
         else {
             val intent = Intent(this@HumanBodySensorActivity, OTAUpdateActivity::class.java)
-            intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
-            intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
-            intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
-            intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+            intent.putExtra(Constant.OTA_MAC, currentSensor?.macAddr)
+            intent.putExtra(Constant.OTA_MES_Add, currentSensor?.meshAddr)
+            intent.putExtra(Constant.OTA_VERSION, currentSensor?.version)
+            intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
             startActivity(intent)
             finish()
         }
@@ -335,7 +335,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun onDestroy() {
         super.onDestroy()
-            if (Constants.IS_ROUTE_MODE)
+            if (Constant.IS_ROUTE_MODE)
                 currentSensor?.let {
                     routerConnectSensor(it, 1, "connectSensor")
                 }
@@ -414,8 +414,8 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         for (i in lightGroup.indices) {
             when (lightGroup[i].deviceType) {
-                Constants.DEVICE_TYPE_CONNECTOR, Constants.DEVICE_TYPE_LIGHT_RGB, Constants.DEVICE_TYPE_LIGHT_NORMAL, Constants.DEVICE_TYPE_NO -> {
-                    if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constants.DEVICE_TYPE_NO)
+                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB, Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
+                    if (lightGroup[i].deviceCount > 0 || lightGroup[i].deviceType == Constant.DEVICE_TYPE_NO)
                         showCheckListData!!.add(lightGroup[i])
                 }
             }
@@ -485,7 +485,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }
 
     private fun getVersion(version: String) {
-        if (TelinkApplication.getInstance().connectDevice != null && !Constants.IS_ROUTE_MODE) {
+        if (TelinkApplication.getInstance().connectDevice != null && !Constant.IS_ROUTE_MODE) {
             hideLoadingDialog()
             tvPSVersion.text = version
             var version = tvPSVersion.text.toString()
@@ -1062,7 +1062,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 paramBytesGroup[i + 2] = groupL
             }
         }
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             /*
             //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
             // triggerKey: Int = 0//0全天    1白天   2夜晚
@@ -1137,7 +1137,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
-        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constants.DB_ADD)
+        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
 
         if (!isReConfirm)
             showRenameDialog(dbSensor)
@@ -1166,7 +1166,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEditText?.text.toString().trim { it <= ' ' }
-                if (Constants.IS_ROUTE_MODE)
+                if (Constant.IS_ROUTE_MODE)
                     routerUpdateSensorName(dbSensor.id, trim)
                 else {
                     dbSensor.name = trim
@@ -1355,7 +1355,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     @SuppressLint("CheckResult")
     private fun autoConnectSensor() {
-        if (Constants.IS_ROUTE_MODE) return
+        if (Constant.IS_ROUTE_MODE) return
         retryConnectCount++
         showLoadingDialog(getString(R.string.connecting_tip))
         //自动重连参数
@@ -1363,14 +1363,14 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         val name: String? = if (isReConfirm)
             DBUtils.lastUser?.controlMeshName
         else
-            Constants.DEFAULT_MESH_FACTORY_NAME
+            Constant.DEFAULT_MESH_FACTORY_NAME
         connectParams?.setMeshName(name)
 
         connectParams?.setConnectMac(mDeviceInfo.macAddress)
         val substring: String = if (isReConfirm)
             NetworkFactory.md5(NetworkFactory.md5(DBUtils.lastUser?.controlMeshName) + DBUtils.lastUser?.controlMeshName).substring(0, 16)
         else
-            Constants.DEFAULT_MESH_FACTORY_PASSWORD
+            Constant.DEFAULT_MESH_FACTORY_PASSWORD
 
         connectParams?.setPassword(substring)
         LogUtils.d("zcl开始连接${mDeviceInfo.macAddress}-----------$substring---------$name----")

@@ -23,7 +23,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
@@ -115,7 +115,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }//scenesListData!![position].isSelected = !scenesListData!![position].isSelected
 
                 R.id.template_device_setting -> {
-                    if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
+                    if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                         ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
                     } else {
                         val lastUser = DBUtils.lastUser
@@ -126,8 +126,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 Log.e("zcl场景", "zcl场景******scene_edit")
                                 val scene = scenesListData!![position]
                                 val intent = Intent(activity, NewSceneSetAct::class.java)
-                                intent.putExtra(Constants.CURRENT_SELECT_SCENE, scene)
-                                intent.putExtra(Constants.IS_CHANGE_SCENE, true)
+                                intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
+                                intent.putExtra(Constant.IS_CHANGE_SCENE, true)
+
                                 startActivityForResult(intent, 3)
                             }
                         }
@@ -135,13 +136,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
                 R.id.template_device_icon -> {
                     Log.e("zcl场景", "zcl场景******scene_apply")
-                    if (Constants.IS_ROUTE_MODE) {
+                    if (Constant.IS_ROUTE_MODE) {
                         try {
                             when {
                                 position < adapter.data.size -> {
                                     val dbScene = scenesListData[position]
                                     when {
-                                        Constants.IS_ROUTE_MODE -> {
+                                        Constant.IS_ROUTE_MODE -> {
                                             RouterModel.routeApplyScene(dbScene.id, "applyScene")?.subscribe({
                                                 //    "errorCode": 90011,message": "场景不存在，请刷新场景数据"
                                                 LogUtils.v("zcl-----------收到路由场景应用请求-------$dbScene")
@@ -205,7 +206,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
             val id = dbScene.id!!
             val list = DBUtils.getActionsBySceneId(id)
-            if (Constants.IS_ROUTE_MODE) {
+            if (Constant.IS_ROUTE_MODE) {
                 RouterModel.routeDelScene(id.toInt())
                         ?.subscribe({
                             startDelSceneTimeOut(it.t)
@@ -236,12 +237,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
-        disposableTimer?.dispose()
-        disposableTimer = Observable.timer((it?.timeout ?: 0).toLong(), TimeUnit.MILLISECONDS)
+        disposableRouteTimer?.dispose()
+        disposableRouteTimer = Observable.timer((it?.timeout ?: 0).toLong()+2L, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    showLoadingDialog(getString(R.string.delete_scene_fail))
+                    ToastUtils.showShort(getString(R.string.delete_scene_fail))
                 }
     }
 
@@ -249,6 +250,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         DBUtils.deleteSceneActionsList(list)
         DBUtils.deleteScene(dbScene)
         adaper?.data?.remove(dbScene)
+        scenesListData.remove(dbScene)
         adaper?.notifyDataSetChanged()
         //refreshAllData()
        // refreshView()
@@ -278,11 +280,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                             dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
                     val gattBody = GwGattBody()
-                    gattBody.ser_id = Constants.SER_ID_SCENE_ON
+                    gattBody.ser_id = Constant.SER_ID_SCENE_ON
                     val s = Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
-                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
-                    gattBody.meshAddr = Constants.SER_ID_SCENE_ON
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+                    gattBody.meshAddr = Constant.SER_ID_SCENE_ON
                     sendToServer(gattBody)
                 } else {
                     ToastUtils.showShort(getString(R.string.gw_not_online))
@@ -364,7 +366,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         callbackLinkMainActAndFragment?.changeToGroup()
                         dialog.dismiss()
                     }
@@ -615,7 +617,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     ToastUtils.showLong(R.string.scene_16_tip)
                 } else {
                     val intent = Intent(activity, NewSceneSetAct::class.java)
-                    intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                    intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                     startActivityForResult(intent, 3)
                 }
             }
@@ -654,14 +656,14 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun addNewScenes() {
         val nowSize = DBUtils.sceneList.size
 
-        if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
             ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
         } else {
             if (nowSize >= SCENE_MAX_COUNT) {
                 ToastUtils.showLong(R.string.scene_16_tip)
             } else {
                 val intent = Intent(activity, NewSceneSetAct::class.java)
-                intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                 startActivityForResult(intent, 3)
             }
         }
@@ -669,7 +671,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     private fun seeHelpe() {
         var intent = Intent(context, InstructionsForUsActivity::class.java)
-        intent.putExtra(Constants.WB_TYPE, "#control-scene")
+        intent.putExtra(Constant.WB_TYPE, "#control-scene")
         startActivity(intent)
     }
 
@@ -724,7 +726,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constants.SER_ID_SCENE_ON -> {
+            Constant.SER_ID_SCENE_ON -> {
                 LogUtils.v("zcl-----------远程控制场景开启成功-------")
                 ToastUtils.showShort(getString(R.string.scene_apply_success))
                 disposableTimer?.dispose()
@@ -735,7 +737,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constants.SER_ID_SCENE_ON -> {
+            Constant.SER_ID_SCENE_ON -> {
                 LogUtils.v("zcl-----------远程控制场景开启成功-------")
                 ToastUtils.showShort(getString(R.string.scene_apply_success))
                 disposableTimer?.dispose()
@@ -745,6 +747,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     override fun tzRouterDelSceneResult(cmdBean: CmdBodyBean) {
+        disposableRouteTimer?.dispose()
+        hideLoadingDialog()
         if (cmdBean.finish && cmdBean.status == 1) {////1 0 -1  部分成功 成功 失败
             currentDbScene?.let {
                 val list = DBUtils.getActionsBySceneId(it.id)

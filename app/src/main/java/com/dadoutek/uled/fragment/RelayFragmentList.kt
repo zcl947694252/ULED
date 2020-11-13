@@ -1,6 +1,6 @@
 package com.dadoutek.uled.fragment
 
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
@@ -11,7 +11,7 @@ class RelayFragmentList : BaseGroupFragment() {
     }
 
     override fun setGroupType(): Long {
-        return Constants.DEVICE_TYPE_CONNECTOR
+        return Constant.DEVICE_TYPE_CONNECTOR
     }
 
     override fun getGroupData(): Collection<DbGroup> {

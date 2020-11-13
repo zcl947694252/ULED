@@ -132,8 +132,10 @@
                     style="@style/SeekBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="100"
-                    android:progress="50" />
+                    android:paddingStart="2dp"
+                    android:paddingEnd="2dp"
+                    android:max="101"
+                    android:min="1" />
 
             <android.support.constraint.ConstraintLayout
                     android:layout_width="match_parent"
@@ -192,7 +194,7 @@
                     style="@style/SeekBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="100"
+                    android:max="101"
                     android:min="1" />
 
             <android.support.constraint.ConstraintLayout

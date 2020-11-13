@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteException;
 import android.os.Environment;
 
 import com.dadoutek.uled.tellink.TelinkLightApplication;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 
 import java.io.File;
@@ -27,7 +27,7 @@ public class CopyDataBaseFile {
     // 保存数据库的路径
     private final static String DATABASE_PATH = "/data/data/com.dadoutek.uled/databases/";
     private final static String dbName = SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
-            Constants.DB_NAME_KEY,"uled")+".db";;
+            Constant.DB_NAME_KEY,"uled")+".db";;
     private Context context;
 
     public CopyDataBaseFile(Context context) {

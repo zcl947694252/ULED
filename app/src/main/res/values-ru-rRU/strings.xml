@@ -1084,6 +1084,9 @@
     <string name="plaese_input_device_name">Введите имя устройства</string>
     <string name="rename_success">Новое имя. Успех.</string>
     <string name="get_versioning">Возьми номер версии, пожалуйста, позже</string>
-    <string name="cloud_assistant">云助手</string>
+    <string name="cloud_assistant">Помощник облака.</string>
+    <string name="no_third_party">Платформа третьей стороны, которая временно не используется</string>
+    <string name="please_set_color">请设置颜色</string>
+    <string name="gp_deletescene">此场景群组已被删除,请重新创建场景</string>
 
 </resources>

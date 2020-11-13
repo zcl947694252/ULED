@@ -60,7 +60,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.design.snackbar
 import org.jetbrains.anko.startActivity
 import java.util.*
@@ -155,7 +154,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                     if (currentSensor == null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
                     else {
-                        if (Constants.IS_ROUTE_MODE)
+                        if (Constant.IS_ROUTE_MODE)
                             routerDeviceResetFactory(currentSensor!!.macAddr, currentSensor!!.meshAddr, 98, "deleteOldPir")
                         else {
                             showLoadingDialog(getString(R.string.please_wait))
@@ -203,8 +202,8 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun goOta() {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-        if (isBoolean || Constants.IS_ROUTE_MODE) {
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        if (isBoolean || Constant.IS_ROUTE_MODE) {
             transformView()
         } else {
             if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
@@ -249,16 +248,17 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             !isSuportOta(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
             isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
-        if (Constants.IS_ROUTE_MODE){
+        if (Constant.IS_ROUTE_MODE){
             startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
-                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+                    "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr,
+                    "version" to currentSensor!!.version )
         finish()}
         else {
             val intent = Intent(this@ConfigSensorAct, OTAUpdateActivity::class.java)
-            intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
-            intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
-            intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
-            intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+            intent.putExtra(Constant.OTA_MAC, currentSensor?.macAddr)
+            intent.putExtra(Constant.OTA_MES_Add, currentSensor?.meshAddr)
+            intent.putExtra(Constant.OTA_VERSION, currentSensor?.version)
+            intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
             startActivity(intent)
             finish()
         }}}
@@ -345,7 +345,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     }
 
     private fun autoConnectSensor() {
-        if (Constants.IS_ROUTE_MODE) return
+        if (Constant.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(DBUtils.lastUser?.controlMeshName)
@@ -426,9 +426,9 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         mGroupScenesName?.clear()
         for (item in mGroups) {
             when (item.deviceType) {
-                Constants.DEVICE_TYPE_CONNECTOR, Constants.DEVICE_TYPE_LIGHT_RGB,
-                Constants.DEVICE_TYPE_LIGHT_NORMAL, Constants.DEVICE_TYPE_NO -> {
-                    if (item.deviceCount > 0 || item.deviceType == Constants.DEVICE_TYPE_NO)
+                Constant.DEVICE_TYPE_CONNECTOR, Constant.DEVICE_TYPE_LIGHT_RGB,
+                Constant.DEVICE_TYPE_LIGHT_NORMAL, Constant.DEVICE_TYPE_NO -> {
+                    if (item.deviceCount > 0 || item.deviceType == Constant.DEVICE_TYPE_NO)
                         mGroupScenesName!!.add(item.name)
                 }
             }
@@ -529,7 +529,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 } else {
                     Thread {
                         val mode = getModeValue()
-                        if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
+                        if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                             showLoadingDialog(getString(R.string.connecting_tip))
                             connectDispose = connect(mDeviceInfo.meshAddress, true)?.subscribe({
                                 hideLoadingDialog()
@@ -540,7 +540,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                             })
                             return@Thread
                         }
-                        if (Constants.IS_ROUTE_MODE) {
+                        if (Constant.IS_ROUTE_MODE) {
                             //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
                             // triggerKey: Int = 0//0全天    1白天   2夜晚
                             //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
@@ -635,7 +635,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEditText?.text.toString().trim { it <= ' ' }
-                if (Constants.IS_ROUTE_MODE)
+                if (Constant.IS_ROUTE_MODE)
                     routerUpdateSensorName(dbSensor.id, trim)
                 else {
                     dbSensor.name = trim
@@ -681,7 +681,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
 
-        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constants.DB_ADD)
+        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
         if (!isReConfirm)
             showRenameDialog(dbSensor)
         else
@@ -705,7 +705,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     override fun onDestroy() {
         super.onDestroy()
-        if (Constants.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE)
             currentSensor?.let {
                 routerConnectSensor(it, 1, "connectSensor")
             }

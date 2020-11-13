@@ -19,7 +19,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -52,7 +52,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_confirmation_code)
-        typeStr = this.intent.extras!!.getString(Constants.TYPE_USER)
+        typeStr = this.intent.extras!!.getString(Constant.TYPE_USER)
         initViewType()
         initView()
         timing()
@@ -67,13 +67,13 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
         phone = this.intent.extras!!.getString("phone")
         account = this.intent.extras!!.getString("account")
         when (typeStr) {
-            Constants.TYPE_VERIFICATION_CODE -> {
+            Constant.TYPE_VERIFICATION_CODE -> {
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + " " + phone
             }
-            Constants.TYPE_REGISTER -> {
+            Constant.TYPE_REGISTER -> {
                 codePhone.text = resources.getString(R.string.send_code) + "+" + countryCode + phone
             }
-            Constants.TYPE_FORGET_PASSWORD -> {
+            Constant.TYPE_FORGET_PASSWORD -> {
                 codePhone.text = resources.getString(R.string.follow_the_steps)
             }
         }
@@ -150,17 +150,17 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
                         when (result) {
                             SMSSDK.RESULT_COMPLETE -> {
                                 when (typeStr) {
-                                    Constants.TYPE_VERIFICATION_CODE -> verificationLogin()
-                                    Constants.TYPE_REGISTER -> {
+                                    Constant.TYPE_VERIFICATION_CODE -> verificationLogin()
+                                    Constant.TYPE_REGISTER -> {
                                         val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
                                         intent.putExtra("phone", phone)
-                                        intent.putExtra(Constants.USER_TYPE, Constants.TYPE_REGISTER)
+                                        intent.putExtra(Constant.USER_TYPE, Constant.TYPE_REGISTER)
                                         startActivityForResult(intent, 0)
                                         finish()
                                     }
-                                    Constants.TYPE_FORGET_PASSWORD -> {
+                                    Constant.TYPE_FORGET_PASSWORD -> {
                                         val intent = Intent(this@EnterConfirmationCodeActivity, InputPwdActivity::class.java)
-                                        intent.putExtra(Constants.USER_TYPE, Constants.TYPE_FORGET_PASSWORD)
+                                        intent.putExtra(Constant.USER_TYPE, Constant.TYPE_FORGET_PASSWORD)
                                         intent.putExtra("phone", account)
                                         startActivity(intent)
                                         finish()
@@ -265,7 +265,7 @@ class EnterConfirmationCodeActivity : TelinkBaseActivity(), View.OnClickListener
 
         override fun complete() {
             hideLoadingDialog()
-            SharedPreferencesHelper.putBoolean(this@EnterConfirmationCodeActivity, Constants.IS_LOGIN, true)
+            SharedPreferencesHelper.putBoolean(this@EnterConfirmationCodeActivity, Constant.IS_LOGIN, true)
             startActivity(Intent(this@EnterConfirmationCodeActivity, MainActivity::class.java))
             finish()
         }

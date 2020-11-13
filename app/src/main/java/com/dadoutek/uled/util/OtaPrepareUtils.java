@@ -7,7 +7,7 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.OtaPrepareListner;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.httpModel.DownLoadFileModel;
 import com.dadoutek.uled.network.NetworkObserver;
 import com.liulishuo.filedownloader.BaseDownloadTask;
@@ -258,7 +258,7 @@ public class OtaPrepareUtils {
                 || localVersion.contains("LA-") || localVersion.contains("LAS-")||localVersion.contains("CC-")
                 || localVersion.contains("CCS-") || localVersion.contains("LX-")||localVersion.contains("LXS-")
                 || localVersion.contains("LG-") || localVersion.contains("LCS-") || localVersion.contains("L36-"))
-                && localVersionNum >= Constants.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
+                && localVersionNum >= Constant.OTA_SUPPORT_LOWEST_VERSION && localVersionNum != -1;
         boolean newSuport = localVersion.contains("PR-") || localVersion.contains("B")||localVersion.contains("E-GW")
                 ||localVersion.contains("NPR")||localVersion.contains("LiG");
         if (oldSuportVersion||newSuport) {

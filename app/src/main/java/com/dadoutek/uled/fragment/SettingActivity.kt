@@ -24,7 +24,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.UserModel
@@ -33,7 +33,6 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
 import com.dadoutek.uled.region.adapter.SettingAdapter
 import com.dadoutek.uled.region.bean.SettingItemBean
-import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.ChooseModeActivity
 import com.dadoutek.uled.router.CloudAssistantActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -93,7 +92,7 @@ class SettingActivity : TelinkBaseActivity() {
                         }
                         2 -> {
                             UserModel.updateModeStatus().subscribe({
-                                Constants.IS_OPEN_AUXFUN = !Constants.IS_OPEN_AUXFUN
+                                Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
                                 adapter.notifyDataSetChanged()
                             }, {
                                 ToastUtils.showShort(it.message)
@@ -125,20 +124,21 @@ class SettingActivity : TelinkBaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_reset, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_lock, getString(R.string.safe_lock)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
-        list.add(SettingItemBean(R.drawable.icon_restore_factory, getString(R.string.work_mode)))
+        list.add(SettingItemBean(R.drawable.icon_internet, getString(R.string.work_mode)))
+        list.add(SettingItemBean(R.drawable.icon_assistant, getString(R.string.cloud_assistant)))
         //if (DBUtils.getAllRouter().size > 1)
         //list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
     }
 
     @SuppressLint("StringFormatMatches")
     private fun showResetTipPop() {
-        if (TelinkLightApplication.getApp().connectDevice != null|| Constants.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice != null|| Constant.IS_ROUTE_MODE) {
 
-            disposableInterval = Observable.intervalRange(0, Constants.downTime, 0, 1, TimeUnit.SECONDS)
+            disposableInterval = Observable.intervalRange(0, Constant.downTime, 0, 1, TimeUnit.SECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { it1 ->
-                        var num = Constants.downTime - 1 - it1
+                        var num = Constant.downTime - 1 - it1
                         when (num) {
                             0L -> setTimerZero()
                             else -> {
@@ -191,7 +191,7 @@ class SettingActivity : TelinkBaseActivity() {
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        SharedPreferencesHelper.putBoolean(this, Constants.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
         DBUtils.deleteAllData()
         CleanUtils.cleanInternalSp()
         CleanUtils.cleanExternalCache()
@@ -219,7 +219,7 @@ class SettingActivity : TelinkBaseActivity() {
         var cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
                 var intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constants.WB_TYPE, "#user-reset")
+                intent.putExtra(Constant.WB_TYPE, "#user-reset")
                 startActivity(intent)
             }
 

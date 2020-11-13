@@ -10,7 +10,6 @@ import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import org.greenrobot.greendao.DbUtils
 import kotlin.collections.ArrayList
 
 /**
@@ -106,22 +105,22 @@ object DBUtils {
 
         for (group in listAll) {
             when (group.deviceType) {
-                Constants.DEVICE_TYPE_DEFAULT_ALL -> {
+                Constant.DEVICE_TYPE_DEFAULT_ALL -> {
                     otherList.add(group)
                 }
-                Constants.DEVICE_TYPE_LIGHT_NORMAL -> {
+                Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
                     normalList.add(group)
                 }
-                Constants.DEVICE_TYPE_LIGHT_RGB -> {
+                Constant.DEVICE_TYPE_LIGHT_RGB -> {
                     rgbList.add(group)
                 }
-                Constants.DEVICE_TYPE_CURTAIN -> {
+                Constant.DEVICE_TYPE_CURTAIN -> {
                     curtainList.add(group)
                 }
-                Constants.DEVICE_TYPE_NO -> {
+                Constant.DEVICE_TYPE_NO -> {
                     allLightList.add(group)
                 }
-                Constants.DEVICE_TYPE_CONNECTOR -> {
+                Constant.DEVICE_TYPE_CONNECTOR -> {
                     connectorList.add(group)
                 }
                 else -> {
@@ -419,6 +418,7 @@ object DBUtils {
     fun getRouterByID(id: Long): DbRouter? {
         return DaoSessionInstance.getInstance().dbRouterDao.load(id)
     }
+
     fun getRouterByMac(macAddr: String): MutableList<DbRouter>? {
         return DaoSessionInstance.getInstance().dbRouterDao.queryBuilder()
                 .where(DbRouterDao.Properties.MacAddr.eq(macAddr)).list()
@@ -500,6 +500,16 @@ object DBUtils {
             dbCurtianList[0]
         } else null
     }
+
+    fun getConnectorByMeshAddr(meshAddr: Int): DbConnector? {
+        val dbCurtianList = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
+                .where(DbCurtainDao.Properties.MeshAddr.eq(meshAddr)).list()
+        return when {
+            dbCurtianList.size <= 0 -> null
+            else -> dbCurtianList[0]
+        }
+    }
+
 
 
     fun getEightSwitchByMeshAddr(meshAddr: Int): DbEightSwitch? {
@@ -615,7 +625,7 @@ object DBUtils {
      */
     fun getGroupByMeshAddr(mesh: Int): DbGroup {
         var dbGroup = DbGroup()
-            dbGroup.id=0L
+        dbGroup.id = 0L
         val dbGroupLs = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.MeshAddr.eq(mesh)).list()
 //        Log.d("datasave", "getGroupByMeshAddr: $mesh")
         if (dbGroupLs.size > 0) {
@@ -702,7 +712,7 @@ object DBUtils {
 
                 recordingChange(dbRegion.id,
                         DaoSessionInstance.getInstance().dbRegionDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
                 //创建新区域首先创建一个所有灯的分组
                 createAllLightControllerGroup()
             } else {//更新数据库
@@ -712,7 +722,7 @@ object DBUtils {
                 SharedPreferencesUtils.saveCurrentUseRegionID(dbRegion.id)
                 recordingChange(dbRegion.id,
                         DaoSessionInstance.getInstance().dbRegionDao.tablename,
-                        Constants.DB_UPDATE)
+                        Constant.DB_UPDATE)
             }
         }
     }
@@ -721,18 +731,24 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbRegionDao.delete(dbRegion)
         recordingChange(dbRegion.id,
                 DaoSessionInstance.getInstance().dbRegionDao.tablename,
-                Constants.DB_DELETE)
+                Constant.DB_DELETE)
     }
 
 
     fun saveGroup(group: DbGroup, isFromServer: Boolean) {
-        if (isFromServer) {
-            DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
-        } else {
-            DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
-            recordingChange(group.id,
-                    DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                    Constants.DB_ADD)
+        if (group.meshAddr == 0)
+            return
+
+        when {
+            isFromServer -> {
+                DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
+            }
+            else -> {
+                DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(group)
+                recordingChange(group.id,
+                        DaoSessionInstance.getInstance().dbGroupDao.tablename,
+                        Constant.DB_ADD)
+            }
         }
     }
 
@@ -750,11 +766,11 @@ object DBUtils {
             if (existList.size > 0) {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbLightDao.tablename,
-                        Constants.DB_UPDATE)
+                        Constant.DB_UPDATE)
             } else {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbLightDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
             }
         }
     }
@@ -773,11 +789,11 @@ object DBUtils {
             if (existList.size > 0) {
                 recordingChange(sensor.id,
                         DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                        Constants.DB_UPDATE)
+                        Constant.DB_UPDATE)
             } else {
                 recordingChange(sensor.id,
                         DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
             }
         }
     }
@@ -794,9 +810,9 @@ object DBUtils {
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             if (existList.size > 0) {
-                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constants.DB_UPDATE, type, keys)
+                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_UPDATE, type, keys)
             } else {
-                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constants.DB_ADD, type, keys)
+                recordingChange(db.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD, type, keys)
             }
         }
     }
@@ -815,11 +831,11 @@ object DBUtils {
             if (existList.size > 0) {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbGatewayDao.tablename,
-                        Constants.DB_UPDATE)
+                        Constant.DB_UPDATE)
             } else {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbGatewayDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
             }
         }
     }
@@ -830,12 +846,12 @@ object DBUtils {
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }
-            DaoSessionInstance.getInstance().dbRouterDao.insertOrReplace(db)
+        DaoSessionInstance.getInstance().dbRouterDao.insertOrReplace(db)
         //不是从服务器下载下来的，才需要把变化写入数据变化表
         if (!isFromServer) {
             when {
-                existList.size > 0 -> recordingChange(db.id, DaoSessionInstance.getInstance().dbRouterDao.tablename, Constants.DB_UPDATE)
-                else -> recordingChange(db.id, DaoSessionInstance.getInstance().dbRouterDao.tablename, Constants.DB_ADD)
+                existList.size > 0 -> recordingChange(db.id, DaoSessionInstance.getInstance().dbRouterDao.tablename, Constant.DB_UPDATE)
+                else -> recordingChange(db.id, DaoSessionInstance.getInstance().dbRouterDao.tablename, Constant.DB_ADD)
             }
         }
     }
@@ -854,11 +870,11 @@ object DBUtils {
             if (existList.size > 0) {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbEightSwitchDao.tablename,
-                        Constants.DB_UPDATE)
+                        Constant.DB_UPDATE)
             } else {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbEightSwitchDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
             }
         }
     }
@@ -878,11 +894,11 @@ object DBUtils {
             if (existList.size > 0) {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbCurtainDao.tablename,
-                        Constants.DB_UPDATE)
+                        Constant.DB_UPDATE)
             } else {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbCurtainDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
 
             }
         }
@@ -903,11 +919,11 @@ object DBUtils {
             if (existList.size > 0) {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbConnectorDao.tablename,
-                        Constants.DB_UPDATE)
+                        Constant.DB_UPDATE)
             } else {
                 recordingChange(db.id,
                         DaoSessionInstance.getInstance().dbConnectorDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
             }
         }
     }
@@ -916,7 +932,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbLightDao.insertOrReplace(light)
         recordingChange(light.id,
                 DaoSessionInstance.getInstance().dbLightDao.tablename,
-                Constants.DB_ADD)
+                Constant.DB_ADD)
     }
 
     fun saveUser(dbUser: DbUser) {
@@ -924,7 +940,7 @@ object DBUtils {
 //        LogUtils.v("zcl-0--------------"+ getAllUser())
         recordingChange(dbUser.id,
                 DaoSessionInstance.getInstance().dbUserDao.tablename,
-                Constants.DB_ADD)
+                Constant.DB_ADD)
     }
 
     fun saveUserDao(dbUser: DbUser) {
@@ -934,9 +950,9 @@ object DBUtils {
 
     fun saveScene(dbScene: DbScene, isFromServer: Boolean) {
 
-            DaoSessionInstance.getInstance().dbSceneDao.insertOrReplace(dbScene)
+        DaoSessionInstance.getInstance().dbSceneDao.insertOrReplace(dbScene)
         if (!isFromServer)
-            recordingChange(dbScene.id, DaoSessionInstance.getInstance().dbSceneDao.tablename, Constants.DB_ADD)
+            recordingChange(dbScene.id, DaoSessionInstance.getInstance().dbSceneDao.tablename, Constant.DB_ADD)
 
     }
 
@@ -944,18 +960,18 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSceneActionsDao.insertOrReplace(sceneActions)
         recordingChange(sceneActions.id,
                 DaoSessionInstance.getInstance().dbSceneActionsDao.tablename,
-                Constants.DB_ADD)
+                Constant.DB_ADD)
     }
 
     fun saveGradient(dbDiyGradient: DbDiyGradient, isFromServer: Boolean) {
-    /*    if (isFromServer) {
-            DaoSessionInstance.getInstance().dbDiyGradientDao.insert(dbDiyGradient)
-        } else {*/
-            DaoSessionInstance.getInstance().dbDiyGradientDao.insertOrReplace(dbDiyGradient)
+        /*    if (isFromServer) {
+                DaoSessionInstance.getInstance().dbDiyGradientDao.insert(dbDiyGradient)
+            } else {*/
+        DaoSessionInstance.getInstance().dbDiyGradientDao.insertOrReplace(dbDiyGradient)
         if (!isFromServer)
             recordingChange(dbDiyGradient.id,
                     DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
-                    Constants.DB_ADD)
+                    Constant.DB_ADD)
         //}
     }
 
@@ -996,7 +1012,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbColorNodeDao.insertOrReplace(colorNodeNew)
     }
 
-    private fun getColorNodeListByIndex(index:Int): ArrayList<DbColorNode> {
+    private fun getColorNodeListByIndex(index: Int): ArrayList<DbColorNode> {
         val query = DaoSessionInstance.getInstance().dbColorNodeDao.queryBuilder().where(DbColorNodeDao.Properties.Index.eq(index)).build()
         return ArrayList(query.list())
     }
@@ -1099,7 +1115,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbGroupDao.delete(dbGroup)
         recordingChange(dbGroup.id,
                 DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                Constants.DB_DELETE)
+                Constant.DB_DELETE)
     }
 
 
@@ -1107,7 +1123,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbLightDao.delete(dbLight)
         recordingChange(dbLight.id,
                 DaoSessionInstance.getInstance().dbLightDao.tablename,
-                Constants.DB_DELETE)
+                Constant.DB_DELETE)
     }
 
 
@@ -1158,7 +1174,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbConnectorDao.delete(dbConnector)
         recordingChange(dbConnector.id,
                 DaoSessionInstance.getInstance().dbConnectorDao.tablename,
-                Constants.DB_DELETE)
+                Constant.DB_DELETE)
     }
 
     fun deleteUser(dbUser: DbUser) {
@@ -1170,14 +1186,14 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSceneDao.delete(dbScene)
         recordingChange(dbScene.id,
                 DaoSessionInstance.getInstance().dbSceneDao.tablename,
-                Constants.DB_DELETE)
+                Constant.DB_DELETE)
     }
 
     fun deleteCurtain(dbCurtain: DbCurtain) {
         DaoSessionInstance.getInstance().dbCurtainDao.delete(dbCurtain)
         recordingChange(dbCurtain.id,
                 DaoSessionInstance.getInstance().dbCurtainDao.tablename,
-                Constants.DB_DELETE
+                Constant.DB_DELETE
         )
     }
 
@@ -1185,7 +1201,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSwitchDao.delete(dbSwitch)
         recordingChange(dbSwitch.id,
                 DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                Constants.DB_DELETE
+                Constant.DB_DELETE
         )
     }
 
@@ -1193,7 +1209,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSensorDao.delete(dbSensor)
         recordingChange(dbSensor.id,
                 DaoSessionInstance.getInstance().dbSensorDao.tablename,
-                Constants.DB_DELETE
+                Constant.DB_DELETE
         )
     }
 
@@ -1201,7 +1217,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbGatewayDao.delete(gateway)
         recordingChange(gateway.id,
                 DaoSessionInstance.getInstance().dbGatewayDao.tablename,
-                Constants.DB_DELETE
+                Constant.DB_DELETE
         )
     }
 
@@ -1209,7 +1225,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbRouterDao.delete(dbRouter)
         recordingChange(dbRouter.id,
                 DaoSessionInstance.getInstance().dbRouterDao.tablename,
-                Constants.DB_DELETE
+                Constant.DB_DELETE
         )
     }
 
@@ -1222,7 +1238,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbDiyGradientDao.delete(dbDiyGradient)
         recordingChange(dbDiyGradient.id,
                 DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
-                Constants.DB_DELETE)
+                Constant.DB_DELETE)
     }
 
 
@@ -1300,7 +1316,7 @@ object DBUtils {
             if (group != null) {
                 recordingChange(group.id,
                         DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
             }
 
         }
@@ -1332,7 +1348,7 @@ object DBUtils {
 
             recordingChange(group.id,
                     DaoSessionInstance.getInstance().dbGroupDao.tablename,
-                    Constants.DB_ADD)
+                    Constant.DB_ADD)
 
             return group
         }
@@ -1395,7 +1411,7 @@ object DBUtils {
     }
 
     private fun checkReachedTheLimit(groups: List<DbGroup>, name: String): Boolean {
-        if (groups.size > Constants.MAX_GROUP_COUNT) {
+        if (groups.size > Constant.MAX_GROUP_COUNT) {
             ToastUtils.showLong(R.string.group_limit)
             return true
         }
@@ -1430,7 +1446,7 @@ object DBUtils {
         groupAllLights.id = 1
         DaoSessionInstance.getInstance().dbGroupDao.insertOrReplace(groupAllLights)
         recordingChange(groupAllLights.id,
-                DaoSessionInstance.getInstance().dbGroupDao.tablename, Constants.DB_ADD)
+                DaoSessionInstance.getInstance().dbGroupDao.tablename, Constant.DB_ADD)
 
         return groupAllLights
     }
@@ -1458,16 +1474,16 @@ object DBUtils {
                     }
 
                     //如果改变相同数据是删除就再记录一次，如果不是删除则不再记录
-                    if (dataChangeList[i].changeType == Constants.DB_ADD && operating == Constants.DB_DELETE) {
+                    if (dataChangeList[i].changeType == Constant.DB_ADD && operating == Constant.DB_DELETE) {
                         deleteDbDataChange(dataChangeList[i].id)
                         break
-                    } else if (dataChangeList[i].changeType == Constants.DB_UPDATE && operating == Constants.DB_DELETE) {
+                    } else if (dataChangeList[i].changeType == Constant.DB_UPDATE && operating == Constant.DB_DELETE) {
                         dataChangeList[i].changeType = operating
                         updateDbchange(dataChangeList[i])
                         continue
-                    } else if (dataChangeList[i].changeType == Constants.DB_ADD && operating == Constants.DB_UPDATE) {
+                    } else if (dataChangeList[i].changeType == Constant.DB_ADD && operating == Constant.DB_UPDATE) {
                         break
-                    } else if (dataChangeList[i].changeType == Constants.DB_DELETE && operating == Constants.DB_ADD) {
+                    } else if (dataChangeList[i].changeType == Constant.DB_DELETE && operating == Constant.DB_ADD) {
                         dataChangeList[i].changeType = operating
                         updateDbchange(dataChangeList[i])
                         break

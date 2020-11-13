@@ -1240,4 +1240,7 @@
     <string name="rename_success">重命名成功</string>
     <string name="get_versioning">获取版本号中，请稍后</string>
     <string name="cloud_assistant">云助手</string>
+    <string name="no_third_party">暂时没有使用过的第三方平台</string>
+    <string name="please_set_color">请设置颜色</string>
+    <string name="gp_deletescene">此场景群组已被删除,请重新创建场景</string>
 </resources>

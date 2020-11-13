@@ -19,7 +19,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.BuildConfig
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -159,7 +159,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEt?.text.toString().trim { it <= ' ' }
-                if (!Constants.IS_ROUTE_MODE)
+                if (!Constant.IS_ROUTE_MODE)
                     renameSw(trim)
                 else
                     routerRenameSw(switchDate!!, trim)
@@ -250,7 +250,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
-            currentGroup = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
+            currentGroup = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             group_name.text = currentGroup?.name
         }
     }
@@ -262,15 +262,15 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         select_group.setOnClickListener {
             val intent = Intent(this@ConfigCurtainSwitchActivity, ChooseGroupOrSceneActivity::class.java)
             val bundle = Bundle()
-            bundle.putInt(Constants.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-            bundle.putInt(Constants.DEVICE_TYPE, Constants.DEVICE_TYPE_CURTAIN.toInt())
+            bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+            bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_CURTAIN.toInt())
             intent.putExtras(bundle)
             startActivityForResult(intent, requestCodeNum)
-            setResult(Constants.RESULT_OK)
+            setResult(Constant.RESULT_OK)
         }
 
         fab.setOnClickListener {
-            if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
+            if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                 if (mConnectingSnackBar?.isShown != true) {
                     mConfigFailSnackbar?.dismiss()
                     showDisconnectSnackBar()
@@ -280,7 +280,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                     ToastUtils.showShort(getString(R.string.please_select_group))
                     return@setOnClickListener
                 }
-                if (!Constants.IS_ROUTE_MODE)
+                if (!Constant.IS_ROUTE_MODE)
                     configSw()
                 else
                     routerConfigSw()
@@ -522,7 +522,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
                 dbSwitch.index = dbSwitch.id.toInt()
 
                 DBUtils.saveSwitch(dbSwitch, false)
-                recordingChange(dbSwitch.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constants.DB_ADD)
+                recordingChange(dbSwitch.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename, Constant.DB_ADD)
                 switchDate = dbSwitch
             }
         } else {
@@ -538,14 +538,14 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private var mConnectingSnackBar: Snackbar? = null
 
     private fun reconnect() {
-        if (Constants.IS_ROUTE_MODE) return
+        if (Constant.IS_ROUTE_MODE) return
         //自动重连参数
         val connectParams = Parameters.createAutoConnectParameters()
         connectParams.setMeshName(mDeviceInfo.meshName)
 
         val mesh = TelinkLightApplication.getApp().mesh
         val pwd: String
-        pwd = if (mDeviceInfo.meshName == Constants.PIR_SWITCH_MESH_NAME) {
+        pwd = if (mDeviceInfo.meshName == Constant.PIR_SWITCH_MESH_NAME) {
             mesh.factoryPassword.toString()
         } else {
             NetworkFactory.md5(NetworkFactory.md5(mDeviceInfo.meshName) + mDeviceInfo.meshName)
@@ -566,7 +566,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         val mesh = mApp?.mesh
         val params = Parameters.createUpdateParameters()
         if (BuildConfig.DEBUG) {
-            params.setOldMeshName(Constants.PIR_SWITCH_MESH_NAME)
+            params.setOldMeshName(Constant.PIR_SWITCH_MESH_NAME)
         } else {
             params.setOldMeshName(mesh?.factoryName)
         }

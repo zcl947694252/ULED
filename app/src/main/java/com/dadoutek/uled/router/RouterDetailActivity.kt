@@ -13,7 +13,7 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
@@ -24,7 +24,6 @@ import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.activity_router_detail.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
@@ -107,7 +106,7 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
     }
 
     private fun initView() {
-        type = Constants.INSTALL_ROUTER
+        type = Constant.INSTALL_ROUTER
     }
 
     override fun batchGpVisible(): Boolean {
@@ -116,7 +115,8 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
     }
 
     override fun goOta() {
-        startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to DeviceType.LIGHT_NORMAL, "deviceMac" to router!!.macAddr)
+        startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to DeviceType.LIGHT_NORMAL,
+                "deviceMac" to router!!.macAddr,"version" to router!!.version )
         finish()
     }
 

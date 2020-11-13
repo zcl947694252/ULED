@@ -13,6 +13,7 @@ import com.dadoutek.uled.base.RouterOTAingNumBean
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.RouterOTAResultBean
@@ -24,6 +25,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_router_ota.*
+import org.greenrobot.greendao.DbUtils
 import java.util.concurrent.TimeUnit
 
 
@@ -38,6 +40,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class RouterOtaActivity : TelinkBaseActivity() {
+    private var deviceVersion: String? = null
     private var isRouter: Boolean = false
     private var clickFinish: Boolean = false
     private var getStatusDispose: Disposable? = null
@@ -77,8 +80,8 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.ota_stop_fail))
@@ -98,13 +101,29 @@ class RouterOtaActivity : TelinkBaseActivity() {
         })
     }
 
-    @SuppressLint("CheckResult")
+    @SuppressLint("CheckResult", "SetTextI18n")
     private fun initData() {
         deviceMeshAddress = intent.getIntExtra("deviceMeshAddress", 0)
         deviceType = intent.getIntExtra("deviceType", 0)
         deviceMac = intent.getStringExtra("deviceMac")
+        deviceVersion = intent.getStringExtra("version")
         val intExtra = intent.getIntExtra("isOTAing", 3)
         isOtaing = intExtra == 1
+
+   /*     var version = when (deviceType) {
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMeshAddr(deviceMeshAddress)?.version ?: ""
+            DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByMeshAddr(deviceMeshAddress)?.version ?: ""
+            DeviceType.SMART_RELAY -> DBUtils.getConnectorByMeshAddr(deviceMeshAddress)?.version ?: ""
+            DeviceType.NORMAL_SWITCH -> DBUtils.getSwitchByMeshAddr(deviceMeshAddress)?.version ?: ""
+            DeviceType.SENSOR -> DBUtils.getSensorByMeshAddr(deviceMeshAddress)?.version ?: ""
+            DeviceType.GATE_WAY -> DBUtils.getGatewayByMeshAddr(deviceMeshAddress)?.version ?: ""
+            else -> DBUtils.getLightByMeshAddr(deviceMeshAddress)?.version ?: ""
+        }*/
+
+        router_ota_local.text = getString(R.string.local_version,deviceVersion)
+        val otaVersion = getOtaVersion(deviceVersion)
+        router_ota_version.text =  getString(R.string.server_version,otaVersion)
+
         isRouter = deviceMeshAddress == 100000
         if (isOtaing)
             if (isRouter)
@@ -153,17 +172,16 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun otaDevice(currentTimeMillis1: Long) {
-        RouterModel.toDevicesOTA(mutableListOf(deviceMeshAddress), deviceType, currentTimeMillis1,1,"routerSingle")?.subscribe({
+        RouterModel.toDevicesOTA(mutableListOf(deviceMeshAddress), deviceType, currentTimeMillis1, 1, "routerSingle")?.subscribe({
             LogUtils.v("zcl-----------收到路由升级请求---deviceMeshAddress$deviceMeshAddress---time$currentTimeMillis1-------deviceTye${deviceType}----$it")
             when (it.errorCode) {
                 0 -> {
-                    setTimeAndOpenUI(currentTimeMillis1)
                     isOtaing = true
                     ToastUtils.showShort(getString(R.string.ota_update_title))
                     router_ota_start.text = getString(R.string.stop_ota)
-                    router_ota_warm.text = getString(R.string.ota_update_title)
                     otaCount = 0
                     router_ota_wave_progress_bar?.value = 0f
+                    setTimeAndOpenUI(currentTimeMillis1)
                 } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
                 90999 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
                     isOtaing = false
@@ -186,11 +204,11 @@ class RouterOtaActivity : TelinkBaseActivity() {
         isOtaing = false
         ToastUtils.showShort(getString(R.string.sanning_to_scan_activity))
         Observable.timer(2000, TimeUnit.MILLISECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread()).subscribe {
-            startActivity(Intent(this@RouterOtaActivity, DeviceScanningNewActivity::class.java))
-            finish()
-        }
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    startActivity(Intent(this@RouterOtaActivity, DeviceScanningNewActivity::class.java))
+                    finish()
+                }
     }
 
     private fun setTimeAndOpenUI(currentTimeMillis1: Long) {
@@ -205,7 +223,6 @@ class RouterOtaActivity : TelinkBaseActivity() {
             }
         }
         ToastUtils.showShort(getString(R.string.ota_update_title))
-        router_ota_warm.text = getString(R.string.ota_update_title)
         if (!isRouter)
             router_ota_start.text = getString(R.string.stop_ota)
         else {
@@ -221,7 +238,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
             RouterModel.routerOTAResult(1, 5000, currentTimeMillis)?.subscribe({
                 val filter = it.filter { item -> deviceMac.toString() == item.macAddr }
                 if (filter.isNotEmpty()) {
-                LogUtils.v("zcl-----------获取路由状态-------$it--${filter.isNotEmpty()}--------${deviceMac.toString()}--")
+                    LogUtils.v("zcl-----------获取路由状态-------$it--${filter.isNotEmpty()}--------${deviceMac.toString()}--")
                     //ota结果。-1失败 0成功 1升级中 2已停止 3处理中
                     val routerOTAResultBean = filter[0]
                     when (routerOTAResultBean.status) {
@@ -263,16 +280,15 @@ class RouterOtaActivity : TelinkBaseActivity() {
         hideLoadingDialog()
         val status = routerOTAingNumBean?.status
         val otaResult = routerOTAingNumBean?.otaResult
-        if (status == 0 )
-            afterOtaSuccess()
-        else
-            if (status == -1 || status == 1)//ota结果。-1失败 0成功 1升级中 2已停止 3处理中
-                afterOtaFail()
+        when (status) {
+            0 -> afterOtaSuccess()
+            //ota结果。-1失败 0成功 1升级中 2已停止 3处理中
+            -1, 1 -> afterOtaFail()
+        }
     }
 
     private fun afterOtaFail() {
         router_ota_start.text = getString(R.string.retry_ota)
-        router_ota_warm.text = getString(R.string.router_ota_faile)
         ToastUtils.showShort(getString(R.string.router_ota_faile))
         isOtaing = false
     }
@@ -293,7 +309,6 @@ class RouterOtaActivity : TelinkBaseActivity() {
         disposableRouteTimer?.dispose()
         hideLoadingDialog()
         router_ota_start.text = getString(R.string.start_update)
-        router_ota_warm.text = getString(R.string.ota_prepare_title)
         router_ota_wave_progress_bar.value = 0f
         Thread.sleep(100)
         router_ota_wave_progress_bar.value = 0f
@@ -321,8 +336,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         }
         if (resultBean.failedCode != -1) {
             router_ota_start.text = getString(R.string.retry_ota)
-            router_ota_warm.text = getString(R.string.router_ota_faile)
-            router_ota_wave_progress_bar.value = 0f
+            router_ota_wave_progress_bar.value = 1f
             getStatusDispose?.dispose()
             disposableRouteTimer?.dispose()
         }
@@ -331,7 +345,6 @@ class RouterOtaActivity : TelinkBaseActivity() {
     private fun afterOtaSuccess() {
         ToastUtils.showShort(getString(R.string.ota_success))
         router_ota_start.text = getString(R.string.ota_success)
-        router_ota_warm.text = getString(R.string.ota_success)
         router_ota_start.isClickable = false
         router_ota_wave_progress_bar.value = 180f
         //initUi()

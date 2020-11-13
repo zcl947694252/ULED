@@ -23,7 +23,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType.LIGHT_RGB
 import com.dadoutek.uled.model.DeviceType.SMART_CURTAIN
@@ -257,38 +257,44 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun initScene() {
         val intent = intent
-        isReconfig = intent.extras!!.get(Constants.IS_CHANGE_SCENE) as Boolean
+        isReconfig = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
         if (isReconfig && !isResult) {
             showGroupList.clear()
-            scene = intent.extras!!.get(Constants.CURRENT_SELECT_SCENE) as DbScene
+            scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
             edit_name.setText(scene?.name)
             //获取场景具体信息
             val actions = DBUtils.getActionsBySceneId(scene!!.id)
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMeshAddr(actions[i].groupAddr)
-                val itemGroup = ItemGroup()
-                itemGroup.gpName = item.name
-                itemGroup.enableCheck = false
-                itemGroup.groupAddress = actions[i].groupAddr
-                itemGroup.brightness = actions[i].brightness
-                itemGroup.temperature = actions[i].colorTemperature
-                itemGroup.color = actions[i].color
-                itemGroup.isOn = actions[i].isOn
-                itemGroup.isEnableBright = actions[i].isEnableBright()
-                itemGroup.isEnableWhiteLight = actions[i].isEnableWhiteBright()
-                item.checked = true
-                itemGroup.rgbType = actions[i].rgbType
-                itemGroup.gradientId = actions[i].gradientId
-                itemGroup.gradientType = actions[i].gradientType
-                itemGroup.gradientName = actions[i].gradientName
-                itemGroup.gradientSpeed = actions[i].gradientSpeed
-                val groupByID = DBUtils.getGroupByID(actions[i].groupAddr.toLong())
-               // if (groupByID != null) {
+                if (item.id != 0L && item.meshAddr != 0) {
+                    val itemGroup = ItemGroup()
+                    itemGroup.gpName = item.name
+                    itemGroup.enableCheck = false
+                    itemGroup.groupAddress = actions[i].groupAddr
+                    itemGroup.brightness = actions[i].brightness
+                    itemGroup.temperature = actions[i].colorTemperature
+                    itemGroup.color = actions[i].color
+                    itemGroup.isOn = actions[i].isOn
+                    itemGroup.isEnableBright = actions[i].isEnableBright()
+                    itemGroup.isEnableWhiteLight = actions[i].isEnableWhiteBright()
+                    item.checked = true
+                    itemGroup.rgbType = actions[i].rgbType
+                    itemGroup.gradientId = actions[i].gradientId
+                    itemGroup.gradientType = actions[i].gradientType
+                    itemGroup.gradientName = actions[i].gradientName
+                    itemGroup.gradientSpeed = actions[i].gradientSpeed
                     showGroupList.add(itemGroup)
-
                     groupMeshAddrArrayList.add(item.meshAddr)
-
-                //sceneGroupAdapter?.notifyDataSetChanged()
+                } else {
+                    val mutableListOf = mutableListOf<DbSceneActions>()
+                    mutableListOf.add(actions[i])
+                    DBUtils.deleteSceneActionsList(mutableListOf)
+                }
+            }
+            isReconfig = showGroupList.isNotEmpty() || groupMeshAddrArrayList.isNotEmpty()
+            if (!isReconfig) {
+                ToastUtils.showShort(getString(R.string.gp_deletescene))
+                DBUtils.deleteScene(scene!!)
             }
         }
 
@@ -349,8 +355,26 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 R.id.cb_total -> switchTotal(position)
                 R.id.cb_bright -> switchBright(position)
                 R.id.cb_white_light -> switchWhiteLight(position)
+                R.id.color_mode_rb -> setRGBJB(position, 0)
+                R.id.gradient_mode_rb -> setRGBJB(position, 1)
             }
         }
+    }
+
+    private fun setRGBJB(pos: Int, rgbType: Int) {
+        if (sceneGroupAdapter?.data == null)
+            return
+        sceneGroupAdapter?.data!![pos].rgbType = rgbType
+        if (rgbType==1){
+            val presetGradientList = resources.getStringArray(R.array.preset_gradient)
+            sceneGroupAdapter?.data?.get(currentPosition)?.gradientName = presetGradientList[0]
+            rgbGradientId = 1
+            sceneGroupAdapter?.data?.get(currentPosition)?.gradientId = rgbGradientId
+            sceneGroupAdapter?.data?.get(currentPosition)?.gradientType = rgbType //渐变类型 1：自定义渐变  2：内置渐变
+            sceneGroupAdapter?.data?.get(currentPosition)?.gradientSpeed = 1 //渐变类型 1：自定义渐变  2：内置渐变
+        }
+        showGroupList[pos].rgbType = rgbType
+        sceneGroupAdapter?.notifyDataSetChanged()
     }
 
     private fun showPopMode(position: Int) {
@@ -367,7 +391,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         var temperature = showGroupList[position].temperature
         if (showGroupList[position].isOn) {
             isOpen = false
-            if (!Constants.IS_ROUTE_MODE)
+            if (!Constant.IS_ROUTE_MODE)
                 showGroupList[position].isOn = false
             showGroupList[position].isEnableBright = false
             showGroupList[position].isEnableWhiteLight = false
@@ -379,7 +403,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             // brightness = 0
             // temperature = 0
         } else {
-            if (!Constants.IS_ROUTE_MODE)
+            if (!Constant.IS_ROUTE_MODE)
                 showGroupList[position].isOn = true
             isOpen = true
             showGroupList[position].isEnableBright = true
@@ -391,7 +415,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             dot_rgb.isEnabled = true
         }
         val addr = showGroupList[position].groupAddress
-        if (!Constants.IS_ROUTE_MODE)
+        if (!Constant.IS_ROUTE_MODE)
             Thread {
                 Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
                 /* Thread.sleep(300)
@@ -420,7 +444,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
 
         val addr = showGroupList[position].groupAddress
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             routeConfigBriGpOrLight(addr, 97, brightness, "configBri")
         } else {
             val params: ByteArray = byteArrayOf(brightness.toByte())
@@ -436,12 +460,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 showGroupList[position].isEnableWhiteLight = false
             }
             else -> {//enableWhiteLight(true)
-                whiteLight = showGroupList[position].color and 0xff000000.toInt() shr 24
+                whiteLight = showGroupList[position].temperature
                 showGroupList[position].isEnableWhiteLight = true
             }
         }
         val addr = showGroupList[position].groupAddress
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             routeConfigWhiteGpOrLight(addr, 97, whiteLight, "configWhite")
         } else {
             val params: ByteArray = byteArrayOf(whiteLight.toByte())//设置白色
@@ -465,7 +489,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun close(position: Int) {
         isOpen = false
-        if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+        if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
             routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 0, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = false
@@ -476,7 +500,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun open(position: Int) {
         isOpen = true
-        if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+        if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
             routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 1, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = true
@@ -535,7 +559,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun changeToColorSelect(position: Int) {
         val intent = Intent(this, SelectColorAct::class.java)
-        intent.putExtra(Constants.GROUPS_KEY, showGroupList[position])
+        intent.putExtra(Constant.GROUPS_KEY, showGroupList[position])
         startActivityForResult(intent, position)
     }
 
@@ -640,7 +664,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun registBrocaster() {
         val filter = IntentFilter()
-        filter.addAction(Constants.LOGIN_OUT)
+        filter.addAction(Constant.LOGIN_OUT)
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         try {
             unregisterReceiver(sceneGroupAdapter?.stompRecevice)
@@ -775,7 +799,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val newItemGroup = ItemGroup()
         newItemGroup.brightness = 50
         newItemGroup.temperature = 50
-        newItemGroup.color = 0
+        newItemGroup.color = (50 shl 24) or (0 shl 16) or (0 shl 8) or 0
         newItemGroup.checked = true
         newItemGroup.enableCheck = false
         newItemGroup.gpName = showCheckListData!![i].name
@@ -794,7 +818,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             isReconfig -> updateOldScene()
             else -> saveNewScene()
         }
-        setResult(Constants.RESULT_OK)
+        setResult(Constant.RESULT_OK)
     }
 
 
@@ -835,7 +859,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             DBUtils.saveSceneActions(sceneActions)
             actionsList.add(sceneActions)
         }
-        if (Constants.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE)
             routerAddScene(name, sceneIcon, actionsList)
         else {
             showLoadingDialog(getString(R.string.saving))
@@ -998,7 +1022,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         scene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
         val belongSceneId = scene?.id!!
 
-        if (!Constants.IS_ROUTE_MODE) {
+        if (!Constant.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.saving))
             DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.id!!))
         }
@@ -1023,7 +1047,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         isChange = compareList(nameList, groupMeshAddrArrayList)
 
         when {
-            Constants.IS_ROUTE_MODE -> routerUpdateScene(belongSceneId, actionsList)
+            Constant.IS_ROUTE_MODE -> routerUpdateScene(belongSceneId, actionsList)
             else -> {
                 DBUtils.updateScene(scene!!)
                 Thread.sleep(100)

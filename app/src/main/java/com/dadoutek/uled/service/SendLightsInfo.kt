@@ -10,7 +10,7 @@ import android.util.Log
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.AppUtils
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.Light
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -100,7 +100,7 @@ class SendLightsInfo : Service(), EventListener<String> {
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             //                            scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 

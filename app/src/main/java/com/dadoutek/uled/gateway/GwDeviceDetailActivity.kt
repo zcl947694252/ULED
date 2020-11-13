@@ -25,7 +25,7 @@ import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constants.*
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
@@ -245,7 +245,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
     private fun addDevice() {//添加网关
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.GATE_WAY)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.GATE_WAY)
         startActivity(intent)
     }
 
@@ -561,7 +561,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
         popupWindow.dismiss()
         if (currentGw != null) {
-            if (Constants.IS_ROUTE_MODE) return
+            if (Constant.IS_ROUTE_MODE) return
             TelinkLightService.Instance()?.idleMode(true)
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableConnect?.dispose()

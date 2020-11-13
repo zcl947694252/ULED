@@ -2,7 +2,6 @@ package com.dadoutek.uled.router
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.inputmethod.InputMethodManager
@@ -10,10 +9,8 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
-import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.RouteInAccountBean
@@ -88,7 +85,7 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
     }
 
     private fun initData() {
-        result = intent.getStringExtra(Constants.ONE_QR)
+        result = intent.getStringExtra(Constant.ONE_QR)
         routing_device_code.setText(result)
         routing_device_code.setSelection(result?.length ?: 0)
     }
@@ -107,7 +104,7 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
     override fun routerAccessIn(routerGroup: RouteInAccountBean) {
         LogUtils.v("zcl----------收到路由入网通知-------$routerGroup")
         if (routerGroup.ser_id == TAG) {
-            if (routerGroup.status == Constants.ALL_SUCCESS) {
+            if (routerGroup.status == Constant.ALL_SUCCESS) {
                 SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                     override fun start() { }
 

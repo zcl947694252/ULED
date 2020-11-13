@@ -27,7 +27,7 @@ import android.widget.Toast;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DeviceType;
 import com.dadoutek.uled.model.Mesh;
 import com.dadoutek.uled.model.Opcode;
@@ -236,10 +236,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     }
 
     private void initData() {
-        lightMeshAddr = getIntent().getIntExtra(Constants.OTA_MES_Add, 0);
-        lightMacAddr = getIntent().getStringExtra(Constants.OTA_MAC);
-        lightVersion = getIntent().getStringExtra(Constants.OTA_VERSION);
-        lightType = getIntent().getIntExtra(Constants.OTA_TYPE, 100);
+        lightMeshAddr = getIntent().getIntExtra(Constant.OTA_MES_Add, 0);
+        lightMacAddr = getIntent().getStringExtra(Constant.OTA_MAC);
+        lightVersion = getIntent().getStringExtra(Constant.OTA_VERSION);
+        lightType = getIntent().getIntExtra(Constant.OTA_TYPE, 100);
 
         boolean b = "".equals(lightVersion) || lightVersion == null;
         btn_start_update.setClickable(!b);

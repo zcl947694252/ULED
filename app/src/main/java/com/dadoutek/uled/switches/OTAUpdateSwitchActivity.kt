@@ -23,7 +23,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Mesh
 import com.dadoutek.uled.model.OtaDevice
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -252,7 +252,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
     }
 
     private fun initData() {
-        dbSwitch = intent.getSerializableExtra(Constants.UPDATE_LIGHT) as DbSwitch
+        dbSwitch = intent.getSerializableExtra(Constant.UPDATE_LIGHT) as DbSwitch
         log("current-light-mesh" + dbSwitch!!.meshAddr)
         onlineLights = ArrayList()
         onlineLights!!.add(dbSwitch!!)
@@ -385,7 +385,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
 
 
     fun connectDevice(mac: String) {
-        if (Constants.IS_ROUTE_MODE) return
+        if (Constant.IS_ROUTE_MODE) return
         log("connectDevice :$mac")
         btn_start_update.setText(R.string.connecting_tip)
         TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT)

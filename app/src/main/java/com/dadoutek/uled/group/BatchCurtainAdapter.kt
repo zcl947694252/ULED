@@ -53,8 +53,8 @@ class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>, var is
 
         if (isRouterBind) {
             val routerByMac = DBUtils.getRouterByMac(item?.boundMac ?: "")
-            LogUtils.v("zcl-----------获取路由名称---${item?.boundMac ?: ""}----${routerByMac!![0].name}")
             if (routerByMac != null && routerByMac.size >= 1) {
+            LogUtils.v("zcl-----------获取路由名称---${item?.boundMac ?: ""}----${routerByMac!![0].name}")
                 groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE
             } else groupName.visibility = View.GONE

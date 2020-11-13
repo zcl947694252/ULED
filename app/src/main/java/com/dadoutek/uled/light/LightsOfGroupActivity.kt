@@ -22,7 +22,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
 
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
@@ -87,8 +87,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     private fun addDevice() {
         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
         when (deviceType) {
-            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-            DeviceType.LIGHT_RGB -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+            DeviceType.LIGHT_RGB -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
         }
         startActivity(intent)
     }
@@ -109,8 +109,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> {
                 when {
                     DBUtils.getAllNormalLight().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE ->
-                        startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.LIGHT_NORMAL, "gp" to group?.meshAddr)
+                    TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE ->
+                        startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.LIGHT_NORMAL, "gp" to group?.meshAddr)
                     else -> ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }
@@ -118,8 +118,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             DeviceType.LIGHT_RGB -> {
                 when {
                     DBUtils.getAllRGBLight().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE ->
-                        startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.LIGHT_RGB, "gp" to group?.meshAddr)
+                    TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE ->
+                        startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.LIGHT_RGB, "gp" to group?.meshAddr)
                     else -> ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }
@@ -358,7 +358,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun skipeScanning(type: Int) {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constants.DEVICE_TYPE, type)
+        intent.putExtra(Constant.DEVICE_TYPE, type)
         startActivityForResult(intent, 0)
     }
 
@@ -373,7 +373,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                 when (currentLight!!.connectionStatus) {
                     ConnectionStatus.OFF.value -> {
                         isOpen = 1
-                        if (Constants.IS_ROUTE_MODE)
+                        if (Constant.IS_ROUTE_MODE)
                             routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 1, "lightSw")
                         else {
                             Commander.openOrCloseLights(lightList[position]!!.meshAddr, true)
@@ -383,7 +383,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                     }
                     else -> {
                         isOpen = 0
-                        if (Constants.IS_ROUTE_MODE)
+                        if (Constant.IS_ROUTE_MODE)
                             routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 0, "lightSw")
                         else {
                             Commander.openOrCloseLights(lightList[position]!!.meshAddr, false)
@@ -400,11 +400,11 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
                     if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
                         intent = Intent(this@LightsOfGroupActivity, RGBSettingActivity::class.java)
-                        intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
+                        intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
                     }
-                    intent.putExtra(Constants.LIGHT_ARESS_KEY, currentLight)
-                    intent.putExtra(Constants.GROUP_ARESS_KEY, group?.meshAddr)
-                    intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
+                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                    intent.putExtra(Constant.GROUP_ARESS_KEY, group?.meshAddr)
+                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                     startActivityForResult(intent, REQ_LIGHT_SETTING)
                 } else {
                     ToastUtils.showLong(R.string.connecting_tip)

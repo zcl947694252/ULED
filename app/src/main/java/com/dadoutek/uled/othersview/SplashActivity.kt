@@ -21,7 +21,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
@@ -44,8 +44,8 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         changeLanguage()
         init()
         initListener()
-        Constants.IS_ROUTE_MODE =  SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)
-        LogUtils.v("zcl--获取状态-------${Constants.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constants.ROUTE_MODE, false)}-")
+        Constant.IS_ROUTE_MODE =  SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        LogUtils.v("zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
     }
 
     private fun changeLanguage() {
@@ -84,7 +84,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
 
         //判断是否是第一次使用app，启动导航页
         mIsFirstData = SharedPreferencesHelper.getBoolean(this@SplashActivity, IS_FIRST_LAUNCH, true)
-        mIsLogging = SharedPreferencesHelper.getBoolean(this@SplashActivity, Constants.IS_LOGIN, false)
+        mIsLogging = SharedPreferencesHelper.getBoolean(this@SplashActivity, Constant.IS_LOGIN, false)
         if (mIsLogging) {
             ActivityUtils.startActivityForResult(this, MainActivity::class.java, 0)
             finish()

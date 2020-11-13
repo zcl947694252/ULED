@@ -112,7 +112,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     .setMessage(getString(R.string.delete_group_confirm, group?.name))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
-                        if (Constants.IS_ROUTE_MODE) {
+                        if (Constant.IS_ROUTE_MODE) {
                             routeDeleteGroup("delCWGp", group!!)
                         } else {
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
@@ -160,7 +160,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     override fun deleteGpSuccess() {
         SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
         this.hideLoadingDialog()
-        this?.setResult(Constants.RESULT_OK)
+        this?.setResult(Constant.RESULT_OK)
         this?.finish()
     }
 
@@ -301,7 +301,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
             if (group != null) {
                 if (group!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                    if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                         routeOpenOrCloseBase(group!!.meshAddr, 97, 1, "gpSetting")
                     } else {
                         Commander.openOrCloseLights(group!!.meshAddr, true)
@@ -319,7 +319,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         true
                     }
                 } else {
-                    if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                    if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                         routeOpenOrCloseBase(group!!.meshAddr, 97, 0, "gpSetting")
                     } else {
                         Commander.openOrCloseLights(group!!.meshAddr, false)
@@ -330,14 +330,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else {
             if (light != null) {
                 if (light!!.connectionStatus == ConnectionStatus.OFF.value) {
-                    if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                    if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                         routeOpenOrCloseBase(light!!.meshAddr, light!!.productUUID, 1, "lightSetting")
                     } else {
                         Commander.openOrCloseLights(light!!.meshAddr, true)
                         afterOpenLight()
                     }
                 } else {
-                    if (Constants.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                    if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                         routeOpenOrCloseBase(light!!.meshAddr, light!!.productUUID, 0, "lightSetting")
                     } else {
                         Commander.openOrCloseLights(light!!.meshAddr, false)
@@ -409,8 +409,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (cmdBean.status == 0) {
             when {
                 currentShowPageGroup -> {
-                    when {
-                        isBri==0 -> group?.brightness = light_sbBrightness.progress
+                    when (isBri) {
+                        0 -> group?.brightness = light_sbBrightness.progress
                         else -> group?.colorTemperature = light_sbBrightness.progress
                     }
                     if (group != null)
@@ -583,7 +583,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 currentShowPageGroup -> {
                                     tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                                     if (group != null) {
-                                        if (!Constants.IS_ROUTE_MODE) {
+                                        if (!Constant.IS_ROUTE_MODE) {
                                             updateLights(group!!.brightness, "brightness", group!!)
                                             group!!.brightness = light_sbBrightness.progress
                                             DBUtils.updateGroup(group!!)
@@ -593,7 +593,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 else -> {
                                     light_sbBrightness.progress = light!!.brightness
                                     tv_Brightness.text = light?.brightness.toString() + "%"
-                                    if (light != null && !Constants.IS_ROUTE_MODE) {
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.brightness = light_sbBrightness.progress
                                         DBUtils.updateLight(light)
                                     }
@@ -605,7 +605,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             if (currentShowPageGroup) {
                                 if (group != null) {
                                     updateLights(group!!.brightness, "brightness", group!!)
-                                    if (!Constants.IS_ROUTE_MODE) {
+                                    if (!Constant.IS_ROUTE_MODE) {
                                         group!!.brightness = light_sbBrightness.progress
                                         DBUtils.updateGroup(group!!)
                                     }
@@ -636,7 +636,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     light_sbBrightness.progress = group!!.colorTemperature
                                     tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                                     if (light != null) {
-                                        if (!Constants.IS_ROUTE_MODE) {
+                                        if (!Constant.IS_ROUTE_MODE) {
                                             light.colorTemperature = light_sbBrightness.progress
                                             DBUtils.updateGroup(light)
                                         }
@@ -646,7 +646,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 else -> {
                                     var light = DBUtils.getLightByID(light!!.id)
                                     if (light != null) {
-                                        if (!Constants.IS_ROUTE_MODE) {
+                                        if (!Constant.IS_ROUTE_MODE) {
                                             light.colorTemperature = light_sbBrightness.progress
                                             DBUtils.updateLight(light)
                                         }
@@ -658,14 +658,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                             when {
                                 currentShowPageGroup -> {
-                                    if (group != null && !Constants.IS_ROUTE_MODE) {
+                                    if (group != null && !Constant.IS_ROUTE_MODE) {
                                         group!!.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateGroup(group!!)
                                         updateLights(group!!.colorTemperature, "colorTemperature", group!!)
                                     }
                                 }
                                 else -> {
-                                    if (light != null && !Constants.IS_ROUTE_MODE) {
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateLight(light)
                                     }
@@ -723,7 +723,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 when {
                                     currentShowPageGroup -> {
                                         val light = DBUtils.getGroupByID(group!!.id)
-                                        if (light != null && !Constants.IS_ROUTE_MODE) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light_sbBrightness.progress
                                             DBUtils.updateGroup(light)
                                             updateLights(light.brightness, "brightness", light)
@@ -731,7 +731,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                     else -> {
                                         val light = DBUtils.getLightByID(light!!.id)
-                                        if (light != null && !Constants.IS_ROUTE_MODE) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light!!.brightness
                                             DBUtils.updateLight(light)
                                         }
@@ -743,7 +743,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 when {
                                     currentShowPageGroup -> {
                                         var light = DBUtils.getGroupByID(group!!.id)
-                                        if (light != null && !Constants.IS_ROUTE_MODE) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light_sbBrightness.progress
                                             DBUtils.updateGroup(light)
                                             updateLights(light.brightness, "brightness", light)
@@ -751,7 +751,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                     else -> {
                                         var light = DBUtils.getLightByID(light!!.id)
-                                        if (light != null && !Constants.IS_ROUTE_MODE) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.brightness = light!!.brightness
                                             DBUtils.updateLight(light)
                                         }
@@ -773,14 +773,14 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                                 if (currentShowPageGroup) {
                                     var light = DBUtils.getGroupByID(group!!.id)
-                                    if (light != null && !Constants.IS_ROUTE_MODE) {
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateGroup(light)
                                         updateLights(light.colorTemperature, "colorTemperature", light)
                                     }
                                 } else {
                                     var light = DBUtils.getLightByID(light!!.id)
-                                    if (light != null && !Constants.IS_ROUTE_MODE) {
+                                    if (light != null && !Constant.IS_ROUTE_MODE) {
                                         light.colorTemperature = light_sbBrightness.progress
                                         DBUtils.updateLight(light)
                                     }
@@ -791,7 +791,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 when {
                                     currentShowPageGroup -> {
                                         var light = DBUtils.getGroupByID(group!!.id)
-                                        if (light != null && !Constants.IS_ROUTE_MODE) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.colorTemperature = light_sbBrightness.progress
                                             DBUtils.updateGroup(light)
                                             updateLights(light.colorTemperature, "colorTemperature", light)
@@ -799,7 +799,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                     }
                                     else -> {
                                         var light = DBUtils.getLightByID(light!!.id)
-                                        if (light != null && !Constants.IS_ROUTE_MODE) {
+                                        if (light != null && !Constant.IS_ROUTE_MODE) {
                                             light.colorTemperature = light_sbBrightness.progress
                                             DBUtils.updateLight(light)
                                         }
@@ -952,23 +952,23 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this@NormalSettingActivity, ChooseGroupOrSceneActivity::class.java)
         val bundle = Bundle()
-        bundle.putInt(Constants.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-        bundle.putInt(Constants.DEVICE_TYPE, Constants.DEVICE_TYPE_LIGHT_NORMAL.toInt())
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_NORMAL.toInt())
         intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
-        this?.setResult(Constants.RESULT_OK)
+        this?.setResult(Constant.RESULT_OK)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
-            var group = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             updateGroupResult(light, group)
         }
     }
 
     private fun updateGroupResult(light: DbLight, group: DbGroup) {
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             val bodyBean = GroupBodyBean(mutableListOf(light.meshAddr), light.productUUID, "normalGp", group.meshAddr)
             routerChangeGpDevice(bodyBean)
         } else {
@@ -1045,7 +1045,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe {
                     if (it!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean) {
                             downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
                                     .subscribe(
@@ -1080,11 +1080,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun startOtaAct() {
         val intent = Intent(this@NormalSettingActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.UPDATE_LIGHT, light)
-        intent.putExtra(Constants.OTA_MES_Add, light?.meshAddr)
-        intent.putExtra(Constants.OTA_MAC, light?.macAddr)
-        intent.putExtra(Constants.OTA_VERSION, light?.version)
-        intent.putExtra(Constants.OTA_TYPE, DeviceType.LIGHT_NORMAL)
+        intent.putExtra(Constant.UPDATE_LIGHT, light)
+        intent.putExtra(Constant.OTA_MES_Add, light?.meshAddr)
+        intent.putExtra(Constant.OTA_MAC, light?.macAddr)
+        intent.putExtra(Constant.OTA_VERSION, light?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.LIGHT_NORMAL)
 
         startActivity(intent)
         finish()
@@ -1122,8 +1122,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     @SuppressLint("CheckResult")
     private fun getVersion() {
         val connectDevice = TelinkApplication.getInstance().connectDevice
-        if (connectDevice != null/*&&connectDevice.meshAddress==light!!.meshAddr*/ || Constants.IS_ROUTE_MODE) {
-            if (Constants.IS_ROUTE_MODE) {
+        if (connectDevice != null/*&&connectDevice.meshAddress==light!!.meshAddr*/ || Constant.IS_ROUTE_MODE) {
+            if (Constant.IS_ROUTE_MODE) {
                 val mesAddress = mutableListOf(light.meshAddr)
                 routerGetVersion(mesAddress, light.productUUID, "cwVersion")
             } else {
@@ -1168,7 +1168,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onResume() {
         super.onResume()
-        if (typeStr == Constants.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             val dbGroup = DBUtils.getGroupByID(group!!.id)
             if (group?.status == 1) {
                 setLightGUIImg(progress = dbGroup?.brightness ?: 0, temperatureValue = dbGroup?.colorTemperature ?: 0)
@@ -1187,7 +1187,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
 
     private fun initType() {
-        typeStr = intent.getStringExtra(Constants.TYPE_VIEW)
+        typeStr = intent.getStringExtra(Constant.TYPE_VIEW)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         setSupportActionBar(toolbar)
@@ -1199,7 +1199,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             toolbar.overflowIcon = moreIcon
         }
         slow_rg_view.setOnClickListener(clickListener)
-        currentShowPageGroup = typeStr == Constants.TYPE_GROUP
+        currentShowPageGroup = typeStr == Constant.TYPE_GROUP
         LogUtils.v("zclmenu----------currentShowPageGroup--------$currentShowPageGroup----${DBUtils.lastUser?.id.toString() == DBUtils.lastUser?.last_authorizer_user_id}")
         if (currentShowPageGroup) {
             initDataGroup()
@@ -1432,7 +1432,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else
             slow_ly.visibility = GONE
 
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             sendProgress = group?.brightness?:50
             routerConfigBrightnesssOrColorTemp(true)
             sendProgress = group?.colorTemperature?:50
@@ -1448,7 +1448,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         var params = byteArrayOf(0x05, colorNum.toByte())
         setLightGUIImg(temperatureValue = colorNum)
         when (typeStr) {
-            Constants.TYPE_GROUP -> {
+            Constant.TYPE_GROUP -> {
                 if (group?.status == 1)
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
             }
@@ -1464,7 +1464,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         var params = byteArrayOf(num.toByte())
         light_sbBrightness.progress = num
         setLightGUIImg(progress = num)
-        if (typeStr == Constants.TYPE_GROUP) {
+        if (typeStr == Constant.TYPE_GROUP) {
             if (group?.status == 1)
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
         } else {
@@ -1492,7 +1492,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
                                     successCallback = {
                                         this.hideLoadingDialog()
-                                        this.setResult(Constants.RESULT_OK)
+                                        this.setResult(Constant.RESULT_OK)
                                         this.finish()
                                     },
                                     failedCallback = {
@@ -1515,8 +1515,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             isMostNew(light?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
                 when {
-                    Constants.IS_ROUTE_MODE -> {
-                        startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr, "deviceType" to DeviceType.LIGHT_NORMAL, "deviceMac" to light!!.macAddr)
+                    Constant.IS_ROUTE_MODE -> {
+                        startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr, "deviceType" to DeviceType.LIGHT_NORMAL,
+                                "deviceMac" to light!!.macAddr,"version" to light!!.version )
                         finish()
                     }
                     else -> when {
@@ -1546,9 +1547,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun initViewLight() {
         this.mApp = this.application as TelinkLightApplication?
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
-        this.light = this.intent.extras!!.get(Constants.LIGHT_ARESS_KEY) as DbLight
-        this.fromWhere = this.intent.getStringExtra(Constants.LIGHT_REFRESH_KEY)
-        this.gpAddress = this.intent.getIntExtra(Constants.GROUP_ARESS_KEY, 0)
+        this.light = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY) as DbLight
+        this.fromWhere = this.intent.getStringExtra(Constant.LIGHT_REFRESH_KEY)
+        this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         toolbarTv.text = light?.name
 
         mRxPermission = RxPermissions(this)
@@ -1579,7 +1580,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             tv_Brightness.text = "$brightnes%"
             LogUtils.v("zcl---------路由发送亮度---$sendProgress------$brightnes")
             when {
-                Constants.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(true)
+                Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(true)
                 else -> setLightBrightnessNum(brightnes, light?.meshAddr)
             }
             isBrightness = true
@@ -1596,7 +1597,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             sendProgress = brightnes
             LogUtils.v("zcl---------路由发送色温---$sendProgress------$brightnes")
             when {
-                Constants.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(false)
+                Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(false)
                 else -> setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)
             }
             isBrightness = false
@@ -1656,7 +1657,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
-                            if (Constants.IS_ROUTE_MODE) {
+                            if (Constant.IS_ROUTE_MODE) {
                                 if (isAdd)
                                     sendProgress++
                                 else
@@ -1671,7 +1672,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
             MotionEvent.ACTION_UP -> {
                 onBtnTouch = false
-                if (Constants.IS_ROUTE_MODE)
+                if (Constant.IS_ROUTE_MODE)
                     routerConfigBrightnesssOrColorTemp(isBrightness)
                 if (thisTime - downTime < 500) {
                     handlerMinusOrAddBtn.sendMessage(Message())
@@ -1715,7 +1716,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 light?.name = renameEt?.text.toString().trim { it <= ' ' }
-                if (Constants.IS_ROUTE_MODE) {
+                if (Constant.IS_ROUTE_MODE) {
                     routerUpdateLightName(light.id, light?.name)
                 } else {
                     renameSucess()
@@ -1811,10 +1812,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
-            if (Constants.IS_ROUTE_MODE) {
+            if (Constant.IS_ROUTE_MODE) {
                 sendProgress = seekBar.progress
                 routerConfigBrightnesssOrColorTemp(isBrightness)
 
@@ -1874,9 +1875,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         if (currentShowPageGroup) {
                             if (group?.brightness != progress) {
                                 when {
-                                    progress > Constants.MAX_VALUE -> {
-                                        params = byteArrayOf(Constants.MAX_VALUE.toByte())
-                                        setLightGUIImg(progress = Constants.MAX_VALUE)
+                                    progress > Constant.MAX_VALUE -> {
+                                        params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                                        setLightGUIImg(progress = Constant.MAX_VALUE)
                                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                     }
                                     else -> {
@@ -1887,9 +1888,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             }
                         } else {
                             if (light?.brightness != progress) {
-                                if (progress > Constants.MAX_VALUE) {
-                                    params = byteArrayOf(Constants.MAX_VALUE.toByte())
-                                    setLightGUIImg(progress = Constants.MAX_VALUE)
+                                if (progress > Constant.MAX_VALUE) {
+                                    params = byteArrayOf(Constant.MAX_VALUE.toByte())
+                                    setLightGUIImg(progress = Constant.MAX_VALUE)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                                 } else {
                                     setLightGUIImg(progress = progress)
@@ -1902,7 +1903,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             group?.brightness = progress
                             setAddAndMinusIcon(progress)
                         } else {
-                            if (!Constants.IS_ROUTE_MODE)
+                            if (!Constant.IS_ROUTE_MODE)
                                 light?.brightness = progress
                             setAddAndMinusIcon(progress)
                         }
@@ -1913,7 +1914,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             if (currentShowPageGroup) {
                                 if (group != null) {//禁止为0
                                     tv_Brightness.text = group!!.brightness.toString() + "%"
-                                    if (!Constants.IS_ROUTE_MODE) {
+                                    if (!Constant.IS_ROUTE_MODE) {
                                         group!!.brightness = if (group!!.brightness < 1) 1 else this@NormalSettingActivity.group!!.brightness
                                         DBUtils.updateGroup(group!!)
                                     }
@@ -1922,7 +1923,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                 }
                             } else {
                                 if (light != null) {  //禁止为0
-                                    if (!Constants.IS_ROUTE_MODE) {
+                                    if (!Constant.IS_ROUTE_MODE) {
                                         light.brightness = if (light!!.brightness < 1) 1 else light!!.brightness
                                         DBUtils.updateLight(light)
                                     }
@@ -1974,7 +1975,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             } else {
                                 var dbLight = DBUtils.getLightByID(light!!.id)
                                 if (dbLight != null) {
-                                    if (!Constants.IS_ROUTE_MODE) {
+                                    if (!Constant.IS_ROUTE_MODE) {
                                         light.colorTemperature = dbLight!!.colorTemperature
                                         DBUtils.updateLight(dbLight)
                                     }
@@ -2032,7 +2033,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
 
     fun remove() {
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             routerDeviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "lightFactory")
         } else {
             if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null) {
@@ -2109,7 +2110,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     override fun onBackPressed() {
         super.onBackPressed()
-        setResult(Constants.RESULT_OK)
+        setResult(Constant.RESULT_OK)
         finish()
     }
 
@@ -2118,7 +2119,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         when (v?.id) {
             R.id.slow_rg_slow -> {
                 tempSpeed = 5
-                if (Constants.IS_ROUTE_MODE) {
+                if (Constant.IS_ROUTE_MODE) {
                     routerSwitchSlowUpSlowDown(1, "slowOpen")
                 } else {
                     sendSpeedUi(group, 5)
@@ -2127,7 +2128,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
             R.id.slow_rg_middle -> {
                 tempSpeed = 3
-                if (Constants.IS_ROUTE_MODE) {
+                if (Constant.IS_ROUTE_MODE) {
                     routerSwitchSlowUpSlowDown(1, "slowOpen")
                 } else {
                     sendSpeedUi(group, 3)
@@ -2136,7 +2137,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
             R.id.slow_rg_fast -> {
                 tempSpeed = 1
-                if (Constants.IS_ROUTE_MODE) {
+                if (Constant.IS_ROUTE_MODE) {
                     routerSwitchSlowUpSlowDown(1, "slowOpen")
                 } else {
                     sendSpeedUi(group, 1)
@@ -2145,7 +2146,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             }
             R.id.slow_rg_close -> {
                 when {
-                    Constants.IS_ROUTE_MODE -> routerSwitchSlowUpSlowDown(2, "slowClose")
+                    Constant.IS_ROUTE_MODE -> routerSwitchSlowUpSlowDown(2, "slowClose")
                     else -> slowOrUpClose()
                 }
             }

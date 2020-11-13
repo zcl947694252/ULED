@@ -30,7 +30,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.httpModel.AccountModel
@@ -194,7 +194,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                         Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
 
                         SharedPreferencesUtils.setUserLogin(true)
-                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, true)
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
                         hideLoadingDialog()
                         ActivityUtils.finishAllActivities(true)
                         ActivityUtils.startActivity(this@LoginActivity, MainActivity::class.java)
@@ -218,7 +218,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                     if (!TextUtils.isEmpty(s))
                         edit_user_phone_or_email.setSelection(s.length)
                 }
-                SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constants.NOT_SHOW, false)
+                SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, false)
             }
         }
     }
@@ -231,16 +231,16 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun initListener() {
         login_isTeck.setOnCheckedChangeListener { _, checkedId ->
-            if (Constants.isDebug) {//如果是debug则可以切换
+            if (Constant.isDebug) {//如果是debug则可以切换
                 when (checkedId) {
                     R.id.login_smart -> {
-                        SharedPreferencesHelper.putInt(this, Constants.IS_TECK, 0)
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 0)
                     }
                     R.id.login_Teck -> {
-                        SharedPreferencesHelper.putInt(this, Constants.IS_TECK, 1)
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 1)
                     }
                     R.id.login_rd -> {
-                        SharedPreferencesHelper.putInt(this, Constants.IS_TECK, 2)
+                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 2)
                     }
                 }
                 //startActivity(Intent(this@LoginActivity, MainActivity::class.java))
@@ -260,7 +260,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         isDebugVisible()
 
         initToolbar()
-        if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constants.IS_LOGIN, false)) {
+        if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
         }
 
@@ -326,7 +326,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private fun verificationCode() {
         returnView()
         var intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
-        intent.putExtra("type", Constants.TYPE_VERIFICATION_CODE)
+        intent.putExtra("type", Constant.TYPE_VERIFICATION_CODE)
         returnView()
         startActivityForResult(intent, 0)
     }
@@ -412,7 +412,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             btn_login.visibility = View.VISIBLE
             eye_btn.visibility = View.VISIBLE
             isDebugVisible()
-            SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constants.NOT_SHOW, true)
+            SharedPreferencesHelper.putBoolean(TelinkApplication.getInstance(), Constant.NOT_SHOW, true)
             login()
         }
         if (view.id == R.id.delete_image) {
@@ -427,7 +427,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun isDebugVisible() {
-        if (Constants.isDebug)
+        if (Constant.isDebug)
             login_isTeck.visibility = View.VISIBLE
         else
             login_isTeck.visibility = View.GONE
@@ -444,7 +444,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_password!!.visibility = View.GONE
 
             if (currentUser?.phone == message!![0]) {
-                SharedPreferencesHelper.removeKey(this, Constants.USER_INFO)
+                SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
                 edit_user_phone_or_email!!.setText("")
                 edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
                 edit_user_password!!.setText("")
@@ -569,7 +569,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
 
         override fun error(msg: String) {
-            val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constants.IS_SHOW_REGION_DIALOG, false)
+            val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, false)
             if (ishowRegionDialog) {
                 initMe()
                 initAuthor()
@@ -577,7 +577,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             }
             isSuccess = false
             hideLoadingDialog()
-            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, false)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         }
     }
 
@@ -645,7 +645,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun syncComplet() {
-        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.IS_LOGIN, true)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
         transformView()
         hideLoadingDialog()
         TelinkLightApplication.getApp().lastMeshAddress = DBUtils.getlastDeviceMesh()

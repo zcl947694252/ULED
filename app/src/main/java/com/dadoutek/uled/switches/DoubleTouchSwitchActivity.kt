@@ -16,7 +16,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.util.GsonUtil
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DaoSessionInstance
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
@@ -148,7 +148,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == requestCodeNum && resultCode == Activity.RESULT_OK) {
-            var group = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             if (isLeft) {
                 switch_double_touch_left_tv.text = group.name
                 leftGroup = group
@@ -163,8 +163,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         val intent = Intent(this@DoubleTouchSwitchActivity, ChooseGroupOrSceneActivity::class.java)
         //传入0代表是群组
         val bundle = Bundle()
-        bundle.putInt(Constants.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-        bundle.putInt(Constants.DEVICE_TYPE, Constants.DEVICE_TYPE_LIGHT_SW.toInt())
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT_SW.toInt())
         intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
     }
@@ -220,7 +220,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 DBUtils.saveSwitch(dbSwitch, false)
                 DBUtils.recordingChange(dbSwitch.id,
                         DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                        Constants.DB_ADD)
+                        Constant.DB_ADD)
                 switchDate = dbSwitch
             }
         } else {
@@ -241,7 +241,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 if (leftGroup == null && rightGroup == null) {
                     ToastUtils.showShort(getString(R.string.config_night_light_select_group))
                 } else {
-                    if (Constants.IS_ROUTE_MODE) {
+                    if (Constant.IS_ROUTE_MODE) {
                         RouterModel.configDoubleSw(RouterListBody(switchDate!!.id, mutableListOf(leftGroup?.meshAddr ?: 0, rightGroup?.meshAddr
                                 ?: 0), "configDoubleSw"))
                                 ?.subscribe({
@@ -292,7 +292,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             R.id.switch_double_touch_i_know -> {
                 switch_double_touch_mb.visibility = View.GONE
                 switch_double_touch_set.visibility = View.VISIBLE
-                SharedPreferencesHelper.putBoolean(this, Constants.IS_FIRST_CONFIG_DOUBLE_SWITCH, false)
+                SharedPreferencesHelper.putBoolean(this, Constant.IS_FIRST_CONFIG_DOUBLE_SWITCH, false)
             }
         }
     }
@@ -361,7 +361,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEt?.text.toString().trim { it <= ' ' }
-                if (!Constants.IS_ROUTE_MODE) {
+                if (!Constant.IS_ROUTE_MODE) {
                     renameSw(trim)
                 } else {
                     routerRenameSw(switchDate!!, trim)

@@ -17,8 +17,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constants
-import com.dadoutek.uled.model.Constants.*
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
@@ -173,8 +173,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
                     batchGroup.visibility = View.GONE
                     batchGroup.setOnClickListener {
                         val intent = Intent(this, CurtainBatchGroupActivity::class.java)
-                        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("curtain", "all_curtain")
                         startActivity(intent)
                     }
@@ -223,8 +223,8 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
                     batchGroup.setText(R.string.batch_group)
                     batchGroup.setOnClickListener {
                         val intent = Intent(this, CurtainBatchGroupActivity::class.java)
-                        intent.putExtra(Constants.IS_SCAN_RGB_LIGHT, true)
-                        intent.putExtra(Constants.IS_SCAN_CURTAIN, true)
+                        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+                        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
                         intent.putExtra("curtain", "group_curtain")
                         intent.putExtra("curtain_group_name", cwLightGroup)
                         startActivity(intent)
@@ -309,7 +309,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                     }
                 }
@@ -334,7 +334,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         dialog.dismiss()
                     }
                 }
@@ -363,7 +363,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun addCurtainDevice() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
         startActivityForResult(intent, 0)
     }
 

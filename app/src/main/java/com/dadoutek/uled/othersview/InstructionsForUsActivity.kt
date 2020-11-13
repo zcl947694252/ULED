@@ -9,7 +9,7 @@ import android.webkit.WebView
 
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import kotlinx.android.synthetic.main.toolbar.*
 
 class InstructionsForUsActivity : TelinkBaseActivity() {
@@ -89,7 +89,7 @@ class InstructionsForUsActivity : TelinkBaseActivity() {
             webView!!.loadUrl("http://www.dadoutek.com/app/README/index.html?lang=1")
         }*/
 
-        var webIndex = intent.getStringExtra(Constants.WB_TYPE)
+        var webIndex = intent.getStringExtra(Constant.WB_TYPE)
 
         val config: Configuration = resources.configuration
         when {

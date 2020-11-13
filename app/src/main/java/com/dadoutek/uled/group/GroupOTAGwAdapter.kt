@@ -6,7 +6,6 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.DbGateway
-import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import org.jetbrains.anko.padding
 import org.jetbrains.anko.textColor
@@ -43,7 +42,7 @@ class GroupOTAGwAdapter(resId: Int, data: MutableList<DbGateway>) : BaseQuickAda
 
         if (item?.isSupportOta == true && !item.isMostNew &&TelinkLightApplication.mapBin.isNotEmpty()) {
             when {
-                Constants.IS_ROUTE_MODE && item.isGetVersion -> {
+                item.isGetVersion -> {
                     helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_gateway)
                             .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
                 }

@@ -5,7 +5,7 @@ import android.text.InputFilter;
 import android.widget.EditText;
 
 import com.dadoutek.uled.R;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbConnector;
 import com.dadoutek.uled.model.dbModel.DbCurtain;
@@ -247,18 +247,18 @@ public class StringUtils {
 
     public static String getInstallDescribe(int type, Context context) {
         switch (type) {
-            case Constants.INSTALL_NORMAL_LIGHT:
-            case Constants.INSTALL_RGB_LIGHT:
+            case Constant.INSTALL_NORMAL_LIGHT:
+            case Constant.INSTALL_RGB_LIGHT:
                 return context.getString(R.string.guide_tip_reset_light);
-            case Constants.INSTALL_SWITCH:
+            case Constant.INSTALL_SWITCH:
                 return context.getString(R.string.guide_tip_reset_switch);
-            case Constants.INSTALL_SENSOR:
+            case Constant.INSTALL_SENSOR:
                 return context.getString(R.string.guide_tip_reset_sensor);
-            case Constants.INSTALL_CURTAIN:
+            case Constant.INSTALL_CURTAIN:
                 return context.getString(R.string.guide_tip_reset_curtain);
-            case Constants.INSTALL_CONNECTOR:
+            case Constant.INSTALL_CONNECTOR:
                 return context.getString(R.string.guide_tip_reset_relay);
-            case Constants.INSTALL_GATEWAY:
+            case Constant.INSTALL_GATEWAY:
                 return context.getString(R.string.guide_tip_reset_gateway);
         }
         return "";

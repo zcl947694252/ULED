@@ -30,8 +30,8 @@ import com.dadoutek.uled.gateway.bean.*
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.gateway.util.GsonUtil
 import com.dadoutek.uled.intf.OtaPrepareListner
-import com.dadoutek.uled.model.Constants
-import com.dadoutek.uled.model.Constants.*
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.httpModel.GwModel
@@ -197,7 +197,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 R.id.toolbar_f_delete -> deleteDevice()
             }
         } else {
-            if (Constants.IS_ROUTE_MODE) return@OnMenuItemClickListener true
+            if (Constant.IS_ROUTE_MODE) return@OnMenuItemClickListener true
             showLoadingDialog(getString(R.string.connecting_tip))
             connect(dbGw!!.meshAddr, true)?.subscribeOn(Schedulers.io())
                     ?.observeOn(AndroidSchedulers.mainThread())

@@ -17,8 +17,8 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
-import com.dadoutek.uled.model.Constants
-import com.dadoutek.uled.model.Constants.*
+import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.router.adapter.RouterDeviceDetailsAdapter
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -221,7 +221,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                             LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
                             if (result != null) {
                                 val intent = Intent(this@RouterDeviceDetailsActivity, RoutingNetworkActivity::class.java)
-                                intent.putExtra(Constants.ONE_QR, result)
+                                intent.putExtra(Constant.ONE_QR, result)
                                 startActivity(intent)
                                 finish()
                             } else {
@@ -292,7 +292,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     private fun transformView() {
         startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to currentDevice!!.productUUID,
-                "deviceMac" to currentDevice!!.macAddr)
+                "deviceMac" to currentDevice!!.macAddr,"version" to currentDevice!!.version )
     }
 
 

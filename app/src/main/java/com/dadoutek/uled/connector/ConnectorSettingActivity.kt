@@ -21,7 +21,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import android.widget.Toast
-import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -30,7 +29,7 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.intf.SyncCallback
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.model.dbModel.DbGroup
@@ -54,7 +53,6 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -129,7 +127,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     fun remove() {
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(getString(R.string.sure_delete_device2))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (Constants.IS_ROUTE_MODE)
+                    if (Constant.IS_ROUTE_MODE)
                         routerDeviceResetFactory(currentDbConnector!!.macAddr, currentDbConnector!!.meshAddr, currentDbConnector!!.productUUID, "deleteConnector")
                     else
                         if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true) {
@@ -198,23 +196,23 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     private fun updateGroup() {//更新分组 断开提示
         val intent = Intent(this@ConnectorSettingActivity, ChooseGroupOrSceneActivity::class.java)
         val bundle = Bundle()
-        bundle.putInt(Constants.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
-        bundle.putInt(Constants.DEVICE_TYPE, Constants.DEVICE_TYPE_CONNECTOR.toInt())
+        bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 0)//传入0代表是群组
+        bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_CONNECTOR.toInt())
         intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
-        this?.setResult(Constants.RESULT_OK)
+        this?.setResult(Constant.RESULT_OK)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
-            var group = data?.getSerializableExtra(Constants.EIGHT_SWITCH_TYPE) as DbGroup
+            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             updateGroupResult(currentDbConnector!!, group)
         }
     }
 
     private fun updateGroupResult(light: DbConnector, group: DbGroup) {
-        if (Constants.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE)
             routerChangeGpDevice(GroupBodyBean(mutableListOf(light.meshAddr), light.productUUID, "connectorGp", group.meshAddr))
         else {
             Commander.addGroup(light.meshAddr, group.meshAddr, {
@@ -226,7 +224,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 ToastUtils.showShort(getString(R.string.grouping_success_tip))
                 if (group != null)
                     DBUtils.updateGroup(group!!)//更新组类型
-                finish()
             }, {
                 ToastUtils.showShort(getString(R.string.grouping_fail))
             })
@@ -372,7 +369,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         mDisposable.add(
                 mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
+                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean)
                             transformView()
                         else
@@ -416,7 +413,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun transformView() {
         val intent = Intent(this@ConnectorSettingActivity, OTAConnectorActivity::class.java)
-        intent.putExtra(Constants.UPDATE_LIGHT, currentDbConnector)
+        intent.putExtra(Constant.UPDATE_LIGHT, currentDbConnector)
         startActivity(intent)
         finish()
     }
@@ -436,7 +433,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEt?.text.toString().trim { it <= ' ' }
-                if (Constants.IS_ROUTE_MODE)
+                if (Constant.IS_ROUTE_MODE)
                     RouterModel.routeUpdateRelayName(currentDbConnector!!.id, trim)?.subscribe({
                         afterRenameSucess(trim)
                     }, {
@@ -508,7 +505,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
-        if (TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE) {
+        if (TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE) {
             when (item?.itemId) {
                 R.id.toolbar_f_rename -> if (isConfigGroup) renameGroup() else renameDevice()
                 R.id.toolbar_fv_change_group -> updateGroup()
@@ -519,8 +516,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                             isMostNew(currentDbConnector?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
                             else -> {
                                 when {
-                                    Constants.IS_ROUTE_MODE ->{ startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
-                                            "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr)
+                                    Constant.IS_ROUTE_MODE ->{ startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
+                                            "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr,
+                                            "version" to currentDbConnector!!.version )
                                     finish()}
                                     else -> checkPermission()
                                 }
@@ -577,8 +575,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun initType() {
-        var type = intent.getStringExtra(Constants.TYPE_VIEW)
-        isConfigGroup = type == Constants.TYPE_GROUP
+        var type = intent.getStringExtra(Constant.TYPE_VIEW)
+        isConfigGroup = type == Constant.TYPE_GROUP
         if (isConfigGroup) {
             currentShowPageGroup = true
             this.currentGroup = this.intent.extras!!.get("group") as DbGroup
@@ -601,7 +599,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         }
         connector_switch.isChecked = currentDbConnector?.connectionStatus == 1
         connector_switch?.setOnCheckedChangeListener { _, isChecked ->
-            if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE)
+            if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE)
                 autoConnect()
             else {
                 if (isChecked)
@@ -616,17 +614,17 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         isOpen = b
         var status = if (b) 1 else 0
         if (isConfigGroup) {
-            if (Constants.IS_ROUTE_MODE) {
+            if (Constant.IS_ROUTE_MODE) {
                 routeOpenOrCloseBase(currentDbConnector!!.meshAddr, 97, status, "switchGp")
             } else {
                 Commander.openOrCloseLights(currentGroup?.meshAddr ?: 0, b)
                 afterSwitchGp(b)
             }
         } else {
-            if (Constants.IS_ROUTE_MODE) {
+            if (Constant.IS_ROUTE_MODE) {
                 routeOpenOrCloseBase(currentDbConnector!!.meshAddr, currentDbConnector!!.productUUID, status, "switchConnector")
             } else {
-                Commander.openOrCloseCurtain(currentDbConnector?.meshAddr ?: 0, isOpen = b, isPause = false)
+                Commander.openOrCloseLights(currentDbConnector?.meshAddr ?: 0, isOpen = b)
                 afterSwConnector(b)
             }
         }
@@ -693,7 +691,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     private fun initViewLight() {
         this.mApp = this.application as TelinkLightApplication?
         manager = DataManager(mApp, mApp!!.mesh.name, mApp!!.mesh.password)
-        val get = this.intent.extras!!.get(Constants.LIGHT_ARESS_KEY)
+        val get = this.intent.extras!!.get(Constant.LIGHT_ARESS_KEY)
         if (get != null)
             currentDbConnector = get as DbConnector
         if (currentDbConnector == null) {
@@ -708,7 +706,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun getVersion() {
         when {
-            Constants.IS_ROUTE_MODE -> routerGetVersion(mutableListOf(currentDbConnector!!.meshAddr), DeviceType.SMART_RELAY, "getRalyVersion")
+            Constant.IS_ROUTE_MODE -> routerGetVersion(mutableListOf(currentDbConnector!!.meshAddr), DeviceType.SMART_RELAY, "getRalyVersion")
             TelinkApplication.getInstance().connectDevice != null -> {
                 val disposable = Commander.getDeviceVersion(currentDbConnector!!.meshAddr)
                         .subscribe(
@@ -758,7 +756,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         return if (keyCode == KeyEvent.KEYCODE_BACK) {
-            setResult(Constants.RESULT_OK)
+            setResult(Constant.RESULT_OK)
             finish()
             false
         } else {

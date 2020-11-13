@@ -17,7 +17,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DbColorNode
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -72,7 +72,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-        colorNode = intent.getSerializableExtra(Constants.COLOR_NODE_KEY) as? DbColorNode
+        colorNode = intent.getSerializableExtra(Constant.COLOR_NODE_KEY) as? DbColorNode
     }
 
     @SuppressLint("ClickableViewAccessibility", "StringFormatMatches", "SetTextI18n")
@@ -108,7 +108,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         rgb_sbBrightness.setOnSeekBarChangeListener(barChangeListener)
         rgb_white_seekbar.setOnSeekBarChangeListener(barChangeListener)
 
-        if (Constants.IS_OPEN_AUXFUN) {
+        if (Constant.IS_OPEN_AUXFUN) {
             ll_r_r.visibility = View.VISIBLE
             ll_g_g.visibility = View.VISIBLE
             ll_b_b.visibility = View.VISIBLE
@@ -286,11 +286,11 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
             try {
 
-                if (w!! > Constants.MAX_VALUE) {
-                    w = Constants.MAX_VALUE
+                if (w!! > Constant.MAX_VALUE) {
+                    w = Constant.MAX_VALUE
                 }
-                if (ws > Constants.MAX_VALUE) {
-                    ws = Constants.MAX_VALUE
+                if (ws > Constant.MAX_VALUE) {
+                    ws = Constant.MAX_VALUE
                 }
                 if (ws == -1) {
                     ws = 0
@@ -342,7 +342,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, color: Int, isOnceSet: Boolean) {
-        if (Constants.IS_ROUTE_MODE)//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
+        if (Constant.IS_ROUTE_MODE)//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
             routerConfigRGBNum(colorNode!!.dstAddress, 6, color)
         else
             GlobalScope.launch {
@@ -404,7 +404,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
@@ -456,7 +456,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                             sbBrightness_add.isEnabled = true
                         }
                     }
-                    if (!Constants.IS_ROUTE_MODE)
+                    if (!Constant.IS_ROUTE_MODE)
                         sendBri(progress, addr, immediate)
                     else
                         routerConfigBriOrWhite(true)
@@ -478,7 +478,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                             sb_w_bright_less.isEnabled = true
                         }
                     }
-                    if (!Constants.IS_ROUTE_MODE)
+                    if (!Constant.IS_ROUTE_MODE)
                         sendWhiteCommend(progress, addr, immediate)
                     else
                         routerConfigBriOrWhite(false)

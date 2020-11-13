@@ -3,7 +3,7 @@ package com.dadoutek.uled.util
 import android.annotation.SuppressLint
 import android.bluetooth.le.ScanFilter
 import android.util.Log
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
@@ -88,7 +88,7 @@ class ReconnectionBluetooth : EventListener<String> {
 
 //                scanPb.visibility = View.GONE
 //                adapter?.notifyDataSetChanged()
-                SharedPreferencesHelper.putBoolean(mApplication, Constants.CONNECT_STATE_SUCCESS_KEY, true)
+                SharedPreferencesHelper.putBoolean(mApplication, Constant.CONNECT_STATE_SUCCESS_KEY, true)
             }
             LightAdapter.STATUS_LOGOUT -> {
                 retryConnect()
@@ -106,7 +106,7 @@ class ReconnectionBluetooth : EventListener<String> {
     }
 
     private fun onNError(event: DeviceEvent) {
-        SharedPreferencesHelper.putBoolean(mApplication, Constants.CONNECT_STATE_SUCCESS_KEY, false)
+        SharedPreferencesHelper.putBoolean(mApplication, Constant.CONNECT_STATE_SUCCESS_KEY, false)
 
         TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.d("DeviceScanningActivity#onNError")

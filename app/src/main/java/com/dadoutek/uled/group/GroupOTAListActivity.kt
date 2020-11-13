@@ -22,7 +22,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.routerModel.RouterModel
@@ -92,7 +92,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         setContentView(R.layout.activity_group_ota_list)
         initView()
         initData()
-        if (Constants.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE)
             getMostNewVersion()
         initListener()
     }
@@ -437,7 +437,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
 
     private fun setRefresh() {
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             ota_swipe_refresh_ly.isRefreshing = false
             return
         }
@@ -622,6 +622,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
         setAllAdapter(emptyView)
         setDevice()
+        if (!Constant.IS_ROUTE_MODE)
+            updataDevice()
     }
 
     private fun setAllAdapter(emptyView: View?) {
@@ -670,7 +672,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun getRelayData() {
         relayList.clear()
         if (isGroup) relayList.addAll(DBUtils.getRelayByGroupID(dbGroup!!.id)) else relayList.addAll(DBUtils.allRely)
-        relayList.forEach { meshAddrList.add(it.meshAddr) }
+        relayList.forEach {
+            meshAddrList.add(it.meshAddr)
+            it.isGetVersion = !Constant.IS_ROUTE_MODE
+        }
     }
 
 
@@ -684,7 +689,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         curtainList.clear()
         if (isGroup)
             curtainList.addAll(DBUtils.getCurtainByGroupID(dbGroup!!.id)) else curtainList.addAll(DBUtils.allCurtain)
-        curtainList.forEach { meshAddrList.add(it.meshAddr) }
+        curtainList.forEach {
+            meshAddrList.add(it.meshAddr)
+            it.isGetVersion = !Constant.IS_ROUTE_MODE
+        }
     }
 
 
@@ -696,16 +704,18 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     private fun getLightData() {
         lightList.clear()
-        if (isGroup)
-            lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
-        else when (deviceType) {
-            DeviceType.LIGHT_NORMAL -> lightList.addAll(DBUtils.getAllNormalLight())
-            DeviceType.LIGHT_RGB -> lightList.addAll(DBUtils.getAllRGBLight())
+        when {
+            isGroup -> lightList.addAll(DBUtils.getLightByGroupID(dbGroup!!.id))
+            else -> when (deviceType) {
+                DeviceType.LIGHT_NORMAL -> lightList.addAll(DBUtils.getAllNormalLight())
+                DeviceType.LIGHT_RGB -> lightList.addAll(DBUtils.getAllRGBLight())
+            }
         }
         lightList.forEach {
             meshAddrList.add(it.meshAddr)
-            it.isGetVersion = false
+            it.isGetVersion = !Constant.IS_ROUTE_MODE
         }
+        LogUtils.v("zcl-----------群组升级普通灯-------$lightList")
     }
 
     private fun updateSw() {
@@ -719,7 +729,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         if (isGroup) switchList else switchList.addAll(DBUtils.getAllSwitch())
         switchList.forEach {
             meshAddrList.add(it.meshAddr)
-            it.isGetVersion = false
+            it.isGetVersion = !Constant.IS_ROUTE_MODE
         }
     }
 
@@ -734,7 +744,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         if (isGroup) gwList else gwList.addAll(DBUtils.getAllGateWay())
         gwList.forEach {
             meshAddrList.add(it.meshAddr)
-            it.isGetVersion = false
+            it.isGetVersion = !Constant.IS_ROUTE_MODE
         }
     }
 
@@ -749,7 +759,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         if (isGroup) sensorList else sensorList.addAll(DBUtils.getAllSensor())
         sensorList.forEach {
             meshAddrList.add(it.meshAddr)
-            it.isGetVersion = false
+            it.isGetVersion = !Constant.IS_ROUTE_MODE
         }
     }
 
@@ -766,7 +776,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var support = lightList.filter { it.isSupportOta && !it.isMostNew }
         lightList.removeAll(support)
         lightList.addAll(support)
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             var su = lightList.filter { it.isGetVersion }
             lightList.removeAll(su)
             lightList.addAll(su)
@@ -784,7 +794,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var unsupport = switchList.filter { it.isSupportOta && !it.isMostNew }
         switchList.removeAll(unsupport)
         switchList.addAll(unsupport)
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             var su = switchList.filter { it.isGetVersion }
             switchList.removeAll(su)
             switchList.addAll(su)
@@ -802,7 +812,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var support = sensorList.filter { it.isSupportOta && !it.isMostNew }
         sensorList.removeAll(support)
         val addAll = sensorList.addAll(support)
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             var su = sensorList.filter { it.isGetVersion }
             sensorList.removeAll(su)
             sensorList.addAll(su)
@@ -820,7 +830,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var support = curtainList.filter { it.isSupportOta && !it.isMostNew }
         curtainList.removeAll(support)
         curtainList.addAll(support)
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             var su = curtainList.filter { it.isGetVersion }
             curtainList.removeAll(su)
             curtainList.addAll(su)
@@ -838,7 +848,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var support = relayList.filter { it.isSupportOta && !it.isMostNew }
         relayList.removeAll(support)
         relayList.addAll(support)
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             var su = relayList.filter { it.isGetVersion }
             relayList.removeAll(su)
             relayList.addAll(su)
@@ -856,7 +866,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         var support = gwList.filter { it.isSupportOta && !it.isMostNew }
         gwList.removeAll(support)
         gwList.addAll(support)
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             var su = gwList.filter { it.isGetVersion }
             gwList.removeAll(su)
             gwList.addAll(su)
@@ -872,7 +882,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         template_recycleView.layoutManager = GridLayoutManager(this, 2)/*LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)*/
         template_recycleView.addItemDecoration(RecyclerGridDecoration(this, 2))
         when {
-            Constants.IS_ROUTE_MODE -> {
+            Constant.IS_ROUTE_MODE -> {
                 group_ota_number_ly.visibility = View.GONE
                 btn_gp_ota_start.visibility = View.VISIBLE
             }
@@ -893,7 +903,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         //设置触发刷新的距离
         ota_swipe_refresh_ly.setDistanceToTriggerSync(200)
         //是否禁止下拉刷新
-        ota_swipe_refresh_ly.isEnabled = !Constants.IS_ROUTE_MODE
+        ota_swipe_refresh_ly.isEnabled = !Constant.IS_ROUTE_MODE
 
         if (TelinkLightApplication.mapBin.isEmpty())
             ToastUtils.showShort(getString(R.string.get_bin_fail))
@@ -912,7 +922,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             setRefresh()
         }
         btn_gp_ota_start.setOnClickListener {
-            if (!isStartOta && Constants.IS_ROUTE_MODE)
+            if (!isStartOta && Constant.IS_ROUTE_MODE)
                 routerStart()
             else
                 ToastUtils.showShort(getString(R.string.otaing))
@@ -926,7 +936,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val filter = lightList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     when {
-                        Constants.IS_ROUTE_MODE -> {
+                        Constant.IS_ROUTE_MODE -> {
                             if (it.isGetVersion)
                                 meshList.add(it.meshAddr)
                         }
@@ -938,7 +948,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val filter = curtainList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     when {
-                        Constants.IS_ROUTE_MODE -> {
+                        Constant.IS_ROUTE_MODE -> {
                             if (it.isGetVersion)
                                 meshList.add(it.meshAddr)
                         }
@@ -950,7 +960,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val filter = relayList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     when {
-                        Constants.IS_ROUTE_MODE -> {
+                        Constant.IS_ROUTE_MODE -> {
                             if (it.isGetVersion)
                                 meshList.add(it.meshAddr)
                         }
@@ -963,7 +973,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val filter = switchList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     when {
-                        Constants.IS_ROUTE_MODE -> {
+                        Constant.IS_ROUTE_MODE -> {
                             if (it.isGetVersion)
                                 meshList.add(it.meshAddr)
                         }
@@ -972,11 +982,11 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 }
             }
             DeviceType.SENSOR -> {
-                if (Constants.IS_ROUTE_MODE) {
+                if (Constant.IS_ROUTE_MODE) {
                     val filter = sensorList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                     filter.forEach {
                         when {
-                            Constants.IS_ROUTE_MODE -> {
+                            Constant.IS_ROUTE_MODE -> {
                                 if (it.isGetVersion)
                                     meshList.add(it.meshAddr)
                             }
@@ -989,7 +999,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 val filter = gwList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     when {
-                        Constants.IS_ROUTE_MODE -> {
+                        Constant.IS_ROUTE_MODE -> {
                             if (it.isGetVersion)
                                 meshList.add(it.meshAddr)
                         }
@@ -998,7 +1008,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 }
             }
         }
-        if (!isStartOta && Constants.IS_ROUTE_MODE)
+        if (!isStartOta && Constant.IS_ROUTE_MODE)
             routerOtaDevice(meshList)
     }
 
@@ -1023,7 +1033,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             DeviceType.SENSOR -> sensorUpdate()
             DeviceType.GATE_WAY -> updateGw()
         }
-        if (isOtaing && Constants.IS_ROUTE_MODE)
+        if (isOtaing && Constant.IS_ROUTE_MODE)
             routerStart()
     }
 
@@ -1039,7 +1049,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
-        if (Constants.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE)
             return@OnItemClickListener
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> bleOTALight(lightList[position])
@@ -1133,7 +1143,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                             showLoadingDialog(getString(R.string.please_wait))
                             TelinkLightService.Instance()?.idleMode(true)
                             Thread.sleep(500)
-                            connect(macAddress = dbsw.macAddr, meshAddress = dbsw.meshAddr, connectTimeOutTime = 12, retryTimes = 2)
+                            connect(macAddress = dbsw.macAddr, meshAddress = dbsw.meshAddr, connectTimeOutTime = 15, retryTimes = 2)
                                     ?.subscribeOn(Schedulers.io())
                                     ?.observeOn(AndroidSchedulers.mainThread())
                                     ?.subscribe({
@@ -1221,14 +1231,14 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun bleOTALight(dbLight: DbLight) {
         when {
-            Constants.IS_ROUTE_MODE -> routerStart()
+            Constant.IS_ROUTE_MODE -> routerStart()
             dbLight.isMostNew -> ToastUtils.showShort(getString(R.string.the_last_version))
             dbLight.isSupportOta -> {
                 when {
                     TextUtils.isEmpty(dbLight.version) -> {
                         showLoadingDialog(getString(R.string.please_wait))
                         when {
-                            TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr || Constants.IS_ROUTE_MODE -> {
+                            TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbLight.meshAddr || Constant.IS_ROUTE_MODE -> {
                                 getDeviceVersionLight(dbLight)
                             }
                             else -> {
@@ -1262,7 +1272,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun getDeviceVersionLight(dbLight: DbLight) {
-        if (Constants.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE)
             Commander.getDeviceVersion(dbLight.meshAddr).subscribe(
                     { s: String ->
                         dbLight!!.version = s
@@ -1380,7 +1390,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 } else {
                     showLoadingDialog(getString(R.string.please_wait))
                     val idleMode = TelinkLightService.Instance()?.idleMode(true)
-                    connect(macAddress = macAddr, meshAddress = meshAddr, fastestMode = true, connectTimeOutTime = 25)?.subscribe({
+                    connect(macAddress = macAddr, meshAddress = meshAddr, fastestMode = true, connectTimeOutTime = 15)?.subscribe({
                         hideLoadingDialog()
                         startOtaAct(meshAddr, macAddr, version, deviceType)
                     }, {
@@ -1401,10 +1411,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     private fun startOtaAct(meshAddr: Int, macAddr: String, version: String, deviceType: Int) {
         val intent = Intent(this@GroupOTAListActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constants.OTA_MES_Add, meshAddr)
-        intent.putExtra(Constants.OTA_MAC, macAddr)
-        intent.putExtra(Constants.OTA_VERSION, version)
-        intent.putExtra(Constants.OTA_TYPE, deviceType)
+        intent.putExtra(Constant.OTA_MES_Add, meshAddr)
+        intent.putExtra(Constant.OTA_MAC, macAddr)
+        intent.putExtra(Constant.OTA_VERSION, version)
+        intent.putExtra(Constant.OTA_TYPE, deviceType)
         startActivity(intent)
     }
 

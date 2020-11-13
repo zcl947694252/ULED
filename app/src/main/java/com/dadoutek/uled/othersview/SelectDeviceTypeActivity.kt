@@ -12,7 +12,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.model.DeviceItem
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.adapter.DeviceTypeAdapter
 import com.dadoutek.uled.router.RoutingNetworkActivity
@@ -136,7 +136,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
                             LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
                             if (result != null) {
                                 val intent = Intent(this@SelectDeviceTypeActivity, RoutingNetworkActivity::class.java)
-                                intent.putExtra(Constants.ONE_QR, result)
+                                intent.putExtra(Constant.ONE_QR, result)
                                 startActivity(intent)
                                 finish()
                             } else {

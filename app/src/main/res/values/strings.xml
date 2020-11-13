@@ -1195,5 +1195,8 @@
     <string name="plaese_input_device_name">Please enter the device name</string>
     <string name="rename_success">Rename successful</string>
     <string name="get_versioning">Get the version number, please wait</string>
-    <string name="cloud_assistant">云助手</string>
+    <string name="cloud_assistant">Cloud assistant</string>
+    <string name="no_third_party">Third party platforms that have not been used for the time being</string>
+    <string name="please_set_color">请设置颜色</string>
+    <string name="gp_deletescene">此场景群组已被删除,请重新创建场景</string>
 </resources>

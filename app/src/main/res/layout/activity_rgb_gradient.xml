@@ -12,9 +12,8 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#eeeeee" />
-
-    <ScrollView
-            android:id="@+id/scroll"
+<!--android:nestedScrollingEnabled="true" NestedScrollView解决item显示不全-->
+    <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
@@ -68,19 +67,12 @@
                     android:layout_height="1dp"
                     android:background="#eeeeee" />
 
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
                 <android.support.v7.widget.RecyclerView
                         android:id="@+id/builtInModeRecycleView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:nestedScrollingEnabled="true"
                         android:overScrollMode="never" />
-
-            </LinearLayout>
 
             <android.support.constraint.ConstraintLayout
                     android:id="@+id/mode_diy_layout"
@@ -120,18 +112,13 @@
                     android:layout_height="1dp"
                     android:background="#eeeeee" />
 
-            <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
                 <android.support.v7.widget.RecyclerView
                         android:id="@+id/builtDiyModeRecycleView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:nestedScrollingEnabled="true"
                         android:scrollbars="none" />
-            </LinearLayout>
+
 
             <include layout="@layout/template_add_help" />
 
@@ -146,7 +133,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/layoutModeDiy" />
 
         </LinearLayout>
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
     <LinearLayout
             android:id="@+id/btnAdd"

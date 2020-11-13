@@ -5,7 +5,6 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.model.Constants
 import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
@@ -46,7 +45,7 @@ class GroupOTACurtainAdapter(resId: Int, data: MutableList<DbCurtain>) : BaseQui
         if (item?.isSupportOta == true && !item.isMostNew&&TelinkLightApplication.mapBin.isNotEmpty()) {
 
             when {
-                Constants.IS_ROUTE_MODE && item.isGetVersion -> {
+                item.isGetVersion -> {
                     helper.setImageResource(R.id.group_ota_icon, R.drawable.icon_curtain_device)
                             .setImageResource(R.id.group_ota_update, R.drawable.uparrow)
                 }

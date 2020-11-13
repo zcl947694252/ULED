@@ -36,7 +36,7 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
 import com.dadoutek.uled.light.NormalSettingActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbDeviceName
 import com.dadoutek.uled.model.dbModel.DbGroup
@@ -382,7 +382,7 @@ class GroupListFragment : BaseFragment() {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         refreshView()
                         dialog.dismiss()
                     }
@@ -472,16 +472,16 @@ class GroupListFragment : BaseFragment() {
                     if (isOpen) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constants.SER_ID_GROUP_ALLON
+                        gattBody.ser_id = Constant.SER_ID_GROUP_ALLON
                     } else {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
-                        gattBody.ser_id = Constants.SER_ID_GROUP_ALLOFF
+                        gattBody.ser_id = Constant.SER_ID_GROUP_ALLOFF
                     }
 
                     val s =  Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
-                    gattBody.cmd = Constants.CMD_MQTT_CONTROL
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
                     gattBody.meshAddr = allGroup!!.meshAddr
                     sendToServer(gattBody)
                 } else {
@@ -545,7 +545,7 @@ class GroupListFragment : BaseFragment() {
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(activity, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
                     }
                 }
@@ -591,7 +591,7 @@ class GroupListFragment : BaseFragment() {
                             checkConnect()
                         } else {
                             intent = Intent(mContext, NormalSettingActivity::class.java)
-                            intent!!.putExtra(Constants.TYPE_VIEW, Constants.TYPE_GROUP)
+                            intent!!.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                             intent!!.putExtra("group", allGroup)
                             startActivityForResult(intent, 2)
                         }
@@ -781,13 +781,13 @@ class GroupListFragment : BaseFragment() {
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constants.SER_ID_GROUP_ALLON -> {
+            Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()
                 allGroupOpenSuccess()
             }
-            Constants.SER_ID_GROUP_ALLOFF -> {
+            Constant.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制群组关闭成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()
@@ -797,13 +797,13 @@ class GroupListFragment : BaseFragment() {
     }
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
-            Constants.SER_ID_GROUP_ALLON -> {
+            Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制群组开启成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()
                 allGroupOpenSuccess()
             }
-            Constants.SER_ID_GROUP_ALLOFF -> {
+            Constant.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制群组关闭成功-------")
                 disposableTimer?.dispose()
                 hideLoadingDialog()

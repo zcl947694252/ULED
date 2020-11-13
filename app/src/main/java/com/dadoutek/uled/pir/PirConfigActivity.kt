@@ -49,7 +49,9 @@ import com.dadoutek.uled.util.*
 import com.dadoutek.uled.util.StringUtils.*
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_pir_new.*
 import kotlinx.android.synthetic.main.template_radiogroup.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -75,6 +77,7 @@ import kotlin.collections.ArrayList
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
+    private var launch = 0
     private var disposableReset: Disposable? = null
     private var currentSensor: DbSensor? = null
     private var fiVersion: MenuItem? = null
@@ -282,7 +285,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
                 showBottomList.addAll(showGroupList)
             } else {
-                currentScene = data?.getParcelableExtra(Constants.EIGHT_SWITCH_TYPE) as DbScene
+                currentScene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
                 setItemScene()
             }
             bottomGvAdapter.notifyDataSetChanged()
@@ -352,20 +355,20 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
             R.id.pir_config_choose_group -> {
                 val intent = Intent(this@PirConfigActivity, ChooseMoreGroupOrSceneActivity::class.java)
-                intent.putExtra(Constants.EIGHT_SWITCH_TYPE, 123)
+                intent.putExtra(Constant.EIGHT_SWITCH_TYPE, 123)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_choose_scene -> {
                 val intent = Intent(this@PirConfigActivity, ChooseGroupOrSceneActivity::class.java)
                 val bundle = Bundle()
-                bundle.putInt(Constants.EIGHT_SWITCH_TYPE, 1)//传入0代表是群组
-                bundle.putInt(Constants.DEVICE_TYPE, Constants.DEVICE_TYPE_LIGHT.toInt())
+                bundle.putInt(Constant.EIGHT_SWITCH_TYPE, 1)//传入0代表是群组
+                bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_LIGHT.toInt())
                 intent.putExtras(bundle)
                 startActivityForResult(intent, REQUEST_CODE_CHOOSE)
             }
             R.id.pir_config_see_help -> {//新版传感器设置隐藏查看帮助
                 var intent = Intent(this@PirConfigActivity, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constants.WB_TYPE, "#sensor-scene-mode")
+                intent.putExtra(Constant.WB_TYPE, "#sensor-scene-mode")
                 startActivity(intent)
             }
 
@@ -410,7 +413,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 when {
                     currentSensor != null -> {
                         when {
-                            Constants.IS_ROUTE_MODE -> {
+                            Constant.IS_ROUTE_MODE -> {
                                 //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
                                 // triggerKey: Int = 0//0全天    1白天   2夜晚
                                 //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
@@ -453,15 +456,14 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
 
                     }
                     else -> {
-                        ToastUtils.showLong(getString(R.string.connect_fail))
                         when {
-                            Constants.IS_ROUTE_MODE -> routerConnectSensor(currentSensor!!, 0, "retryConnectSensor")
-                            else -> autoConnect()
-                        }
-                        timeDispsable = Observable.timer(10000, TimeUnit.MILLISECONDS).subscribe {
-                            runOnUiThread {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.connect_fail))
+                            Constant.IS_ROUTE_MODE -> routerConnectSensor(currentSensor!!, 0, "retryConnectSensor")
+                            else ->{
+                                launch++
+                                when {
+                                    launch%2==0 -> connect()
+                                    else -> autoConnect()
+                                }
                             }
                         }
                     }
@@ -550,7 +552,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         saveSensor(dbSensor, isReConfirm)//保存进服务器
 
         dbSensor = DBUtils.getSensorByID(dbSensor.id)!!
-        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constants.DB_ADD)
+        DBUtils.recordingChange(dbSensor.id, DaoSessionInstance.getInstance().dbSensorDao.tablename, Constant.DB_ADD)
 
         if (!isReConfirm)
             showRenameDialog(dbSensor)
@@ -574,7 +576,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                     if (currentSensor == null)
                         ToastUtils.showShort(getString(R.string.invalid_data))
                     else {
-                        if (Constants.IS_ROUTE_MODE) {
+                        if (Constant.IS_ROUTE_MODE) {
                             routerDeviceResetFactory(currentSensor!!.macAddr, currentSensor!!.meshAddr, 98, "deleteNPR")
                         } else {
                             GlobalScope.launch(Dispatchers.Main) {
@@ -628,8 +630,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun goOta() {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constants.IS_DEVELOPER_MODE, false)
-        if (isBoolean || Constants.IS_ROUTE_MODE) {
+        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        if (isBoolean || Constant.IS_ROUTE_MODE) {
             transformView()
         } else {
             if (OtaPrepareUtils.instance().checkSupportOta(version)!!) {
@@ -674,16 +676,16 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             !isSuportOta(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
             isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
-                if (Constants.IS_ROUTE_MODE) {
+                if (Constant.IS_ROUTE_MODE) {
                     startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
-                            "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr)
+                            "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr, "version" to currentSensor!!.version)
                     finish()
                 } else {
                     val intent = Intent(this@PirConfigActivity, OTAUpdateActivity::class.java)
-                    intent.putExtra(Constants.OTA_MAC, currentSensor?.macAddr)
-                    intent.putExtra(Constants.OTA_MES_Add, currentSensor?.meshAddr)
-                    intent.putExtra(Constants.OTA_VERSION, currentSensor?.version)
-                    intent.putExtra(Constants.OTA_TYPE, DeviceType.SENSOR)
+                    intent.putExtra(Constant.OTA_MAC, currentSensor?.macAddr)
+                    intent.putExtra(Constant.OTA_MES_Add, currentSensor?.meshAddr)
+                    intent.putExtra(Constant.OTA_VERSION, currentSensor?.version)
+                    intent.putExtra(Constant.OTA_TYPE, DeviceType.SENSOR)
                     startActivity(intent)
                     finish()
                 }
@@ -704,7 +706,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
                 val trim = renameEt?.text.toString().trim { it <= ' ' }
-                if (!Constants.IS_ROUTE_MODE) {
+                if (!Constant.IS_ROUTE_MODE) {
                     dbSensor.name = trim
                     saveSensor(dbSensor, false)
                 } else {
@@ -745,12 +747,38 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         return controlGroupListStr
     }
 
-    fun autoConnect() {
-        if (Constants.IS_ROUTE_MODE) return
-        val deviceTypes = mutableListOf(DeviceType.SENSOR)
-        ToastUtils.showLong(getString(R.string.connecting_tip))
+    private fun connect() {
+        if (Constant.IS_ROUTE_MODE) return
+        showLoadingDialog(getString(R.string.connecting_tip))
+        GlobalScope.launch {
+            delay(200)
+            TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, 30)
+        }
+        LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
+
+        connectDisposable?.dispose()    //取消掉上一个超时计时器
+        connectDisposable = Observable.timer(30, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    LogUtils.e("zcl timeout retryConnect")
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                }
+    }
+
+    override fun afterLogin() {
+        super.afterLogin()
+        hideLoadingDialog()
         connectDisposable?.dispose()
-        connectDisposable = connect(macAddress = mDeviceInfo!!.macAddress, fastestMode = true, retryTimes = 2, deviceTypes = deviceTypes)
+    }
+
+    fun autoConnect() {
+        if (Constant.IS_ROUTE_MODE) return
+        showLoadingDialog(getString(R.string.connecting_tip))
+        connectDisposable?.dispose()
+        LogUtils.v("zcl-----------connect开始连接-------${mDeviceInfo!!.macAddress}---------${mDeviceInfo!!.meshAddress}")
+        connectDisposable = connect(meshAddress = mDeviceInfo!!.meshAddress, macAddress = mDeviceInfo!!.macAddress, fastestMode = true, connectTimeOutTime = 30)
                 ?.subscribe({
                     runOnUiThread {
                         hideLoadingDialog()
@@ -880,9 +908,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onDestroy() {
         super.onDestroy()
         allDispoables()
-        if (Constants.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE)
             currentSensor?.let {
-                routerConnectSensor(it, 1,"connectSensor")
+                routerConnectSensor(it, 1, "connectSensor")
             }
         TelinkLightService.Instance()?.idleMode(true)
     }

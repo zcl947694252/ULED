@@ -34,8 +34,8 @@ class BatchSwAdapter(layoutResId: Int, data: MutableList<DbSwitch>) : BaseQuickA
         groupName.text = item?.boundMacName
 
         val routerByMac = DBUtils.getRouterByMac(item?.boundMac?:"")
-        LogUtils.v("zcl-----------获取路由名称---${item?.boundMac?:""}----${routerByMac!![0].name}")
         if (routerByMac != null && routerByMac.size >= 1) {
+        LogUtils.v("zcl-----------获取路由名称---${item?.boundMac?:""}----${routerByMac!![0].name}")
             groupName.text = routerByMac[0].name
             groupName.visibility = View.VISIBLE
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.blue_text))

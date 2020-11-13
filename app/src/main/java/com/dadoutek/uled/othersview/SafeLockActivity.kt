@@ -6,7 +6,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
@@ -106,7 +106,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun checkConnect() {
-        if (Constants.IS_ROUTE_MODE) return
+        if (Constant.IS_ROUTE_MODE) return
         try {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showShort(getString(R.string.connecting_tip))

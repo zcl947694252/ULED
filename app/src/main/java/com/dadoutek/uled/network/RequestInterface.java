@@ -1364,24 +1364,6 @@ public interface RequestInterface {
                                                                @Field("status") int status,
                                                                @Field("ser_id") String ser_id);
 
-    /**
-     * 窗帘&组控制集合 https://dev.dadoutek.com/xxxx/router/control/curtain POST
-     * meshAddr	是	int	目标组meshAddr
-     * ser_id	是	string	app会话id，推送时回传
-     * meshType	是	int	mesh地址类型
-     * controlCmd	是	int	窗帘具体控制操作cmd
-     * value	否	int	只需在调节窗帘速度时需要
-     * { "meshAddr" : 1, "meshType": 4,"controlCmd": 1,"value": 10"ser_id": "app会话id，自己维护"}
-     * controlCmd  开 = 0x0a  暂停 = 0x0b  关 = 0x0c  调节速度 = 0x15  恢复出厂 = 0xec   重启 = 0xea
-     * value 调节速度值 = 1~3  其他 = 不填或随意   meshType 窗帘 = 16 组 = 97
-     */
-    @FormUrlEncoded
-    @POST("router/control/curtain")
-    Observable<Response<RouterTimeoutBean>> routerControlCurtain(@Field("meshAddr") int meshAddr,
-                                                                 @Field("meshType") int meshType,
-                                                                 @Field("controlCmd") int controlCmd,
-                                                                 @Field("value") int speedValue,
-                                                                 @Field("ser_id") String ser_id);
 
     /**
      * .用户复位 https://dev.dadoutek.com/xxxx/router/control/user-reset  DELETE
@@ -1593,8 +1575,8 @@ public interface RequestInterface {
      * controlCmd	是	int	窗帘具体控制操作cmd
      * value	否	int	只需在调节窗帘速度时需要
      * "meshAddr" : 1, "meshType": 4, "controlCmd": 1, "value": 10,"ser_id": "app会话id，自己维护"
-     * controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea
-     * value
+     * controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea   换向 = 0x11value = 1
+     *
      * 调节速度值 = 1~3    其他 = 不填或随意
      * meshType  窗帘 = 16  组 = 97
      */

@@ -15,13 +15,12 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DbGroup
-import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
@@ -61,7 +60,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        type = this.intent.getIntExtra(Constants.DEVICE_TYPE, 0)
+        type = this.intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         inflater = this.layoutInflater
         initData()
         initView()
@@ -177,7 +176,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                     }
                 }
@@ -203,7 +202,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
                         //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constants.DEVICE_TYPE_DEFAULT_ALL)
+                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
                         dialog.dismiss()
                     }
                 }
@@ -232,7 +231,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     private fun addDevice() {
         intent = Intent(this, DeviceScanningNewActivity::class.java)
-        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
         startActivityForResult(intent, 0)
     }
 
@@ -242,25 +241,25 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         Opcode.LIGHT_ON_OFF
         val unit = when (view.id) {
             R.id.template_device_icon -> {
-                if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE) {
+                if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                     autoConnect()
                 } else {
                     canBeRefresh = true
 
                     when (currentDevice!!.connectionStatus) {
                         ConnectionStatus.OFF.value -> {
-                            if (Constants.IS_ROUTE_MODE)
+                            if (Constant.IS_ROUTE_MODE)
                                 routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 1, "relayOpen")
                             else {
-                                Commander.openOrCloseCurtain(currentDevice!!.meshAddr, true, false)
+                                Commander.openOrCloseLights(currentDevice!!.meshAddr, true)
                                 afterOpenOrClose(adapter!!)
                             }
                         }
                         else -> {
-                            if (Constants.IS_ROUTE_MODE)
+                            if (Constant.IS_ROUTE_MODE)
                                 routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 0, "relayClose")
                             else {
-                                Commander.openOrCloseCurtain(currentDevice!!.meshAddr, false, false)
+                                Commander.openOrCloseLights(currentDevice!!.meshAddr, false)
                                 afterOpenOrClose(adapter!!)
                             }
                         }
@@ -273,13 +272,13 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
-                if (TelinkLightApplication.getApp().connectDevice == null&&!Constants.IS_ROUTE_MODE) {
+                if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE) {
                     autoConnect()
                 } else {
                     var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
-                    intent.putExtra(Constants.LIGHT_ARESS_KEY, currentDevice)
-                    intent.putExtra(Constants.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
-                    intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
+                    intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDevice)
+                    intent.putExtra(Constant.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
+                    intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                     startActivityForResult(intent, REQ_LIGHT_SETTING)
                 }
             }

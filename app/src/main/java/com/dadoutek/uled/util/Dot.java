@@ -14,22 +14,22 @@ import com.dadoutek.uled.R;
 public class Dot extends View {
     public Dot(Context context) {
         super(context);
-        mPaint.setColor(getResources().getColor(R.color.colorGray));
+        mPaint.setColor(getResources().getColor(R.color.white));
     }
 
     public Dot(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        mPaint.setColor(getResources().getColor(R.color.colorGray));
+        mPaint.setColor(getResources().getColor(R.color.white));
     }
 
     public Dot(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mPaint.setColor(getResources().getColor(R.color.colorGray));
+        mPaint.setColor(getResources().getColor(R.color.white));
     }
 
     public Dot(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        mPaint.setColor(getResources().getColor(R.color.colorGray));
+        mPaint.setColor(getResources().getColor(R.color.white));
     }
 
     //Paint.ANTI_ALIAS_FLAG是使位图抗锯齿的标志
@@ -55,13 +55,13 @@ public class Dot extends View {
     public void setChecked(boolean checked,int color) {
         if (checked) {
             if(color == -1){
-                mPaint.setColor(getResources().getColor(R.color.colorGray));
+                mPaint.setColor(getResources().getColor(R.color.white));
             }else{
                 mPaint.setColor(color);
             }
 
         } else {
-            mPaint.setColor(getResources().getColor(R.color.colorGray));
+            mPaint.setColor(getResources().getColor(R.color.white));
         }
         invalidate();
     }

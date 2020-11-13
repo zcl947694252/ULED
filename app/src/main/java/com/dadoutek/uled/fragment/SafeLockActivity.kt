@@ -8,7 +8,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
@@ -71,13 +71,13 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         isFristUserClickCheckConnect = true
         val dstAddr = this.allGroup!!.meshAddr
-        if (TelinkLightApplication.getApp().connectDevice == null && !Constants.IS_ROUTE_MODE)
+        if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE)
             checkConnect()
         else {
             when (v?.id) {
                 R.id.safe_open -> {
                     ToastUtils.showShort(getString(R.string.open_light))
-                    if (Constants.IS_ROUTE_MODE)
+                    if (Constant.IS_ROUTE_MODE)
                         routeOpenOrCloseBase(DBUtils.allGroups[0].meshAddr, 97, 1, "safeLockOpen")
                     else
                         Commander.openOrCloseLights(dstAddr, true)
@@ -94,7 +94,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     // safe_open.setBackgroundResource(R.drawable.rect_blue_60)
                     //1打开2关闭 12位
                     status = 1
-                    if (Constants.IS_ROUTE_MODE)
+                    if (Constant.IS_ROUTE_MODE)
                         routerLockOrUnlock(status, "lock")
                     else
                         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 1))
@@ -106,7 +106,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     //safe_close_arrow.setImageResource(R.mipmap.icon_safe_arrow_blue)
                     //safe_open.setBackgroundResource(R.drawable.rect_gray_60)
                     //safe_open_arrow.setImageResource(R.mipmap.icon_arrow_safe)
-                    if (Constants.IS_ROUTE_MODE) {
+                    if (Constant.IS_ROUTE_MODE) {
                         routeOpenOrCloseBase(DBUtils.allGroups[0].meshAddr, 97, 0, "safeLockClose")
                     } else {
                         Commander.openOrCloseLights(dstAddr, false)
@@ -119,7 +119,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     //safe_close.setBackgroundResource(R.drawable.rect_blue_60)
                     //1打开2关闭 12位
                     status = 2
-                    if (Constants.IS_ROUTE_MODE)
+                    if (Constant.IS_ROUTE_MODE)
                         routerLockOrUnlock(status, "unlock")
                     else
                         TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 2))
@@ -193,7 +193,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun checkConnect() {
-        if (Constants.IS_ROUTE_MODE) return
+        if (Constant.IS_ROUTE_MODE) return
         try {
             if (TelinkLightApplication.getApp().connectDevice == null) {
                 ToastUtils.showShort(getString(R.string.connecting_tip))

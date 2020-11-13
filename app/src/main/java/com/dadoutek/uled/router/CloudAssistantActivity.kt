@@ -3,6 +3,8 @@ package com.dadoutek.uled.router
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View
+import android.widget.Button
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -11,6 +13,8 @@ import com.dadoutek.uled.network.ThirdPartyBean
 import com.dadoutek.uled.router.CloudAssistantItemAdapter
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.textColor
 
 
 /**
@@ -68,5 +72,12 @@ class CloudAssistantActivity : TelinkBaseActivity() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         template_recycleView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
         template_recycleView.adapter = adapter
+        adapter.bindToRecyclerView(template_recycleView)
+        var emptyView = View.inflate(this, R.layout.empty_view, null)
+        val addBtn = emptyView.findViewById<Button>(R.id.add_device_btn)
+        addBtn.background =null
+        addBtn.text = getString(R.string.no_third_party)
+        addBtn.textColor = getColor(R.color.gray)
+        adapter.emptyView = emptyView
     }
 }

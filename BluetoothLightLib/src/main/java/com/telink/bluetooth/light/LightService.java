@@ -196,6 +196,16 @@ public abstract class LightService extends Service implements LightAdapter.Callb
      * @return
      */
     public boolean sendCommandNoResponse(byte opcode, int address, byte[] params) {
+        /**
+         * 字节转十六进制
+         * @param b 需要进行转换的byte字节
+         * @return  转换后的Hex字符串
+         */
+            String hex = Integer.toHexString(opcode & 0xFF);
+            if(hex.length() < 2){
+                hex = "0" + hex;
+            }
+        LogUtils.v("zcl-----------扫描发送指令-------"+ hex);
         return this.sendCommandNoResponse(opcode, address, params, null, 0, false);
     }
 

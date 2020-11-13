@@ -1,7 +1,7 @@
 package com.dadoutek.uled.model.routerModel
 
 import com.dadoutek.uled.gateway.bean.DbRouter
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.network.*
@@ -95,6 +95,7 @@ object RouterModel {
 
     /**
      * 路由扫描结果
+     * /.//正式服暂无
      */
     fun getRouteScanningResult(): Observable<RouteScanResultBean>? {
         return NetworkFactory.getApi().scanResult
@@ -145,7 +146,7 @@ object RouterModel {
      * 路由开始扫描
      */
     fun routerStartScan(scanType: Int, ser_id: String): Observable<Response<ScanDataBean>>? {
-        return NetworkFactory.getApi().routeScanDevcie(scanType, Constants.DEFAULT_MESH_FACTORY_NAME, ser_id)
+        return NetworkFactory.getApi().routeScanDevcie(scanType, Constant.DEFAULT_MESH_FACTORY_NAME, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -372,15 +373,6 @@ object RouterModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    /**
-     * 路由开关传感器
-     * @Field("meshAddr") int ,@Field("meshType") int , @Field("controlCmd") int , @Field("value") int speedValue, @Field("ser_id") String ser_id)
-     */
-    fun routerControlCurtain(meshAddr: Int, meshType: Int, controlCmd: Int, speedValue: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routerControlCurtain(meshAddr, meshType, controlCmd, speedValue, ser_id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-    }
 
     /**
      * 用户复位
@@ -466,7 +458,7 @@ object RouterModel {
     /**
      * 控制相关开始
      * 恢复出厂设置  meshType	是	int	meshAddr类型  普通灯 = 4彩灯 = 6 蓝牙连接器 = 5
-     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部 = 100
+     * 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24 组 = 97 全部 = 100 窗帘 = 0x10
      * 不支持窗帘  meshType=97&meshAddr=65535时效果与meshType=100一致
      */
     fun routeResetFactory(bodyBean: MacResetBody): Observable<Response<RouterTimeoutBean>>? {

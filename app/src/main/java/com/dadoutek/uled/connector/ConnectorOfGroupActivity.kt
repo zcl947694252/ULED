@@ -30,7 +30,7 @@ import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.light.DeviceScanningNewActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.model.dbModel.DbGroup
@@ -139,7 +139,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     else {
                         if (DBUtils.getAllRelay().size == 0) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
-                            intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                            intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
                             startActivityForResult(intent, 0)
                         } else {
                             addDevice()
@@ -160,7 +160,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         startActivity(intent)
         finish()*/
         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
-        intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
+        intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
         startActivity(intent)
     }
 
@@ -215,8 +215,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun skipeBatch() {
         when {
             DBUtils.getAllRelay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-            TelinkLightApplication.getApp().connectDevice != null||Constants.IS_ROUTE_MODE ->
-                startActivity<BatchGroupFourDeviceActivity>(Constants.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group?.meshAddr)
+            TelinkLightApplication.getApp().connectDevice != null|| Constant.IS_ROUTE_MODE ->
+                startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group?.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }
     }
@@ -405,7 +405,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     ConnectionStatus.OFF.value -> {
                         isOpen = 1
                         when {
-                            Constants.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 1, "relaySw")
+                            Constant.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 1, "relaySw")
                             else -> {
                                 Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
                                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
@@ -416,7 +416,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     else -> {
                         isOpen = 0
                         when {
-                            Constants.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 0, "relaySw")
+                            Constant.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 0, "relaySw")
                             else -> {
                                 Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
                                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
@@ -442,11 +442,11 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                             var intent = Intent(this@ConnectorOfGroupActivity, ConnectorSettingActivity::class.java)
                             if (currentLight?.productUUID == DeviceType.LIGHT_RGB) {
                                 intent = Intent(this@ConnectorOfGroupActivity, RGBSettingActivity::class.java)
-                                intent.putExtra(Constants.TYPE_VIEW, Constants.TYPE_LIGHT)
+                                intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_LIGHT)
                             }
-                            intent.putExtra(Constants.LIGHT_ARESS_KEY, currentLight)
-                            intent.putExtra(Constants.GROUP_ARESS_KEY, group.meshAddr)
-                            intent.putExtra(Constants.LIGHT_REFRESH_KEY, Constants.LIGHT_REFRESH_KEY_OK)
+                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentLight)
+                            intent.putExtra(Constant.GROUP_ARESS_KEY, group.meshAddr)
+                            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
                             startActivityForResult(intent, REQ_LIGHT_SETTING)
                         } else {
                             ToastUtils.showLong(R.string.connecting_tip)
@@ -590,7 +590,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                     } else {
                         GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constants.CONNECT_STATE_SUCCESS_KEY, true);
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
                     }
 

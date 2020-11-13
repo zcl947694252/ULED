@@ -13,7 +13,7 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.AppUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.SyncCallback;
-import com.dadoutek.uled.model.Constants;
+import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.othersview.SplashActivity;
@@ -76,7 +76,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                 isClickExlogin = true;
                 if (DBUtils.INSTANCE.getAllLight().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutLight() && DBUtils.INSTANCE.getAllCurtain().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutCurtain() && DBUtils.INSTANCE.getAllRely().size() == 0 && !DBUtils.INSTANCE.getDataChangeAllHaveAboutRelay()) {
                     if (isClickExlogin) {
-                        SharedPreferencesHelper.putBoolean(mContenxt, Constants.IS_LOGIN, false);
+                        SharedPreferencesHelper.putBoolean(mContenxt, Constant.IS_LOGIN, false);
                         TelinkLightService instance = TelinkLightService.Instance();
                         if (instance!=null)
                             instance.idleMode(true);
@@ -141,7 +141,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(R.string.confirm, (dialog, which) -> {
-                            SharedPreferencesHelper.putBoolean(mContenxt, Constants.IS_LOGIN, false);
+                            SharedPreferencesHelper.putBoolean(mContenxt, Constant.IS_LOGIN, false);
                             TelinkLightService instance = TelinkLightService.Instance();
                             if (instance!=null)
                                 instance.idleMode(true);

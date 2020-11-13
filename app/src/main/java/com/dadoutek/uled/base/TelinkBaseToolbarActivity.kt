@@ -7,12 +7,11 @@ import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
-import android.widget.TextView
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupOTAListActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -106,13 +105,13 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
-                if (TelinkLightApplication.getApp().connectDevice != null || Constants.IS_ROUTE_MODE) {
+                if (TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE) {
                     val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
                     when (type) {
-                        Constants.INSTALL_NORMAL_LIGHT -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
-                        Constants.INSTALL_RGB_LIGHT -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.LIGHT_RGB)
-                        Constants.INSTALL_CURTAIN -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
-                        Constants.INSTALL_CONNECTOR -> intent.putExtra(Constants.DEVICE_TYPE, DeviceType.SMART_RELAY)
+                        Constant.INSTALL_NORMAL_LIGHT -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
+                        Constant.INSTALL_RGB_LIGHT -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+                        Constant.INSTALL_CURTAIN -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
+                        Constant.INSTALL_CONNECTOR -> intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
                     }
                     startActivity(intent)
                 } else autoConnectAll()
@@ -123,54 +122,54 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
 
     open fun goOta() {
             when (type) {
-            Constants.INSTALL_NORMAL_LIGHT -> {
+            Constant.INSTALL_NORMAL_LIGHT -> {
                 when (DBUtils.getAllNormalLight().size) {
                     0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_NORMAL)
                 }
             }
 
-            Constants.INSTALL_RGB_LIGHT -> {
+            Constant.INSTALL_RGB_LIGHT -> {
                 when (DBUtils.getAllRGBLight().size) {
                     0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.LIGHT_RGB)
                 }
             }
-            Constants.INSTALL_CURTAIN -> {
+            Constant.INSTALL_CURTAIN -> {
                 when (DBUtils.getAllCurtains().size) {
                     0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SMART_CURTAIN)
                 }
             }
-            Constants.INSTALL_CONNECTOR -> {
+            Constant.INSTALL_CONNECTOR -> {
                 when (DBUtils.getAllRelay().size) {
                     0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SMART_RELAY)
                 }
             }
-            Constants.INSTALL_SWITCH -> {
+            Constant.INSTALL_SWITCH -> {
                 when (DBUtils.getAllSwitch().size) {
                     0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.NORMAL_SWITCH)
                 }
             }
-            Constants.INSTALL_SENSOR -> {
+            Constant.INSTALL_SENSOR -> {
                 when (DBUtils.getAllSensor().size) {
                     0 -> ToastUtils.showShort(getString(R.string.no_device))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.SENSOR)
                 }
             }
-            Constants.INSTALL_GATEWAY -> {//路由不支持网关
+            Constant.INSTALL_GATEWAY -> {//路由不支持网关
                 when {
                     DBUtils.getAllGateWay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constants.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport))
+                    Constant.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.GATE_WAY)
                 }
             }
-            Constants.INSTALL_ROUTER -> {
+            Constant.INSTALL_ROUTER -> {
                 when {
                     DBUtils.getAllRouter().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                   Constants.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport_gp_ota))
+                   Constant.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport_gp_ota))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.ROUTER)
                 }
             }

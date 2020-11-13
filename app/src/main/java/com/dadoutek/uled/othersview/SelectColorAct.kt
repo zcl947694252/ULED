@@ -23,7 +23,6 @@ import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.InputRGBColorDialog
 import com.dadoutek.uled.util.OtherUtils
 import io.reactivex.Observable
-import io.reactivex.Observer
 import kotlinx.android.synthetic.main.activity_select_color.*
 import kotlinx.android.synthetic.main.activity_select_color.color_b
 import kotlinx.android.synthetic.main.activity_select_color.color_g
@@ -72,7 +71,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun initData() {
-        itemGroup = intent.getSerializableExtra(Constants.GROUPS_KEY) as? ItemGroup
+        itemGroup = intent.getSerializableExtra(Constant.GROUPS_KEY) as? ItemGroup
         num = intent.getIntExtra("circle", 0)
     }
 
@@ -89,7 +88,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         ll_b.setOnClickListener(this)
         ll_g.setOnClickListener(this)
 
-        presetColors = SharedPreferencesHelper.getObject(this, Constants.PRESET_COLOR) as? MutableList<ItemColorPreset>
+        presetColors = SharedPreferencesHelper.getObject(this, Constant.PRESET_COLOR) as? MutableList<ItemColorPreset>
         if (presetColors == null) {
             presetColors = ArrayList()
             for (i in 0..4) {
@@ -201,10 +200,10 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                if (w!! > Constants.MAX_VALUE)
-                    w = Constants.MAX_VALUE
-                if (ws > Constants.MAX_VALUE)
-                    ws = Constants.MAX_VALUE
+                if (w!! > Constant.MAX_VALUE)
+                    w = Constant.MAX_VALUE
+                if (ws > Constant.MAX_VALUE)
+                    ws = Constant.MAX_VALUE
                 if (ws == -1)
                     ws = 0
                 delay(80)
@@ -260,12 +259,12 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         val params = byteArrayOf(0x04, red, green, blue)
         Log.d("RGBCOLOR", String.format("R = %x, G = %x, B = %x", red, green, blue))
 
-        var white = itemGroup!!.color and 0xff000000.toInt() shr 24
+        var white =( itemGroup!!.color and 0xff000000.toInt()) shr 24
         color = (white shl 24) or (r shl 16) or (G shl 8) or B
 
         if (thisTime - lastTime >= 200) {
             when {
-                Constants.IS_ROUTE_MODE//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
+                Constant.IS_ROUTE_MODE//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
                 -> routerConfigRGBNum(itemGroup!!.groupAddress, 97, color)
                 else -> {
                     if (isOnceSet) {
@@ -352,14 +351,14 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as Dot?
         textView?.setChecked(true, 0xff000000.toInt() or itemGroup!!.color)
         Log.e("TAG_COLOR", itemGroup!!.color.toString())
-        SharedPreferencesHelper.putObject(this, Constants.PRESET_COLOR, presetColors)
+        SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
         false
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
 
         private var preTime: Long = 0
-        private val delayTime = Constants.MAX_SCROLL_DELAY_VALUE
+        private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
 
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true

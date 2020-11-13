@@ -7,7 +7,7 @@ import android.widget.ImageView
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
-import com.dadoutek.uled.model.Constants
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -44,7 +44,7 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun updateUi() {
-        if (Constants.IS_ROUTE_MODE) {
+        if (Constant.IS_ROUTE_MODE) {
             choose_mode_ble_iv.setImageResource(R.drawable.choice_off)
             choose_mode_router_iv.setImageResource(R.drawable.choice_on)
         } else {
@@ -55,27 +55,23 @@ class ChooseModeActivity : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
-                    Constants.IS_ROUTE_MODE = !Constants.IS_ROUTE_MODE
+                    Constant.IS_ROUTE_MODE = !Constant.IS_ROUTE_MODE
         when (v?.id) {
-            R.id.choose_mode_ble_iv -> {
-                UserModel.updateModeStatus().subscribe({
-                    LogUtils.v("zcl--------------上传云状态为蓝牙----")
-                    SharedPreferencesHelper.putBoolean(this, Constants.ROUTE_MODE, false)
-                    updateUi()
-                }, {
-                    Constants.IS_ROUTE_MODE = !Constants.IS_ROUTE_MODE
-                })
-            }
-            R.id.choose_mode_router_iv -> {
-                UserModel.updateModeStatus().subscribe({
-                    SharedPreferencesHelper.putBoolean(this, Constants.ROUTE_MODE, true)
-                    TelinkLightService.Instance()?.idleMode(true)
-                    updateUi()
-                    LogUtils.v("zcl--------------上传云状态为路由----")
-                }, {
-                    Constants.IS_ROUTE_MODE = !Constants.IS_ROUTE_MODE
-                })
+            R.id.choose_mode_ble_iv, R.id.choose_mode_router_iv -> {
+                updateModeStatus()
             }
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun updateModeStatus() {
+        UserModel.updateModeStatus().subscribe({
+            SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, Constant.IS_ROUTE_MODE)
+            TelinkLightService.Instance()?.idleMode(true)
+            updateUi()
+            LogUtils.v("zcl--------------上传云状态为路由----")
+        }, {
+            Constant.IS_ROUTE_MODE = !Constant.IS_ROUTE_MODE
+        })
     }
 }

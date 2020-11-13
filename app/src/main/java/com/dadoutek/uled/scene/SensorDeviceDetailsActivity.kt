@@ -21,17 +21,15 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
-import com.dadoutek.uled.intf.OtaPrepareListner
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.*
-import com.dadoutek.uled.model.Constants.*
+import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
-import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
 import com.dadoutek.uled.pir.PirConfigActivity
@@ -39,16 +37,13 @@ import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.stomp.MqttBodyBean
-import com.dadoutek.uled.switches.ScanningSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.OtaPrepareUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
 import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.light.ConnectionStatus
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LightAdapter
 import com.telink.bluetooth.light.Parameters
@@ -255,7 +250,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         startActivity(Intent(this, ScanningSensorActivity::class.java))
                     } else {
                       var  intent = Intent(this, DeviceScanningNewActivity::class.java)
-                        intent.putExtra(Constants.DEVICE_TYPE, 98)       //connector也叫relay
+                        intent.putExtra(Constant.DEVICE_TYPE, 98)       //connector也叫relay
                         startActivityForResult(intent, 0)
                     }
                     doFinish()
@@ -291,7 +286,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         ToastUtils.showLong(R.string.scene_16_tip)
                     } else {
                         val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constants.IS_CHANGE_SCENE, false)
+                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
                         startActivity(intent)
                         connectSensorTimeoutDisposable?.dispose()
                         disposable?.dispose()
@@ -394,7 +389,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 if (currentDevice?.openTag == 1) {
                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                             0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
-                    gattBody.ser_id = Constants.SER_ID_SENSOR_OFF
+                    gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
                 } else {
                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                             0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
@@ -403,7 +398,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
                 val s = Base64Utils.encodeToStrings(gattPar)
                 gattBody.data = s
-                gattBody.cmd = Constants.CMD_MQTT_CONTROL
+                gattBody.cmd = Constant.CMD_MQTT_CONTROL
                 gattBody.meshAddr = currentDevice?.meshAddr ?: 0
                 sendToServer(gattBody)
             } else {
