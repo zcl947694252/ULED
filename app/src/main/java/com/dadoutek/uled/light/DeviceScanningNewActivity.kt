@@ -13,7 +13,10 @@ import android.util.Log
 import android.util.SparseArray
 import android.view.*
 import android.view.inputmethod.InputMethodManager
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.RomUtils
@@ -21,6 +24,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.ble.RxBleManager
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
@@ -29,24 +33,29 @@ import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.model.ScannedDeviceItem
 import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant.VENDOR_ID
+import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.dbModel.DBUtils.lastRegion
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
-import com.dadoutek.uled.model.httpModel.GwModel
-import com.dadoutek.uled.model.routerModel.RouterModel
-import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DBUtils.saveUser
+import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.httpModel.RegionModel
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkStatusCode
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.SplashActivity
+import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
+import com.dadoutek.uled.router.bean.Data
+import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.switches.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.util.*
+import com.polidea.rxandroidble2.scan.ScanResult
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
@@ -77,12 +86,10 @@ import java.util.concurrent.TimeUnit
  * 创建时间   2019/8/28 18:37
  * 描述	      ${搜索 冷暖灯 全彩灯  窗帘 Connector蓝牙接收器设备}$
  *路由逻辑: 1. http请求扫描 等待mqtt回调(无回调 失败) - 接收mqtt上传的设备每次超时每个6秒收到刷新-超时--走跳转逻辑(请求获取未确认扫描结果得到数据包装)
- * --如果得到数据的情况下是超时也就是mqtt没有接到但是没有结束 重新计算超时 如果借宿了 确认清除数据 跳转
- * 更新者     $Author$
- *
- * 更新时间   $Date$
+ * --如果得到数据的情况下是超时也就是mqtt没有接到但是没有结束 重新计算超时 如果借宿了 确认清除数据 跳转43
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+    private var disposableUpMeshTimer: Disposable? = null
     private var scanRouterTimeoutTime: Long = 0
     private var routerScanCount: Int = 0
     private val TAG = "zcl-DeviceScanningNewActivity"
@@ -133,6 +140,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var isSelectAll = false
     private var initHasGroup = false
     private var allLightId: Long = 0
+    private var meshUpdateType: Long = 0 //0发送命令更新mesh等待回调  1收到mesh回调
     private var updateMeshStatus: UPDATE_MESH_STATUS? = null
     private var mAddDeviceType: Int = 0
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
@@ -156,7 +164,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         initListener()
         startScan()
     }
-
 
     private val currentGroup: DbGroup?
         get() {
@@ -266,6 +273,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     //扫描失败处理方法
     private fun scanFail() {
+        hideLoadingDialog()
         closeAnimation()
         btn_stop_scan.visibility = View.GONE
         scanning_no_device.visibility = View.VISIBLE
@@ -276,7 +284,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun startTimer() {
         stopScanTimer()
         LogUtils.d("startTimer")
-        mTimer = Observable.timer(scanTimeoutTime, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+        mTimer = Observable.timer(scanTimeoutTime, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     LogUtils.d("onLeScanTimeout")
                     onLeScanTimeout()
@@ -285,14 +295,17 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun retryScan() {
         // toolbarTv.text = getString(R.string.scanning)
+        //TelinkLightService.Instance()?.mAdapter?.stop()//此处导致整个扫描中断
         if (mUpdateMeshRetryCount < MAX_RETRY_COUNT) {
             mUpdateMeshRetryCount++
-            Log.d("ScanningTest", "update mesh failed , retry count = $mUpdateMeshRetryCount")
+            Log.d("TelinkBluetoothSDK ", "完整流程更新mesh失败重新扫秒 update mesh failed , retry count = $mUpdateMeshRetryCount")
             stopScanTimer()
             meshList.clear()
-            this.startScan()
+            startScan()
         } else {
-            Log.d("ScanningTest", "update mesh failed , do not retry")
+            Log.d("TelinkBluetoothSDK", "update mesh failed , do not retry")
+            stopScan()
+            LogUtils.v("zcl-----------完整流程扫描重试超时-------")
         }
         updateMeshStatus = UPDATE_MESH_STATUS.FAILED
     }
@@ -310,8 +323,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun scanSuccess() {
         TelinkLightService.Instance()?.idleMode(true)
         //更新Title
-        // toolbar!!.title = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
-        // toolbarTv.text = getString(R.string.title_scanned_lights_num, mAddedDevices.size)
         //存储当前添加的灯。
         //2018-4-19-hejiajun 添加灯调整位置，防止此时点击灯造成下标越界
         if (nowDeviceList.size > 0) {
@@ -324,6 +335,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         disposableConnectTimer?.dispose()
         disposableConnectTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     autoConnect(mutableListOf(mAddDeviceType))
@@ -359,7 +371,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             checkNetworkAndSync()
         }
         updateList.clear()
-
+        routerStopScan(false)
         disposeAllSubscribe()
 
         mApplication?.removeEventListener(this)
@@ -389,30 +401,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         mApplication?.removeEventListener(this)
     }
 
-
-    @SuppressLint("StringFormatInvalid", "StringFormatMatches")
-    private fun sureGroups() {
-        if (isSelectLight && TelinkLightApplication.getApp().connectDevice != null) {
-            //进行分组操作
-            //获取当前选择的分组
-            val group = currentGroup
-            if (group != null) {
-                if (group.meshAddr == 0xffff) {
-                    ToastUtils.showLong(R.string.tip_add_gp)
-                    return
-                }
-                //获取当前勾选灯的列表
-                val selectLights = mAddedDevices.filter { it.isSelected }
-
-                showLoadingDialog(getString(R.string.grouping_wait_tip, selectLights.size.toString()))
-                //将灯列表的灯循环设置分组
-                testId = group
-                setGroups(group, selectLights)
-            }
-        } else {
-            showToast(getString(R.string.selected_lamp_tip))
-        }
-    }
 
     //等待解决无法加入窗帘如组
     private fun setGroupOneByOne(dbGroup: DbGroup, selectLights: List<ScannedDeviceItem>, index: Int) {
@@ -574,6 +562,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun addGw(dbGw: DbGateway) {
         GwModel.add(dbGw)?.subscribe({
             LogUtils.v("zcl-----网关失添成功返回-------------$it")
@@ -602,30 +591,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-
-    private fun showGroupForUpdateNameDialog(position: Int) {
-        val textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.setText(groups[position].name)
-        textGp.singleLine = true
-        //        //设置光标默认在最后
-        textGp.setSelection(textGp.text.toString().length)
-        AlertDialog.Builder(this)
-                .setTitle(getString(R.string.update_group))
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        groups!![position].name = textGp.text.toString().trim { it <= ' ' }
-                        DBUtils.updateGroup(groups!![position])
-                        groupsRecyclerViewAdapter.notifyItemChanged(position)
-                        mAddedDevicesAdapter!!.notifyDataSetChanged()
-                    }
-                }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
-    }
 
     override fun onMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -729,6 +694,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         hideLoadingDialog()
                         ToastUtils.showLong(getString(R.string.connect_fail))
                         LogUtils.d(it)
+                        onLogin()
                     }
                     )
         }
@@ -746,7 +712,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             popFinish?.dismiss()
             stopScanTimer()
             closeAnimation()
-            finish()
+            getAndFinish()
         }
 
         scanning_no_factory_btn.setOnClickListener {
@@ -765,30 +731,14 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             addNewGroup()
         }
         btn_stop_scan?.setOnClickListener {//停止扫描
-            closeAnimation()
-            list_devices.visibility = View.GONE
-            scanning_num.visibility = View.GONE
-            btn_stop_scan.visibility = View.GONE
             if (Constant.IS_ROUTE_MODE) {
-                RouterModel.routeStopScan(TAG, Constant.SCAN_SERID)
-                        ?.subscribe({ itr ->
-                            when (itr.errorCode) {
-                                0 -> ToastUtils.showShort(getString(R.string.stop_scan_fail))
-                                NetworkStatusCode.ROUTER_STOP -> skipeType()//路由停止
-                            }
-                        }, {
-                            ToastUtils.showShort(it.message)
-                        })
+                routerStopScan(false)
             } else {
-                stopScanTimer()
-                if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备
-                    scanSuccess()
-                } else {
-                    closeAnimation()
-                    btn_stop_scan.visibility = View.GONE
-                    ToastUtils.showLong(getString(R.string.scan_end))
-                    finish()
-                }
+                closeAnimation()
+                list_devices.visibility = View.GONE
+                scanning_num.visibility = View.GONE
+                btn_stop_scan.visibility = View.GONE
+                stopScan()
             }
         }
 
@@ -819,6 +769,72 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 }
             }
             mAddedDevicesAdapter.notifyItemChanged(position)
+        }
+    }
+
+    private fun getAndFinish() {
+        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, object : SyncCallback {
+            override fun start() {}
+
+            override fun complete() {
+                finish()
+            }
+
+            override fun error(msg: String?) {
+                finish()
+            }
+        })
+    }
+
+    private fun stopScan() {
+        stopScanTimer()
+        if (mAddedDevices.size > 0) {//表示目前已经搜到了至少有一个设备
+            scanSuccess()
+        } else {
+            closeAnimation()
+            btn_stop_scan.visibility = View.GONE
+            ToastUtils.showLong(getString(R.string.scan_end))
+            finish()
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerStopScan(isFinisAc: Boolean) {
+        RouterModel.routeStopScan(TAG, Constant.SCAN_SERID)
+                ?.subscribe({ itr ->
+                    LogUtils.v("zcl-----------收到路由停止请求-------$itr")
+                    when (itr.errorCode) {
+                        0 -> {
+                            showLoadingDialog(getString(R.string.please_wait))
+                            disposableTimer?.dispose()
+                            disposableTimer = Observable.timer(itr.t.timeout + 3L, TimeUnit.SECONDS)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe {
+                                        hideLoadingDialog()
+                                        if (!isFinisAc)
+                                            ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
+                                        finish()
+                                    }
+                        }
+                        NetworkStatusCode.ROUTER_STOP -> if (!isFinisAc) skipeType()//路由停止
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+    }
+
+    override fun tzRouteStopScan(cmdBean: CmdBodyBean) {
+        hideLoadingDialog()
+        LogUtils.v("zcl---------收到路由停止请求通知---------")
+        if (cmdBean.status == 0) {
+            closeAnimation()
+            list_devices.visibility = View.GONE
+            scanning_num.visibility = View.GONE
+            btn_stop_scan.visibility = View.GONE
+            getRouterScanResult()
+        } else {
+            ToastUtils.showShort(getString(R.string.router_stop_scan_faile))
         }
     }
 
@@ -906,8 +922,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         var title = when (mAddDeviceType) {
             DeviceType.LIGHT_NORMAL -> getString(R.string.normal_light)
             DeviceType.LIGHT_RGB -> getString(R.string.rgb_light)
-            DeviceType.SENSOR -> getString(R.string.sensor)
-            DeviceType.NORMAL_SWITCH -> getString(R.string.switch_title)
+            98 -> getString(R.string.sensor)
+            99 -> getString(R.string.switch_title)
             DeviceType.SMART_RELAY -> getString(R.string.relay)
             DeviceType.SMART_CURTAIN -> getString(R.string.curtain)
             DeviceType.GATE_WAY -> getString(R.string.Gate_way)
@@ -1043,6 +1059,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                         LogUtils.e("write login data 没有收到response")
                     }
                 }
+                finish()
             }
         }
     }
@@ -1068,39 +1085,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-    override fun tzStartRouterScan(cmdBodyBean: CmdBodyBean) {
-        if (cmdBodyBean.ser_id == TAG) {
-            disposableTimer?.dispose()
-            if (cmdBodyBean.status == Constant.ALL_SUCCESS) {
-                routeTimerOut()
-                Constant.SCAN_SERID = cmdBodyBean.scanSerId
-            } else {
-                ToastUtils.showShort(cmdBodyBean.msg)
-                closeAnimation()
-            }
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    override fun tzRouteDeviceNum(cmdBodyBean: CmdBodyBean) {//收到扫描的设备数
-        if (cmdBodyBean.ser_id == TAG) {
-            if (cmdBodyBean.status == Constant.ALL_SUCCESS) {
-                routerScanCount = cmdBodyBean.count
-                if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB || mAddDeviceType == DeviceType.SMART_RELAY ||
-                        mAddDeviceType == DeviceType.SMART_CURTAIN)
-                    scanning_num.text = getString(R.string.title_scanned_device_num, routerScanCount)
-                else
-                    scanning_num.text = getString(R.string.scanning)
-            }
-            routeTimerOut()
-        }
-    }
-
     private fun routeTimerOut() {
         disposableTimer?.dispose()
-        disposableTimer = Observable.timer(scanRouterTimeoutTime, TimeUnit.MILLISECONDS).subscribe {
-            skipeType()
-        }
+        disposableTimer = Observable.timer(scanRouterTimeoutTime, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    //  skipeType()
+                }
     }
 
     /**
@@ -1108,42 +1098,143 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun startScan() {
+        LogUtils.v("zcl-----------收到路由扫描开始-------${Constant.IS_ROUTE_MODE}IS_ROUTE_MODE")
         if (Constant.IS_ROUTE_MODE) {//发送命令
-            RouterModel.routerStartScan(mAddDeviceType, TAG)?.subscribe({
-                scanRouterTimeoutTime = it.t.timeout.toLong()
-                routeTimerOut()
-                startAnimation()
-            }, {
-                ToastUtils.showLong(it.message)
-                scanFail()
-            })
+            routerStartScan()
         } else {
             isScanning = true
-            //添加进disposable，防止内存溢出.
-            mRxPermission?.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                    Manifest.permission.BLUETOOTH_ADMIN)?.subscribe { granted ->
-                if (granted!!) {
-                    oldStartScan()
-                } else {
-                    DialogUtils.showNoBlePermissionDialog(this, {
-                        startScan()
-                        null
-                    }, {
-                        doFinish()
-                        null
-                    })
+            if (mRxPermission != null)
+                mRxPermission!!.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                        Manifest.permission.BLUETOOTH_ADMIN)?.subscribe { granted ->
+                    if (granted!!) {
+                        oldStartScan()
+                    } else {
+                        DialogUtils.showNoBlePermissionDialog(this, {
+                            startScan()
+                            null
+                        }, {
+                            doFinish()
+                            null
+                        })
+                    }
+                }?.let {
+                    mDisposable.add(it)
                 }
-            }?.let {
-                mDisposable.add(it)
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routerStartScan() {
+        RouterModel.routerStartScan(mAddDeviceType, TAG)?.subscribe({
+            LogUtils.v("zcl-----------收到路由h扫描开始-------$it")
+            when (it.errorCode) {
+                0 -> {
+                    routeStartTimerOut(it.t.timeout.toLong())
+                    startAnimation()
+                }
+                90025 -> {
+                    showLoadingDialog(getString(R.string.scan_result_confirm))
+                    getRouterScanResult()
+                }
+                90018 -> {
+                    ToastUtils.showShort(getString(R.string.no_this_device_type) + mAddDeviceType)
+                    finish()
+                }//":999999未收录的scanType"
+                20030 -> {
+                    ToastUtils.showShort(getString(R.string.transfer_accounts_code_exit_cont_scan))
+                    finish()
+                }//移交码存在的时候不能扫描
+                90999 -> {
+                    startAnimation()
+                    getScanRouterState()
+                }//扫描中，不能再次进行扫描。请尝试获取路由模式下状态以恢复上次扫描
+                90998 -> {
+                    ToastUtils.showShort(getString(R.string.otaing_to_ota_activity))
+                    startActivity(Intent(this@DeviceScanningNewActivity, RouterOtaActivity::class.java))
+                    finish()
+                }//OTA中不能扫描，请稍后。请尝试获取路由模式下状态以恢复上次OTA
+                90006 -> {
+                    ToastUtils.showShort(getString(R.string.mesh_not_enought))
+                    finish()
+                }//meshAddr地址不够, 无法再扫描设备
+                90004 -> {
+                    ToastUtils.showShort(getString(R.string.region_no_router))
+                    finish()
+                }//该账号该区域下没有路由
+                90005 -> {
+                    ToastUtils.showShort(getString(R.string.router_offline))
+                    scanFail()
+                    stopScanTimer()
+                }//该账号该区域下没有可用的路由，请检查路由是否上电联网
+                else -> ToastUtils.showShort(it.message)
+            }
+
+        }, {
+            ToastUtils.showLong(it.message)
+            scanFail()
+        })
+    }
+
+    override fun tzStartRouterScan(cmdBodyBean: CmdBodyBean) {//收到路由是否开始扫描的回调
+        LogUtils.v("zcl-----------收到路由开始扫描-------$cmdBodyBean")
+        if (cmdBodyBean.ser_id == TAG) {
+            disposableTimer?.dispose()
+            if (cmdBodyBean.status == Constant.ALL_SUCCESS) {//扫描成功继续重新计算超时时间
+                routeTimerOut()
+                Constant.SCAN_SERID = cmdBodyBean.scanSerId
+            } else {
+                ToastUtils.showShort(cmdBodyBean.msg)
+                if (cmdBodyBean.cmd == 3001)//路由没有进行扫描，请重试
+                    finish()
+                closeAnimation()
             }
         }
+    }
+
+    @SuppressLint("SetTextI18n")
+    override fun tzRouteDeviceNum(cmdBodyBean: CmdBodyBean) {//收到扫描的设备数
+        if (cmdBodyBean.finish) {
+            skipeType()
+            LogUtils.v("zcl-----------收到路由设备结束-------$cmdBodyBean")
+        } else {
+            LogUtils.v("zcl-----------收到路由设备数-------$cmdBodyBean")
+            routerScanCount = cmdBodyBean.count
+            if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB || mAddDeviceType == DeviceType.SMART_RELAY ||
+                    mAddDeviceType == DeviceType.SMART_CURTAIN || mAddDeviceType == 98 || mAddDeviceType == 99)
+                scanning_num.text = getString(R.string.title_scanned_device_num, routerScanCount)
+            else
+                scanning_num.text = getString(R.string.scanning)
+            routeTimerOut()
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun getScanRouterState() {
+        RouterModel.getRouteScanningResult()?.subscribe({
+            it.data?.let { it1 ->
+                Constant.SCAN_SERID = it1.scanSerId.toLong()
+            }
+        }, {
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    private fun routeStartTimerOut(toLong: Long) {
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer(toLong + 1L, TimeUnit.SECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    stopScan()
+                    ToastUtils.showShort(getString(R.string.router_scan_faile))
+                }
     }
 
     @SuppressLint("CheckResult")
     private fun oldStartScan() {
         isScanning = true
         TelinkLightService.Instance()?.idleMode(true)
-        LogUtils.d("#### start scan idleMode true ####")
+        LogUtils.d("####TelinkBluetoothSDK 完整流程开始扫描------------ start scan idleMode true ####")
         startTimer()
         startAnimation()
         handleIfSupportBle()
@@ -1169,7 +1260,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     params.setTimeoutSeconds(scanTimeoutTime.toInt())
                     params.setScanMode(true)
                     TelinkLightService.Instance()?.startScan(params)
-                      LogUtils.v("zcl-----------扫描先关参数-------mesh?.factoryName${mesh?.factoryName}-----$params")
                     bestRssiDevice = null
                 }
     }
@@ -1194,12 +1284,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .subscribe {
                     if (bestRssiDevice != null) {
                         val mesh = mApplication!!.mesh
+                        TelinkLightService.Instance().disconnect()
+                        TelinkLightService.Instance()?.idleMode(true)
+                        Thread.sleep(500)
                         updateMesh(bestRssiDevice!!, meshAddress, mesh)
                     } else {
                         retryScan()
                     }
                 }
-       // startMeshTimeoutTimer()//更新mesh超时时间
+        startMeshTimeoutTimer()//更新mesh超时时间
     }
 
     @SuppressLint("CheckResult")
@@ -1230,11 +1323,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         })
         return mesh
     }
+
     private fun getGwId(): Long {
         val list = DBUtils.getAllGateWay()
         val idList = ArrayList<Int>()
         for (i in list.indices)
             idList.add(list[i].id!!.toInt())
+
         var id = 0
         if (list.size == 0) {
             id = 1
@@ -1258,7 +1353,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val manuData = byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
         val manuDataMask = byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
 
-        val scanFilter = ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID, manuData, manuDataMask).build()
+        val scanFilter = ScanFilter.Builder().setManufacturerData(VENDOR_ID, manuData, manuDataMask).build()
         scanFilters.add(scanFilter)
         return scanFilters
     }
@@ -1266,16 +1361,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun getSwitchFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
 
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
         return scanFilters
@@ -1329,10 +1424,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         params.setNewPassword(NetworkFactory.md5(NetworkFactory.md5(user?.controlMeshName) + user?.controlMeshName).substring(0, 16))
         params.setUpdateDeviceList(deviceInfo)
+        meshUpdateType = 0
         TelinkLightService.Instance()?.updateMesh(params)
-
+        LogUtils.d("####TelinkBluetoothSDK 完整流程更新meshName--####")
         stopScanTimer()
-
         LogUtils.d("updateMesh: " + deviceInfo.meshAddress + "" +
                 "--" + deviceInfo.macAddress + "--productUUID:" + deviceInfo.productUUID)
     }
@@ -1342,51 +1437,56 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val deviceInfo = event.args
         when (deviceInfo.status) {
             LightAdapter.STATUS_UPDATE_MESH_COMPLETED -> {
-                if (bestRssiDevice == null)
-                    bestRssiDevice = deviceInfo
-                else
-                    if (bestRssiDevice!!.rssi < deviceInfo.rssi)
-                        bestRssiDevice = deviceInfo
-
-
-                GlobalScope.launch { mApplication?.mesh?.saveOrUpdate(this@DeviceScanningNewActivity) }
-
-                LogUtils.d("update mesh success meshAddress = ${deviceInfo.meshAddress}")
-                val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
-                //刚开始扫的设备mac是null所以不能mac去重
-                mAddedDevices.add(scannedDeviceItem)
-                Thread.sleep(500)
-              //  sendTimeZone(scannedDeviceItem)
-                updateDevice(scannedDeviceItem)
-
-                mAddedDevicesAdapter.notifyDataSetChanged()
-
-                //扫描出灯就设置为非首次进入
-                if (isFirtst) {
-                    isFirtst = false
-                    SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
-                }
-                // toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
-                if (mAddDeviceType != DeviceType.GATE_WAY)
-                    scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
-
-                updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
-                mUpdateMeshRetryCount = 0
-                mConnectRetryCount = 0
-                if (mAddDeviceType != DeviceType.GATE_WAY)
-                    this.startScan()    //继续开始扫描设备
-                else {
-                    btn_add_groups?.setText(R.string.config_gate_way)
-                    scanSuccess()
-                }
+                disposableUpMeshTimer?.dispose()
+                LogUtils.v("zcl----------完整流程旧的收到更新mesh通知------进行重新扫描---------$deviceInfo")
+                updateMeshAddrAfter(deviceInfo)
             }
             LightAdapter.STATUS_UPDATE_MESH_FAILURE -> {
+                disposableUpMeshTimer?.dispose()
                 retryScan()
             }
 
             LightAdapter.STATUS_LOGIN -> {
-
             }
+        }
+    }
+
+    private fun updateMeshAddrAfter(deviceInfo: DeviceInfo) {
+        if (bestRssiDevice == null)
+            bestRssiDevice = deviceInfo
+        else
+            if (bestRssiDevice!!.rssi < deviceInfo.rssi)
+                bestRssiDevice = deviceInfo
+
+        GlobalScope.launch { mApplication?.mesh?.saveOrUpdate(this@DeviceScanningNewActivity) }
+
+        LogUtils.d("update mesh success meshAddress = ${deviceInfo.meshAddress}")
+        val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
+        //刚开始扫的设备mac是null所以不能mac去重
+        mAddedDevices.add(scannedDeviceItem)
+        Thread.sleep(500)
+        updateDevice(scannedDeviceItem)
+
+        mAddedDevicesAdapter.notifyDataSetChanged()
+
+        //扫描出灯就设置为非首次进入
+        if (isFirtst) {
+            isFirtst = false
+            SharedPreferencesHelper.putBoolean(this@DeviceScanningNewActivity, SplashActivity.IS_FIRST_LAUNCH, false)
+        }
+        // toolbarTv?.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+        if (mAddDeviceType != DeviceType.GATE_WAY)
+            scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
+
+        updateMeshStatus = UPDATE_MESH_STATUS.SUCCESS
+        mUpdateMeshRetryCount = 0
+        mConnectRetryCount = 0
+        LogUtils.d("####TelinkBluetoothSDK 完整流程更新meshName完成后是否开始重新扫描--####${mAddDeviceType != DeviceType.GATE_WAY}")
+        if (mAddDeviceType != DeviceType.GATE_WAY)
+            this.startScan()    //继续开始扫描设备
+        else {
+            btn_add_groups?.setText(R.string.config_gate_way)
+            scanSuccess()
         }
     }
 
@@ -1401,7 +1501,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-    private fun sendTimeZone(scannedDeviceItem: ScannedDeviceItem) {
+    private fun connectBestRssi(scan: ScanResult, scannedDeviceItem: ScannedDeviceItem) {
         val meshAddress = scannedDeviceItem.deviceInfo.meshAddress
         val mac = scannedDeviceItem.deviceInfo.sixByteMacAddress.split(":")
         if (mac != null && mac.size >= 6) {
@@ -1417,13 +1517,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
             val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
                     mac2.toByte(), mac3.toByte(), mac4.toByte(), second, minute, hour, day)
-
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
+            val subscribe = RxBleManager.writeData(scan.bleDevice, byteArrayOf)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        RxBleManager.disconnectAllDevice()
+                        LogUtils.v("zcl物理写入数据成功$it")
+                    }, {
+                        LogUtils.v("zcl物理写入数据错误$it")
+                        RxBleManager.disconnectAllDevice()
+                    })
         }
     }
 
-    private fun skipeType() {
-        //开关传感器不能批量也就不能使用找回
+    private fun skipeType() { //开关传感器不能批量也就不能使用找回
         when (mAddDeviceType) {
             DeviceType.NORMAL_SWITCH -> when (bestRssiDevice?.productUUID) {//传感器开关单独扫描界面
                 DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "deviceType" to bestRssiDevice?.productUUID)
@@ -1476,11 +1583,12 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun startToRecoverDevices() {
         LogUtils.v("zcl------找回controlMeshName:${lastUser?.controlMeshName}")
-        disposableTimer = Observable.timer(10, TimeUnit.SECONDS).subscribe {
-            hideLoadingDialog()
-            disposableFind?.dispose()
-            skipeType()
-        }
+        disposableTimer = Observable.timer(10, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                    hideLoadingDialog()
+                    disposableFind?.dispose()
+                    skipeType()
+                }
         val scanFilter = com.polidea.rxandroidble2.scan.ScanFilter.Builder().setDeviceName(lastUser?.controlMeshName).build()
         val scanSettings = ScanSettings.Builder().build()
         disposableFind = RecoverMeshDeviceUtil.rxBleClient.scanBleDevices(scanSettings, scanFilter)
@@ -1494,6 +1602,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 }
                 .map { deviceInfo ->
                     mAddedDevices.add(ScannedDeviceItem(deviceInfo, deviceInfo.deviceName))
+                    if (mAddDeviceType != DeviceType.GATE_WAY)
+                        scanning_num.text = getString(R.string.title_scanned_device_num, mAddedDevices.size)
                     RecoverMeshDeviceUtil.count
                 }
                 .timeout(RecoverMeshDeviceUtil.SCAN_TIMEOUT_SECONDS, TimeUnit.SECONDS) {
@@ -1613,47 +1723,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun skipeBatchActivity() {
-        val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
         if (Constant.IS_ROUTE_MODE) {//获取扫描数据
-            RouterModel.getRouteScanningResult()?.subscribe({ it ->
-                val data = it.data
-                if (data != null && data.status == 0) {
-                    mAddedDevicesInfos.clear()
-                    when {
-                         data.scannedData.isNotEmpty() -> {
-                            showLoadingDialog(resources.getString(R.string.please_wait))
-                            data.scannedData.forEach { x ->
-                                val deviceInfo = DeviceInfo()
-                                deviceInfo.id = x.id
-                                deviceInfo.index = x.index
-                                deviceInfo.sixByteMacAddress = x.macAddr
-                                deviceInfo.macAddress = x.macAddr
-                                deviceInfo.macAddress = x.macAddr
-                                deviceInfo.meshAddress = x.meshAddr
-                                deviceInfo.meshUUID = x.meshUUID
-                                deviceInfo.deviceName = x.name
-                                deviceInfo.productUUID = x.productUUID
-                                deviceInfo.uid = x.uid
-                                deviceInfo.firmwareRevision = x.version
-                                deviceInfo.colorTemperature = x.colorTemperature
-                                deviceInfo.color = x.color
-                                deviceInfo.brightness = x.brightness
-                                deviceInfo.boundMac = x.boundMac
-                                deviceInfo.belongRegionId = x.belongRegionId
-                                deviceInfo.belongGroupId = x.belongGroupId.toLong()
-                                mAddedDevicesInfos.add(deviceInfo)
-                            }
-                            tellServerClear()
-                        }
-                        else -> scanFail()
-                    }
-                } else {//如果还在扫描则重新计算超时时间
-                    routeTimerOut()
-                }
-            }, {
-                LogUtils.v("zcl-----------$it-------")
-            })
+            getRouterScanResult()
         } else {
+            val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
             DBUtils.saveRegion(lastMyRegion, true)
             var meshAddress = 0
             for (item in mAddedDevices) {
@@ -1672,10 +1745,86 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     @SuppressLint("CheckResult")
-    private fun tellServerClear() {
+    private fun getRouterScanResult() {
+        RouterModel.getRouteScanningResult()?.subscribe({ it ->
+            LogUtils.v("zcl-----------收到路由获取服务器扫描结果-------$it")
+            val data = it.data
+            if (data != null && data.status == 0) {
+                mAddedDevicesInfos.clear()
+                when {
+                    data.scannedData.isNotEmpty() -> makeDeviceAndSkipe(data)
+                    else -> tellServerCanClear(false)
+                }
+                lastUser?.let {
+                    SyncDataPutOrGetUtils.syncGetDataStart(it, object : SyncCallback {
+                        override fun start() {}
+                        override fun complete() {
+                            LogUtils.v("zcl-----------收到路由下载数据成功-------")
+                        }
+
+                        override fun error(msg: String?) {}
+                    })
+                }
+            } else {//如果还在扫描则重新计算超时时间
+                ToastUtils.showShort(getString(R.string.no_device))
+                scanFail()
+            }
+        }, {
+            LogUtils.v("zcl-----------$it-------")
+        })
+    }
+
+    private fun makeDeviceAndSkipe(data: Data) {
+        showLoadingDialog(resources.getString(R.string.please_wait))
+        data.scannedData.forEach { x ->
+            val deviceInfo = DeviceInfo()
+            deviceInfo.id = x.id
+            deviceInfo.index = x.index
+            deviceInfo.sixByteMacAddress = x.macAddr
+            deviceInfo.macAddress = x.macAddr
+            deviceInfo.macAddress = x.macAddr
+            deviceInfo.meshAddress = x.meshAddr
+            deviceInfo.meshUUID = x.meshUUID
+            deviceInfo.deviceName = x.name
+            deviceInfo.productUUID = x.productUUID
+            deviceInfo.uid = x.uid
+            deviceInfo.firmwareRevision = x.version
+            deviceInfo.colorTemperature = x.colorTemperature
+            deviceInfo.color = x.color
+            deviceInfo.brightness = x.brightness
+            deviceInfo.boundMac = x.boundMac
+            deviceInfo.belongRegionId = x.belongRegionId
+            deviceInfo.belongGroupId = x.belongGroupId.toLong()
+            mAddedDevicesInfos.add(deviceInfo)
+        }
+        LogUtils.v("zcl-----------收到路由重新包装deviceInfo个数-------${mAddedDevicesInfos.size}")
+        tellServerCanClear(true)
+    }
+
+    @SuppressLint("CheckResult")
+    private fun tellServerCanClear(isScanSucess: Boolean) {
         val subscribe = RouterModel.routeScanClear()
                 ?.subscribe({
-                    skipeActivity(intent)
+                    LogUtils.v("zcl-----------收到路由告诉服务器确认结果可以清除-------$it")
+                    if (isScanSucess) {
+                        val intent: Intent
+                        when (mAddDeviceType) {
+                            98 -> {
+                                intent = Intent(this, SensorDeviceDetailsActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
+                                getAndFinish()
+                            }
+                            99 -> {
+                                intent = Intent(this, SwitchDeviceDetailsActivity::class.java)
+                                intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
+                                getAndFinish()
+                            }
+                            else -> {
+                                intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
+                                skipeActivity(intent)
+                            }
+                        }
+                    } else scanFail()
                 }) {
                     ToastUtils.showShort(it.message)
                 }
@@ -1703,7 +1852,24 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         disposableFind?.dispose()
         disposableTimer?.dispose()
         mConnectDisposal?.dispose()
+        routerStopScan(true)
         disposeAllSubscribe()
         mApplication?.removeEventListener(this)
+        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+    }
+
+    private fun startMeshTimeoutTimer() {
+        disposableUpMeshTimer?.dispose()
+        disposableUpMeshTimer = Observable.timer(12000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    if (meshUpdateType == 0L)
+                        runOnUiThread {
+                            stopScanTimer()
+                            //TelinkLightService.Instance()?.mAdapter?.stop()/此处导致整个扫描中断
+                            retryScan()
+                        }
+                }
     }
 }

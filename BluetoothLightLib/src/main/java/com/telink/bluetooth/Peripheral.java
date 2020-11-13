@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.telink.util.Arrays;
 
 import java.lang.reflect.Method;
@@ -62,7 +63,7 @@ public class Peripheral extends BluetoothGattCallback {
     protected final Runnable mCommandDelayRunnable = new CommandDelayRunnable();
 
     private final Object mStateLock = new Object();
-//    private final Object mProcessLock = new Object();
+    //    private final Object mProcessLock = new Object();
 
     protected BluetoothDevice device;
     protected BluetoothGatt gatt;
@@ -104,6 +105,7 @@ public class Peripheral extends BluetoothGattCallback {
     public void setGwVoipState(int gwVoipState) {
         this.gwVoipState = gwVoipState;
     }
+
     private String get4ByteMac(String macString) {
         String[] strArray = macString.split(":");
         this.macBytes = new byte[4];
@@ -112,10 +114,11 @@ public class Peripheral extends BluetoothGattCallback {
         this.macBytes[2] = (byte) (Integer.parseInt(strArray[3], 16) & 0xFF);
         this.macBytes[3] = (byte) (Integer.parseInt(strArray[2], 16) & 0xFF);
 
-        long mac4Byte = (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
+        long mac4Byte =
+                (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
 
-        String mac = strArray[5]+":"+strArray[4]+":"+strArray[3]+":"+strArray[2];
-         return valueOf(mac4Byte);
+        String mac = strArray[5] + ":" + strArray[4] + ":" + strArray[3] + ":" + strArray[2];
+        return valueOf(mac4Byte);
     }
 
     public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
@@ -124,7 +127,7 @@ public class Peripheral extends BluetoothGattCallback {
         this.rssi = rssi;
         this.name = device.getName();
         this.type = device.getType(); //ble
-       // this.mac = get4ByteMac2(scanRecord);
+        // this.mac = get4ByteMac2(scanRecord);
         this.version = getVersion(scanRecord);
         this.mac = get4ByteMac(device.getAddress());
         this.sixByteMac = device.getAddress();
@@ -223,7 +226,7 @@ public class Peripheral extends BluetoothGattCallback {
             this.gatt.disconnect();
         }
 
-//        TelinkLog.d("disconnect " + this.getDeviceName() + " -- " + this.getMacAddress());
+        //        TelinkLog.d("disconnect " + this.getDeviceName() + " -- " + this.getMacAddress());
     }
 
     private void clear() {
@@ -316,11 +319,11 @@ public class Peripheral extends BluetoothGattCallback {
         }
 
         this.mInputCommandQueue.add(commandContext);
-//        synchronized (this.mProcessLock) {
+        //        synchronized (this.mProcessLock) {
         if (!this.processing.get()) {
             this.processCommand();
         }
-//        }
+        //        }
     }
 
     private void processCommand() {
@@ -545,7 +548,7 @@ public class Peripheral extends BluetoothGattCallback {
         boolean success = true;
         String errorMsg = "";
 
-//        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
+        //        Log.d("dadou_writeCha", "writeCharacteristic: "+data.length);
 
         if (gatt == null)
             return;
@@ -582,7 +585,7 @@ public class Peripheral extends BluetoothGattCallback {
         if (!success) {
             this.commandError(errorMsg);
             this.commandCompleted();
-//            Log.d("checkXConnect-wrerro", "writeCharacteristic: ");
+            //            Log.d("checkXConnect-wrerro", "writeCharacteristic: ");
         }
     }
 
@@ -750,11 +753,13 @@ public class Peripheral extends BluetoothGattCallback {
 
                 BluetoothGatt localBluetoothGatt = mBluetoothGatt;
 
-                Method localMethod = localBluetoothGatt.getClass().getMethod("refresh", new Class[0]);
+                Method localMethod = localBluetoothGatt.getClass().getMethod("refresh",
+                        new Class[0]);
 
                 if (localMethod != null) {
 
-                    boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
+                    boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt,
+                            new Object[0])).booleanValue();
 
                     TelinkLog.d("refreshDeviceCache ret = " + bool);
                     return bool;
@@ -783,11 +788,11 @@ public class Peripheral extends BluetoothGattCallback {
                 + newState);
 
         if (newState == BluetoothGatt.STATE_CONNECTED) {
-//            setMTU(103);
+            //            setMTU(103);
 
             this.mConnState.set(CONN_STATE_CONNECTED);
 
-//            Log.d("dadouhjj", "onConnectionStateChange: "+a);
+            //            Log.d("dadouhjj", "onConnectionStateChange: "+a);
 
             if (this.gatt == null || !this.gatt.discoverServices()) {
                 TelinkLog.d("remote service discovery has been stopped status = " + newState);
@@ -798,6 +803,7 @@ public class Peripheral extends BluetoothGattCallback {
 
         } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
             synchronized (this.mStateLock) {
+                refreshDeviceCache();
                 if (this.gatt != null) {
                     closeGatt();
                     TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect Gatt Close");
@@ -809,6 +815,24 @@ public class Peripheral extends BluetoothGattCallback {
                 this.onDisconnect();
             }
         }
+    }
+
+    public boolean refreshDeviceCache() {
+        if (gatt != null) {
+            try {
+                BluetoothGatt localBluetoothGatt = gatt;
+                Method localMethod = localBluetoothGatt.getClass().getMethod("refresh",
+                        new Class[0]);
+                boolean bool =
+                        ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
+                LogUtils.v("zcl-----------清除缓存-------" + bool);
+                return bool;
+            } catch (Exception localException) {
+                TelinkLog.d("An exception occured while refreshing device");
+            }
+        }
+        LogUtils.v("zcl-----------清除缓存-------false");
+        return false;
     }
 
 
@@ -899,9 +923,11 @@ public class Peripheral extends BluetoothGattCallback {
     private boolean isOutOfSize = false;
     private byte[][] packets;
 
-    public void sendData(byte[] data, BluetoothGattCharacteristic characteristicData, int writeType) {
+    public void sendData(byte[] data, BluetoothGattCharacteristic characteristicData,
+                         int writeType) {
         int chunksize = 20; //20 byte chunk
-        packetSize = (int) Math.ceil(data.length / (double) chunksize); //make this variable public so we can access it on the other function
+        packetSize = (int) Math.ceil(data.length / (double) chunksize); //make this variable
+        // public so we can access it on the other function
 
         //this is use as header, so peripheral device know ho much packet will be received.
         characteristicData.setValue(data);
@@ -1013,7 +1039,8 @@ public class Peripheral extends BluetoothGattCallback {
     }
 
     public String getVersion(byte[] scanRecord) {
-        String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
+        String version =
+                valueOf((char) scanRecord[39]) + (char) scanRecord[40] + (char) scanRecord[41]
                 + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];
         return version;
     }
