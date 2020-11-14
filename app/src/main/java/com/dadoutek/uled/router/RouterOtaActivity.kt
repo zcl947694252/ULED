@@ -304,8 +304,8 @@ class RouterOtaActivity : TelinkBaseActivity() {
         if (routerOTAFinishBean?.finish == true) {
             if (routerOTAFinishBean.ser_id == "router_stop_ota") {
                 initUi()
-                if (routerOTAFinishBean.status == 0 && clickFinish)
-                    finish()
+                /*if (routerOTAFinishBean.status == 0 && clickFinish)
+                    finish()*/
             }
         }
     }

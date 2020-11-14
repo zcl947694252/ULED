@@ -2246,6 +2246,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         if (cmdBean.ser_id == "slowSpeed") {
             LogUtils.v("zcl-----------收到路由调节速度通知-------$cmdBean")
             hideLoadingDialog()
+            disposableRouteTimer?.dispose()
             when (cmdBean.status) {
                 0 -> sendSpeedUi(group, tempSpeed)
                 else -> {

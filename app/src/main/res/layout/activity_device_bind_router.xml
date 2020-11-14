@@ -23,6 +23,7 @@
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="33dp"
+                android:background="@color/gray_e"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -30,7 +31,6 @@
                     android:layout_width="0dp"
                     android:layout_height="38dp"
                     android:layout_weight="1"
-                    android:background="@color/gray_e"
                     android:gravity="center_vertical"
                     android:paddingStart="@dimen/dp_10"
                     android:text="@string/choose_device"
@@ -48,7 +48,7 @@
         <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:background="@color/gray_e" />
+                android:background="@color/gray_e"/>
     </LinearLayout>
 
     <LinearLayout
@@ -132,7 +132,7 @@
             android:layout_marginBottom="8dp"
             android:background="@drawable/btn_rec_black_bt"
             android:clickable="false"
-            android:text="@string/sure_group"
+            android:text="@string/bind_reouter"
             android:textColor="@android:color/white"
             android:visibility="visible" />
 

@@ -38,6 +38,7 @@ import com.dadoutek.uled.curtain.CurtainOfGroupActivity
 import com.dadoutek.uled.curtains.WindowCurtainsActivity
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.LightsOfGroupActivity
 import com.dadoutek.uled.light.NormalSettingActivity
 import com.dadoutek.uled.model.Constant
@@ -61,6 +62,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -451,8 +453,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.open_faile))
@@ -462,7 +464,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
         }, {
             LogUtils.v("zcl-----------收到路由开关组失败-------$it")
@@ -590,10 +592,10 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 }
                                 intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                                 intent?.putExtra("group", currentGroup)
-                                if (TelinkLightApplication.getApp().connectDevice==null&&!Constant.IS_ROUTE_MODE) {
+                                if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
                                     goConnect()
-                                }else{
-                                     startActivityForResult(intent, 2)
+                                } else {
+                                    startActivityForResult(intent, 2)
                                 }
                             }
                         }
@@ -688,18 +690,18 @@ abstract class BaseGroupFragment : BaseFragment() {
             }
              */
             when (it.errorCode) {
-                0, 90015,90007 -> {
+                0, 90015, 90007 -> {
                     showLoadingDialog(getString(R.string.please_wait))
-                    if (it.errorCode==0){
+                    if (it.errorCode == 0) {
                         disposableRouteTimer?.dispose()
                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                 .subscribeOn(Schedulers.io())
-                                                 .observeOn(AndroidSchedulers.mainThread())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
                                     hideLoadingDialog()
                                     ToastUtils.showShort(getString(R.string.delete_gp_fail))
                                 }
-                    }else{
+                    } else {
                         DBUtils.deleteGroupOnly(dbGroup)
                         deleteComplete()
                     }
@@ -707,11 +709,11 @@ abstract class BaseGroupFragment : BaseFragment() {
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
-                else-> ToastUtils.showShort(it.message)
+                else -> ToastUtils.showShort(it.message)
             }
             LogUtils.v("zcl-----------收到路由删组-------$it")
         }, {
-                ToastUtils.showShort(it.message)
+            ToastUtils.showShort(it.message)
 
         })
     }
@@ -726,9 +728,15 @@ abstract class BaseGroupFragment : BaseFragment() {
                 val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())
                 when (routerGroup?.status) {
                     0 -> {
-                        DBUtils.deleteGroupOnly(gp!!)
+                        if (gp != null)
+                            DBUtils.deleteGroupOnly(gp!!)
                         deleteComplete()
-                        ToastUtils.showShort(getString(R.string.delete_group_success,routerGroup.succeedNow.size))
+                        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                            override fun start() {}
+                            override fun complete() {}
+                            override fun error(msg: String?) {}
+                        })
+                        ToastUtils.showShort(getString(R.string.delete_group_success, routerGroup.succeedNow.size))
                     }
                     1 -> ToastUtils.showShort(getString(R.string.delete_group_some_fail))
                     -1 -> ToastUtils.showShort(getString(R.string.delete_gp_fail))
@@ -794,8 +802,8 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     var lightList: MutableList<DbLight> = ArrayList()
                     when (group.meshAddr) {
@@ -888,7 +896,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                         DBUtils.updateLight(light)
                         lights.remove(light)
                         //修改分组成功后删除场景信息。
-                         deleteAllSceneByLightAddr(light.meshAddr)
+                        deleteAllSceneByLightAddr(light.meshAddr)
                         Thread.sleep(100)
                         if (lights.count() == 0) {
                             //所有灯都删除了分组
