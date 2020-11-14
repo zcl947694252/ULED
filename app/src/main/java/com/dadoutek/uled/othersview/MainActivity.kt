@@ -150,28 +150,24 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
-        if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
-            when (SharedPreferencesHelper.getInt(this, Constant.IS_TECK, 0)) {
-                0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
-                1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek"
-                2 -> DEFAULT_MESH_FACTORY_NAME = "dadourd"
-            }
-            Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
-            main_toast.visibility = VISIBLE
-        } else {
-            main_toast.visibility = GONE
+        when {
+            Constant.isDebug -> main_toast.visibility = VISIBLE
+            else -> main_toast.visibility = GONE
         }
+
+        LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL}")
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener { getBin() }
         initBottomNavigation()
         checkVersionAvailable()
+
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         if (Constant.IS_ROUTE_MODE)
-        getScanResult()
+            getScanResult()//获取扫描状态
 
         getRouterStatus()
         getRegionList()
         getAllStatus()
-        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         LogUtils.v("zcl---获取状态------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
     }
 
@@ -217,7 +213,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         otaData.size <= 1 -> {
                                             when (lastOtaType) {
                                                 3 -> startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to
-                                                        productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1,"version" to otaDataOne!!.fromVersion )
+                                                        productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
                                                 1 -> {
                                                     var meshAddr = when (productUUID) {
                                                         DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByID(otaDataOne.id.toLong())?.meshAddr
@@ -226,7 +222,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                         else -> DBUtils.getLightByID(otaDataOne.id.toLong())?.meshAddr
                                                     }
                                                     startActivity<RouterOtaActivity>("deviceMeshAddress" to meshAddr, "deviceType" to
-                                                            productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1,"version" to otaDataOne!!.fromVersion )
+                                                            productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
                                                 }
                                             }
                                         }
@@ -270,18 +266,18 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     @SuppressLint("CheckResult")
     private fun getAllStatus() {
         if (Constant.IS_ROUTE_MODE)
-        UserModel.getModeStatus()?.subscribe({
-            LogUtils.v("zcl-----------获取状态服务器返回-------$it")
-            Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
-            if (Constant.IS_ROUTE_MODE)
-                TelinkLightService.Instance().idleMode(true)
-            Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
-            SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, Constant.IS_ROUTE_MODE)
-            changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
-        }, {
-            Constant.IS_ROUTE_MODE = false
-            Constant.IS_OPEN_AUXFUN = false
-        })
+            UserModel.getModeStatus()?.subscribe({
+                LogUtils.v("zcl-----------获取状态服务器返回-------$it")
+                Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
+                if (Constant.IS_ROUTE_MODE)
+                    TelinkLightService.Instance().idleMode(true)
+                Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
+                SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, Constant.IS_ROUTE_MODE)
+                changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
+            }, {
+                Constant.IS_ROUTE_MODE = false
+                Constant.IS_OPEN_AUXFUN = false
+            })
     }
 
     private fun getScanResult() {
@@ -751,9 +747,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         mConnectDisposable?.dispose()
                                         mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
                                                 ?.subscribe({//找回有效设备
-                                                            //RecoverMeshDeviceUtil.addDevicesToDb(it)
-                                                            onLogin()
-                                                        },
+                                                    //RecoverMeshDeviceUtil.addDevicesToDb(it)
+                                                    onLogin()
+                                                },
                                                         {
                                                             LogUtils.v("zcl-----------连接失败继续连接-------")
                                                             if (!Constant.IS_ROUTE_MODE)

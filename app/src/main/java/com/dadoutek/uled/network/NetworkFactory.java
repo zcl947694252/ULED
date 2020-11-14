@@ -26,18 +26,21 @@ public class NetworkFactory {
     private static final long DEFAULT_TIMEOUT = 15;
     private static RequestInterface api;
     private static Converter.Factory gsonConverterFactory = GsonConverterFactory.create();
-    private static CallAdapter.Factory rxJavaCallAdapterFactory = RxJava2CallAdapterFactory.create();
+    private static CallAdapter.Factory rxJavaCallAdapterFactory =
+            RxJava2CallAdapterFactory.create();
     private static OkHttpClient okHttpClient;
 
     private static OkHttpClient initHttpClient() {
 
-        final TrustManager[] trustAllCerts = new TrustManager[] {
+        final TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     @Override
-                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) { }
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain,
+                                                   String authType) { }
 
                     @Override
-                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) { }
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain,
+                                                   String authType) { }
 
                     @Override
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -61,8 +64,10 @@ public class NetworkFactory {
         // Create an ssl socket factory with our all-trusting manager
         final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
-       // HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(Constant.isDebug?HttpLoggingInterceptor.Level.BODY:HttpLoggingInterceptor.Level.NONE);
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
+        // HttpLoggingInterceptor logging = new HttpLoggingInterceptor().setLevel(Constant
+        // .isDebug?HttpLoggingInterceptor.Level.BODY:HttpLoggingInterceptor.Level.NONE);
+        HttpLoggingInterceptor logging =
+                new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
                 .readTimeout(3, TimeUnit.SECONDS)
@@ -73,8 +78,8 @@ public class NetworkFactory {
                 .hostnameVerifier((hostname, session) -> true)
                 .retryOnConnectionFailure(true);
 
-       // if (BuildConfig.DEBUG)
-            okHttpBuilder.addInterceptor(logging);
+        // if (BuildConfig.DEBUG)
+        okHttpBuilder.addInterceptor(logging);
 
         return okHttpBuilder.build();
     }
@@ -87,13 +92,23 @@ public class NetworkFactory {
         /**
          * 记得修改stomp的前缀地址 StompManager不能是测试的  还有dadousmart
          */
-        if (null == api) {
+        if (Constant.isDebug) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
                     .baseUrl(Constant.BASE_URL)
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(rxJavaCallAdapterFactory)
                     .build();
+
+            api = retrofit.create(RequestInterface.class);
+        } else if (null == api) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .client(okHttpClient)
+                    .baseUrl(Constant.BASE_URL)
+                    .addConverterFactory(gsonConverterFactory)
+                    .addCallAdapterFactory(rxJavaCallAdapterFactory)
+                    .build();
+
             api = retrofit.create(RequestInterface.class);
         }
         return api;

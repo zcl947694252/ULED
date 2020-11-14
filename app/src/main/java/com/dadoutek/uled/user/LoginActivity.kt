@@ -31,11 +31,11 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbUser
 import com.dadoutek.uled.model.httpModel.AccountModel
 import com.dadoutek.uled.model.httpModel.RegionModel
-import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
@@ -49,12 +49,8 @@ import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.mob.tools.utils.DeviceHelper
 import com.telink.TelinkApplication
-import io.reactivex.Observable.*
+import io.reactivex.Observable.timer
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_login.facebook_btn
-import kotlinx.android.synthetic.main.activity_login.google_btn
-import kotlinx.android.synthetic.main.activity_login.qq_btn
-import kotlinx.android.synthetic.main.activity_login.third_party_text
 import org.jetbrains.anko.toast
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -163,48 +159,57 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
 
     @SuppressLint("CheckResult")
-    private fun getRegioninfo(){//在更新User的regionID 以及lastUserID后再拉取区域信息 赋值对应controlMesName 以及PWd
+    private fun getRegioninfo() {//在更新User的regionID 以及lastUserID后再拉取区域信息 赋值对应controlMesName 以及PWd
         NetworkFactory.getApi()
                 .getRegionInfo(DBUtils.lastUser?.last_authorizer_user_id, DBUtils.lastUser?.last_region_id)
                 .compose(NetworkTransformer())
-                .subscribe( {
-                        //保存最后的区域信息到application
-                        val application = DeviceHelper.getApplication() as TelinkLightApplication
-                        val mesh = application.mesh
-                        mesh.name = it.controlMesh
-                        mesh.password = it.controlMeshPwd
-                        mesh.factoryName = it.installMesh
-                        mesh.factoryPassword = it.installMeshPwd
+                .subscribe({
+                    //保存最后的区域信息到application
+                    val application = DeviceHelper.getApplication() as TelinkLightApplication
+                    val mesh = application.mesh
+                    mesh.name = it.controlMesh
+                    mesh.password = it.controlMeshPwd
+                    mesh.factoryName = it.installMesh
+                    mesh.factoryPassword = it.installMeshPwd
 
-                        DBUtils.lastUser?.controlMeshName = it.controlMesh
-                        DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
+                    DBUtils.lastUser?.controlMeshName = it.controlMesh
+                    DBUtils.lastUser?.controlMeshPwd = it.controlMeshPwd
 
-                        SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
-                        application.setupMesh(mesh)
-                        val lastUser = DBUtils.lastUser!!
-                        DBUtils.saveUser(lastUser)
+                    SharedPreferencesUtils.saveCurrentUseRegionID(it.id)
+                    application.setupMesh(mesh)
+                    val lastUser = DBUtils.lastUser!!
+                    DBUtils.saveUser(lastUser)
 
-                        DBUtils.deleteLocalData()
-                        DBUtils.deleteAllData()
-                        //创建数据库
-                        AccountModel.initDatBase(lastUser)
-                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                        SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
+                    DBUtils.deleteLocalData()
+                    DBUtils.deleteAllData()
+                    //创建数据库
+                    AccountModel.initDatBase(lastUser)
+                    //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser, syncCallback)
 
-                        Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
+                    Log.e("zclenterpassword", "zcl***保存数据***" + DBUtils.lastUser?.last_authorizer_user_id + "--------------------" + DBUtils.lastUser?.last_region_id)
 
-                        SharedPreferencesUtils.setUserLogin(true)
-                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
-                        hideLoadingDialog()
-                        ActivityUtils.finishAllActivities(true)
-                        ActivityUtils.startActivity(this@LoginActivity, MainActivity::class.java)
-                    },{
-                        LogUtils.v("zcl-------$it")
-                        hideLoadingDialog()
-                        ToastUtils.showLong(it.localizedMessage)
+                    SharedPreferencesUtils.setUserLogin(true)
+                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, true)
+                    hideLoadingDialog()
+                    ActivityUtils.finishAllActivities(true)
+                    ActivityUtils.startActivity(this@LoginActivity, MainActivity::class.java)
+                }, {
+                    LogUtils.v("zcl-------$it")
+                    hideLoadingDialog()
+                    ToastUtils.showLong(it.localizedMessage)
                 })
     }
+
     private fun initData() {
+        Constant.DEFAULT_MESH_FACTORY_NAME = "dadoutek"
+        Constant.PIR_SWITCH_MESH_NAME = Constant.DEFAULT_MESH_FACTORY_NAME
+        SharedPreferencesHelper.putBoolean(this, Constant.IS_SMART, false)
+
+        login_isOnline_tv.text = "测试服"
+        Constant.BASE_URL = Constant.BASE_DEBUG_URL
+        LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL}")
+
         dbUser = DbUser()
         val intent = intent
         isFirstLauch = intent.getBooleanExtra(IS_FIRST_LAUNCH, true)
@@ -230,21 +235,21 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initListener() {
-        login_isTeck.setOnCheckedChangeListener { _, checkedId ->
-            if (Constant.isDebug) {//如果是debug则可以切换
-                when (checkedId) {
-                    R.id.login_smart -> {
-                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 0)
-                    }
-                    R.id.login_Teck -> {
-                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 1)
-                    }
-                    R.id.login_rd -> {
-                        SharedPreferencesHelper.putInt(this, Constant.IS_TECK, 2)
-                    }
-                }
-                //startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+        login_isSmart.setOnCheckedChangeListener { _, isChecked ->
+            login_isSmart_tv.text = if (isChecked) "dadousmart" else "dadoutek"
+            Constant.DEFAULT_MESH_FACTORY_NAME = when (isChecked) {
+                true -> "dadousmart"
+                false -> "dadoutek"
             }
+            Constant.PIR_SWITCH_MESH_NAME = Constant.DEFAULT_MESH_FACTORY_NAME
+            SharedPreferencesHelper.putBoolean(this, Constant.IS_SMART, isChecked)
+            LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL}")
+        }
+        login_isOnline.setOnCheckedChangeListener { _, isChecked ->
+            login_isOnline_tv.text = if (isChecked) "正式服" else "测试服"
+            Constant.BASE_URL =  if (isChecked)Constant.BASE_URL_JAVA else Constant.BASE_DEBUG_URL
+            SharedPreferencesHelper.putBoolean(this, Constant.IS_ONLINE, isChecked)
+            LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url--isDebug--${Constant.isDebug}--${Constant.BASE_URL}")
         }
         btn_login.setOnClickListener(this)
         forget_password.setOnClickListener(this)
@@ -532,7 +537,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
         if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
-             userLogin()
+            userLogin()
         } else {
             Toast.makeText(this, getString(R.string.phone_or_password_can_not_be_empty), Toast.LENGTH_SHORT).show()
         }
@@ -545,15 +550,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         }
         AccountModel.login(phone!!, editPassWord!!)
                 .subscribe({
-                        DBUtils.deleteLocalData()
-                        SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
-                        //判断是否用户是首次在这个手机登录此账号，是则同步数据
-                        SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallback)
-                        SharedPreferencesUtils.setUserLogin(true)
-                    },{
-                        LogUtils.d("logging: " + "登录错误" + it.message)
-                        ToastUtils.showShort(it.message)
-                        hideLoadingDialog()
+                    DBUtils.deleteLocalData()
+                    SharedPreferencesUtils.saveLastUser("$phone-$editPassWord")
+                    //判断是否用户是首次在这个手机登录此账号，是则同步数据
+                    SyncDataPutOrGetUtils.syncGetDataStart(it, syncCallback)
+                    SharedPreferencesUtils.setUserLogin(true)
+                }, {
+                    LogUtils.d("logging: " + "登录错误" + it.message)
+                    ToastUtils.showShort(it.message)
+                    hideLoadingDialog()
                 })
     }
 
@@ -583,18 +588,18 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun initMe() {
         val disposable = RegionModel.get()?.subscribe({
-                setMeRegion(it)
-            }, {
-                ToastUtils.showLong(it.message)
+            setMeRegion(it)
+        }, {
+            ToastUtils.showLong(it.message)
         })
     }
 
     @SuppressLint("CheckResult")
     private fun initAuthor() {
         RegionModel.getAuthorizerList()?.subscribe({
-                setAuthorizeRegion(it)
-            }, {
-                ToastUtils.showLong(it.message)
+            setAuthorizeRegion(it)
+        }, {
+            ToastUtils.showLong(it.message)
         })
     }
 
@@ -602,46 +607,46 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private fun setAuthorizeRegion(authorList: MutableList<RegionAuthorizeBean>) {
         poptitleAuthorize?.text = getString(R.string.received_net_num, authorList.size)
         mAuthorList = authorList
-            itemAdapterAuthor = RegionAuthorizeDialogAdapter(R.layout.region_dialog_item, mAuthorList)
-            popRecycleAuthorize?.adapter = itemAdapterAuthor
-            itemAdapterAuthor?.setOnItemClickListener { _, _, position ->
-                regionBeanAuthorize = authorList[position]
-                when (whoClick) {
-                    NONE -> itemAdapterAuthor?.data?.get(position)?.is_selected = true
-                    //上次点击的自己不用便利其他人
-                    AUTHOR ->
-                        if (itemAdapterAuthor != null)
-                            for (i in itemAdapterAuthor!!.data.indices)
-                                itemAdapterAuthor!!.data[i].is_selected = i == position
-                    //上次点击个人区域 这次自己 个人全是false
-                    ME -> initMe()
-                }
-                itemAdapterAuthor?.notifyDataSetChanged()
-                whoClick = AUTHOR
+        itemAdapterAuthor = RegionAuthorizeDialogAdapter(R.layout.region_dialog_item, mAuthorList)
+        popRecycleAuthorize?.adapter = itemAdapterAuthor
+        itemAdapterAuthor?.setOnItemClickListener { _, _, position ->
+            regionBeanAuthorize = authorList[position]
+            when (whoClick) {
+                NONE -> itemAdapterAuthor?.data?.get(position)?.is_selected = true
+                //上次点击的自己不用便利其他人
+                AUTHOR ->
+                    if (itemAdapterAuthor != null)
+                        for (i in itemAdapterAuthor!!.data.indices)
+                            itemAdapterAuthor!!.data[i].is_selected = i == position
+                //上次点击个人区域 这次自己 个人全是false
+                ME -> initMe()
             }
+            itemAdapterAuthor?.notifyDataSetChanged()
+            whoClick = AUTHOR
+        }
     }
 
     @SuppressLint("StringFormatInvalid", "StringFormatMatches")
     private fun setMeRegion(list: MutableList<RegionBean>) {
         poptitle?.text = getString(R.string.me_net_num, list.size)
         mList = list
-            itemAdapter = RegionDialogAdapter(R.layout.region_dialog_item, mList!!)
-            popRecycle?.adapter = itemAdapter
-            itemAdapter?.setOnItemClickListener { _, _, position ->
-                regionBean = list[position]
-                if (itemAdapter != null)
-                    when (whoClick) {//更新UI
-                        NONE -> itemAdapter!!.data[position].is_selected = true
-                        //上次点击的自己不用便利其他人 更改状态
-                        ME -> for (i in itemAdapter!!.data.indices)
-                            itemAdapter!!.data[i].is_selected = i == position
+        itemAdapter = RegionDialogAdapter(R.layout.region_dialog_item, mList!!)
+        popRecycle?.adapter = itemAdapter
+        itemAdapter?.setOnItemClickListener { _, _, position ->
+            regionBean = list[position]
+            if (itemAdapter != null)
+                when (whoClick) {//更新UI
+                    NONE -> itemAdapter!!.data[position].is_selected = true
+                    //上次点击的自己不用便利其他人 更改状态
+                    ME -> for (i in itemAdapter!!.data.indices)
+                        itemAdapter!!.data[i].is_selected = i == position
 
-                        //上次点击收授权区域 这次自己 授权全是false
-                        AUTHOR -> initAuthor()
-                    }
-                itemAdapter?.notifyDataSetChanged()
-                whoClick = ME
-            }
+                    //上次点击收授权区域 这次自己 授权全是false
+                    AUTHOR -> initAuthor()
+                }
+            itemAdapter?.notifyDataSetChanged()
+            whoClick = ME
+        }
     }
 
     private fun syncComplet() {

@@ -15,30 +15,26 @@ public class Constant
     //网络请求服务器java域名地址
     public static final String BASE_URL_JAVA = "https://dev.dadoutek.com/smartlight_java/";
     //网络请求服务器测试地址
-
     public static final String BASE_DEBUG_URL = "http://47.107.227.130/smartlight_test/";
     //长连接请求服务器域名地址
     public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
-    public static Boolean isDebug = false;
+    public static Boolean isDebug = true;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
-
     /**
      * 上线必改  正式服url stomp正式服url  dadousmart正式服  倒计是为11
-     * 测试mqtt服务器地址
-     * tcp://47.107.227.130:1885
-     * 正式mqtt服务器地址
-     * tcp://smart.dadoutek.com:1883
+     * 测试mqtt服务器地址  tcp://47.107.227.130:1885
+     * 正式mqtt服务器地址 tcp://smart.dadoutek.com:1883
      */
     public static String HOST =isDebug ? "47.107.227.130":"smart.dadoutek.com";
     public static String HOST2 =isDebug ? "tcp://47.107.227.130":"tcp://smart.dadoutek.com";
     public static int PORT = isDebug ?1885:1883;
 
     public static final long downTime = isDebug ? 3 : 11;
-    public static final String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
+    public static  String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
     public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
     //public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
@@ -279,7 +275,8 @@ public class Constant
     public static final String ISCONFIRM = "isConfirm";
     public static boolean isCreat = false;
     public static final String DEVICE_NUM = "DEVICE_NUM";
-    public static final String IS_TECK = "IS_TECK";
+    public static final String IS_SMART = "IS_TECK";
+    public static final String IS_ONLINE = "IS_ONLINE";
     public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
 
     public static final String GW_COMMEND_CODE = "GW_COMMEND_CODE";

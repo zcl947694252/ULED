@@ -110,19 +110,19 @@ class RouterOtaActivity : TelinkBaseActivity() {
         val intExtra = intent.getIntExtra("isOTAing", 3)
         isOtaing = intExtra == 1
 
-   /*     var version = when (deviceType) {
-            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMeshAddr(deviceMeshAddress)?.version ?: ""
-            DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByMeshAddr(deviceMeshAddress)?.version ?: ""
-            DeviceType.SMART_RELAY -> DBUtils.getConnectorByMeshAddr(deviceMeshAddress)?.version ?: ""
-            DeviceType.NORMAL_SWITCH -> DBUtils.getSwitchByMeshAddr(deviceMeshAddress)?.version ?: ""
-            DeviceType.SENSOR -> DBUtils.getSensorByMeshAddr(deviceMeshAddress)?.version ?: ""
-            DeviceType.GATE_WAY -> DBUtils.getGatewayByMeshAddr(deviceMeshAddress)?.version ?: ""
-            else -> DBUtils.getLightByMeshAddr(deviceMeshAddress)?.version ?: ""
-        }*/
+        /*     var version = when (deviceType) {
+                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMeshAddr(deviceMeshAddress)?.version ?: ""
+                 DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByMeshAddr(deviceMeshAddress)?.version ?: ""
+                 DeviceType.SMART_RELAY -> DBUtils.getConnectorByMeshAddr(deviceMeshAddress)?.version ?: ""
+                 DeviceType.NORMAL_SWITCH -> DBUtils.getSwitchByMeshAddr(deviceMeshAddress)?.version ?: ""
+                 DeviceType.SENSOR -> DBUtils.getSensorByMeshAddr(deviceMeshAddress)?.version ?: ""
+                 DeviceType.GATE_WAY -> DBUtils.getGatewayByMeshAddr(deviceMeshAddress)?.version ?: ""
+                 else -> DBUtils.getLightByMeshAddr(deviceMeshAddress)?.version ?: ""
+             }*/
 
-        router_ota_local.text = getString(R.string.local_version,deviceVersion)
+        router_ota_local.text = getString(R.string.local_version, deviceVersion)
         val otaVersion = getOtaVersion(deviceVersion)
-        router_ota_version.text =  getString(R.string.server_version,otaVersion)
+        router_ota_version.text = getString(R.string.server_version, otaVersion)
 
         isRouter = deviceMeshAddress == 100000
         if (isOtaing)
@@ -172,31 +172,35 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun otaDevice(currentTimeMillis1: Long) {
-        RouterModel.toDevicesOTA(mutableListOf(deviceMeshAddress), deviceType, currentTimeMillis1, 1, "routerSingle")?.subscribe({
-            LogUtils.v("zcl-----------收到路由升级请求---deviceMeshAddress$deviceMeshAddress---time$currentTimeMillis1-------deviceTye${deviceType}----$it")
-            when (it.errorCode) {
-                0 -> {
-                    isOtaing = true
-                    ToastUtils.showShort(getString(R.string.ota_update_title))
-                    router_ota_start.text = getString(R.string.stop_ota)
-                    otaCount = 0
-                    router_ota_wave_progress_bar?.value = 0f
-                    setTimeAndOpenUI(currentTimeMillis1)
-                } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
-                90999 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
-                    isOtaing = false
-                    goScanning()
-                }
-                90998 -> {//OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
-                    isOtaing = true
-                    ToastUtils.showShort(getString(R.string.ota_update_title))
-                    setTimeAndOpenUI(SharedPreferencesUtils.getLastOtaTime())
-                }
-                else -> ToastUtils.showShort(it.message)
-            }
-        }, {
-            ToastUtils.showShort(it.message)
-        })
+        val meshAddrs = mutableListOf(deviceMeshAddress)
+        when {
+            meshAddrs.isEmpty() -> ToastUtils.showShort(getString(R.string.no_can_ota_device))
+            else -> RouterModel.toDevicesOTA(meshAddrs, deviceType, currentTimeMillis1, 1, "routerSingle")?.subscribe({
+                    LogUtils.v("zcl---收到路由升级请求---deviceMeshAddress$deviceMeshAddress--time$currentTimeMillis1--deviceTye${deviceType}--$it")
+                    when (it.errorCode) {
+                        0 -> {
+                            isOtaing = true
+                            ToastUtils.showShort(getString(R.string.ota_update_title))
+                            router_ota_start.text = getString(R.string.stop_ota)
+                            otaCount = 0
+                            router_ota_wave_progress_bar?.value = 0f
+                            setTimeAndOpenUI(currentTimeMillis1)
+                        } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
+                        90999 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
+                            isOtaing = false
+                            goScanning()
+                        }
+                        90998 -> {//OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
+                            isOtaing = true
+                            ToastUtils.showShort(getString(R.string.ota_update_title))
+                            setTimeAndOpenUI(SharedPreferencesUtils.getLastOtaTime())
+                        }
+                        else -> ToastUtils.showShort(it.message)
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -291,6 +295,8 @@ class RouterOtaActivity : TelinkBaseActivity() {
         router_ota_start.text = getString(R.string.retry_ota)
         ToastUtils.showShort(getString(R.string.router_ota_faile))
         isOtaing = false
+        currentTimeMillis = 0
+        SharedPreferencesUtils.setLastOtaTime(currentTimeMillis)
     }
 
     override fun tzRouterOTAStopRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
@@ -319,20 +325,21 @@ class RouterOtaActivity : TelinkBaseActivity() {
         // 4版本号异常 5已是最新版本，无需升级 6路由升级失败 7路由蓝牙连接失败 8路由下载bin文件失败 99路由回复超时
         isOtaing = false
         when (resultBean.failedCode) {
-            -1 -> afterOtaSuccess()
-            0 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-            1 -> ToastUtils.showShort(getString(R.string.no_get_version))
-            2 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
-            3 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-            4 -> ToastUtils.showShort(getString(R.string.version_error))
-            5 -> {
-                ToastUtils.showShort(getString(R.string.the_last_version))
-                twoSecondFinish()
-            }
-            6 -> ToastUtils.showShort(getString(R.string.router_ota_faile))
-            7 -> ToastUtils.showShort(getString(R.string.router_offline))
-            8 -> ToastUtils.showShort(getString(R.string.router_load_bin_faile))
-            99 -> ToastUtils.showShort(getString(R.string.router_time_out))
+            -1, 5 -> afterOtaSuccess()
+            -1, 5 -> afterOtaFail()
+            /*      0 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                  1 -> ToastUtils.showShort(getString(R.string.no_get_version))
+                  2 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
+                  3 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                  4 -> ToastUtils.showShort(getString(R.string.version_error))
+                  5 -> {
+                      ToastUtils.showShort(getString(R.string.the_last_version))
+                      twoSecondFinish()
+                  }
+                  6 -> ToastUtils.showShort(getString(R.string.router_ota_faile))
+                  7 -> ToastUtils.showShort(getString(R.string.router_connect_ble_fail))
+                  8 -> ToastUtils.showShort(getString(R.string.router_load_bin_faile))
+                  99 -> ToastUtils.showShort(getString(R.string.router_time_out))*/
         }
         if (resultBean.failedCode != -1) {
             router_ota_start.text = getString(R.string.retry_ota)
@@ -350,6 +357,8 @@ class RouterOtaActivity : TelinkBaseActivity() {
         //initUi()
         SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
         twoSecondFinish()
+        currentTimeMillis = 0
+        SharedPreferencesUtils.setLastOtaTime(currentTimeMillis)
     }
 
     @SuppressLint("CheckResult")

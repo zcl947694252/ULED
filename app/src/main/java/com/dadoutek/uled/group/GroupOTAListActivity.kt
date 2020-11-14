@@ -307,6 +307,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 ToastUtils.showShort(getString(R.string.ota_finish))
                 btn_gp_ota_start.text = getString(R.string.start_update)
                 btn_gp_ota_start.isClickable = true
+                currentTime = 0
+                SharedPreferencesUtils.setLastOtaTime(currentTime)
             }
         }, {
             ToastUtils.showShort(it.message)
@@ -349,6 +351,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             if (routerOTAFinishBean.ser_id == "router_ota") {
                 if (routerOTAFinishBean.status == 0) {
                     disposableRouteTimer?.dispose()
+                    currentTime = 0
                     finish()
                 }
             }
@@ -428,12 +431,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         val status = routerOTAingNumBean?.status
         val otaResult = routerOTAingNumBean?.otaResult
         startGetStatus(routerOTAingNumBean?.finish == true)
-
-//        if (status == 0 && deviceMac == otaResult?.macAddr && otaResult?.failedCode == -1)
-//            afterOtaSuccess()
-//        else
-//            if (status == -1 || status == 1)
-//                afterOtaFail()
     }
 
 
@@ -1010,7 +1007,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             }
         }
         if (!isStartOta && Constant.IS_ROUTE_MODE)
-            routerOtaDevice(meshList)
+            when {
+                meshList.isEmpty() -> ToastUtils.showShort(getString(R.string.no_can_ota_device))
+                else -> routerOtaDevice(meshList)
+            }
     }
 
     private fun setDevice() {

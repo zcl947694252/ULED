@@ -1243,4 +1243,7 @@
     <string name="no_third_party">暂时没有使用过的第三方平台</string>
     <string name="please_set_color">请设置颜色</string>
     <string name="gp_deletescene">此场景群组已被删除,请重新创建场景</string>
+    <string name="router_list">路由列表</string>
+    <string name="router_connect_ble_fail">路由蓝牙连接失败</string>
+    <string name="no_can_ota_device">没有可升级设备</string>
 </resources>
