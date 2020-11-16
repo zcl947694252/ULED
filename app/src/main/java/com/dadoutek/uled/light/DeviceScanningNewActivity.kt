@@ -88,7 +88,7 @@ import java.util.concurrent.TimeUnit
  *路由逻辑: 1. http请求扫描 等待mqtt回调(无回调 失败) - 接收mqtt上传的设备每次超时每个6秒收到刷新-超时--走跳转逻辑(请求获取未确认扫描结果得到数据包装)
  * --如果得到数据的情况下是超时也就是mqtt没有接到但是没有结束 重新计算超时 如果借宿了 确认清除数据 跳转43
  */
-class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String>, Toolbar.OnMenuItemClickListener {
+class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
     private var disposableUpMeshTimer: Disposable? = null
     private var scanRouterTimeoutTime: Long = 0
     private var routerScanCount: Int = 0
@@ -106,7 +106,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     val user = lastUser
     private var mAutoConnectDisposable: Disposable? = null
     private var disposable: Disposable? = null
-    private var testId: DbGroup? = null
     private var mApplication: TelinkLightApplication? = null
     private var mRxPermission: RxPermissions? = null
 
@@ -137,7 +136,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     //灯的mesh地址
     private var mConnectTimer: Disposable? = null
     private val mBlinkDisposables = SparseArray<Disposable>()
-    private var isSelectAll = false
     private var initHasGroup = false
     private var allLightId: Long = 0
     private var meshUpdateType: Long = 0 //0发送命令更新mesh等待回调  1收到mesh回调
@@ -145,16 +143,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var mAddDeviceType: Int = 0
     private var mAddedDevices: MutableList<ScannedDeviceItem> = mutableListOf()
     private var mAddedDevicesInfos = arrayListOf<DeviceInfo>()
-    private val mAddedDevicesAdapter: DeviceListAdapter = DeviceListAdapter(R.layout.template_batch_small_item, mAddedDevices)
-
-    //有无被选中的用来分组的灯
-    private val isSelectLight: Boolean get() = mAddedDevices.any { it.isSelected }       //只要已添加的设备里有一个选中的，就返回False
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         disableConnectionStatusListener()
         mRxPermission = RxPermissions(this)
         //设置屏幕常亮
+        isScanningJM = true
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_device_scanning)
         meshList.clear()
@@ -162,34 +157,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         initData()
         initView()
         initListener()
-        startScan()
     }
-
-    private val currentGroup: DbGroup?
-        get() {
-            if (currentGroupIndex == -1) {
-                if (groups.size > 1)
-                    Toast.makeText(this, R.string.please_select_group, Toast.LENGTH_SHORT).show()
-                else
-                    Toast.makeText(this, R.string.tip_add_gp, Toast.LENGTH_SHORT).show()
-                return null
-            }
-            return groups[currentGroupIndex]
-        }
-
-    /**
-     * 是否所有灯都分了组
-     * @return false还有没有分组的灯 true所有灯都已经分组
-     */
-    private val isAllLightsGrouped: Boolean
-        get() {
-            for (device in mAddedDevices)
-                if (device.belongGroupId == allLightId) {
-                    return false
-                }
-            return true
-        }
-
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
         override fun start() {}
@@ -202,74 +170,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var bestRssiDevice: DeviceInfo? = null
 
     enum class UPDATE_MESH_STATUS { SUCCESS, FAILED, UPDATING_MESH }
-
-    private fun isSelectAll() {
-        when {
-            isSelectAll -> {
-                for (j in nowDeviceList.indices) {
-                    this.updateList.add(nowDeviceList[j])
-                    nowDeviceList[j].isSelected = true
-
-                    btn_add_groups?.setText(R.string.sure_group)
-
-                    if (groups.size != -1) {
-                        startBlink(nowDeviceList[j])
-                    } else {
-                        ToastUtils.showLong(R.string.tip_add_group)
-                    }
-                }
-
-                this.mAddedDevicesAdapter.notifyDataSetChanged()
-            }
-            else -> {
-                for (j in nowDeviceList.indices) {
-                    this.updateList.remove(nowDeviceList[j])
-                    nowDeviceList[j].isSelected = false
-                    stopBlink(nowDeviceList[j])
-                    if (!isSelectLight && isAllLightsGrouped) {
-                        btn_add_groups?.setText(R.string.complete)
-                    }
-                }
-                this.mAddedDevicesAdapter.notifyDataSetChanged()
-            }
-        }
-    }
-
-    /**
-     * 让灯开始闪烁
-     */
-    private fun startBlink(scannedDeviceItem: ScannedDeviceItem) {
-        val group: DbGroup
-        if (groups.size > 0) {
-            var groupId = scannedDeviceItem!!.belongGroupId
-            val groupOfTheLight = DBUtils.getGroupByID(groupId)
-            group = when (groupOfTheLight) {
-                null -> groups[0]
-                else -> groupOfTheLight
-            }
-            val groupAddress = group.meshAddr
-            Log.d("Saw", "startBlink groupAddresss = $groupAddress")
-            val dstAddress = scannedDeviceItem.deviceInfo.meshAddress
-            val opcode = Opcode.SET_GROUP
-            val params = byteArrayOf(0x01, (groupAddress and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())
-            params[0] = 0x01
-
-            if (mBlinkDisposables.get(dstAddress) != null) {
-                mBlinkDisposables.get(dstAddress).dispose()
-            }
-
-            //每隔1s发一次，就是为了让灯一直闪.
-            mBlinkDisposables.put(dstAddress, Observable.interval(0, 1000, TimeUnit.MILLISECONDS)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddress, params) })
-        }
-    }
-
-    private fun stopBlink(light: ScannedDeviceItem) {
-        val disposable = mBlinkDisposables.get(light.deviceInfo.meshAddress)
-        disposable?.dispose()
-    }
 
     //扫描失败处理方法
     private fun scanFail() {
@@ -328,9 +228,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (nowDeviceList.size > 0) {
             nowDeviceList.clear()
         }
-        val elements = mAddedDevicesAdapter.data
-        nowDeviceList.addAll(elements)
-
+        nowDeviceList.addAll(mAddedDevices)
+        closeAnimation()
         showLoadingDialog(resources.getString(R.string.please_wait))
 
         disposableConnectTimer?.dispose()
@@ -399,86 +298,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             mConnectTimer!!.dispose()
         mConnectDisposal?.dispose()
         mApplication?.removeEventListener(this)
-    }
-
-
-    //等待解决无法加入窗帘如组
-    private fun setGroupOneByOne(dbGroup: DbGroup, selectLights: List<ScannedDeviceItem>, index: Int) {
-        val dbLight = selectLights[index]
-        val lightMeshAddr = dbLight.deviceInfo.meshAddress
-
-        Commander.addGroup(lightMeshAddr, dbGroup.meshAddr, {
-            dbLight.belongGroupId = dbGroup.id
-            updateGroupResult(dbLight, dbGroup)
-            if (index + 1 > selectLights.size - 1)
-                completeGroup(selectLights)
-            else
-                setGroupOneByOne(dbGroup, selectLights, index + 1)
-            null
-        }) {
-            dbLight.belongGroupId = allLightId
-            ToastUtils.showLong(R.string.group_fail_tip)
-            updateGroupResult(dbLight, dbGroup)
-            if (TelinkLightApplication.getApp().connectDevice == null) {
-                ToastUtils.showLong(getString(R.string.device_disconnected))
-                stopScanTimer()
-                onLeScanTimeout()
-            } else {
-                if (index + 1 > selectLights.size - 1)
-                    completeGroup(selectLights)
-                else
-                    setGroupOneByOne(dbGroup, selectLights, index + 1)
-            }
-            null
-        }
-
-    }
-
-    private fun completeGroup(selectLights: List<ScannedDeviceItem>) {
-        //取消分组成功的勾选的灯
-        for (i in selectLights.indices) {
-            val light = selectLights[i]
-            light.isSelected = false
-        }
-        mAddedDevicesAdapter.notifyDataSetChanged()
-        hideLoadingDialog()
-        if (isAllLightsGrouped) {
-            btn_add_groups?.setText(R.string.complete)
-        }
-    }
-
-    private fun setGroups(group: DbGroup?, selectLights: List<ScannedDeviceItem>) {
-        if (group == null) {
-            Toast.makeText(mApplication, R.string.select_group_tip, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        if (isSelectAll) {
-            toolbar!!.menu.findItem(R.id.menu_select_all).title = getString(R.string.select_all)
-            isSelectAll = false
-        }
-
-        for (i in selectLights.indices)
-        //让选中的灯停下来别再发闪的命令了。
-            stopBlink(selectLights[i])
-
-        setGroupOneByOne(group, selectLights, 0)
-    }
-
-    private fun updateGroupResult(item: ScannedDeviceItem, group: DbGroup) {
-        for (i in nowDeviceList.indices) {
-            if (item.deviceInfo.meshAddress == nowDeviceList[i].deviceInfo.meshAddress) {
-                if (item.belongGroupId != allLightId) {
-                    nowDeviceList[i].hasGroup = true
-                    nowDeviceList[i].belongGroupId = group.id
-                    nowDeviceList[i].name = DBUtils.getGroupByID(group.id)?.name
-                            ?: getString(R.string.not_grouped)
-                    updateDevice(item)
-                } else {
-                    nowDeviceList[i].hasGroup = false
-                }
-            }
-        }
     }
 
     private fun updateDevice(item: ScannedDeviceItem) {
@@ -574,8 +393,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun onBackPressed() {
         if (grouping) {
             for (meshAddr in mAddedDevices)
-                stopBlink(meshAddr)
-            doFinish()
+                doFinish()
         } else {
             if (isScanning) {
                 AlertDialog.Builder(this)
@@ -590,24 +408,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
         }
     }
-
-
-    override fun onMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_select_all -> {
-                if (isSelectAll) {
-                    isSelectAll = false
-                    item.setTitle(R.string.select_all)
-                } else {
-                    isSelectAll = true
-                    item.setTitle(R.string.cancel)
-                }
-                isSelectAll()
-            }
-        }
-        return false
-    }
-
 
     private fun addNewGroup() {
         val textGp = EditText(this)
@@ -674,17 +474,22 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun autoConnect(elements: MutableList<Int>) {
         isScanning = false
         when (mAddDeviceType) {
-            DeviceType.GATE_WAY -> mAutoConnectDisposable = connect(macAddress = bestRssiDevice?.macAddress, fastestMode = true, retryTimes = 2)
-                    ?.subscribe(
-                            {
-                                TelinkLightApplication.getApp().isConnectGwBle = true
-                                onLogin()
-                            }, {
-                        // onLogin()
-                        hideLoadingDialog()
-                        ToastUtils.showLong(getString(R.string.connect_fail))
-                        LogUtils.d(it)
-                    })
+            DeviceType.GATE_WAY -> {
+                LogUtils.v("zcl----连接类型---$mAddDeviceType----网关-----${DeviceType.GATE_WAY}-----mac---${bestRssiDevice?.macAddress}" +
+                        "--------mesh--${bestRssiDevice?.meshAddress}")
+                mAutoConnectDisposable = connect(deviceTypes = elements, macAddress = bestRssiDevice?.macAddress, fastestMode = true,  connectTimeOutTime = 15)
+                        ?.subscribe(
+                                {
+                                    TelinkLightApplication.getApp().isConnectGwBle = true
+                                    onLogin()
+                                }, {
+                            // onLogin()
+                            hideLoadingDialog()
+                            ToastUtils.showLong(getString(R.string.connect_fail))
+                            finish()
+                            LogUtils.d(it)
+                        })
+            }
             else -> mAutoConnectDisposable = connect(deviceTypes = elements, fastestMode = true, retryTimes = 2)
                     ?.subscribe(
                             {
@@ -744,32 +549,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         add_group_relativeLayout?.setOnClickListener { _ -> addNewGroup() }
 
-        mAddedDevicesAdapter.setOnItemClickListener { _, _, position ->
-            val item = this.mAddedDevicesAdapter.getItem(position)
-            item?.isSelected = !(item?.isSelected ?: false)
-            if (item?.isSelected == true) {
-                this.updateList.add(item)
-                nowDeviceList[position].isSelected = true
-
-                btn_add_groups?.setText(R.string.sure_group)
-
-                if (groups.size != -1) {
-                    startBlink(item)
-                } else {
-                    ToastUtils.showLong(R.string.tip_add_group)
-                }
-            } else {
-                nowDeviceList[position].isSelected = false
-                if (item != null) {
-                    stopBlink(item)
-                    this.updateList.remove(item)
-                }
-                if (!isSelectLight && isAllLightsGrouped) {
-                    btn_add_groups?.setText(R.string.complete)
-                }
-            }
-            mAddedDevicesAdapter.notifyItemChanged(position)
-        }
     }
 
     private fun getAndFinish() {
@@ -845,9 +624,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
         this.inflater = this.layoutInflater
         this.grouping_completed?.setBackgroundColor(resources.getColor(R.color.gray))
-
-        list_devices.adapter = mAddedDevicesAdapter
-        list_devices.layoutManager = GridLayoutManager(this, 2)
 
         this.updateList.clear()
         initVisiable()
@@ -954,9 +730,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         super.onResume()
         stopTimerUpdate()
         disableConnectionStatusListener()//停止监听 否则扫描到新设备会自动创建新的对象
-        //检测service是否为空，为空则重启
-        if (TelinkLightService.Instance() == null)
+        if (TelinkLightService.Instance() == null) //检测service是否为空，为空则重启
             mApplication?.startLightService(TelinkLightService::class.java)
+        if (isFirtst)
+            startScan()
     }
 
     // 如果没有网络，则弹出网络设置对话框
@@ -966,42 +743,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     override fun onLocationEnable() {}
-    internal inner class DeviceListAdapter(layoutId: Int, data: MutableList<ScannedDeviceItem>) : BaseQuickAdapter<ScannedDeviceItem, BaseViewHolder>(layoutId, data) {
-        override fun convert(helper: BaseViewHolder?, item: ScannedDeviceItem?) {
-            val icon = helper?.getView<ImageView>(R.id.template_device_batch_icon)
-            val groupName = helper?.getView<TextView>(R.id.template_device_batch_title_blow)
-            val deviceName = helper?.getView<TextView>(R.id.template_device_batch_title)
-            val imageView = helper?.getView<ImageView>(R.id.template_device_batch_selected)
-
-            groupName?.visibility = View.GONE
-            if (item?.isSelected == true)
-                imageView?.setImageResource(R.drawable.icon_checkbox_selected)
-            else
-                imageView?.setImageResource(R.drawable.icon_checkbox_unselected)
-
-            deviceName?.text = item?.name
-            when (mAddDeviceType) {
-                DeviceType.GATE_WAY -> icon?.setImageResource(R.drawable.icon_gw_small)
-                DeviceType.LIGHT_RGB -> icon?.setImageResource(R.drawable.icon_rgb_n)
-                DeviceType.SMART_RELAY -> icon?.setImageResource(R.drawable.icon_acceptor_s)
-                DeviceType.SMART_CURTAIN -> icon?.setImageResource(R.drawable.icon_curtain_s)
-                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> icon?.setImageResource(R.drawable.icon_light_n)
-            }
-
-            if (item?.hasGroup == true) {
-                icon?.visibility = View.VISIBLE
-                imageView?.visibility = View.VISIBLE
-            } else {
-                deviceName?.visibility = View.VISIBLE
-                icon?.visibility = View.VISIBLE
-                if (grouping) {
-                    imageView?.visibility = View.VISIBLE
-                } else {
-                    imageView?.visibility = View.GONE
-                }
-            }
-        }
-    }
 
     /**
      * 泰凌微蓝牙库的状态回调
@@ -1101,6 +842,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      */
     @SuppressLint("CheckResult")
     private fun startScan() {
+        isFirtst = false
         LogUtils.v("zcl-----------收到路由扫描开始-------${Constant.IS_ROUTE_MODE}IS_ROUTE_MODE")
         if (Constant.IS_ROUTE_MODE) {//发送命令
             routerStartScan()
@@ -1471,8 +1213,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         Thread.sleep(500)
         updateDevice(scannedDeviceItem)
 
-        mAddedDevicesAdapter.notifyDataSetChanged()
-
         //扫描出灯就设置为非首次进入
         if (isFirtst) {
             isFirtst = false
@@ -1490,7 +1230,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             this.startScan()    //继续开始扫描设备
         else {
             btn_add_groups?.setText(R.string.config_gate_way)
-            scanSuccess()
+            stopScan()
         }
     }
 
@@ -1505,34 +1245,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
     }
 
-    private fun connectBestRssi(scan: ScanResult, scannedDeviceItem: ScannedDeviceItem) {
-        val meshAddress = scannedDeviceItem.deviceInfo.meshAddress
-        val mac = scannedDeviceItem.deviceInfo.sixByteMacAddress.split(":")
-        if (mac != null && mac.size >= 6) {
-            val mac1 = Integer.valueOf(mac[2], 16)
-            val mac2 = Integer.valueOf(mac[3], 16)
-            val mac3 = Integer.valueOf(mac[4], 16)
-            val mac4 = Integer.valueOf(mac[5], 16)
-
-            val instance = Calendar.getInstance()
-            val second = instance.get(Calendar.SECOND).toByte()
-            val minute = instance.get(Calendar.MINUTE).toByte()
-            val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
-            val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
-            val byteArrayOf = byteArrayOf((meshAddress and 0xFF).toByte(), (meshAddress shr 8 and 0xFF).toByte(), mac1.toByte(),
-                    mac2.toByte(), mac3.toByte(), mac4.toByte(), second, minute, hour, day)
-            val subscribe = RxBleManager.writeData(scan.bleDevice, byteArrayOf)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        RxBleManager.disconnectAllDevice()
-                        LogUtils.v("zcl物理写入数据成功$it")
-                    }, {
-                        LogUtils.v("zcl物理写入数据错误$it")
-                        RxBleManager.disconnectAllDevice()
-                    })
-        }
-    }
 
     private fun skipeType() { //开关传感器不能批量也就不能使用找回
         when (mAddDeviceType) {

@@ -92,16 +92,17 @@ public class NetworkFactory {
         /**
          * 记得修改stomp的前缀地址 StompManager不能是测试的  还有dadousmart
          */
-        if (Constant.isDebug) {
+        /*if (Constant.isDebug) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
-                    .baseUrl(Constant.BASE_URL)
+                    .baseUrl(Constant.BASE_URL2)
                     .addConverterFactory(gsonConverterFactory)
                     .addCallAdapterFactory(rxJavaCallAdapterFactory)
                     .build();
 
             api = retrofit.create(RequestInterface.class);
-        } else if (null == api) {
+        } else*/
+        if (null == api) {
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
                     .baseUrl(Constant.BASE_URL)

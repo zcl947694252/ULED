@@ -60,14 +60,14 @@ object Commander : EventListener<String> {
         val params: ByteArray = if (isOpen) {
             //0x64代表延时100ms，从而保证多个灯同步开关
             if (groupAddr == 0xffff)//是否是所有组
-                byteArrayOf(0x01, 0x64, 0x00,0x00, 0x01)
+                byteArrayOf(0x01, 0x64, 0x00, 0x00, 0x01)
             else
                 byteArrayOf(0x01, 0x64, 0x00)
         } else {
             if (groupAddr == 0xffff)
-                byteArrayOf(0x00, 0x64, 0x00,0x00, 0x01)
+                byteArrayOf(0x00, 0x64, 0x00, 0x00, 0x01)
             else
-            byteArrayOf(0x00, 0x64, 0x00)
+                byteArrayOf(0x00, 0x64, 0x00)
         }
 
         GlobalScope.launch {
@@ -646,7 +646,6 @@ object Commander : EventListener<String> {
                     meshAddr != 0 -> connectParams.setConnectMeshAddress(meshAddr)
                     //true == 快速模式(不会扫几秒去找信号最好的)   //1367540967
                 }
-
                 if (deviceTypes != null)
                     connectParams.setConnectDeviceType(deviceTypes)
                 connectParams.setPassword(meshPwd)
@@ -664,7 +663,7 @@ object Commander : EventListener<String> {
                 mConnectObservable = null
             }.retry(retryTimes)
             return mConnectObservable
-        } else {
+        } else {2
             DeviceType.NORMAL_SWITCH
             LogUtils.d("in connecting device mode")
             return null

@@ -38,6 +38,7 @@ class SceneRecycleListAdapter(layoutResId: Int, data: List<DbScene>?, internal v
                     itemGroup.temperature = actions[i].colorTemperature
                     itemGroup.color = actions[i].color
                     itemGroup.isOn = actions[i].isOn
+                    itemGroup.deviceType = actions[i].deviceType
                     item.checked = true
                     showGroupList!!.add(itemGroup)
                 }

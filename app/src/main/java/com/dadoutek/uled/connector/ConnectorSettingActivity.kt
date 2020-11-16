@@ -516,10 +516,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                             isMostNew(currentDbConnector?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
                             else -> {
                                 when {
-                                    Constant.IS_ROUTE_MODE ->{ startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
-                                            "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr,
-                                            "version" to currentDbConnector!!.version )
-                                    finish()}
+                                    Constant.IS_ROUTE_MODE -> {
+                                        startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
+                                                "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr,
+                                                "version" to currentDbConnector!!.version)
+                                        finish()
+                                    }
                                     else -> checkPermission()
                                 }
                             }
@@ -732,26 +734,28 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     override fun tzRouterUpdateVersionRecevice(routerVersion: RouteGetVerBean?) {
-           LogUtils.v("zcl-----------收到路由getRalyVersion通知-------$routerVersion")
-                   if (routerVersion?.ser_id=="getRalyVersion"){
-                       disposableRouteTimer?.dispose()
-                       hideLoadingDialog()
-                       if (routerVersion?.status==0){
-                           currentDbConnector?.version = routerVersion?.succeedNow[0].version
-                           DBUtils.saveConnector(currentDbConnector!!,false)
-                           localVersion = routerVersion?.succeedNow[0].version
-                           runOnUiThread { fiVersion?.title = localVersion }
-                       }else{
-                           ToastUtils.showShort(getString(R.string.get_version_fail))
-                       }
-                   }
+        LogUtils.v("zcl-----------收到路由getRalyVersion通知-------$routerVersion")
+        if (routerVersion?.ser_id == "getRalyVersion") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (routerVersion?.status == 0) {
+                currentDbConnector?.version = routerVersion?.succeedNow[0].version
+                DBUtils.saveConnector(currentDbConnector!!, false)
+                localVersion = routerVersion?.succeedNow[0].version
+                runOnUiThread { fiVersion?.title = localVersion }
+            } else {
+                ToastUtils.showShort(getString(R.string.get_version_fail))
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        val relay = DBUtils.getConnectorByID(currentDbConnector!!.id)
-        localVersion = relay?.version
-        runOnUiThread { fiVersion?.title = localVersion }
+        if (!isConfigGroup) {
+            val relay = DBUtils.getConnectorByID(currentDbConnector!!.id)
+            localVersion = relay?.version
+            runOnUiThread { fiVersion?.title = localVersion }
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

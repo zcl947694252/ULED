@@ -283,6 +283,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     itemGroup.gradientType = actions[i].gradientType
                     itemGroup.gradientName = actions[i].gradientName
                     itemGroup.gradientSpeed = actions[i].gradientSpeed
+                    itemGroup.deviceType = actions[i].deviceType
                     showGroupList.add(itemGroup)
                     groupMeshAddrArrayList.add(item.meshAddr)
                 } else {
@@ -866,7 +867,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
             GlobalScope.launch {
                 delay(100)
                 addScene(belongSceneId)
-                afterSaveScene()
             }
         }
     }
@@ -989,6 +989,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
             }
         } while (count < 3)
+        afterSaveScene()
     }
 
     private fun getSceneId(): Long {

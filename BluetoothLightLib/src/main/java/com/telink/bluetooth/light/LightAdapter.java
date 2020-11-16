@@ -811,9 +811,10 @@ public class LightAdapter {
         if (mode == MODE_SCAN_MESH) {
 //            Log.d("SawTest", "scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME));
 
-            Log.v("zcl","lightAdapter 0nLeScan"+ meshName.toString() +"------------------"+ light);
             String scanMac = params.getString(Parameters.PARAM_SCAN_MAC);
-            if (scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac))
+            boolean b = scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac);
+            Log.v("zcl","lightAdapter 0nLeScan-----"+b+"---"+scanMac);
+            if (b)
                 return false;
 
             outOfMeshName = Strings.stringToBytes(params.getString(Parameters.PARAM_OUT_OF_MESH), 16);

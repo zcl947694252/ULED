@@ -335,8 +335,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         builder?.setMessage(string)
                         builder?.create()?.show()
                     }
-                    else -> {
-                    }
+                    else -> {}
                 }
             }
         }

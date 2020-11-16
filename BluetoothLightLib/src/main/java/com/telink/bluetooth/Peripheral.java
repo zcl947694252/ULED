@@ -130,7 +130,7 @@
             public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
                 this.device = device;
                 this.scanRecord = scanRecord;
-                LogUtils.v("zcl-----------收到广播包-------" + Arrays.bytesToHexString(scanRecord, ","));
+               // LogUtils.v("zcl-----------收到广播包-------" + Arrays.bytesToHexString(scanRecord, ","));
                 this.rssi = rssi;
                 this.name = device.getName();
                 this.type = device.getType(); //ble
@@ -1073,7 +1073,7 @@
                                     17] + (char) scanRecord[i + 18]
                                     + (char) scanRecord[i + 19] + (char) scanRecord[i + 20] +
                                     (char) scanRecord[i + 21];*/
-                            LogUtils.v("zcl-----------获取广播版本-------" + version);
+//                            LogUtils.v("zcl-----------获取广播版本-------" + version);
                         }
                     }
                 }

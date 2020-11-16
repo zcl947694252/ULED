@@ -35,6 +35,7 @@ public class Constant
 
     public static final long downTime = isDebug ? 3 : 11;
     public static  String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
+    public static  String BASE_URL2 = BASE_DEBUG_URL;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
     public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
     //public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";

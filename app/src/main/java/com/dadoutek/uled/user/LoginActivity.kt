@@ -207,8 +207,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         SharedPreferencesHelper.putBoolean(this, Constant.IS_SMART, false)
 
         login_isOnline_tv.text = "测试服"
-        Constant.BASE_URL = Constant.BASE_DEBUG_URL
-        LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL}")
+       // Constant.BASE_URL2 = Constant.BASE_DEBUG_URL
+        LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL2}")
 
         dbUser = DbUser()
         val intent = intent
@@ -243,13 +243,13 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             }
             Constant.PIR_SWITCH_MESH_NAME = Constant.DEFAULT_MESH_FACTORY_NAME
             SharedPreferencesHelper.putBoolean(this, Constant.IS_SMART, isChecked)
-            LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL}")
+            LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL2}")
         }
         login_isOnline.setOnCheckedChangeListener { _, isChecked ->
             login_isOnline_tv.text = if (isChecked) "正式服" else "测试服"
-            Constant.BASE_URL =  if (isChecked)Constant.BASE_URL_JAVA else Constant.BASE_DEBUG_URL
+            Constant.BASE_URL2 =  if (isChecked)Constant.BASE_URL_JAVA else Constant.BASE_DEBUG_URL
             SharedPreferencesHelper.putBoolean(this, Constant.IS_ONLINE, isChecked)
-            LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url--isDebug--${Constant.isDebug}--${Constant.BASE_URL}")
+            LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url--isDebug--${Constant.isDebug}--${Constant.BASE_URL2}")
         }
         btn_login.setOnClickListener(this)
         forget_password.setOnClickListener(this)

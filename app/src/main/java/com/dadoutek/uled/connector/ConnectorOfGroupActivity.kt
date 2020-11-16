@@ -407,7 +407,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                         when {
                             Constant.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 1, "relaySw")
                             else -> {
-                                Commander.openOrCloseCurtain(currentLight!!.meshAddr, true, false)
+                                Commander.openOrCloseLights(currentLight!!.meshAddr, true)
                                 currentLight!!.connectionStatus = ConnectionStatus.ON.value
                                 afterClickIcon()
                             }
@@ -418,7 +418,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                         when {
                             Constant.IS_ROUTE_MODE -> routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 0, "relaySw")
                             else -> {
-                                Commander.openOrCloseCurtain(currentLight!!.meshAddr, false, false)
+                                Commander.openOrCloseLights(currentLight!!.meshAddr, false)
                                 currentLight!!.connectionStatus = ConnectionStatus.OFF.value
                                 afterClickIcon()
                             }

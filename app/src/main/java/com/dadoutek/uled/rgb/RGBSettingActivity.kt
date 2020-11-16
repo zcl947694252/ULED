@@ -1661,10 +1661,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             isDiyMode = false
             changeToDiyPage()
         } else {
-            toolbar.menu.setGroupVisible(0, true)
-            toolbar.menu.setGroupVisible(1, true)
-            toolbar.menu.setGroupVisible(2, true)
-            toolbar.menu.setGroupVisible(3, true)
+           //toolbar.menu.setGroupVisible(0, true)
+           //toolbar.menu.setGroupVisible(1, true)
+           //toolbar.menu.setGroupVisible(2, true)
+           //toolbar.menu.setGroupVisible(3, true)
             rgb_diy.visibility = View.GONE
             rgb_set.visibility = View.VISIBLE
             dynamic_rgb.setTextColor(resources.getColor(R.color.black_nine))
@@ -2099,10 +2099,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             if (lightList != null && lightList.size > 0)
                 firstLightAddress = lightList[0].meshAddr
         } else {
-            toolbar.menu.setGroupVisible(0, false)
-            toolbar.menu.setGroupVisible(1, false)
-            toolbar.menu.setGroupVisible(2, false)
-            toolbar.menu.setGroupVisible(3, false)
+           // toolbar.menu.setGroupVisible(0, false)
+            //toolbar.menu.setGroupVisible(1, false)
+           // toolbar.menu.setGroupVisible(2, false)
+            //toolbar.menu.setGroupVisible(3, false)
             rgb_diy.visibility = View.VISIBLE
             rgb_set.visibility = View.GONE
             normal_rgb.setTextColor(resources.getColor(R.color.black_nine))

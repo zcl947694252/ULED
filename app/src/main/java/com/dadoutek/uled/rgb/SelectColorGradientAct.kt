@@ -123,7 +123,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         if (colorNode!!.rgbw == -1) {
             rgb_sbBrightness.progress = 100
             colorNode!!.brightness = 100
-            rgb_white_seekbar.progress = 0
+            rgb_white_seekbar.progress = 1
             sbBrightness_num.text = 100.toString() + "%"
             sb_w_bright_num.text = 0.toString() + "%"
 
@@ -148,7 +148,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     sb_w_bright_add.isEnabled = false
                     sb_w_bright_less.isEnabled = true
                 }
-                rgb_white_seekbar.progress <= 0 -> {
+                rgb_white_seekbar.progress <=1 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_add.isEnabled = true
                 }
@@ -191,7 +191,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     sb_w_bright_add.isEnabled = false
                     sb_w_bright_less.isEnabled = true
                 }
-                rgb_white_seekbar.progress <= 0 -> {
+                rgb_white_seekbar.progress <= 1 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_add.isEnabled = true
                 }
@@ -849,12 +849,12 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             super.handleMessage(msg)
             rgb_white_seekbar.progress--
             when {
-                rgb_white_seekbar.progress < 0 -> {
+                rgb_white_seekbar.progress < 1 -> {
                     sb_w_bright_less.isEnabled = false
                     stopTracking = false
                     onBtnTouch = false
                 }
-                rgb_white_seekbar.progress == 0 -> {
+                rgb_white_seekbar.progress == 1 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_num.text = rgb_white_seekbar.progress.toString() + "%"
                     stopTracking = false

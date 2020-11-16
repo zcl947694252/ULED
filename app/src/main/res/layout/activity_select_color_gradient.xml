@@ -132,9 +132,10 @@
                     style="@style/SeekBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingStart="2dp"
-                    android:paddingEnd="2dp"
-                    android:max="101"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    android:progress="1"
+                    android:max="100"
                     android:min="1" />
 
             <android.support.constraint.ConstraintLayout
@@ -194,7 +195,10 @@
                     style="@style/SeekBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:max="101"
+                    android:layout_marginStart="@dimen/dp_10"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    android:progress="1"
+                    android:max="100"
                     android:min="1" />
 
             <android.support.constraint.ConstraintLayout

@@ -1768,9 +1768,20 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         var params: ByteArray
         params = when (opcode) {
-            Opcode.SET_TEMPERATURE -> byteArrayOf(0x05, progressCmd.toByte())
-            Opcode.SET_LUM -> byteArrayOf(progressCmd.toByte())
-            else -> byteArrayOf(progressCmd.toByte())
+            Opcode.SET_TEMPERATURE ->{
+                data[currentPostion].temperature = progressCmd
+                byteArrayOf(0x05, progressCmd.toByte())
+            }
+            Opcode.SET_LUM ->{
+                data[currentPostion].brightness = progressCmd
+                byteArrayOf(progressCmd.toByte())}
+            Opcode.SET_W_LUM ->{
+                data[currentPostion].color = (progressCmd shl 24) or (Color.red(data[currentPostion].color) shl 16) or
+                        (Color.green(data[currentPostion].color) shl 8) or Color.blue(data[currentPostion].color)
+                byteArrayOf(progressCmd.toByte())}
+            else ->{
+                data[currentPostion].brightness = progressCmd
+                byteArrayOf(progressCmd.toByte())}
         }
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
     }

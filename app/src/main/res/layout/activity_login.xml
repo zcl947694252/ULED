@@ -303,6 +303,7 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical|end"
                 android:text="测试服"
+                android:visibility="gone"
                 android:paddingEnd="15dp"
                 android:textColor="@color/gray_3"
                 android:textSize="15sp" />
@@ -312,6 +313,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="15dp"
+                android:visibility="gone"
                 android:background="@drawable/select_check" />
     </LinearLayout>
 

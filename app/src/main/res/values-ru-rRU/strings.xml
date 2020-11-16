@@ -1091,5 +1091,6 @@
     <string name="router_list">路由列表</string>
     <string name="router_connect_ble_fail">路由蓝牙连接失败</string>
     <string name="no_can_ota_device">没有可升级设备</string>
+    <string name="please_select_color">请选择渐变颜色</string>
 
 </resources>

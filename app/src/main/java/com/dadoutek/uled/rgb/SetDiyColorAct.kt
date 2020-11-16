@@ -184,7 +184,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             toolbarTv.text = getString(R.string.add_gradient)
             editName.setText(DBUtils.getDefaultModeName())
             editName.setSelection(editName.text.toString().length)
-            sbSpeed.setProgress(50f)
+            sbSpeed.setProgress(1f)
 
             speed_num.text = 50.toString() + "%"
         }
@@ -368,6 +368,16 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 DBUtils.saveColorNode(colorNodeList!![i])
             }
 
+            var isHaveColorNode = false
+            colorNodeList?.forEach {
+                if (it.rgbw!=-1)
+                    isHaveColorNode = true
+            }
+
+            if (!isHaveColorNode){
+                ToastUtils.showShort(getString(R.string.please_select_color))
+                return@launch
+            }
             deleteGradient(belongDynamicModeId)
             delay(200)
             if (Constant.IS_ROUTE_MODE) {

@@ -89,6 +89,7 @@ import java.util.concurrent.TimeUnit
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    var isScanningJM: Boolean = false
     open var lastTime: Long = 0
     private var isShow: Boolean = false
     private var showTime: Long = 0
@@ -164,6 +165,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
+        isScanningJM = false
         enableConnectionStatusListener()    //尽早注册监听
         //注册网络状态监听广播
         netWorkChangReceiver = NetWorkChangReceiver()
@@ -541,8 +543,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     override fun onResume() {
         super.onResume()
         isShow = true
-        unbindSe()
-        bindService()
+        if (!isScanningJM) {
+            unbindSe()
+            bindService()
+        }
         if (!LeBluetooth.getInstance().enable(applicationContext) && !Constant.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         val lastUser = lastUser
@@ -656,7 +660,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     override fun onPause() {
         super.onPause()
         stopTimerUpdate()
-        unbindSe()
+        if (!isScanningJM) {
+            unbindSe()
+        }
         isShow = false
         showDialogHardDelete?.dismiss()
         mConnectDisposable?.dispose()
@@ -1138,9 +1144,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16), retryTimes: Long = 2,
                 deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
-
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
-        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
+        LogUtils.v("zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}------${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---")
+        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE && TelinkLightApplication.getApp().connectDevice == null) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
