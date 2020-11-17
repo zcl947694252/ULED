@@ -5,32 +5,32 @@
         package com.telink.bluetooth;
 
         import android.annotation.TargetApi;
-        import android.bluetooth.BluetoothDevice;
-        import android.bluetooth.BluetoothGatt;
-        import android.bluetooth.BluetoothGattCallback;
-        import android.bluetooth.BluetoothGattCharacteristic;
-        import android.bluetooth.BluetoothGattDescriptor;
-        import android.bluetooth.BluetoothGattService;
-        import android.content.Context;
-        import android.os.Build;
-        import android.os.Handler;
-        import android.os.Looper;
-        import android.util.Log;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattDescriptor;
+import android.bluetooth.BluetoothGattService;
+import android.content.Context;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 
-        import com.blankj.utilcode.util.LogUtils;
-        import com.telink.util.Arrays;
+import com.blankj.utilcode.util.LogUtils;
+import com.telink.util.Arrays;
 
-        import java.lang.reflect.Method;
-        import java.util.List;
-        import java.util.Map;
-        import java.util.Queue;
-        import java.util.UUID;
-        import java.util.concurrent.ConcurrentHashMap;
-        import java.util.concurrent.ConcurrentLinkedQueue;
-        import java.util.concurrent.atomic.AtomicBoolean;
-        import java.util.concurrent.atomic.AtomicInteger;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-        import static java.lang.String.valueOf;
+import static java.lang.String.valueOf;
 
         /**
          * 蓝牙发送数据相关类
@@ -1073,7 +1073,7 @@
                                     17] + (char) scanRecord[i + 18]
                                     + (char) scanRecord[i + 19] + (char) scanRecord[i + 20] +
                                     (char) scanRecord[i + 21];*/
-//                            LogUtils.v("zcl-----------获取广播版本-------" + version);
+                           LogUtils.v("zcl-----------获取广播版本-------" + version+"--"+ Arrays.bytesToHexString(scanRecord,","));
                         }
                     }
                 }

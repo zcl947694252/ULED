@@ -7,24 +7,18 @@ import android.bluetooth.le.ScanFilter
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.Toolbar
 import android.util.Log
 import android.util.SparseArray
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.RomUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.chad.library.adapter.base.BaseQuickAdapter
-import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
-import com.dadoutek.uled.ble.RxBleManager
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.GwLoginActivity
 import com.dadoutek.uled.gateway.bean.DbGateway
@@ -32,9 +26,11 @@ import com.dadoutek.uled.group.BatchGroupFourDeviceActivity
 import com.dadoutek.uled.group.GroupsRecyclerViewAdapter
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.model.ScannedDeviceItem
-import com.dadoutek.uled.model.*
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.VENDOR_ID
-import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.model.Mesh
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.dbModel.DBUtils.lastRegion
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
@@ -55,7 +51,6 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
 import com.dadoutek.uled.util.*
-import com.polidea.rxandroidble2.scan.ScanResult
 import com.polidea.rxandroidble2.scan.ScanSettings
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.LeBluetooth
@@ -1204,9 +1199,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 bestRssiDevice = deviceInfo
 
         GlobalScope.launch { mApplication?.mesh?.saveOrUpdate(this@DeviceScanningNewActivity) }
-
         LogUtils.d("update mesh success meshAddress = ${deviceInfo.meshAddress}")
         val scannedDeviceItem = ScannedDeviceItem(deviceInfo, getString(R.string.not_grouped))
+        LogUtils.v("zcl----版本赋值--" + deviceInfo.firmwareRevision + "===" + scannedDeviceItem.deviceInfo.firmwareRevision)
         //刚开始扫的设备mac是null所以不能mac去重
         mAddedDevices.add(scannedDeviceItem)
         Thread.sleep(500)

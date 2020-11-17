@@ -44,7 +44,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         changeLanguage()
         init()
         initListener()
-        Constant.IS_ROUTE_MODE =  SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        Constant.IS_ROUTE_MODE =  /*SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)*/false
         LogUtils.v("zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
     }
 

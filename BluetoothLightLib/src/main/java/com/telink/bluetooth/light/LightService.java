@@ -440,6 +440,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         deviceInfo.status = light.getStatus();
         deviceInfo.rssi = light.getRssi();
         deviceInfo.firmwareRevision = light.getVersion();
+        LogUtils.v("zcl----版本赋值--"+deviceInfo.firmwareRevision+"==="+light.getVersion());
 
         Intent intent = new Intent();
         intent.setAction(ACTION_LE_SCAN);
@@ -472,6 +473,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         } else if (newStatus == LightAdapter.STATUS_OTA_PROGRESS) {
             OtaDeviceInfo deviceInfo = new OtaDeviceInfo();
             deviceInfo.firmwareRevision = light.getFirmwareRevision();
+            LogUtils.v("zcl----版本赋值--"+deviceInfo.firmwareRevision+"==="+light.getFirmwareRevision());
             deviceInfo.macAddress = light.getMacAddress();
             deviceInfo.sixByteMacAddress = light.getSixByteMacAddress();
            // =deviceInfo.macAddress = light.getDeviceMac();
@@ -506,13 +508,13 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         deviceInfo.productUUID = light.getProductUUID();
         deviceInfo.status = newStatus;
         deviceInfo.rssi = light.getRssi();
-        deviceInfo.firmwareRevision = light.getFirmwareRevision();
+        deviceInfo.firmwareRevision = light.getVersion();
+        LogUtils.v("zcl----版本赋值--"+deviceInfo.firmwareRevision+"==="+light.getVersion());
         return deviceInfo;
     }
 
     @Override
-    public void onNotify(LightPeripheral light, int mode, int opcode, int src,
-                         byte[] params) {
+    public void onNotify(LightPeripheral light, int mode, int opcode, int src, byte[] params) {
 
         Intent intent = new Intent();
         intent.setAction(ACTION_NOTIFICATION);
