@@ -336,7 +336,6 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                     TelinkLightApplication.getApp().offLine = b
                     if (!TelinkLightApplication.getApp().offLine) {
                         sendOpenOrCloseGw(false)
-
                     } else {
                         ToastUtils.showShort(getString(R.string.gw_not_online))
                     }

@@ -98,12 +98,12 @@ class SettingActivity : TelinkBaseActivity() {
                                 ToastUtils.showShort(it.message)
                             })
                         }
-                        3 -> {
-                            var intent = Intent(this, ChooseModeActivity::class.java)
+                        3-> {
+                            var intent = Intent(this, CloudAssistantActivity::class.java)
                             startActivity(intent)
                         }
-                        4-> {
-                            var intent = Intent(this, CloudAssistantActivity::class.java)
+                        4 -> {
+                            var intent = Intent(this, ChooseModeActivity::class.java)
                             startActivity(intent)
                         }
                         else->{}
@@ -124,10 +124,8 @@ class SettingActivity : TelinkBaseActivity() {
         list.add(SettingItemBean(R.drawable.icon_reset, getString(R.string.user_reset)))
         list.add(SettingItemBean(R.drawable.icon_lock, getString(R.string.safe_lock)))
         list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.auxfun)))
-        list.add(SettingItemBean(R.drawable.icon_internet, getString(R.string.work_mode)))
         list.add(SettingItemBean(R.drawable.icon_assistant, getString(R.string.cloud_assistant)))
-        //if (DBUtils.getAllRouter().size > 1)
-        //list.add(SettingItemBean(R.drawable.icon_restore, getString(R.string.bind_reouter)))
+        //list.add(SettingItemBean(R.drawable.icon_internet, getString(R.string.work_mode)))
     }
 
     @SuppressLint("StringFormatMatches")
