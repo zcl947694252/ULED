@@ -15,7 +15,7 @@ class ItemRgbGradient :Serializable{
     var index = 0
     var belongRegionId: Long? = null
     var isSceneModeSelect:Boolean = false
-    var gradientType = 0 //渐变类型 1：自定义渐变  2：内置渐变
+    var gradientType = 2 //渐变类型 1：自定义渐变  2：内置渐变
 
     @ToMany(referencedJoinProperty = "belongDynamicChangeId")
      var colorNodes: List<DbColorNode>? = null

@@ -371,7 +371,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             sceneGroupAdapter?.data?.get(currentPosition)?.gradientName = presetGradientList[0]
             rgbGradientId = 1
             sceneGroupAdapter?.data?.get(currentPosition)?.gradientId = rgbGradientId
-            sceneGroupAdapter?.data?.get(currentPosition)?.gradientType = rgbType //渐变类型 1：自定义渐变  2：内置渐变
+            sceneGroupAdapter?.data?.get(currentPosition)?.gradientType = 2 //渐变类型 1：自定义渐变  2：内置渐变
             sceneGroupAdapter?.data?.get(currentPosition)?.gradientSpeed = 1 //渐变类型 1：自定义渐变  2：内置渐变
         }
         showGroupList[pos].rgbType = rgbType
