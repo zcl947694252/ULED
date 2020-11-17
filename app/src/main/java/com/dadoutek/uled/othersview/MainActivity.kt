@@ -170,8 +170,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         initBottomNavigation()
         checkVersionAvailable()
 
-        Constant.IS_ROUTE_MODE = /*SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)*/false
-
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         if (Constant.IS_ROUTE_MODE)
             getScanResult()//获取扫描状态
 
