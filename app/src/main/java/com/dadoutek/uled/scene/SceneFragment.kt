@@ -438,8 +438,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
         var emptyView = View.inflate(context, R.layout.empty_view, null)
          emptyAdd = emptyView.findViewById(R.id.add_device_btn)
+        emptyAdd?.text = getString(R.string.create_scene)
         emptyAdd?.setOnClickListener(this)
         adaper?.addFooterView(footer)
+        adaper?.emptyView = emptyView
 
         isDelete = false
         adaper!!.changeState(isDelete)
