@@ -150,10 +150,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
 
-        when {
-            Constant.isDebug -> main_toast.visibility = VISIBLE
-            else -> main_toast.visibility = GONE
+        if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
+            when (SharedPreferencesHelper.getInt(this, Constant.IS_SMART, 0)) {
+                0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
+                1 -> DEFAULT_MESH_FACTORY_NAME = "dadoutek"
+                2 -> DEFAULT_MESH_FACTORY_NAME = "dadourd"
+            }
+            Constant.PIR_SWITCH_MESH_NAME = DEFAULT_MESH_FACTORY_NAME
+            main_toast.visibility = VISIBLE
+        } else {
+            main_toast.visibility = GONE
         }
+        main_toast.text = DEFAULT_MESH_FACTORY_NAME
+        main_toast.setOnClickListener { getBin() }
 
         LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL}")
         main_toast.text = DEFAULT_MESH_FACTORY_NAME

@@ -157,6 +157,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         initData()
         initView()
         initListener()
+        startScan()
     }
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
@@ -732,8 +733,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         disableConnectionStatusListener()//停止监听 否则扫描到新设备会自动创建新的对象
         if (TelinkLightService.Instance() == null) //检测service是否为空，为空则重启
             mApplication?.startLightService(TelinkLightService::class.java)
-        if (isFirtst)
-            startScan()
     }
 
     // 如果没有网络，则弹出网络设置对话框
