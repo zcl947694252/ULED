@@ -802,7 +802,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     private fun doFinish() {
         connectSensorTimeoutDisposable?.dispose()
         disposable?.dispose()
-        finish()
+       finish()
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {

@@ -446,7 +446,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                             failedCallback = {
                                                 snackbar(sensor_root, getString(R.string.config_fail))
                                                 setLoadingVisbiltyOrGone()
-                                                TelinkLightService.Instance()?.idleMode(true)
+                                                //TelinkLightService.Instance()?.idleMode(true)
                                             })
 
                                 }
@@ -524,7 +524,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun saveSensor() {
         var dbSensor = DbSensor()
         if (isReConfirm) {
-            dbSensor.index = mDeviceInfo!!.id.toInt()
+            dbSensor.index = mDeviceInfo!!.id
             if (100000000 != mDeviceInfo!!.id)
                 dbSensor.id = mDeviceInfo!!.id.toLong()
         } else {//如果不是重新配置就保存进服务器
