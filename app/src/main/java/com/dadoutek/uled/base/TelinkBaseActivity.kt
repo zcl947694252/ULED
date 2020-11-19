@@ -899,14 +899,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.tzRouteResetFactory -> tzRouterResetFactory(cmdBean)
                 Cmd.tzRouteUserReset -> tzRouteUserReset(cmdBean)
                 Cmd.tzRouteSafeLock -> tzRouterSafeLock(cmdBean)
-                Cmd.tzRouteConfigWhite -> tzRouterConfigWhite(cmdBean)
                 Cmd.tzRouteAddTimerScene -> tzRouterAddTimerScene(cmdBean)
                 Cmd.tzRouteUpdateTimerScene -> tzRouterUpdateTimerScene(cmdBean)
                 Cmd.tzRouteDelTimerScene -> tzRouterDelTimerScene(cmdBean)
                 Cmd.tzRouteTimerSceneStatus -> tzRouterChangeTimerSceneStatus(cmdBean)
+                Cmd.tzRouteConfigWhite -> tzRouterConfigWhite(cmdBean)
                 Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean, 0)
                 Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean, 1)
-                Cmd.tzRouteConfigWhite -> tzRouterConfigBriOrTemp(cmdBean, 2)
             }
 /*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -1374,6 +1373,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             R.id.install_see_helpe -> seeHelpe("#add-and-configure")
 
             R.id.search_bar -> {
+                TelinkLightService.Instance()?.idleMode(true)
+                Thread.sleep(500)
                 if (medressData <= MeshUtils.DEVICE_ADDRESS_MAX) {
                     when (installId) {
                         INSTALL_NORMAL_LIGHT -> {

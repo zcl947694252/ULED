@@ -1236,15 +1236,14 @@ object DBUtils {
 
     fun deleteGradient(dbDiyGradient: DbDiyGradient) {
         DaoSessionInstance.getInstance().dbDiyGradientDao.delete(dbDiyGradient)
-        recordingChange(dbDiyGradient.id,
-                DaoSessionInstance.getInstance().dbDiyGradientDao.tablename,
-                Constant.DB_DELETE)
+        recordingChange(dbDiyGradient.id, DaoSessionInstance.getInstance().dbDiyGradientDao.tablename, Constant.DB_DELETE)
     }
 
 
     fun deleteColorNodeList(colorNodelist: List<DbColorNode>) {
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteInTx(colorNodelist)
     }
+
 
     fun deleteAllData() {
         DaoSessionInstance.getInstance().dbUserDao.deleteAll()
@@ -1260,7 +1259,7 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
         DaoSessionInstance.getInstance().dbConnectorDao.deleteAll()
-        DaoSessionInstance.getInstance().dbGatewayDao.deleteAll()
+        //DaoSessionInstance.getInstance().dbGatewayDao.deleteAll()
         DaoSessionInstance.getInstance().dbRouterDao.deleteAll()
     }
 

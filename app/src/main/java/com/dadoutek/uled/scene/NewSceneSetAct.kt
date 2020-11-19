@@ -366,13 +366,23 @@ class NewSceneSetAct : TelinkBaseActivity() {
         if (sceneGroupAdapter?.data == null)
             return
         sceneGroupAdapter?.data!![pos].rgbType = rgbType
-        if (rgbType==1){
-            val presetGradientList = resources.getStringArray(R.array.preset_gradient)
-            sceneGroupAdapter?.data?.get(currentPosition)?.gradientName = presetGradientList[0]
-            rgbGradientId = 1
-            sceneGroupAdapter?.data?.get(currentPosition)?.gradientId = rgbGradientId
-            sceneGroupAdapter?.data?.get(currentPosition)?.gradientType = 2 //渐变类型 1：自定义渐变  2：内置渐变
-            sceneGroupAdapter?.data?.get(currentPosition)?.gradientSpeed = 1 //渐变类型 1：自定义渐变  2：内置渐变
+            val itemGroup = sceneGroupAdapter?.data?.get(currentPosition)
+        when (rgbType) {
+            1 -> {
+                val presetGradientList = resources.getStringArray(R.array.preset_gradient)
+                itemGroup?.gradientName = presetGradientList[0]
+                rgbGradientId = 1
+                itemGroup?.gradientId = rgbGradientId
+                itemGroup?.gradientType = 2 //渐变类型 1：自定义渐变  2：内置渐变
+                itemGroup?.gradientSpeed = 1 //渐变类型 1：自定义渐变  2：内置渐变
+            }
+            0 -> {
+                itemGroup?.brightness = 50
+                itemGroup?.color = (50 shl 24) or (0 shl 16) or (0 shl 8) or 0
+                itemGroup?.temperature = 50
+                itemGroup?.checked = true
+                itemGroup?.enableCheck = false
+            }
         }
         showGroupList[pos].rgbType = rgbType
         sceneGroupAdapter?.notifyDataSetChanged()
@@ -474,19 +484,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
         sceneGroupAdapter?.notifyItemChanged(position)
     }
-
-    private fun enableWhiteLight(enable: Boolean) {
-        rgb_white_seekbar.isEnabled = enable
-        sb_w_bright_add.isEnabled = enable
-        sb_w_bright_less.isEnabled = enable
-    }
-
-    private fun enableBright(enable: Boolean) {
-        rgb_sbBrightness.isEnabled = enable
-        sbBrightness_add.isEnabled = enable
-        sbBrightness_less.isEnabled = enable
-    }
-
 
     private fun close(position: Int) {
         isOpen = false
@@ -885,7 +882,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     LogUtils.v("zcl-----------收到创建场景请求-------$it")
                     showLoadingDialog(getString(R.string.saving))
                     startAddSceneTimeOut(it.t)
-                    afterSaveScene()
                 }
                 //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
@@ -905,7 +901,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    showLoadingDialog(getString(R.string.add_scene_fail))
+                    ToastUtils.showShort(getString(R.string.add_scene_fail))
                 }
     }
 
@@ -1208,6 +1204,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     ToastUtils.showShort(getString(R.string.config_success))
                     disposableTimer?.dispose()
                     hideLoadingDialog()
+                    afterSaveScene()
                     getNewScenes()
                 }
                 else -> ToastUtils.showShort(routerScene?.msg)

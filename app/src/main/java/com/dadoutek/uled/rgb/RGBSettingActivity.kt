@@ -2204,6 +2204,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             var g = Color.green(it.color)
                             var b = Color.blue(it.color)
                             it.color = (w shl 24) or (r shl 16) or (g shl 8) or b
+                            DBUtils.saveLight(it,false)
                         }
                 }
             }
@@ -2459,7 +2460,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     override fun tzRouterConfigWhite(cmdBean: CmdBodyBean) {
         disposableRouteTimer?.dispose()
-        if (cmdBean.ser_id == "gpTem" || cmdBean.ser_id == "rgbBri") {
+        if (cmdBean.ser_id == "rgbwhite") {
             LogUtils.v("zcl------收到路由配置白光灯通知------------$cmdBean---$color---$sendProgress")
             when (cmdBean.status) {
                 0 -> {

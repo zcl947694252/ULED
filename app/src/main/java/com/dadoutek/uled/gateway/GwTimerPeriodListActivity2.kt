@@ -445,7 +445,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
             var index = 0
             val startTime = (tasksBean?.startHour ?: 0) * 60 + (tasksBean?.startMins ?: 0)
             val endTime = (tasksBean?.endHour ?: 0) * 60 + (tasksBean?.endMins ?: 0)
-            val standingNum = tasksBean?.stayTime ?: 0
+            val standingNum = tasksBean?.stayTime ?: 1
 
             for (time in startTime..endTime step standingNum) {
                 val i = endTime - time //判断还剩时间用于判断是不是最后一个

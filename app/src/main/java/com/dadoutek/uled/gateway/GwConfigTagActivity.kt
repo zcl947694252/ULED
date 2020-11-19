@@ -196,7 +196,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             finish()
         }
         listTask.clear()
-        val tasks = tagBean!!.tasks
+        val tasks = tagBean?.tasks
         if (tasks != null) {
             val elements = GsonUtil.stringToList(tasks, GwTasksBean::class.java)
             listTask.addAll(elements)

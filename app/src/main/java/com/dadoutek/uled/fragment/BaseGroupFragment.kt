@@ -722,6 +722,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     override fun tzRouterDelGroupResult(routerGroup: RouteGroupingOrDelBean) {
         LogUtils.v("zcl-----------收到路由删组通知-------${routerGroup}")
         disposableTimer?.dispose()
+        disposableRouteTimer?.dispose()
         if (routerGroup.ser_id == "delGp") {
             hideLoadingDialog()
             if (routerGroup?.finish) {

@@ -304,10 +304,10 @@ class GwLoginActivity : TelinkBaseActivity() {
 
                 if (isPwd) {
                     LogUtils.v("zcl----------蓝牙数据密码参数-------${Arrays.bytesToHexString(params, ",")}")
-                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_PASSWORD, dbGw?.meshAddr ?: 0, params, "1")
+                    TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_WIFI_PASSWORD, dbGw?.meshAddr ?: 0, params, "1")
                 } else {
                     LogUtils.v("zcl----------蓝牙数据账号参数-------${Arrays.bytesToHexString(params, ",")}")
-                    TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_WIFI_SDID, dbGw?.meshAddr ?: 0, params, "1")
+                    TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_WIFI_SDID, dbGw?.meshAddr ?: 0, params, "1")
                 }
             }
         }

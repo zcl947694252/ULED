@@ -156,8 +156,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     internal var syncCallback: SyncCallback = object : SyncCallback {
-        override fun start() {}
         override fun complete() {}
+        override fun start() {}
         override fun error(msg: String) {
             ToastUtils.showLong(R.string.upload_data_failed)
         }

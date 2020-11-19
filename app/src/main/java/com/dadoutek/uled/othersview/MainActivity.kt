@@ -164,13 +164,14 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener { getBin() }
 
-        LogUtils.v("zcl---改变参数meshName-------${Constant.DEFAULT_MESH_FACTORY_NAME}----改变参数url----${Constant.BASE_URL}")
+        LogUtils.v("zcl---改变参数meshName-------$DEFAULT_MESH_FACTORY_NAME----改变参数url----${Constant.BASE_URL}")
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
         main_toast.setOnClickListener { getBin() }
         initBottomNavigation()
         checkVersionAvailable()
 
-        Constant.IS_ROUTE_MODE = /*SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)*/false
+         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+         //Constant.IS_ROUTE_MODE = false
         if (Constant.IS_ROUTE_MODE)
             getScanResult()//获取扫描状态
 
@@ -284,7 +285,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, Constant.IS_ROUTE_MODE)
                 changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
             }, {
-                Constant.IS_ROUTE_MODE = false
                 Constant.IS_OPEN_AUXFUN = false
             })
     }
@@ -498,7 +498,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         registerReceiver(mReceiver, filter)
         getBin()
 
-        Constant.IS_ROUTE_MODE = /*SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)*/false
+         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        //Constant.IS_ROUTE_MODE = false
     }
 
     override fun onPostResume() {

@@ -135,6 +135,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
 
     private fun startScan() {
+        Thread.sleep(500)
         btn_stop_scan.text = getString(R.string.stop_scan)
         TelinkLightService.Instance()?.idleMode(true)
         scanning_num.text = getString(R.string.scanning)
@@ -192,25 +193,25 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress,retryTimes = 2)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ version ->
-                                if (version != null && version != "") {
-                                    skipSwitch(version)
-                                    finish()
-                                } else {
-                                    val version1 = bestRSSIDevice?.firmwareRevision ?: ""
-                                    if (TextUtils.isEmpty(version1))
-                                        skipSwitch(version1)
-                                    else
-                                        skipSwitch(version1)
-                                    finish()
-                                }
-                                closeAnimation()
-                            }, {
+                        if (version != null && version != "") {
+                            skipSwitch(version)
+                            finish()
+                        } else {
+                            val version1 = bestRSSIDevice?.firmwareRevision ?: ""
+                            if (TextUtils.isEmpty(version1))
+                                skipSwitch(version1)
+                            else
+                                skipSwitch(version1)
+                            finish()
+                        }
+                        closeAnimation()
+                    }, {
                         //showToast(getString(R.string.get_version_fail))
                         closeAnimation()
                         val version1 = bestRSSIDevice?.firmwareRevision ?: ""
 
                         if (TextUtils.isEmpty(version1))
-                            //ToastUtils.showLong(getString(R.string.get_version_fail))
+                        //ToastUtils.showLong(getString(R.string.get_version_fail))
                             skipSwitch(version1)
                         else
                             skipSwitch(version1)

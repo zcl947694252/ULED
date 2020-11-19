@@ -11,17 +11,21 @@ import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.group.*
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.TitleBean
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import io.reactivex.Observable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_device_bind_router.*
 import kotlinx.android.synthetic.main.activity_device_bind_router.batch_see_help
 import kotlinx.android.synthetic.main.activity_device_bind_router.grouping_completed
 import kotlinx.android.synthetic.main.toolbar.toolbar
 import kotlinx.android.synthetic.main.toolbar.toolbarTv
+import java.util.concurrent.TimeUnit
 
 /**
  * 创建者     ZCL
@@ -32,6 +36,7 @@ import kotlinx.android.synthetic.main.toolbar.toolbarTv
  * 更新描述
  */
 class BindRouterActivity : TelinkBaseActivity() {
+    private var disposableIntervalTime: Disposable? = null
     private var lastCheckedGroupPostion: Int = 1000
     private var isAll: Boolean = false
     private var currentGroup: DbGroup? = null
@@ -52,7 +57,7 @@ class BindRouterActivity : TelinkBaseActivity() {
     private val relayAdapter: BatchRelayAdapter = BatchRelayAdapter(R.layout.template_batch_small_item, deviceDataRelay, true)
     private val swAdapter: BatchSwAdapter = BatchSwAdapter(R.layout.template_batch_small_item, deviceDataSw)
     private val senserAdapter: BatchSensorAdapter = BatchSensorAdapter(R.layout.template_batch_small_item, deviceDataSensor)
-
+    private val blinkList = mutableListOf<Int>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device_bind_router)
@@ -81,32 +86,36 @@ class BindRouterActivity : TelinkBaseActivity() {
 
         lightAdapter.setOnItemClickListener { adapter, _, position ->
             deviceDataLight[position].selected = !deviceDataLight[position].selected
+            if (deviceDataLight[position].selected)
+                blinkList.add(deviceDataLight[position].meshAddr)
             changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         curtainAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataCurtain.forEach { it.selected = false }
             deviceDataCurtain[position].selected = !deviceDataCurtain[position].selected
+            if (deviceDataCurtain[position].selected)
+                blinkList.add(deviceDataCurtain[position].meshAddr)
             changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         relayAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataRelay.forEach { it.selected = false }
             deviceDataRelay[position].selected = !deviceDataRelay[position].selected
+            if (deviceDataRelay[position].selected)
+                blinkList.add(deviceDataRelay[position].meshAddr)
             changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         swAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataSw.forEach {
-                it.selected = false
-            }
             deviceDataSw[position].selected = !deviceDataSw[position].selected
+            if (deviceDataSw[position].selected)
+                blinkList.add(deviceDataSw[position].meshAddr)
             changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
         senserAdapter.setOnItemClickListener { adapter, _, position ->
-            deviceDataSensor.forEach { it.selected = false }
             deviceDataSensor[position].selected = !deviceDataSensor[position].selected
+            if (deviceDataSensor[position].selected)
+                blinkList.add(deviceDataSensor[position].meshAddr)
             changeGroupingCompleteState()
             adapter.notifyDataSetChanged()
         }
@@ -138,34 +147,46 @@ class BindRouterActivity : TelinkBaseActivity() {
 
 
     private fun setAllSelect(all: Boolean) {
+        blinkList.clear()
         when ((currentGroup?.deviceType ?: 0).toInt()) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 deviceDataLight.forEach {
                     it.selected = all
+                    if (all)
+                        blinkList.add(it.meshAddr)
                 }
+
                 lightAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_CURTAIN -> {
                 deviceDataCurtain.forEach {
                     it.selected = all
+                    if (all)
+                        blinkList.add(it.meshAddr)
                 }
                 curtainAdapter.notifyDataSetChanged()
             }
             DeviceType.SMART_RELAY -> {
                 deviceDataRelay.forEach {
                     it.selected = all
+                    if (all)
+                        blinkList.add(it.meshAddr)
                 }
                 relayAdapter.notifyDataSetChanged()
             }
             DeviceType.NORMAL_SWITCH -> {
                 deviceDataSw.forEach {
                     it.selected = all
+                    if (all)
+                        blinkList.add(it.meshAddr)
                 }
                 swAdapter.notifyDataSetChanged()
             }
             DeviceType.SENSOR -> {
                 deviceDataSensor.forEach {
                     it.selected = all
+                    if (all)
+                        blinkList.add(it.meshAddr)
                 }
                 senserAdapter.notifyDataSetChanged()
             }
@@ -245,6 +266,7 @@ class BindRouterActivity : TelinkBaseActivity() {
             DeviceType.SENSOR -> 98
             else -> 4
         }
+        blinkList.clear()
         RouterModel.bindRouter(meshAddList, meshType, routerList.filter { it.isSelect }[0].macAddr)?.subscribe({
             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                 override fun start() {}
@@ -382,5 +404,18 @@ class BindRouterActivity : TelinkBaseActivity() {
                 false), TitleBean(getString(R.string.switch_title), false), TitleBean(getString(R.string.sensor), false),
                 TitleBean(getString(R.string.curtain), false), TitleBean(getString(R.string.relay), false)))
         titleAdapter.bindToRecyclerView(bind_router_type)
+
+        if (Constant.IS_ROUTE_MODE) {
+            disposableIntervalTime?.dispose()
+            disposableIntervalTime = Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
+                    .subscribe {
+                        //   LogUtils.v("zcl-----------收到理由闪烁-------$blinkList---------${blinkList.size}")
+                        RouterModel.routeBatchGpBlink(GroupBlinkBodyBean(blinkList, (currentGroup?.deviceType ?: 0).toInt()))?.subscribe({
+                            // LogUtils.v("zcl----------收到理由闪烁--------成功")
+                        }, {
+                            //  LogUtils.v("zcl----------收到理由闪烁--------失败")
+                        })
+                    }
+        }
     }
 }

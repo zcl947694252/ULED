@@ -205,7 +205,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             if(hex.length() < 2){
                 hex = "0" + hex;
             }
-        LogUtils.v("zcl-----------扫描发送指令-------0x"+ hex);
+//        LogUtils.v("zcl-----------扫描发送指令-------0x"+ hex);
         return this.sendCommandNoResponse(opcode, address, params, null, 0, false);
     }
 

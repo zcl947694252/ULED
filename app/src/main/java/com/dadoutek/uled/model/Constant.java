@@ -7,8 +7,7 @@ import java.io.Serializable;
  * Created by hejiajun on 2018/3/22.
  * dadoutek2018
  */
-public class Constant
-        implements Serializable {
+public class Constant implements Serializable {
     //虚拟主机号。测试服:/smartlight/test 正式服:/smartlight 服务器已做处理暂时不必添加转换
     // val WS_DEBUG_HOST = "/smartlight/test" 服务器已做处理暂时不必添加转换
     public static String WS_HOST = "/smartlight";
@@ -35,7 +34,6 @@ public class Constant
 
     public static final long downTime = isDebug ? 3 : 11;
     public static  String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
-    public static  String BASE_URL2 = BASE_DEBUG_URL;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
     public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
     //public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";

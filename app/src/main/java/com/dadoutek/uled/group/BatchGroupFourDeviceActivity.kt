@@ -82,9 +82,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private var tipBottomLy: LinearLayout? = null
     private var popTip: PopupWindow? = null
     private var tipCancel: TextView? = null
-    private var tipConfirm: TextView? = null
     private var tipRecycleView: RecyclerView? = null
-    private val TAG = "zcl-BatchGroupFourDeviceActivity"
     private var gpMeshAddr: Int = 0
     private var isAll: Boolean = false
     private var disposableScan: Disposable? = null
@@ -187,21 +185,21 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         toolbar.setNavigationOnClickListener {
             //checkNetworkAndSync(this)
             setDeviceTypeDataStopBlink(deviceType, false)
-            if (isChange) {
-                AlertDialog.Builder(this)
+            when {
+                isChange -> AlertDialog.Builder(this)
                         .setMessage(R.string.grouping_success_tip)
                         .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                             dialog.dismiss()
                             finish()
                         }.show()
-            } else
-                finish()
+                else -> finish()
+            }
         }
 
-        if (TelinkApplication.getInstance().connectDevice == null)
-            image_bluetooth.setImageResource(R.drawable.bluetooth_no)
-        else
-            image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+        when (TelinkApplication.getInstance().connectDevice) {
+            null -> image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+            else -> image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+        }
 
         emptyGroupView = LayoutInflater.from(this).inflate(R.layout.empty_group_view, null)
         btnAddGroups = emptyGroupView!!.findViewById(R.id.add_groups_btn)
@@ -272,7 +270,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.SMART_RELAY -> {
                 relayAdapterm.bindToRecyclerView(batch_four_device_recycle)
                 relayGroupedAdapterm.bindToRecyclerView(batch_four_device_recycle_grouped)
-
                 //subRelayData()
             }
         }
@@ -334,10 +331,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         listGroup.clear()
         noGroup.addAll(observableNoGroup)
         listGroup.addAll(observableGrouped)
-        if (checkedNoGrouped)
-            setDeviceListAndEmpty(noGroup.size)
-        else
-            setDeviceListAndEmpty(listGroup.size)
+        when {
+            checkedNoGrouped -> setDeviceListAndEmpty(noGroup.size)
+            else -> setDeviceListAndEmpty(listGroup.size)
+        }
         setTitleTexts(noGroup.size, listGroup.size)
 
         lightAdapterm.notifyDataSetChanged()
@@ -932,7 +929,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     @SuppressLint("CheckResult")
     private fun routerGroupDevice(list: MutableList<Int>, it: View?) {
-        disposableIntervalTime?.dispose()
+        blinkList.clear()
         LogUtils.v("zcl-----------收到路由新传递参数-------${GroupBodyBean(list, deviceType, "batchGp", currentGroup!!.meshAddr)}")
         val subscribe = RouterModel.routeBatchGpNew(GroupBodyBean(list, deviceType, "batchGp", currentGroup!!.meshAddr))?.subscribe({ itR ->
             LogUtils.v("zcl-----------收到路由开始分组http成功-------$itR")

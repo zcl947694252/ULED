@@ -632,24 +632,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         }
     }
 
-    private fun routerConfigBrightnesssOrColorTemp()/*= when*/ {
-        /*  isBrightness -> {//亮度
-              val group = data[currentPostion]
-              //clickType 普通色温亮度 彩灯亮度白光
-              var seekBar = when (clickType) {
-                  1, 2 -> getViewByPosition(currentPostion, R.id.normal_temperature) as SeekBar
-                  3, 4 -> getViewByPosition(currentPostion, R.id.normal_sbBrightness) as SeekBar
-                  6, 5 -> getViewByPosition(currentPostion, R.id.rgb_sbBrightness) as SeekBar
-                  7, 8 -> getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
-                  else -> getViewByPosition(currentPostion, R.id.rgb_white_seekbar) as SeekBar
-              }
-          }
-          else -> {*/
+    private fun routerConfigBrightnesssOrColorTemp() {
         val group = data[currentPostion]
         var seekBar: SeekBar
         when (group) {
-            null -> {
-            }
+            null -> { }
             else -> {
                 when (clickType) {//普通色温亮度 彩灯亮度白光
                     1, 2 -> {
@@ -750,7 +737,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         disposableRouteTimer?.dispose()
         when (cmdBean.status) {
             0 -> {
-                when (clickType) {//普通色温亮度 彩灯亮度白光
+             /*   when (clickType) {//普通色温亮度 彩灯亮度白光
                     1 -> hAddCwTem(currentPostion, data)
                     2 -> hLessCwTem(currentPostion, data)
                     3 -> hAddCwBri(currentPostion, data)
@@ -759,7 +746,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     6 -> hLessRgbBri(currentPostion, data)
                     7 -> hAddWhite(currentPostion, data)
                     8 -> hLesswihte(currentPostion, data)
-                }
+                }*/
                 if (currentSeekBar != null)
                     changeTextView(currentSeekBar!!, seekBarprogress, currentPostion)
                 hideLoadingDialog()

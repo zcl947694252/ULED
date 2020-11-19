@@ -36,9 +36,6 @@ android {
             storeFile file('.\\..\\dadou.key')
             storePassword 'dadoutek2018'
             keyAlias = 'dadou'
-
-
-
            keyPassword 'dadoutek2018'
         }
     }
@@ -48,8 +45,8 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 280
-        versionName "4.0.8"
+        versionCode 281
+        versionName "4.0.9"
 
         multiDexEnabled true
         javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }

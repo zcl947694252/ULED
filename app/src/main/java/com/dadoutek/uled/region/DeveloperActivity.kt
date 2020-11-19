@@ -321,7 +321,8 @@ class DeveloperActivity : BaseActivity() {
 
     //清空缓存初始化APP
     @SuppressLint("CheckResult", "SetTextI18n", "StringFormatMatches")
-    private fun emptyTheCache() {//清除数据
+    private fun emptyTheCache() {
+        //清除数据
         isResetFactory = 1
         setFirstePopAndShow(R.string.clear_one, R.string.clear_two,
                 R.string.clear_one, isResetFactory)
@@ -407,7 +408,7 @@ class DeveloperActivity : BaseActivity() {
             when (isResetFactory) {
                 1 -> clearData()
                 3 -> startActivity(Intent(this@DeveloperActivity, PhysicalRecoveryActivity::class.java))
-                2 -> if (TelinkLightApplication.getApp().connectDevice != null)//恢复出厂设置恢复数据不恢复设备
+                2 -> if (TelinkLightApplication.getApp().connectDevice != null||Constant.IS_ROUTE_MODE)//恢复出厂设置恢复数据不恢复设备
                     resetAllLights()
                 else
                     ToastUtils.showLong(R.string.device_not_connected)
@@ -487,7 +488,7 @@ class DeveloperActivity : BaseActivity() {
                                                  .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
                                     hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.user_reset_faile))
+                                    ToastUtils.showShort(getString(R.string.reset_factory_fail))
                                 }
                     }
                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -520,7 +521,7 @@ class DeveloperActivity : BaseActivity() {
                     updateLastMeshZero()
                     syncData()
                 }
-                else ->ToastUtils.showShort(getString(R.string.user_reset_faile))
+                else ->ToastUtils.showShort(getString(R.string.reset_factory_fail))
             }
         }
     }
