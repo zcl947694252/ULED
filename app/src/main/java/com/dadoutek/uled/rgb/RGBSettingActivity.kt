@@ -1259,25 +1259,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         clickDiy = false
         when (view!!.id) {
             R.id.gradient_mode_on -> {
-                //应用内置渐变
-                if (!Constant.IS_ROUTE_MODE) {
-                    applyDisposable?.dispose()
-                    applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
-                            .subscribe {
-                                GlobalScope.launch {
-                                    for (i in 0..2) {
-                                        stopGradient()
-                                        delay(50)
-                                    }
-                                }
-                                positionState = position + 1
-                                Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
-                            }
-                    postionAndNum?.position = position
-                    systemGradientApply(clickPostion)
-                } else {
-                    routerSystemGradientApply(buildInModeList[clickPostion].id + 1, speed, "systemApply")
-                }
+                applyModeGradient(position)
             }
 
             R.id.gradient_mode_off -> {
@@ -1314,6 +1296,30 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             }
         }
 
+    }
+
+    private fun applyModeGradient(position: Int) {
+        isPresetMode = true
+        isDiyMode = false
+        //应用内置渐变
+        if (!Constant.IS_ROUTE_MODE) {
+            applyDisposable?.dispose()
+            applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
+                    .subscribe {
+                        GlobalScope.launch {
+                            for (i in 0..2) {
+                                stopGradient()
+                                delay(50)
+                            }
+                        }
+                        positionState = position + 1
+                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
+                    }
+            postionAndNum?.position = position
+            systemGradientApply(clickPostion)
+        } else {
+            routerSystemGradientApply(buildInModeList[clickPostion].id + 1, speed, "systemApply")
+        }
     }
 
     private fun systemGradientStop() {
@@ -1364,17 +1370,21 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             toolbar!!.title = getString(R.string.dynamic_gradient)
             rgbDiyGradientAdapter!!.notifyDataSetChanged()
             setDate()
-            if (clickPostion != 100 && diyPosition != 100) {
+            when {
+                isDiyMode -> applyDiyGradient(clickPostion)
+                else -> applyModeGradient(clickPostion)
+            }
+          /*  if (clickPostion != 100 && diyPosition != 100) {
                 diyGradientList!![diyPosition].isSelect = false//开关状态
                 diyGradientList!![clickPostion].isSelect = true//开关状态
                 diyPosition = clickPostion
             } else {
                 if (diyPosition != 100)
                     diyGradientList!![diyPosition].isSelect = true//开关状态
-            }
-            isExitGradient = false
-            isDiyMode = true
-            changeToDiyPage()
+            }*/
+            //isExitGradient = false
+            //isDiyMode = true
+           /* changeToDiyPage()
 
             //应用自定义渐变
             if (diyPosition != 100)
@@ -1382,7 +1392,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     stopGradient()
                     delay(200)
                   ///  Commander.applyDiyGradient(dstAddress, diyGradientList!![diyPosition].id.toInt(), diyGradientList!![diyPosition].speed, firstLightAddress)
-                }
+                }*/
         }
     }
 
@@ -1448,17 +1458,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         when (view!!.id) {
             R.id.diy_mode_on -> {
                 //应用自定义渐变
-                if (!Constant.IS_ROUTE_MODE) {
-                    GlobalScope.launch {
-                        stopGradient()
-                        delay(200)
-                        Commander.applyDiyGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(),
-                                diyGradientList!![position].speed, firstLightAddress)
-                    }
-                    diyOpenGradientResult(clickPostion)
-                } else {
-                    routerDiyGradientApply(diyGradientList[clickPostion].id.toInt(), "diyModeApply")
-                }
+                applyDiyGradient(position)
             }
 
             R.id.diy_mode_off -> {
@@ -1483,6 +1483,22 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             }
         }
 
+    }
+
+    private fun applyDiyGradient(position: Int) {
+        isPresetMode = false
+        isDiyMode = true
+        if (!Constant.IS_ROUTE_MODE) {
+            GlobalScope.launch {
+                stopGradient()
+                delay(200)
+                Commander.applyDiyGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(),
+                        diyGradientList!![position].speed, firstLightAddress)
+            }
+            diyOpenGradientResult(clickPostion)
+        } else {
+            routerDiyGradientApply(diyGradientList[clickPostion].id.toInt(), "diyModeApply")
+        }
     }
 
     private fun diyOpenGradientResult(position: Int) {

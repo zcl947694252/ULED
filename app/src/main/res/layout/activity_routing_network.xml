@@ -28,6 +28,10 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="32dp"
                 android:paddingStart="@dimen/dp_10"
+                android:maxLength="12"
+                android:singleLine="true"
+                android:inputType="text"
+                android:digits="@string/filter_vcode"
                 android:background="@drawable/rect_black_n_3"
                 android:layout_weight="1" />
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+
     <string-array name="trigger_lux_array" translatable="false">
         <item>0</item>
         <item>2</item>
@@ -249,7 +250,7 @@
     <!-- Activity Labels -->
     <string name="app_name">ULed</string>
     <string name="activity_device_grouping">Device Grouping</string>
-
+    <string name="filter_vcode">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- DeviceSchema Setting -->
     <string name="device_setting_temperature">Color Temperature:%1$s</string>
 
@@ -1203,4 +1204,7 @@
     <string name="router_connect_ble_fail">路由蓝牙连接失败</string>
     <string name="no_can_ota_device">没有可升级设备</string>
     <string name="please_select_color">请选择渐变颜色</string>
+    <string name="input_device_code">请输入设备码</string>
+    <string name="input_right_code">请输入正确的条形码</string>
+    <string name="scan_code">设备码扫描</string>
 </resources>

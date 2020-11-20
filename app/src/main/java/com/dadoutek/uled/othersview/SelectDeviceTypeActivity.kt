@@ -112,7 +112,8 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun openScan() {
         mRxPermission.request(Manifest.permission.CAMERA).subscribe({
-            var intent = Intent(this@SelectDeviceTypeActivity, CaptureActivity::class.java)
+            var intent = Intent(this@SelectDeviceTypeActivity, MyScanActivity::class.java)
+            //var intent = Intent(this@SelectDeviceTypeActivity, CaptureActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE)
         },{
             ToastUtils.showShort(it.message)

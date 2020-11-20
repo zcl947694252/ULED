@@ -170,8 +170,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         initBottomNavigation()
         checkVersionAvailable()
 
-         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
-         //Constant.IS_ROUTE_MODE = false
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        //Constant.IS_ROUTE_MODE = false
         if (Constant.IS_ROUTE_MODE)
             getScanResult()//获取扫描状态
 
@@ -498,7 +498,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         registerReceiver(mReceiver, filter)
         getBin()
 
-         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         //Constant.IS_ROUTE_MODE = false
     }
 
@@ -759,9 +759,10 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                 ?.subscribe({//找回有效设备
                                                     //RecoverMeshDeviceUtil.addDevicesToDb(it)
                                                     onLogin()
+                                                    LogUtils.v("zcl-----------连接成功失败-------")
                                                 },
                                                         {
-                                                            LogUtils.v("zcl-----------连接失败继续连接-------")
+                                                            LogUtils.v("zcl-----------连接失败失败继续连接-------")
                                                             if (!Constant.IS_ROUTE_MODE)
                                                                 autoConnect()
                                                             LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")

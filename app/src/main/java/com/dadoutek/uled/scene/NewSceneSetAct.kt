@@ -398,8 +398,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun switchTotal(position: Int) {
-        var brightness = showGroupList[position].brightness
-        var temperature = showGroupList[position].temperature
         if (showGroupList[position].isOn) {
             isOpen = false
             if (!Constant.IS_ROUTE_MODE)
@@ -438,8 +436,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             var status = if (isOpen) 1 else 0
             routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, status, "openOrCloseGp")
         }
-        //sceneGroupAdapter?.notifyItemChanged(position)
-        sceneGroupAdapter?.notifyDataSetChanged()
+        sceneGroupAdapter?.notifyItemChanged(position,showGroupList.size)
+        //sceneSetGpAdapter()
     }
 
     private fun switchBright(position: Int) {
@@ -461,7 +459,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             val params: ByteArray = byteArrayOf(brightness.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
         }
-        sceneGroupAdapter?.notifyItemChanged(position)
+        sceneGroupAdapter?.notifyItemChanged(position,showGroupList.size)
     }
 
     private fun switchWhiteLight(position: Int) {
@@ -482,7 +480,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             val params: ByteArray = byteArrayOf(whiteLight.toByte())//设置白色
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
         }
-        sceneGroupAdapter?.notifyItemChanged(position)
+        sceneGroupAdapter?.notifyItemChanged(position,showGroupList.size)
     }
 
     private fun close(position: Int) {
@@ -491,7 +489,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 0, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = false
-            sceneGroupAdapter?.notifyItemChanged(position)
+            sceneGroupAdapter?.notifyItemChanged(position,showGroupList.size)
             Commander.openOrCloseLights(showGroupList[position].groupAddress, false)
         }
     }
@@ -502,7 +500,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 1, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = true
-            sceneGroupAdapter?.notifyItemChanged(position)
+            sceneGroupAdapter?.notifyItemChanged(position,showGroupList.size)
             Commander.openOrCloseLights(showGroupList[position].groupAddress, true)
         }
     }
@@ -652,12 +650,16 @@ class NewSceneSetAct : TelinkBaseActivity() {
         scene_gp_detail_list.itemAnimator!!.changeDuration = 0
         if (sceneGroupAdapter?.stompRecevice != null)
             unregisterReceiver(sceneGroupAdapter?.stompRecevice)
-        sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
-        sceneGroupAdapter?.bindToRecyclerView(scene_gp_detail_list)
+        sceneSetGpAdapter()
         registBrocaster()
         //sceneGroupAdapter?.initStompReceiver()
 
         sceneGroupAdapter?.onItemChildClickListener = onItemChildClickListener
+    }
+
+    private fun sceneSetGpAdapter() {
+        sceneGroupAdapter = SceneGroupAdapter(R.layout.scene_adapter_layout, showGroupList)
+        sceneGroupAdapter?.bindToRecyclerView(scene_gp_detail_list)
     }
 
     private fun registBrocaster() {

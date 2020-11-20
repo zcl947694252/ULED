@@ -15,12 +15,14 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.bean.RouteInAccountBean
 import com.dadoutek.uled.util.NetWorkUtils
+import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_routing_network.*
+import kotlinx.android.synthetic.main.activtiy_myzxing.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
@@ -99,6 +101,7 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         routing_device_code.requestFocus()
         imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
+        StringUtils.initEditTextFilter(routing_device_code)
     }
 
     override fun routerAccessIn(routerGroup: RouteInAccountBean) {

@@ -510,6 +510,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
         var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
+        LogUtils.v("zcl-----------发送时区-------地址${dbGw?.meshAddr}")
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
     }
 
@@ -1044,6 +1045,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             }
 
             override fun setGwComplete(deviceInfo: DeviceInfo) {
+                LogUtils.v("zcl-----------发送时区回调-------$deviceInfo")
                 when (deviceInfo.gwVoipState) {
                     GW_TIME_ZONE_VOIP, GW_CONFIG_TIMER_LABEL_VOIP, GW_CONFIG_TIME_PERIVODE_LABEL_VOIP -> {
                         disposableTimer?.dispose()

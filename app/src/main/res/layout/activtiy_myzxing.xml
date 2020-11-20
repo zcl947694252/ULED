@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <FrameLayout
+                android:id="@+id/fl_zxing_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            <SurfaceView
+                    android:id="@+id/preview_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            <com.uuzuche.lib_zxing.view.ViewfinderView
+                    android:id="@+id/viewfinder_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+        </FrameLayout>
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:layout_marginTop="@dimen/dp_45"
+                android:orientation="horizontal">
+            <EditText
+                    android:id="@+id/scan_device_code"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="32dp"
+                    android:layout_weight="1"
+                    android:text="@string/input_device_code"
+                    android:textColor="@color/white"
+                    android:background="@drawable/rect_e_w_5"
+                    android:digits="@string/filter_vcode"
+                    android:inputType="text"
+                    android:maxLength="12"
+                    android:paddingStart="@dimen/dp_10"
+                    android:singleLine="true" />
+
+            <Button
+                    android:id="@+id/scan_confim"
+                    android:layout_width="66dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:layout_marginStart="@dimen/dp_18"
+                    android:layout_marginEnd="@dimen/dp_18"
+                    android:text="@string/confirm" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>

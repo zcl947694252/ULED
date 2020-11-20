@@ -12,7 +12,7 @@
     <string name="complete">完成</string>
     <string name="activity_device_grouping">设备分组</string>
     <!--    通用End-->
-
+    <string name="filter_vcode">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- 页面Start   -->
     <string name="device">设备</string>
     <string name="group">组</string>
@@ -1203,4 +1203,7 @@
     <string name="router_connect_ble_fail">路由蓝牙连接失败</string>
     <string name="no_can_ota_device">没有可升级设备</string>
     <string name="please_select_color">请选择渐变颜色</string>
+    <string name="input_device_code">请输入设备码</string>
+    <string name="input_right_code">请输入正确的条形码</string>
+    <string name="scan_code">设备码扫描</string>
 </resources>

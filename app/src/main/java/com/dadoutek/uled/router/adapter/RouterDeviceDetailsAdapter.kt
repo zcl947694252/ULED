@@ -29,7 +29,7 @@ class RouterDeviceDetailsAdapter(layoutResId: Int, data: MutableList<DbRouter>, 
             else -> helper.setText(R.id.template_device_group_name, helper.position)
         }
 
-        helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch)
+        helper.setImageResource(R.id.template_device_icon, R.drawable.icon_wifi)
         helper.setVisible(R.id.template_device_card_delete,isDelete)
                 .setTag(R.id.template_device_setting, helper.adapterPosition)
                 .setTag(R.id.template_device_icon, helper.adapterPosition)

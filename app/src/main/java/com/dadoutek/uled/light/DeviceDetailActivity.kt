@@ -709,5 +709,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             }
         }
     }
-
 }
+
+

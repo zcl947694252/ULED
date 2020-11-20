@@ -1142,7 +1142,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16), retryTimes: Long = 2,
-                deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
+                deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 15, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         LogUtils.v("zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}------${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---")
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE && TelinkLightApplication.getApp().connectDevice == null) {
@@ -1155,6 +1155,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         TelinkLightService.Instance()?.idleMode(false)
                     }
         } else {
+            LogUtils.v("zcl-----------连接失败失败继续连接-------")
             LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
             Observable.create {
                 it.onNext(TelinkLightApplication.getApp().connectDevice)

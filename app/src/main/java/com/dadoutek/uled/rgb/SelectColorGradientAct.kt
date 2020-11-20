@@ -48,7 +48,7 @@ import top.defaults.colorpicker.ColorObserver
 import java.util.concurrent.TimeUnit
 
 class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
-    private var colorNow: Int = 0
+    private var colorNow: Int = 33554431
     private var sendProgress: Int = 0
     private var colorNode: DbColorNode? = null
     private var stopTracking = false
@@ -125,14 +125,14 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             colorNode!!.brightness = 100
             rgb_white_seekbar.progress = 1
             sbBrightness_num.text = 100.toString() + "%"
-            sb_w_bright_num.text = 0.toString() + "%"
+            sb_w_bright_num.text = 1.toString() + "%"
 
             when {
                 rgb_sbBrightness!!.progress >= 100 -> {
                     sbBrightness_add.isEnabled = false
                     sbBrightness_less.isEnabled = true
                 }
-                rgb_sbBrightness!!.progress <= 0 -> {
+                rgb_sbBrightness!!.progress <= 1 -> {
                     sbBrightness_less.isEnabled = false
                     sbBrightness_add.isEnabled = true
                 }
@@ -159,12 +159,14 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             }
         } else {
 
-            var w = ((colorNode?.rgbw ?: 0) and 0xff000000.toInt()) shr 24
+            val i = (1 shl 24) or (0 shl 16) or (0 shl 8) or 0
+            var w = ((colorNode?.rgbw ?: i) and 0xff000000.toInt()) shr 24
             var r = Color.red(colorNode?.rgbw!!)
             var g = Color.green(colorNode?.rgbw!!)
             var b = Color.blue(colorNode?.rgbw!!)
             color_picker.setInitialColor((colorNode?.rgbw ?: 0 and 0xffffff) or 0xff000000.toInt())
-
+            if (w==0)
+                w=1
             rgb_sbBrightness.progress = colorNode!!.brightness
             rgb_white_seekbar.progress = w
             sbBrightness_num.text = colorNode!!.brightness.toString() + "%"
@@ -175,7 +177,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     sbBrightness_add.isEnabled = false
                     sbBrightness_less.isEnabled = true
                 }
-                rgb_sbBrightness!!.progress <= 0 -> {
+                rgb_sbBrightness!!.progress <= 1 -> {
                     sbBrightness_less.isEnabled = false
                     sbBrightness_add.isEnabled = true
                 }
