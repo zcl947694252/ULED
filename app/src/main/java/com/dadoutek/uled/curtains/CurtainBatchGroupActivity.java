@@ -46,13 +46,13 @@ import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
 import com.dadoutek.uled.model.DadouDeviceInfo;
+import com.dadoutek.uled.model.DeviceType;
+import com.dadoutek.uled.model.Opcode;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbCurtain;
 import com.dadoutek.uled.model.dbModel.DbGroup;
 import com.dadoutek.uled.model.dbModel.DbUser;
-import com.dadoutek.uled.model.DeviceType;
-import com.dadoutek.uled.model.Opcode;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.othersview.SplashActivity;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
@@ -62,7 +62,6 @@ import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -135,7 +134,6 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     private static final int MAX_RETRY_COUNT = 5;   //update mesh failed的重试次数设置为4次
     private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
-    private RxPermissions mRxPermission;
     private static final int SCAN_TIMEOUT_SECOND = 10;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
@@ -875,7 +873,6 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRxPermission = new RxPermissions(this);
         //设置屏幕常亮
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

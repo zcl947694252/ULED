@@ -162,13 +162,7 @@ class SendLightsInfo : Service(), EventListener<String> {
     private fun startScan() {
         //当App在前台时，才进行扫描。
         if (AppUtils.isAppForeground())
-            if (!(mScanDisposal?.isDisposed ?: false)) {
-                //"startScanLight_LightOfGroup")
-//                mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-//                        Manifest.permission.BLUETOOTH_ADMIN)
-//                        .subscribeOn(Schedulers.io())
-//                        .subscribe {
-//                            if (it) {
+            if (mScanDisposal?.isDisposed != true) {
                 TelinkLightService.Instance()?.idleMode(true)
                 bestRSSIDevice = null   //扫描前置空信号最好设备。
                 //扫描参数

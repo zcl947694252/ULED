@@ -653,6 +653,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     private fun sortList(arr: java.util.ArrayList<DbLight>): java.util.ArrayList<DbLight> {
+        if (arr==null)
+            return arrayListOf()
         var min: Int
         var temp: DbLight
         for (i in arr.indices) {//包括结束区间

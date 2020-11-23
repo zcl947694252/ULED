@@ -343,14 +343,15 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun connectAndConfig() {
+        TelinkLightService.Instance()?.idleMode(true)
+        Thread.sleep(500)
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
         if (IS_ROUTE_MODE)
             currentDevice?.let {
                 routerConnectSensor(it, 0,"connectSensor")
             }
         else {
-            TelinkLightService.Instance()?.idleMode(true)
-            Thread.sleep(200)
+            Thread.sleep(500)
             showLoadingDialog(getString(R.string.please_wait))
             connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
                 relocationSensor()
@@ -668,8 +669,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                                         skipeDevice(isOTA, currentDevice?.version ?: "")
                                         hideLoadingDialog()
                                     }
-                                },
-                                {
+                                }, {
                                     hideLoadingDialog()
                                     skipeDevice(isOTA, currentDevice?.version ?: "")
                                 }

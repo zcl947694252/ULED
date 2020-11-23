@@ -130,8 +130,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> {
-                    }
+                    BluetoothAdapter.STATE_OFF -> {}
                 }
             }
         }
@@ -627,7 +626,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun connect2(mac: String) {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
-                .subscribe {
+                 .subscribeOn(Schedulers.io())
+                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribe( {
                     if (it) {
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
@@ -639,7 +640,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, { connect2(mac) }, { finish() })
                     }
-                }
+                },{})
     }
 
     private fun startConnectTimer() {
@@ -659,7 +660,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun retryConnect() {
         if (retryConnectCount < MAX_RETRY_CONNECT_TIME) {
             retryConnectCount++
-            if (TelinkLightService.Instance().adapter.mLightCtrl.currentLight?.isConnected != true)
+            if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected != true)
                 startScan()
             else
                 login()
@@ -697,7 +698,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
                 .subscribeOn(Schedulers.io())
-                .subscribe {
+                .subscribe ({
                     if (it) {
                         TelinkLightService.Instance().idleMode(true)
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
@@ -729,7 +730,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             startScan()
                         }, { finish() })
                     }
-                }
+                },{})
     }
 
 

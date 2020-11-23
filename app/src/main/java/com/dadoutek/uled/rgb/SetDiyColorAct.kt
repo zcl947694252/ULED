@@ -49,7 +49,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var rgbDiyColorListAdapter: RGBDiyColorCheckAdapter? = null
     private var isChange = false
     private var diyGradient: DbDiyGradient? = null
-    private var speed = 50
+    private var speed = 1
     private var dstAddress: Int = 0
     private val NODE_MODE_RGB_GRADIENT = 0
 

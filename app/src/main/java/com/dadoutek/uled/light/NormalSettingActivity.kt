@@ -80,7 +80,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var localVersion: String? = null
     private lateinit var light: DbLight
     private val mDisposable = CompositeDisposable()
-    private var mRxPermission: RxPermissions? = null
     var gpAddress: Int = 0
     var fromWhere: String? = null
     private var updateLightDisposal: Disposable? = null
@@ -267,8 +266,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS, Schedulers.io())
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     var lightList: MutableList<DbLight> = ArrayList()
 
@@ -430,19 +429,19 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             when {
                 currentShowPageGroup -> {
                     when {
-                        isBri==0 -> light_sbBrightness.progress = group?.brightness ?: 1
+                        isBri == 0 -> light_sbBrightness.progress = group?.brightness ?: 1
                         else -> light_sbBrightness.progress = group?.colorTemperature ?: 1
                     }
                 }
                 else -> {
                     when {
-                        isBri==0 -> light_sbBrightness.progress = light?.brightness
+                        isBri == 0 -> light_sbBrightness.progress = light?.brightness
                         else -> light_sbBrightness.progress = light?.colorTemperature
                     }
                 }
             }
             when {
-                isBri==0 -> ToastUtils.showShort(getString(R.string.config_bri_fail))
+                isBri == 0 -> ToastUtils.showShort(getString(R.string.config_bri_fail))
                 else -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
             }
         }
@@ -1042,40 +1041,42 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
     private fun checkPermission() {
         mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe {
-                    if (it!!) {
-                        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
-                        if (isBoolean) {
-                            downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
-                                    .subscribe(
-                                            { s ->
-                                                if (!TextUtils.isEmpty(s)) {
-                                                    localVersion = s
-                                                    light?.version = s
-                                                    findItem?.title = localVersion
-                                                }
-                                                if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
-                                                    DBUtils.saveLight(light!!, false)
-                                                    transformView()
-                                                } else {
-                                                    ToastUtils.showLong(getString(R.string.version_disabled))
-                                                }
-                                                hideLoadingDialog()
-                                            },
-                                            {
-                                                hideLoadingDialog()
-                                                ToastUtils.showLong(getString(R.string.get_version_fail))
-                                            }
-                                    )
+                RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            if (it!!) {
+                                var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                                if (isBoolean) {
+                                    downloadDispoable = Commander.getDeviceVersion(light.meshAddr)
+                                            .subscribe(
+                                                    { s ->
+                                                        if (!TextUtils.isEmpty(s)) {
+                                                            localVersion = s
+                                                            light?.version = s
+                                                            findItem?.title = localVersion
+                                                        }
+                                                        if (OtaPrepareUtils.instance().checkSupportOta(s)!!) {
+                                                            DBUtils.saveLight(light!!, false)
+                                                            transformView()
+                                                        } else {
+                                                            ToastUtils.showLong(getString(R.string.version_disabled))
+                                                        }
+                                                        hideLoadingDialog()
+                                                    },
+                                                    {
+                                                        hideLoadingDialog()
+                                                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                                                    }
+                                            )
 
-                        } else {
-                            OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
-                        }
-                    } else {
-                        ToastUtils.showLong(R.string.update_permission_tip)
-                    }
-                })
+                                } else {
+                                    OtaPrepareUtils.instance().gotoUpdateView(this@NormalSettingActivity, localVersion, otaPrepareListner)
+                                }
+                            } else {
+                                ToastUtils.showLong(R.string.update_permission_tip)
+                            }
+                        }, {}))
     }
 
     private fun startOtaAct() {
@@ -1432,15 +1433,15 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         } else
             slow_ly.visibility = GONE
 
- /*       if (Constant.IS_ROUTE_MODE) {
-            sendProgress = group?.brightness?:50
-            routerConfigBrightnesssOrColorTemp(true)
-            sendProgress = group?.colorTemperature?:50
-            routerConfigBrightnesssOrColorTemp(false)
-        } else {
-            setLightBrightnessNum(group?.brightness ?: 1, group?.meshAddr!!)
-            setLightTemperatureValue(group?.colorTemperature ?: 1, group?.meshAddr ?: 0)
-        }*/
+        /*       if (Constant.IS_ROUTE_MODE) {
+                   sendProgress = group?.brightness?:50
+                   routerConfigBrightnesssOrColorTemp(true)
+                   sendProgress = group?.colorTemperature?:50
+                   routerConfigBrightnesssOrColorTemp(false)
+               } else {
+                   setLightBrightnessNum(group?.brightness ?: 1, group?.meshAddr!!)
+                   setLightTemperatureValue(group?.colorTemperature ?: 1, group?.meshAddr ?: 0)
+               }*/
     }
 
     private fun setLightTemperatureValue(colorNum: Int, meshAddr: Int) {
@@ -1517,7 +1518,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 when {
                     Constant.IS_ROUTE_MODE -> {
                         startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr, "deviceType" to DeviceType.LIGHT_NORMAL,
-                                "deviceMac" to light!!.macAddr,"version" to light!!.version )
+                                "deviceMac" to light!!.macAddr, "version" to light!!.version)
                         finish()
                     }
                     else -> when {
@@ -1552,7 +1553,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         this.gpAddress = this.intent.getIntExtra(Constant.GROUP_ARESS_KEY, 0)
         toolbarTv.text = light?.name
 
-        mRxPermission = RxPermissions(this)
         brightness_btn.setOnClickListener(clickListener)
         light_switch.setOnClickListener(clickListener)
         temperature_btn.setOnClickListener(clickListener)
@@ -1579,10 +1579,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             sendProgress = brightnes
             tv_Brightness.text = "$brightnes%"
             LogUtils.v("zcl---------路由发送亮度---$sendProgress------$brightnes")
-        /*    when {
-                Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(true)
-                else -> setLightBrightnessNum(brightnes, light?.meshAddr)
-            }*/
+            /*    when {
+                    Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(true)
+                    else -> setLightBrightnessNum(brightnes, light?.meshAddr)
+                }*/
             isBrightness = true
         } else {
             adjustment.text = getString(R.string.color_temperature_adjustment)
@@ -1596,10 +1596,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             tv_Brightness.text = "$brightnes%"
             sendProgress = brightnes
             LogUtils.v("zcl---------路由发送色温---$sendProgress------$brightnes")
-         /*   when {
-                Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(false)
-                else -> setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)
-            }*/
+            /*   when {
+                   Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp(false)
+                   else -> setLightTemperatureValue(light?.colorTemperature, light?.meshAddr)
+               }*/
             isBrightness = false
         }
 
@@ -2174,8 +2174,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 if (status == 2)
@@ -2227,8 +2227,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.slow_speed_faile))

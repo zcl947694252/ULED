@@ -116,7 +116,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             if (isScanning) {
                 scanFail()
                 doFinish()
-            } else{
+            } else {
                 startScan()
             }
         }
@@ -146,12 +146,12 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun closeAnimal() {
         runOnUiThread {
-        isScanning = false
-        device_lottieAnimationView.cancelAnimation()
-        //scanning_device_ly.visibility = View.GONE
-        device_lottieAnimationView.visibility = View.GONE
-        image_no_group.visibility = View.VISIBLE
-        tv_tip.text = getString(R.string.see_help)
+            isScanning = false
+            device_lottieAnimationView.cancelAnimation()
+            //scanning_device_ly.visibility = View.GONE
+            device_lottieAnimationView.visibility = View.GONE
+            image_no_group.visibility = View.VISIBLE
+            tv_tip.text = getString(R.string.see_help)
         }
     }
 
@@ -175,7 +175,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     private fun startScan() {
         device_stop_scan.text = getString(R.string.stop_scan)
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe { granted ->
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
             if (granted) {
                 startAnimation()
                 Thread {
@@ -215,7 +215,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
                 LogUtils.e("zcl pir开始扫描")
             }
-        }
+        }, {})
     }
 
     override fun onDestroy() {
@@ -322,7 +322,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         GlobalScope.launch(Dispatchers.Main) {
             ToastUtils.showLong(R.string.not_find_pir)
         }
-        device_stop_scan.text  = getString(R.string.scan_retry)
+        device_stop_scan.text = getString(R.string.scan_retry)
         closeAnimal()
     }
 
@@ -374,23 +374,23 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         scanDisposable?.dispose()
         isSearchedDevice = false
 
-    /*    val meshAddress = mDeviceInfo?.meshAddress
-        val mac = mDeviceInfo?.sixByteMacAddress?.split(":")
-        if (mac != null && mac.size >= 6) {
-            val mac1 = Integer.valueOf(mac[2], 16)
-            val mac2 = Integer.valueOf(mac[3], 16)
-            val mac3 = Integer.valueOf(mac[4], 16)
-            val mac4 = Integer.valueOf(mac[5], 16)
+        /*    val meshAddress = mDeviceInfo?.meshAddress
+            val mac = mDeviceInfo?.sixByteMacAddress?.split(":")
+            if (mac != null && mac.size >= 6) {
+                val mac1 = Integer.valueOf(mac[2], 16)
+                val mac2 = Integer.valueOf(mac[3], 16)
+                val mac3 = Integer.valueOf(mac[4], 16)
+                val mac4 = Integer.valueOf(mac[5], 16)
 
-            val instance = Calendar.getInstance()
-            val second = instance.get(Calendar.SECOND).toByte()
-            val minute = instance.get(Calendar.MINUTE).toByte()
-            val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
-            val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
-            val byteArrayOf = byteArrayOf((meshAddress?:0 and 0xFF).toByte(), (meshAddress?:0 shr 8 and 0xFF).toByte(), mac1.toByte(),
-                    mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress?:0, byteArrayOf)
-        }*/
+                val instance = Calendar.getInstance()
+                val second = instance.get(Calendar.SECOND).toByte()
+                val minute = instance.get(Calendar.MINUTE).toByte()
+                val hour = instance.get(Calendar.HOUR_OF_DAY).toByte()
+                val day = instance.get(Calendar.DAY_OF_MONTH).toByte()
+                val byteArrayOf = byteArrayOf((meshAddress?:0 and 0xFF).toByte(), (meshAddress?:0 shr 8 and 0xFF).toByte(), mac1.toByte(),
+                        mac2.toByte(), mac3.toByte(), mac4.toByte(),second,minute,hour,day)
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress?:0, byteArrayOf)
+            }*/
 
         LogUtils.e("zcl人体扫描登录跳转前" + DBUtils.getAllSensor())
         getVersion()
@@ -446,7 +446,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         LogUtils.e("zcl  showConnectFailed")
         ToastUtils.showLong(getString(R.string.connect_fail))
         isSearchedDevice = false
-        device_stop_scan.text  = getString(R.string.scan_retry)
+        device_stop_scan.text = getString(R.string.scan_retry)
     }
 
 

@@ -171,7 +171,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         rgbDiyGradientAdapter!!.addFooterView(lin)
     }
 
-    var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
+    private var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
         isDelete = true
         rgbDiyGradientAdapter!!.changeState(isDelete)
         refreshData()

@@ -16,7 +16,6 @@ import com.dadoutek.uled.model.dbModel.DbLight
  * 创建者     ZCL
  * 创建时间   2019/10/16 15:52
  * 描述
- *
  * 更新者     $
  * 更新时间   批量分组冷暖灯彩灯适配器$
  * 更新描述
@@ -32,17 +31,16 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRout
 
         helper.setText(R.id.template_device_batch_title, item?.name)
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
-        if (isRgb)
-            icon.setImageResource(R.drawable.icon_rgb_n)
-        else
-            icon.setImageResource(R.drawable.icon_light_n)
+        when {
+            isRgb -> icon.setImageResource(R.drawable.icon_rgb_n)
+            else -> icon.setImageResource(R.drawable.icon_light_n)
+        }
 
 
 
-        if (item?.isSelected == true) {
-            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
-        } else {
-            helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
+        when (item?.isSelected) {
+            true -> helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_selected)
+            else -> helper.setImageResource(R.id.template_device_batch_selected, R.drawable.icon_checkbox_unselected)
         }
 
 

@@ -35,7 +35,6 @@ import org.jetbrains.anko.startActivity
 class ScanningSwitchActivity : TelinkBaseActivity() {
     private var count: Int = 0
     private lateinit var mApplication: TelinkLightApplication
-    private var mRxPermission: RxPermissions? = null
     private var bestRSSIDevice: DeviceInfo? = null
     private var mConnectDisposal: Disposable? = null
     private var retryConnectCount = 0
@@ -46,7 +45,6 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_switch)
         this.mApplication = this.application as TelinkLightApplication
-        mRxPermission = RxPermissions(this)
         initView()
         initData()
         initListener()

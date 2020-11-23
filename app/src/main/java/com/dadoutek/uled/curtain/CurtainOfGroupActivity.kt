@@ -79,11 +79,12 @@ private const val CONNECT_TIMEOUT = 10
 private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
-class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener ,View.OnClickListener{
+class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener, View.OnClickListener {
     private var deleteDevice: MenuItem? = null
     private var onlineUpdate: MenuItem? = null
     private var batchGp: MenuItem? = null
     private var isDelete: Boolean = false
+
     //    private lateinit var mMeshAddressGenerator: MeshAddressGenerator
     private val REQ_LIGHT_SETTING: Int = 0x01
 
@@ -135,7 +136,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     }
 
 
-     override fun initOnLayoutListener() {
+    override fun initOnLayoutListener() {
         val view = window.decorView
         val viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
@@ -149,15 +150,15 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.light_add_device_btn -> {
-                 DBUtils.lastUser?.let {
+                DBUtils.lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
-                        if(DBUtils.getAllCurtains().size ==0){
+                        if (DBUtils.getAllCurtains().size == 0) {
                             intent = Intent(this, DeviceScanningNewActivity::class.java)
                             intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
                             startActivityForResult(intent, 0)
-                        }else{
+                        } else {
                             addDevice()
                         }
                     }
@@ -170,13 +171,13 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 //        intent = Intent(this, CurtainsDeviceDetailsActivity::class.java)
 //        intent.putExtra(Constant.DEVICE_TYPE,Constant.INSTALL_CURTAIN_OF)
 //        intent.putExtra("curtain_name",group.name)
-       /* val intent = Intent(this, CurtainBatchGroupActivity::class.java)
-        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-        intent.putExtra("curtain","group_curtain")
-        intent.putExtra("curtain_group_name",group.name)
-        startActivity(intent)
-        finish()*/
+        /* val intent = Intent(this, CurtainBatchGroupActivity::class.java)
+         intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+         intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+         intent.putExtra("curtain","group_curtain")
+         intent.putExtra("curtain_group_name",group.name)
+         startActivity(intent)
+         finish()*/
         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
         intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_CURTAIN)
         startActivity(intent)
@@ -246,12 +247,12 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun onStop() {
         super.onStop()
         this.mApplication!!.removeEventListener(this)
-            TelinkLightService.Instance()?.disableAutoRefreshNotify()
+        TelinkLightService.Instance()?.disableAutoRefreshNotify()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-                this.mApplication?.removeEventListener(this)
+        this.mApplication?.removeEventListener(this)
         canBeRefresh = false
         acitivityIsAlive = false
         mScanDisposal?.dispose()
@@ -268,7 +269,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             else -> curtainList = DBUtils.getCurtainByGroupID(group.id)
         }
 
-        toolbar.title = group?.name+"(${group?.deviceCount})"
+        toolbar.title = group?.name + "(${group?.deviceCount})"
 
         if (curtainList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
@@ -343,9 +344,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             curtainList[i].updateIcon()
         }
 
-        if(DBUtils.getAllCurtains().size==0){
+        if (DBUtils.getAllCurtains().size == 0) {
             light_add_device_btn.text = getString(R.string.device_scan_scan)
-        }else{
+        } else {
             light_add_device_btn.text = getString(R.string.add_device)
         }
     }
@@ -380,11 +381,12 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private fun skipeBatch() {
         when {
             DBUtils.getAllCurtains().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-            TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE->
+            TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE ->
                 startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_CURTAIN, "gp" to group?.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }
     }
+
     private fun goOta() {
         if (DBUtils.getAllCurtains().size == 0)
             ToastUtils.showShort(getString(R.string.no_device))
@@ -402,6 +404,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         adapterDevice?.changeState(isDelete)
         adapterDevice?.notifyDataSetChanged()
     }
+
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         currentCurtain = curtainList[position]
         positionCurrent = position
@@ -409,8 +412,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             R.id.template_device_icon, R.id.template_device_setting -> {
                 if (scanPb.visibility != View.VISIBLE) {
                     //判断是否为rgb灯
-                    if(currentCurtain?.productUUID==DeviceType.SMART_CURTAIN){
-                        intent=Intent(this@CurtainOfGroupActivity, WindowCurtainsActivity::class.java)
+                    if (currentCurtain?.productUUID == DeviceType.SMART_CURTAIN) {
+                        intent = Intent(this@CurtainOfGroupActivity, WindowCurtainsActivity::class.java)
                         intent.putExtra(Constant.TYPE_VIEW, Constant.TYPE_CURTAIN)
                     }
                     intent.putExtra(Constant.LIGHT_ARESS_KEY, currentCurtain)
@@ -430,7 +433,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     private fun showDeleteSingleDialog(dbLight: DbCurtain) {
         val builder = android.app.AlertDialog.Builder(this)
-        builder.setMessage(getString(R.string.sure_delete_device,dbLight.name))
+        builder.setMessage(getString(R.string.sure_delete_device, dbLight.name))
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             deletePreGroup(dbLight)
 
@@ -495,7 +498,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-            NotificationEvent.GET_ALARM -> {}
+            NotificationEvent.GET_ALARM -> {
+            }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             ServiceEvent.SERVICE_CONNECTED -> this.onServiceConnected(event as ServiceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
@@ -514,24 +518,24 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         } else {  //如果蓝牙没开，则弹窗提示用户打开蓝牙
             if (!LeBluetooth.getInstance().isEnabled) {
                 GlobalScope.launch(Dispatchers.Main) {
-                    var root=findViewById<ConstraintLayout>(R.id.configPirRoot)
-                    root.indefiniteSnackbar( R.string.openBluetooth, android.R.string.ok) {
+                    var root = findViewById<ConstraintLayout>(R.id.configPirRoot)
+                    root.indefiniteSnackbar(R.string.openBluetooth, android.R.string.ok) {
                         LeBluetooth.getInstance().enable(applicationContext)
                     }
                 }
             } else {
                 //如果位置服务没打开，则提示用户打开位置服务
                 if (!BleUtils.isLocationEnable(this)) {
-                    CoroutineScope(Dispatchers.Main) .launch{
+                    CoroutineScope(Dispatchers.Main).launch {
                         showOpenLocationServiceDialog()
                     }
                 } else {
-                     CoroutineScope(Dispatchers.Main) .launch{
+                    CoroutineScope(Dispatchers.Main).launch {
                         hideLocationServiceDialog()
                     }
                     if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
-                             GlobalScope.launch(Dispatchers.Main) {
+                            GlobalScope.launch(Dispatchers.Main) {
                                 retryConnectCount = 0
                                 connectFailedDeviceMacList.clear()
                                 startScan()
@@ -540,7 +544,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                         }
 
                     } else {
-                         GlobalScope.launch(Dispatchers.Main) {
+                        GlobalScope.launch(Dispatchers.Main) {
                             scanPb?.visibility = View.GONE
                             SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.CONNECT_STATE_SUCCESS_KEY, true);
                         }
@@ -562,7 +566,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
-                        .subscribe {
+                        .subscribe({
                             if (it) {
                                 TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
@@ -574,7 +578,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
                                 val params = LeScanParameters.create()
                                 //if (!com.dadoutek.uled.util.AppUtils.isExynosSoc)
-                                    params.setScanFilters(scanFilters)
+                                params.setScanFilters(scanFilters)
 
                                 params.setMeshName(account)
                                 params.setOutOfMeshName(account)
@@ -592,7 +596,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                                     startScan()
                                 }, { finish() })
                             }
-                        }
+                        }, {})
             }
     }
 
@@ -614,20 +618,23 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private fun connect(mac: String) {
         try {
             mCheckRssiDisposal?.dispose()
-            mCheckRssiDisposal=RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+            mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN)
-                    .subscribe {
-                        if (it) {
-                            //授予了权限
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        when {
+                            it -> {//授予了权限
                                 progressBar?.visibility = View.VISIBLE
                                 TelinkLightService.Instance()?.connect(mac, CONNECT_TIMEOUT)
                                 startConnectTimer()
-                        } else {
-                            //没有授予权限
-                            DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
+                            }
+                            else -> {//没有授予权限
+                                DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
+                            }
                         }
-                    }
-        }catch (e:Exception){
+                    }, {})
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -754,7 +761,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
                 TelinkLightService.Instance()?.enableNotification()
                 TelinkLightService.Instance()?.updateNotification()
-                 GlobalScope.launch(Dispatchers.Main) {
+                GlobalScope.launch(Dispatchers.Main) {
                     stopConnectTimer()
                     if (progressBar?.visibility != View.GONE)
                         progressBar?.visibility = View.GONE
@@ -780,7 +787,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             }
 
             LightAdapter.STATUS_CONNECTED -> {
-                TelinkLightService.Instance()?:return
+                TelinkLightService.Instance() ?: return
                 if (!TelinkLightService.Instance()!!.isLogin)
                     login()
             }

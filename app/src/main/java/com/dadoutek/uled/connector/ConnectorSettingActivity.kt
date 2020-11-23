@@ -80,7 +80,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     private var localVersion: String? = null
     private var currentDbConnector: DbConnector? = null
     private val mDisposable = CompositeDisposable()
-    private var mRxPermission: RxPermissions? = null
     private var mApp: TelinkLightApplication? = null
     private var manager: DataManager? = null
     private var mConnectDevice: DeviceInfo? = null
@@ -367,7 +366,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun checkPermission() {
         mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                RxPermissions(this)!!.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     if (granted!!) {
                         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                         if (isBoolean)
@@ -701,7 +700,6 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
             finish()
         }
         toolbarTv.text = currentDbConnector?.name ?: ""
-        mRxPermission = RxPermissions(this)
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
 
     }

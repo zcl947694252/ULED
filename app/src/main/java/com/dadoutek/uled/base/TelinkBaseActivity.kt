@@ -755,7 +755,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 it.findViewById<TextView>(R.id.code_warm_title).text = title
                 it.findViewById<TextView>(R.id.code_warm_context).text = recever + phone
                 it.findViewById<TextView>(R.id.code_warm_i_see).setOnClickListener {
-                    PopUtil.dismiss(pop)
 //                    if (type == 0)
 //                        restartApplication()
                     PopUtil.dismiss(pop)
@@ -1145,7 +1144,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 15, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         LogUtils.v("zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}------${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---")
-        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE && TelinkLightApplication.getApp().connectDevice == null) {
+        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it

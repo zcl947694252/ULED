@@ -152,13 +152,13 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun addDevice() {
-     /*   val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
-        intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
-        intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
-        intent.putExtra("relayType", "group_relay")
-        intent.putExtra("relay_group_name", group.name)
-        startActivity(intent)
-        finish()*/
+        /*   val intent = Intent(this, ConnectorBatchGroupActivity::class.java)
+           intent.putExtra(Constant.IS_SCAN_RGB_LIGHT, true)
+           intent.putExtra(Constant.IS_SCAN_CURTAIN, true)
+           intent.putExtra("relayType", "group_relay")
+           intent.putExtra("relay_group_name", group.name)
+           startActivity(intent)
+           finish()*/
         val intent = Intent(this, BatchGroupFourDeviceActivity::class.java)
         intent.putExtra(Constant.DEVICE_TYPE, DeviceType.SMART_RELAY)
         startActivity(intent)
@@ -215,11 +215,12 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun skipeBatch() {
         when {
             DBUtils.getAllRelay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-            TelinkLightApplication.getApp().connectDevice != null|| Constant.IS_ROUTE_MODE ->
+            TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE ->
                 startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group?.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }
     }
+
     private fun goOta() {
         if (DBUtils.getAllRelay().size == 0)
             ToastUtils.showShort(getString(R.string.no_device))
@@ -283,8 +284,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun initParameter() {
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
-        val get = this.intent.extras!!.get("group")?:return
-            this.group = get as DbGroup
+        val get = this.intent.extras!!.get("group") ?: return
+        this.group = get as DbGroup
     }
 
     override fun onResume() {
@@ -318,7 +319,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             0xffff -> filter("", false)
             else -> lightList = DBUtils.getRelayByGroupID(group.id)
         }
-        toolbar.title = group?.name+"(${group?.deviceCount})"
+        toolbar.title = group?.name + "(${group?.deviceCount})"
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light_ly.visibility = View.GONE
@@ -373,7 +374,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
 
-
     private fun initView() {
         when (group.meshAddr) {
             0xffff -> toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
@@ -425,7 +425,6 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                         }
 
 
-
                     }
                 }
 
@@ -468,7 +467,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                 currentLight!!.connectionStatus = isOpen
                 afterClickIcon()
             } else {
-                if (isOpen==1)
+                if (isOpen == 1)
                     ToastUtils.showShort(getString(R.string.open_faile))
                 else
                     ToastUtils.showShort(getString(R.string.close_faile))
@@ -484,7 +483,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun showDeleteSingleDialog(dbLight: DbConnector) {
         val builder = android.app.AlertDialog.Builder(this)
-        builder.setMessage(getString(R.string.sure_delete_device,dbLight.name))
+        builder.setMessage(getString(R.string.sure_delete_device, dbLight.name))
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             deletePreGroup(dbLight)
             DBUtils.updateGroup(group!!)
@@ -534,7 +533,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2500)
             when {
-                this@ConnectorOfGroupActivity == null || this@ConnectorOfGroupActivity.isDestroyed || this@ConnectorOfGroupActivity.isFinishing || !acitivityIsAlive -> { }
+                this@ConnectorOfGroupActivity == null || this@ConnectorOfGroupActivity.isDestroyed || this@ConnectorOfGroupActivity.isFinishing || !acitivityIsAlive -> {
+                }
                 else -> autoConnect()
             }
         }
@@ -545,7 +545,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> onLeScan(event as LeScanEvent)
-            NotificationEvent.GET_ALARM -> { }
+            NotificationEvent.GET_ALARM -> {
+            }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             ServiceEvent.SERVICE_DISCONNECTED -> this.onServiceDisconnected(event as ServiceEvent)
             ErrorReportEvent.ERROR_REPORT -> {
@@ -611,7 +612,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                 mScanDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)
                         .subscribeOn(Schedulers.io())
-                        .subscribe {
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
                             if (it) {
                                 TelinkLightService.Instance()?.idleMode(true)
                                 bestRSSIDevice = null   //扫描前置空信号最好设备。
@@ -641,7 +643,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                                     startScan()
                                 }, { finish() })
                             }
-                        }
+                        }, {})
             }
     }
 
@@ -665,7 +667,9 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
             mCheckRssiDisposal?.dispose()
             mCheckRssiDisposal = RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                     Manifest.permission.BLUETOOTH_ADMIN)
-                    .subscribe {
+                     .subscribeOn(Schedulers.io())
+                                     .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe ({
                         if (it) {
                             //授予了权限
                             if (TelinkLightService.Instance() != null) {
@@ -677,7 +681,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                             //没有授予权限
                             DialogUtils.showNoBlePermissionDialog(this, { connect(mac) }, { finish() })
                         }
-                    }
+                    },{})
         } catch (e: Exception) {
             e.printStackTrace()
         }

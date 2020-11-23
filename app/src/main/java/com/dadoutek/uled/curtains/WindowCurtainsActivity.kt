@@ -83,7 +83,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var handBoolean: Boolean = true
     private var typeStr: String? = null
     private val mDisposable = CompositeDisposable()
-    private var mRxPermission: RxPermissions? = null
     private lateinit var openBtn: ImageView
     private lateinit var closeBtn: ImageView
     private lateinit var openText: TextView
@@ -624,7 +623,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
             hideLoadingDialog()
 
             when (cmdBean.ser_id) {
-                "inverse" -> {}
+                "inverse" -> {
+                }
                 "configSpeed" -> {
                     if (cmdBean.status == 0)
                         curtain?.let {
@@ -699,30 +699,32 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun checkPermission() {
-        mRxPermission = RxPermissions(this)
         mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-                    if (granted!!) {
-                        disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
-                                .subscribe(
-                                        { s ->
-                                            hideLoadingDialog()
-                                            when {
-                                                !isSuportOta(curtain?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
-                                                isMostNew(curtain?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
-                                                else -> {
-                                                    curtain!!.version = s
-                                                    isDirectConnectDevice()
+                RxPermissions(this)!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({ granted ->
+                            if (granted!!) {
+                                disposable = Commander.getDeviceVersion(curtain!!.meshAddr)
+                                        .subscribe(
+                                                { s ->
+                                                    hideLoadingDialog()
+                                                    when {
+                                                        !isSuportOta(curtain?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+                                                        isMostNew(curtain?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
+                                                        else -> {
+                                                            curtain!!.version = s
+                                                            isDirectConnectDevice()
 
-                                                }
-                                            }
-                                        }, { hideLoadingDialog() }
-                                )
-                    } else {
-                        ToastUtils.showLong(R.string.update_permission_tip)
-                    }
-                })
+                                                        }
+                                                    }
+                                                }, { hideLoadingDialog() }
+                                        )
+                            } else {
+                                ToastUtils.showLong(R.string.update_permission_tip)
+                            }
+                        }, {}))
     }
 
     private fun isDirectConnectDevice() {

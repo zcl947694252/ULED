@@ -102,12 +102,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private var fromWhere: String? = null
     private var dataManager: DataManager? = null
     private val mDisposable = CompositeDisposable()
-    private var mRxPermission: RxPermissions? = null
     private var mConnectDevice: DeviceInfo? = null
     val POSIONANDNUM = "POSIONANDNUM"
     private var currentShowGroupSetPage = true
     private var isExitGradient = false
-    private var isDiyMode = true
+    private var isDiyMode = false
     private var isPresetMode = true
     private var diyPosition: Int = 100
     private var isDelete = false
@@ -303,10 +302,15 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private fun checkPermission() {
         mDisposable.add(
-                mRxPermission!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
-                    isDirectConnectDevice(granted)
-                })
+                RxPermissions(this)!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                         .subscribeOn(Schedulers.io())
+                                         .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            isDirectConnectDevice(it)
+                        },{
+
+                        }) )
     }
 
     private fun isDirectConnectDevice(granted: Boolean) {
@@ -621,7 +625,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             true
         }
 
-        mRxPermission = RxPermissions(this)
 
         rgb_sbBrightness!!.max = 100
         rgb_white_seekbar!!.max = 100
@@ -1302,6 +1305,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         isPresetMode = true
         isDiyMode = false
         //应用内置渐变
+        if (clickPostion!=100)
         if (!Constant.IS_ROUTE_MODE) {
             applyDisposable?.dispose()
             applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
@@ -1370,10 +1374,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             toolbar!!.title = getString(R.string.dynamic_gradient)
             rgbDiyGradientAdapter!!.notifyDataSetChanged()
             setDate()
-            when {
+          /*  when {
                 isDiyMode -> applyDiyGradient(clickPostion)
                 else -> applyModeGradient(clickPostion)
-            }
+            }*/
           /*  if (clickPostion != 100 && diyPosition != 100) {
                 diyGradientList!![diyPosition].isSelect = false//开关状态
                 diyGradientList!![clickPostion].isSelect = true//开关状态
@@ -1488,6 +1492,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun applyDiyGradient(position: Int) {
         isPresetMode = false
         isDiyMode = true
+        if (clickPostion!=100)
         if (!Constant.IS_ROUTE_MODE) {
             GlobalScope.launch {
                 stopGradient()
@@ -2994,7 +2999,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     override fun toString(): String {
-        return "RGBSettingActivity(color=$color, sendProgress=$sendProgress, disposableTimer=$disposableTimer, deviceType=$deviceType, addr=$addr, lastTime=$lastTime, fiChangeGp=$fiChangeGp, findItem=$findItem, requestCodeNum=$requestCodeNum, mConnectDeviceDisposable=$mConnectDeviceDisposable, clickPostion=$clickPostion, postionAndNum=$postionAndNum, mApplication=$mApplication, stopTracking=$stopTracking, presetColors=$presetColors, colorSelectDiyRecyclerViewAdapter=$colorSelectDiyRecyclerViewAdapter, group=$group, mConnectTimer=$mConnectTimer, localVersion=$localVersion, light=$light, gpAddress=$gpAddress, fromWhere=$fromWhere, dataManager=$dataManager, mDisposable=$mDisposable, mRxPermission=$mRxPermission, mConnectDevice=$mConnectDevice, POSIONANDNUM='$POSIONANDNUM', currentShowGroupSetPage=$currentShowGroupSetPage, isExitGradient=$isExitGradient, isDiyMode=$isDiyMode, isPresetMode=$isPresetMode, diyPosition=$diyPosition, isDelete=$isDelete, dstAddress=$dstAddress, firstLightAddress=$firstLightAddress, typeStr='$typeStr', speed=$speed, positionState=$positionState, buildInModeList=$buildInModeList, diyGradientList=$diyGradientList, rgbGradientAdapter=$rgbGradientAdapter, rgbDiyGradientAdapter=$rgbDiyGradientAdapter, applyDisposable=$applyDisposable, downTime=$downTime, thisTime=$thisTime, onBtnTouch=$onBtnTouch, tvValue=$tvValue, redColor=$redColor, greenColor=$greenColor, blueColor=$blueColor, mConnectDisposal=$mConnectDisposal, mScanDisposal=$mScanDisposal, mScanTimeoutDisposal=$mScanTimeoutDisposal, mCheckRssiDisposal=$mCheckRssiDisposal, acitivityIsAlive=$acitivityIsAlive, otaPrepareListner=$otaPrepareListner, cbOnClickListener=$cbOnClickListener, handler=$handler, handler_brightness_add=$handler_brightness_add, handler_brightness_less=$handler_brightness_less, handler_less=$handler_less, clickListener=$clickListener, onItemChildClickListener=$onItemChildClickListener, onItemChildClickListenerDiy=$onItemChildClickListenerDiy, onItemChildLongClickListenerDiy=$onItemChildLongClickListenerDiy, menuItemClickListener=$menuItemClickListener, diyOnItemChildClickListener=$diyOnItemChildClickListener, diyOnItemChildLongClickListener=$diyOnItemChildLongClickListener, barChangeListener=$barChangeListener, colorObserver=$colorObserver)"
+        return "RGBSettingActivity(color=$color, sendProgress=$sendProgress, disposableTimer=$disposableTimer, deviceType=$deviceType, addr=$addr, lastTime=$lastTime, fiChangeGp=$fiChangeGp, findItem=$findItem, requestCodeNum=$requestCodeNum, mConnectDeviceDisposable=$mConnectDeviceDisposable, clickPostion=$clickPostion, postionAndNum=$postionAndNum, mApplication=$mApplication, stopTracking=$stopTracking, presetColors=$presetColors, colorSelectDiyRecyclerViewAdapter=$colorSelectDiyRecyclerViewAdapter, group=$group, mConnectTimer=$mConnectTimer, localVersion=$localVersion, light=$light, gpAddress=$gpAddress, fromWhere=$fromWhere, dataManager=$dataManager, mDisposable=$mDisposable, mConnectDevice=$mConnectDevice, POSIONANDNUM='$POSIONANDNUM', currentShowGroupSetPage=$currentShowGroupSetPage, isExitGradient=$isExitGradient, isDiyMode=$isDiyMode, isPresetMode=$isPresetMode, diyPosition=$diyPosition, isDelete=$isDelete, dstAddress=$dstAddress, firstLightAddress=$firstLightAddress, typeStr='$typeStr', speed=$speed, positionState=$positionState, buildInModeList=$buildInModeList, diyGradientList=$diyGradientList, rgbGradientAdapter=$rgbGradientAdapter, rgbDiyGradientAdapter=$rgbDiyGradientAdapter, applyDisposable=$applyDisposable, downTime=$downTime, thisTime=$thisTime, onBtnTouch=$onBtnTouch, tvValue=$tvValue, redColor=$redColor, greenColor=$greenColor, blueColor=$blueColor, mConnectDisposal=$mConnectDisposal, mScanDisposal=$mScanDisposal, mScanTimeoutDisposal=$mScanTimeoutDisposal, mCheckRssiDisposal=$mCheckRssiDisposal, acitivityIsAlive=$acitivityIsAlive, otaPrepareListner=$otaPrepareListner, cbOnClickListener=$cbOnClickListener, handler=$handler, handler_brightness_add=$handler_brightness_add, handler_brightness_less=$handler_brightness_less, handler_less=$handler_less, clickListener=$clickListener, onItemChildClickListener=$onItemChildClickListener, onItemChildClickListenerDiy=$onItemChildClickListenerDiy, onItemChildLongClickListenerDiy=$onItemChildLongClickListenerDiy, menuItemClickListener=$menuItemClickListener, diyOnItemChildClickListener=$diyOnItemChildClickListener, diyOnItemChildLongClickListener=$diyOnItemChildLongClickListener, barChangeListener=$barChangeListener, colorObserver=$colorObserver)"
     }
 
 }

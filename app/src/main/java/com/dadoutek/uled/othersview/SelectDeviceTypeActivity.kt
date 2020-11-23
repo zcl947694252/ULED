@@ -25,7 +25,6 @@ import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
 class SelectDeviceTypeActivity : TelinkBaseActivity() {
-    private lateinit var mRxPermission: RxPermissions
     private val deviceTypeList = mutableListOf<DeviceItem>()
     private val deviceAdapter = DeviceTypeAdapter(R.layout.select_device_type_item, deviceTypeList)
     private val REQUEST_CODE: Int = 1000
@@ -59,7 +58,6 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         toolbarTv.text = getString(R.string.add_device_new)
         template_recycleView.layoutManager = GridLayoutManager(this@SelectDeviceTypeActivity, 3)
         template_recycleView.adapter = deviceAdapter
-        mRxPermission = RxPermissions(this)
     }
 
 
@@ -111,7 +109,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun openScan() {
-        mRxPermission.request(Manifest.permission.CAMERA).subscribe({
+        RxPermissions(this).request(Manifest.permission.CAMERA).subscribe({
             var intent = Intent(this@SelectDeviceTypeActivity, MyScanActivity::class.java)
             //var intent = Intent(this@SelectDeviceTypeActivity, CaptureActivity::class.java)
             startActivityForResult(intent, REQUEST_CODE)

@@ -1,7 +1,6 @@
 package com.dadoutek.uled.connector;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
@@ -42,13 +41,13 @@ import com.dadoutek.uled.intf.OnRecyclerviewItemClickListener;
 import com.dadoutek.uled.intf.OnRecyclerviewItemLongClickListener;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.DeviceType;
+import com.dadoutek.uled.model.Opcode;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.model.dbModel.DBUtils;
 import com.dadoutek.uled.model.dbModel.DbConnector;
 import com.dadoutek.uled.model.dbModel.DbGroup;
 import com.dadoutek.uled.model.dbModel.DbUser;
-import com.dadoutek.uled.model.DeviceType;
-import com.dadoutek.uled.model.Opcode;
-import com.dadoutek.uled.model.SharedPreferencesHelper;
 import com.dadoutek.uled.network.NetworkFactory;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
 import com.dadoutek.uled.tellink.TelinkLightService;
@@ -57,7 +56,6 @@ import com.dadoutek.uled.util.NetWorkUtils;
 import com.dadoutek.uled.util.OtherUtils;
 import com.dadoutek.uled.util.StringUtils;
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.telink.TelinkApplication;
 import com.telink.bluetooth.LeBluetooth;
 import com.telink.bluetooth.event.DeviceEvent;
@@ -123,20 +121,14 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     @BindView(R.id.add_group)
     RelativeLayout add_group;
 
-    private static final int MAX_RETRY_COUNT = 4;   //update mesh failed的重试次数设置为4次
-    private static final int MAX_RSSI = 90;
     private TelinkLightApplication mApplication;
-    private RxPermissions mRxPermission;
-    private static final int SCAN_TIMEOUT_SECOND = 10;
     //防止内存泄漏
     CompositeDisposable mDisposable = new CompositeDisposable();
-    private Dialog loadDialog;
     //分组所含灯的缓存
     private List<DbConnector> nowLightList;
     private LayoutInflater inflater;
     private boolean grouping;
     private DeviceListAdapter adapter;
-    boolean isFirtst = true;
     //标记登录状态
     private boolean isLoginSuccess = false;
     private GridView deviceListView;
@@ -862,7 +854,6 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mRxPermission = new RxPermissions(this);
         //设置屏幕常亮
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);

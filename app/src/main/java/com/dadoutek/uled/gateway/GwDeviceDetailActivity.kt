@@ -478,8 +478,10 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                                 }
                                 hideLoadingDialog()
                             }, {
-                        hideLoadingDialog()
-                        ToastUtils.showLong(getString(R.string.get_version_fail))
+                        runOnUiThread {
+                            hideLoadingDialog()
+                            ToastUtils.showLong(getString(R.string.get_version_fail))
+                        }
                     }
                     )
         }
