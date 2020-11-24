@@ -37,7 +37,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="32dp"
                     android:layout_weight="1"
-                    android:text="@string/input_device_code"
+                    android:hint="@string/input_device_code"
                     android:textColor="@color/white"
                     android:background="@drawable/rect_e_w_5"
                     android:digits="@string/filter_vcode"

@@ -76,7 +76,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private var curtain: DbCurtain? = null
     private var ctAdress: Int? = null
     private var curtainGroup: DbGroup? = null
-    private var currentShowGroupSetPage = true
     private var mConnectDevice: DeviceInfo? = null
     private var commutationBoolean: Boolean = true
     private var slowBoolean: Boolean = true
@@ -569,7 +568,17 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         var macAddr = if (typeStr == Constant.TYPE_GROUP) "97" else curtain!!.macAddr
         var meshAddr = if (typeStr == Constant.TYPE_GROUP) curtainGroup!!.meshAddr else curtain!!.meshAddr
 
-        value = if (isInverser) 1 else indicatorSeekBar.progress
+        if (isInverser)
+            commutationBoolean = when {
+                commutationBoolean -> {
+                    value = 1
+                    false
+                }
+                else -> {
+                    value = 0
+                    true
+                }
+            }
         RouterModel.routeControlCurtain(meshAddr, meshType, opcode, value, ser_id)//换向 = 0x11
                 ?.subscribe({
                     LogUtils.v("zcl-----------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
@@ -624,6 +633,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
             when (cmdBean.ser_id) {
                 "inverse" -> {
+                    disposableRouteTimer?.dispose()
                 }
                 "configSpeed" -> {
                     if (cmdBean.status == 0)
@@ -971,7 +981,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun electricCommutation() {
         when {
             Constant.IS_ROUTE_MODE -> {
-                routerControlCurtain(0x11, "inverse", true)
+
+                routerControlCurtain(0x11, "inverse", commutationBoolean)
             }
             else -> {
                 when (typeStr) {

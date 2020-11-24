@@ -322,7 +322,6 @@ public class TelinkApplication extends Application {
 
     protected void onStatusChanged(Intent intent) {
         DeviceInfo deviceInfo = intent.getParcelableExtra(LightService.EXTRA_DEVICE);
-
         if (deviceInfo.status == LightAdapter.STATUS_LOGIN) {
             mCurrentConnect = deviceInfo;
             this.dispatchEvent(DeviceEvent.newInstance(this, DeviceEvent.CURRENT_CONNECT_CHANGED, deviceInfo));

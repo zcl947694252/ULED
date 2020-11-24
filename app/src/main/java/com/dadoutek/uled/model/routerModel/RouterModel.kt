@@ -1,5 +1,6 @@
 package com.dadoutek.uled.model.routerModel
 
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Response
@@ -219,6 +220,7 @@ object RouterModel {
      *路由升级 //0设备类型  1单灯  2群组  3 ota Router本身
      */
     fun toDevicesOTA(meshAddrs: MutableList<Int>, meshType: Int, currentTimeMillis: Long,op: Int,ser_id: String): Observable<Response<Any>>? {
+        LogUtils.v("zcl-----------收到路由设备升级--mesh--$meshAddrs---类型---$meshType---时间$currentTimeMillis---来源-$op")
         return NetworkFactory.getApi().routerToDevicesOta(MeshAddressTypeTimeBody(meshType,meshAddrs,currentTimeMillis,op,ser_id))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

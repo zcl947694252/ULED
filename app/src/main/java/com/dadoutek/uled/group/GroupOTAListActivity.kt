@@ -93,7 +93,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         setContentView(R.layout.activity_group_ota_list)
         initView()
         initData()
-        if (Constant.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE&&!isOtaing)
             getMostNewVersion()
         initListener()
     }
@@ -125,6 +125,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 NetworkStatusCode.ROUTER_ALL_OFFLINE -> {
                     ToastUtils.showShort(getString(R.string.router_offline))
                     finish()
+                }
+                NetworkStatusCode.ROUTER_OTAING_CONT_OTA -> {
+                   routerStart()
                 }
                 else -> ToastUtils.showShort(it.message)
             }
@@ -264,29 +267,38 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                         isGroup -> SharedPreferencesUtils.setLastOtaType(2)
                         else -> SharedPreferencesUtils.setLastOtaType(0)
                     }
-                    ota_progress.visibility = View.VISIBLE
                     currentTime = time
-                    SharedPreferencesUtils.setLastOtaTime(currentTime)
-                    isStartOta = true
-                    btn_gp_ota_start.text = getString(R.string.otaing)
-                    group_ota_number_ly.visibility = View.VISIBLE
-                    group_ota_all.text = getString(R.string.ota_all_num) + meshList.size
-                    group_ota_success.text = getString(R.string.ota_success_num) + "0"
-                    group_ota_fail.text = getString(R.string.ota_fail_num) + "0"
-                    btn_gp_ota_start.isClickable = false
-                    ToastUtils.showShort(getString(R.string.ota_update_title))
+                    setStartOta(meshList)
                 } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
-                90998 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
+                90999 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
                     goScanning()
                 }
-                90999 -> {//OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
+                90998 -> {//OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
                     ToastUtils.showShort(getString(R.string.ota_update_title))
+                    isOtaing = true
+                    isStartOta = true
+                    ToastUtils.showShort(getString(R.string.ota_update_title))
+                    currentTime =SharedPreferencesUtils.getLastOtaTime()
+                    setStartOta(meshList)
                 }
                 else -> ToastUtils.showShort(it.message)
             }
         }, {
             ToastUtils.showShort(it.message)
         })
+    }
+
+    private fun setStartOta(meshList: MutableList<Int>) {
+        ota_progress.visibility = View.VISIBLE
+        SharedPreferencesUtils.setLastOtaTime(currentTime)
+        isStartOta = true
+        btn_gp_ota_start.text = getString(R.string.otaing)
+        group_ota_number_ly.visibility = View.VISIBLE
+        group_ota_all.text = getString(R.string.ota_all_num) + meshList.size
+        group_ota_success.text = getString(R.string.ota_success_num) + "0"
+        group_ota_fail.text = getString(R.string.ota_fail_num) + "0"
+        btn_gp_ota_start.isClickable = false
+        ToastUtils.showShort(getString(R.string.ota_update_title))
     }
 
     @SuppressLint("SetTextI18n", "CheckResult")
@@ -620,7 +632,6 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
         setAllAdapter(emptyView)
         setDevice()
-        if (!Constant.IS_ROUTE_MODE)
             updataDevice()
     }
 
@@ -762,12 +773,14 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun supportAndUNLight() {
+        LogUtils.v("zcl-----------收到路由判断钱-------$lightList")
         lightList.forEach {
             it.version?.let { itv ->
                 val suportOta = isSuportOta(itv)
                 val mostNew = isMostNew(itv)
                 it.isSupportOta = suportOta
                 it.isMostNew = mostNew
+                LogUtils.v("zcl-----------收到路由判断-------$suportOta---$mostNew")
             }
         }
 
@@ -779,6 +792,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
             lightList.removeAll(su)
             lightList.addAll(su)
         }
+        LogUtils.v("zcl-----------收到路由判断后-------$lightList")
     }
 
     private fun supportAndUNSwitch() {
@@ -929,13 +943,14 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     private fun routerStart() {
         val meshList = mutableListOf<Int>()
+        LogUtils.v("zcl-----------收到路由添加mesh升级前-------$lightList")
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 val filter = lightList.filter { it.productUUID == deviceType }.filter { it.isSupportOta && !it.isMostNew }
                 filter.forEach {
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            if (it.isGetVersion)
+                            if (it.isGetVersion||isOtaing)
                                 meshList.add(it.meshAddr)
                         }
                         else -> meshList.add(it.meshAddr)
@@ -947,7 +962,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 filter.forEach {
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            if (it.isGetVersion)
+                            if (it.isGetVersion||isOtaing)
                                 meshList.add(it.meshAddr)
                         }
                         else -> meshList.add(it.meshAddr)
@@ -959,7 +974,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 filter.forEach {
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            if (it.isGetVersion)
+                            if (it.isGetVersion||isOtaing)
                                 meshList.add(it.meshAddr)
                         }
                         else -> meshList.add(it.meshAddr)
@@ -972,7 +987,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 filter.forEach {
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            if (it.isGetVersion)
+                            if (it.isGetVersion||isOtaing)
                                 meshList.add(it.meshAddr)
                         }
                         else -> meshList.add(it.meshAddr)
@@ -985,7 +1000,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                     filter.forEach {
                         when {
                             Constant.IS_ROUTE_MODE -> {
-                                if (it.isGetVersion)
+                                if (it.isGetVersion||isOtaing)
                                     meshList.add(it.meshAddr)
                             }
                             else -> meshList.add(it.meshAddr)
@@ -998,7 +1013,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 filter.forEach {
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            if (it.isGetVersion)
+                            if (it.isGetVersion||isOtaing)
                                 meshList.add(it.meshAddr)
                         }
                         else -> meshList.add(it.meshAddr)
@@ -1011,6 +1026,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 meshList.isEmpty() -> ToastUtils.showShort(getString(R.string.no_can_ota_device))
                 else -> routerOtaDevice(meshList)
             }
+        LogUtils.v("zcl-----------收到路由mesh地址-------$meshList")
     }
 
     private fun setDevice() {

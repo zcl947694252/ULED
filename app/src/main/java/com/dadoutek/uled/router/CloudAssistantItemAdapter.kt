@@ -18,7 +18,7 @@ import com.dadoutek.uled.network.ThirdPartyBean
 class CloudAssistantItemAdapter(resId: Int, data: MutableList<ThirdPartyBean>) :BaseQuickAdapter<ThirdPartyBean,BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: ThirdPartyBean?) {
         helper
-                ?.setVisible(R.id.item_setting_icon,false)
+                ?.setVisible(R.id.item_setting_icon,true)
                 ?.setVisible(R.id.item_setting_back,false)
                 ?.setText(R.id.item_setting_text,item?.name)
     }

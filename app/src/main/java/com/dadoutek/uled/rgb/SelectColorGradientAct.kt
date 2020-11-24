@@ -148,7 +148,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
                     sb_w_bright_add.isEnabled = false
                     sb_w_bright_less.isEnabled = true
                 }
-                rgb_white_seekbar.progress <=1 -> {
+                rgb_white_seekbar.progress <= 1 -> {
                     sb_w_bright_less.isEnabled = false
                     sb_w_bright_add.isEnabled = true
                 }
@@ -165,8 +165,8 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
             var g = Color.green(colorNode?.rgbw!!)
             var b = Color.blue(colorNode?.rgbw!!)
             color_picker.setInitialColor((colorNode?.rgbw ?: 0 and 0xffffff) or 0xff000000.toInt())
-            if (w==0)
-                w=1
+            if (w == 0)
+                w = 1
             rgb_sbBrightness.progress = colorNode!!.brightness
             rgb_white_seekbar.progress = w
             sbBrightness_num.text = colorNode!!.brightness.toString() + "%"
@@ -373,7 +373,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
     @SuppressLint("CheckResult")
     private fun routerConfigRGBNum(meshAddr: Int, deviceType: Int, color: Int) {
         thisTime = System.currentTimeMillis()
-        synchronized(this@SelectColorGradientAct){
+        synchronized(this@SelectColorGradientAct) {
             if (thisTime - lastTime >= 500) {
                 lastTime = System.currentTimeMillis()
                 LogUtils.v("zcl-----------收到路由调节色盘成功---$thisTime----$lastTime------${thisTime - lastTime >= 500}")
@@ -516,13 +516,14 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun routerConfigBriOrWhite(isBrightness: Boolean) {
         thisTime = System.currentTimeMillis()
+        var meshType = if (currentShowGroupSetPage) 97 else 6
         if (thisTime - lastTime >= 300)
             when {
                 isBrightness -> {//亮度
-                    routeConfigBriGpOrLight(colorNode!!.dstAddress, 6, rgb_sbBrightness.progress, "diyBri")
+                    routeConfigBriGpOrLight(colorNode!!.dstAddress, meshType, rgb_sbBrightness.progress, "diyBri")
                 }
                 else -> {
-                    routeConfigWhiteGpOrLight(colorNode!!.dstAddress, 6, rgb_white_seekbar.progress, "diywhite")
+                    routeConfigWhiteGpOrLight(colorNode!!.dstAddress, meshType, rgb_white_seekbar.progress, "diywhite")
                 }
             }
 

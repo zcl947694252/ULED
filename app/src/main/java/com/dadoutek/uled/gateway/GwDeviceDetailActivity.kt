@@ -211,8 +211,6 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
     override fun onResume() {
         super.onResume()
-        TelinkLightService.Instance()?.idleMode(true)
-        Thread.sleep(500)
         inflater = this.layoutInflater
         notifyData()
         this.mApp.removeEventListeners()
@@ -263,10 +261,10 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             }
             R.id.template_device_icon -> {
                 //开关网关通过普通灯的连接状态发送
-                if (TelinkLightApplication.getApp().connectDevice != null)
-                    sendOpenOrCloseGw(true)
-                else
-                    getGw()
+                when {
+                    TelinkLightApplication.getApp().connectDevice != null -> sendOpenOrCloseGw(true)
+                    else -> getGw()
+                }
             }
             R.id.template_device_card_delete -> {
                 val string = getString(R.string.sure_delete_device, currentGw?.name)
@@ -331,11 +329,9 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                 if (db.meshAddr == currentGw!!.meshAddr) {//网关在线状态，1表示在线，0表示离线
                     val b = db.state == 0
                     TelinkLightApplication.getApp().offLine = b
-                    if (!TelinkLightApplication.getApp().offLine) {
-                        sendOpenOrCloseGw(false)
-
-                    } else {
-                        ToastUtils.showShort(getString(R.string.gw_not_online))
+                    when {
+                        !TelinkLightApplication.getApp().offLine -> sendOpenOrCloseGw(false)
+                        else -> ToastUtils.showShort(getString(R.string.gw_not_online))
                     }
                 }
             }
@@ -567,7 +563,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             Thread.sleep(500)
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableConnect?.dispose()
-            disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 6L)?.subscribe({
+            disposableConnect = connect(macAddress = currentGw?.macAddr, connectTimeOutTime = 15L)?.subscribe({
                 LogUtils.v("zcl-----------发送时区连接设备-------$it")
                 disposableTimer?.dispose()
                 TelinkLightApplication.getApp().isConnectGwBle = true
@@ -580,10 +576,9 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             }, {
                 hideLoadingDialog()
                 disposableTimer?.dispose()
-                if (configType == 0) {//重新配置为0
-                    connectService()
-                } else {
-                    ToastUtils.showShort(getString(R.string.connect_fail))
+                when (configType) {
+                    0 ->connectService()//重新配置为0
+                    else -> ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             })
         } else {
@@ -695,8 +690,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         adaper?.notifyDataSetChanged()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return gwDatas[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id)
-                        ?: false
+                return gwDatas[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id) ?: false
             }
 
             override fun getOldListSize(): Int {
@@ -710,12 +704,9 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
                 val beanOld = gwDatas[oldItemPosition]
                 val beanNew = mNewDatas[newItemPosition]
-                return if (beanOld.name != beanNew.name) {
-                    return false//如果有内容不同，就返回false
-                } else true
+                return beanOld.name == beanNew.name
             }
         }, true)
-
     }
 
     private fun onLogin(isConfigGw: Int) {

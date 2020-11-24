@@ -89,6 +89,8 @@ import java.util.concurrent.TimeUnit
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    open var currentShowGroupSetPage = true
+    open var isLoginAccount: Boolean = true
     var isScanningJM: Boolean = false
     open var lastTime: Long = 0
     private var isShow: Boolean = false
@@ -335,15 +337,16 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
-            ToastUtils.showLong(getString(R.string.connecting_tip))
-            mConnectDisposable?.dispose()
-            mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
-                    ?.subscribe({
-                        LogUtils.d("connection success")
-                    }, {
-                        LogUtils.d("connect failed")
-                    }
-                    )
+            if (!TelinkLightService.Instance().isLogin&&isLoginAccount) {
+                ToastUtils.showLong(getString(R.string.connecting_tip))
+                mConnectDisposable?.dispose()
+                mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
+                        ?.subscribe({
+                            LogUtils.d("connection success")
+                        }, {
+                            LogUtils.d("connect failed")
+                        })
+            }
         }
     }
 
@@ -567,7 +570,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         } else {
             changeDisplayImgOnToolbar(false)
         }
-
+        autoConnectAll()
     }
 
     override fun onDestroy() {
@@ -1144,7 +1147,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 15, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
         // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
         LogUtils.v("zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}------${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---")
-        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
+        return if (/*mConnectDisposable == null &&*/ TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
@@ -1705,7 +1708,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     LogUtils.v("zcl-----------收到路由请求连接开关或者传感器是否是连接--${op == 0}-------$response")
                     when (response.errorCode) {
                         0 -> {
-                            showLoadingDialog(getString(R.string.please_wait))
                             disposableRouteTimer?.dispose()
                             disposableRouteTimer = Observable.timer((response.t.timeout).toLong() + 1, TimeUnit.SECONDS)
                                     .subscribe {
@@ -1714,14 +1716,22 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                                     }
                         }
                         90018 -> {
+                            hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.device_not_exit))
                             finish()
                         }
-                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                        90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                        90008 -> {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        }
+                        90005 -> {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.router_offline))
+                        }
                     }
 
                 }, { it1 ->
+                    hideLoadingDialog()
                     ToastUtils.showShort(it1.message)
                 })
     }

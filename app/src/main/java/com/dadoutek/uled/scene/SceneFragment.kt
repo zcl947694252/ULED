@@ -238,10 +238,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
         disposableRouteTimer?.dispose()
-        disposableRouteTimer = Observable.timer((it?.timeout ?: 0).toLong()+2L, TimeUnit.MILLISECONDS)
+        val i = it?.timeout ?: 0
+        disposableRouteTimer = Observable.timer(i.toLong()+2L, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
+                    LogUtils.v("zcl-----------收到路由超时大汗出失败-------$i")
                     ToastUtils.showShort(getString(R.string.delete_scene_fail))
                 }
     }
@@ -749,9 +751,10 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     override fun tzRouterDelSceneResult(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由删除回调-------$cmdBean")
         disposableRouteTimer?.dispose()
         hideLoadingDialog()
-        if (cmdBean.finish && cmdBean.status == 1) {////1 0 -1  部分成功 成功 失败
+        if (cmdBean.finish && cmdBean.status == 0) {////1 0 -1  部分成功 成功 失败
             currentDbScene?.let {
                 val list = DBUtils.getActionsBySceneId(it.id)
                 deleteSceneSuccess(list, it)

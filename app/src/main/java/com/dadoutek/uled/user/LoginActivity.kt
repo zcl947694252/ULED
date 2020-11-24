@@ -102,6 +102,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         phoneList = DBUtils.getAllUser()
         if (phoneList!!.size == 0)
             date_phone.visibility = View.GONE
+        isLoginAccount = false
         makePop()
         initData()
         initView()

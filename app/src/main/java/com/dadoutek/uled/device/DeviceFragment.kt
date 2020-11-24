@@ -81,9 +81,8 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (userVisibleHint) {
+        if (userVisibleHint)
             refreshView()
-        }
     }
 
     override fun onResume() {
@@ -113,9 +112,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
             }
         }
     }
-
-
-
 
     private fun initView() {
         rvDevice?.layoutManager = GridLayoutManager(this.activity, 2)

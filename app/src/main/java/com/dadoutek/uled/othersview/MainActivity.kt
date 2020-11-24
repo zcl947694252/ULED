@@ -130,7 +130,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         retryConnectCount = 0
                         autoConnect()
                     }
-                    BluetoothAdapter.STATE_OFF -> {}
+                    BluetoothAdapter.STATE_OFF -> {
+                    }
                 }
             }
         }
@@ -161,20 +162,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener { getBin() }
+        main_toast.setOnClickListener { getRouterStatus() }
 
         LogUtils.v("zcl---改变参数meshName-------$DEFAULT_MESH_FACTORY_NAME----改变参数url----${Constant.BASE_URL}")
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener { getBin() }
         initBottomNavigation()
         checkVersionAvailable()
 
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         //Constant.IS_ROUTE_MODE = false
-        if (Constant.IS_ROUTE_MODE)
+        if (Constant.IS_ROUTE_MODE) {
             getScanResult()//获取扫描状态
-
-        getRouterStatus()
+            getRouterStatus()
+        }
         getRegionList()
         getAllStatus()
         LogUtils.v("zcl---获取状态------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
@@ -213,52 +213,43 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             Constant.ROUTER_OTA_ING -> {
                                 val data = it.data.data
                                 val productUUID = data.productUUID
-                                val lastOtaType = data.op
-                                val otaData = data.otaData
-                                if (otaData.isNotEmpty()) {
-                                    val otaDataOne = otaData[0]
-                                    LogUtils.v("zcl-----------收到路由状态-------$otaData")
-                                    when {
-                                        otaData.size <= 1 -> {
-                                            when (lastOtaType) {
-                                                3 -> startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to
-                                                        productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
-                                                1 -> {
-                                                    var meshAddr = when (productUUID) {
-                                                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByID(otaDataOne.id.toLong())?.meshAddr
-                                                        DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByID(otaDataOne.id.toLong())?.meshAddr
-                                                        DeviceType.SMART_RELAY -> DBUtils.getConnectorByID(otaDataOne.id.toLong())?.meshAddr
-                                                        else -> DBUtils.getLightByID(otaDataOne.id.toLong())?.meshAddr
-                                                    }
-                                                    startActivity<RouterOtaActivity>("deviceMeshAddress" to meshAddr, "deviceType" to
-                                                            productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
-                                                }
+                                if (data.otaData.isNotEmpty()) {
+                                    val otaDataOne = data.otaData[0]
+                                    LogUtils.v("zcl-----------收到路由状态--op-${data.op}----${data.otaData}")
+                                    SharedPreferencesUtils.setLastOtaTime(otaDataOne.start)
+                                    when (data.op) {//路由升级 0设备类型  1单灯  2群组  3 ota Router本身
+                                        0 -> startActivity<GroupOTAListActivity>("DeviceType" to productUUID, "isOTAing" to 1)
+                                        1 -> {
+                                            var meshAddr = when (productUUID) {
+                                                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMac(otaDataOne.macAddr)?.meshAddr
+                                                DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByMac(otaDataOne.macAddr)?.meshAddr
+                                                DeviceType.SMART_RELAY -> DBUtils.getConnectorByMac(otaDataOne.macAddr)?.meshAddr
+                                                else -> DBUtils.getLightByMac(otaDataOne.macAddr)?.meshAddr
                                             }
+                                            startActivity<RouterOtaActivity>("deviceMeshAddress" to meshAddr, "deviceType" to productUUID,
+                                                    "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
                                         }
-                                        else -> {
-                                            val productUUID = productUUID
-                                            when (lastOtaType) {
-                                                0 -> startActivity<GroupOTAListActivity>("DeviceType" to productUUID, "isOTAing" to 1)
-                                                2 -> {
-                                                    var gpId = when (productUUID) {
-                                                        DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                                                            DBUtils.getLightByID(otaDataOne.id.toLong())?.belongGroupId
-                                                        }
-                                                        DeviceType.SMART_CURTAIN -> {
-                                                            DBUtils.getCurtainByID(otaDataOne.id.toLong())?.belongGroupId
-                                                        }
-                                                        DeviceType.SMART_RELAY -> {
-                                                            DBUtils.getConnectorByID(otaDataOne.id.toLong())?.belongGroupId
-                                                        }
-                                                        else -> DBUtils.getLightByID(otaDataOne.id.toLong())?.belongGroupId
-                                                    }
-                                                    val groupByID = DBUtils.getGroupByID(gpId ?: 0)
-                                                    startActivity<GroupOTAListActivity>("group" to groupByID!!, "DeviceType" to DeviceType.LIGHT_RGB, "isOTAing" to 1)
+                                        2 -> {
+                                            var gpId = when (productUUID) {
+                                                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                                                    DBUtils.getLightByMac(otaDataOne.macAddr)?.belongGroupId
                                                 }
+                                                DeviceType.SMART_CURTAIN -> {
+                                                    DBUtils.getCurtainByMac(otaDataOne.macAddr)?.belongGroupId
+                                                }
+                                                DeviceType.SMART_RELAY -> {
+                                                    DBUtils.getConnectorByMac(otaDataOne.macAddr)?.belongGroupId
+                                                }
+                                                else -> DBUtils.getLightByMac(otaDataOne.macAddr)?.belongGroupId
                                             }
+                                            val groupByID = DBUtils.getGroupByID(gpId ?: 0)
+                                            LogUtils.v("zcl---收到路由跳转信息----GPid---$groupByID------deviceType---$productUUID-----isotaing--1--" +
+                                                    "--${DBUtils.getGroupByID(otaDataOne.id.toLong())}")
+                                            startActivity<GroupOTAListActivity>("group" to groupByID!!, "DeviceType" to productUUID, "isOTAing" to 1)
                                         }
+                                        3 -> startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to
+                                                productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
                                     }
-
                                 }
                             }
                             Constant.ROUTER_SCANNING, Constant.ROUTER_SCAN_END -> {
@@ -626,9 +617,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun connect2(mac: String) {
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe( {
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
                     if (it) {
                         //授予了权限
                         if (TelinkLightService.Instance() != null) {
@@ -640,7 +631,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         //没有授予权限
                         DialogUtils.showNoBlePermissionDialog(this, { connect2(mac) }, { finish() })
                     }
-                },{})
+                }, {})
     }
 
     private fun startConnectTimer() {
@@ -698,7 +689,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                 Manifest.permission.BLUETOOTH_ADMIN)
                 .subscribeOn(Schedulers.io())
-                .subscribe ({
+                .subscribe({
                     if (it) {
                         TelinkLightService.Instance().idleMode(true)
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
@@ -730,7 +721,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             startScan()
                         }, { finish() })
                     }
-                },{})
+                }, {})
     }
 
 

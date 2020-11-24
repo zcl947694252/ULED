@@ -91,10 +91,12 @@ class SettingActivity : TelinkBaseActivity() {
                             startActivity(intent)
                         }
                         2 -> {
+                            Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
                             UserModel.updateModeStatus().subscribe({
-                                Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
                                 adapter.notifyDataSetChanged()
                             }, {
+                                Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
+                                adapter.notifyDataSetChanged()
                                 ToastUtils.showShort(it.message)
                             })
                         }

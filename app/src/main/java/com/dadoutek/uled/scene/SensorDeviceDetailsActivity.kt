@@ -343,6 +343,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun connectAndConfig() {
+        showLoadingDialog(getString(R.string.please_wait))
         TelinkLightService.Instance()?.idleMode(true)
         Thread.sleep(500)
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
@@ -352,7 +353,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             }
         else {
             Thread.sleep(500)
-            showLoadingDialog(getString(R.string.please_wait))
             connect(macAddress = currentDevice?.macAddr, deviceTypes = deviceTypes)?.subscribe({
                 relocationSensor()
             }, {
@@ -689,7 +689,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
                     else
                         startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
-                    doFinish()
+                    //doFinish()
                 }
                 DeviceType.NIGHT_LIGHT -> {//2.0
                     if ("" == s || (s.contains("N") || s.contains("PR") || s.contains("NPR"))) {
@@ -697,7 +697,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                             startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
                         else
                             startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
-                        doFinish()
+                       // doFinish()
                     } else {
                         connectAndConfig()
                     }

@@ -43,10 +43,7 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.receiver.GwBrocasetReceiver
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
-import com.dadoutek.uled.util.DensityUtil
-import com.dadoutek.uled.util.OtaPrepareUtils
-import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.TmtUtils
+import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.DeviceInfo
@@ -80,6 +77,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildClickListener, EventListener<String> {
+    private var isDelete: Boolean = false
     private var fiOta: MenuItem? = null
     private var downloadDispoable: Disposable? = null
     private var fiVersion: MenuItem? = null
@@ -294,6 +292,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     hardTimer()
                     showLoadingDialog(getString(R.string.please_wait))
                     sendGwResetFactory(0)////恢复出厂设置
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
@@ -302,8 +301,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private fun hardTimer() {
         disposableFactoryTimer?.dispose()
         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     hideLoadingDialog()
                     CoroutineScope(Dispatchers.Main).launch {
@@ -358,8 +357,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     disposableFactoryTimer?.dispose()
                     disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.user_reset_faile))
@@ -379,6 +378,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     private fun sendGwResetFactory(frist: Int) {
+        isDelete = true
         var labHeadPar = byteArrayOf(frist.toByte(), 0, 0, 0, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, dbGw?.meshAddr ?: 0, labHeadPar, "1")
     }
@@ -884,8 +884,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         disposableTimer?.dispose()
         connectCount++
         disposableTimer = Observable.timer(20000, TimeUnit.MILLISECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (connectCount < 3)
                         sendOpenOrCloseGw(dbGwTag, isMutex)
@@ -998,8 +998,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setTimerDelay(gwTagBean: GwTagBean, currentTime: Long, delay: Long) {
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
                     if (connectCount < 3)
                         deleteTimerLable(gwTagBean, currentTime)
@@ -1101,7 +1101,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             dbGw?.tags = GsonUtils.toJson(listOne)
             dbGw?.timePeriodTags = GsonUtils.toJson(listTwo)//赋值时一定要转换为gson字符串
         }
-        DBUtils.saveGateWay(dbGw!!, true)
+        if (!isDelete)
+            DBUtils.saveGateWay(dbGw!!, true)
         TelinkLightService.Instance()?.idleMode(true)
     }
 

@@ -28,7 +28,7 @@ import org.jetbrains.anko.textColor
  */
 class CloudAssistantActivity : TelinkBaseActivity() {
     var data   = mutableListOf<ThirdPartyBean>()
-    val adapter = CloudAssistantItemAdapter(R.layout.group_item, data)
+    val adapter = CloudAssistantItemAdapter(R.layout.item_setting, data)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_cloud_assistant)
@@ -56,7 +56,7 @@ class CloudAssistantActivity : TelinkBaseActivity() {
     private fun initData() {
         RouterModel.appThirdParty()?.subscribe({
             if (it.isNotEmpty()){
-                data=it
+                adapter.setNewData(it)
                 adapter.notifyDataSetChanged()
             }
         },{

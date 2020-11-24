@@ -28,7 +28,7 @@ class MyScanActivity : CaptureActivity() {
             val toString = scan_device_code.editableText.toString()
 
             when {
-                toString.isEmpty() || toString.length == 12 -> ToastUtils.showShort(getString(R.string.input_right_code))
+                toString.isEmpty() || toString.length != 12 -> ToastUtils.showShort(getString(R.string.input_right_code))
                 else -> {
                     val intent = Intent()
                     intent.putExtra(CodeUtils.RESULT_TYPE, CodeUtils.RESULT_SUCCESS)

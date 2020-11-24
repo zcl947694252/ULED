@@ -432,12 +432,29 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbConnectorDao.load(id)
     }
 
+    fun getConnectorByMac(mac: String): DbConnector? {
+        val list = DaoSessionInstance.getInstance().dbConnectorDao.queryBuilder()
+                .where(DbConnectorDao.Properties.MacAddr.eq(mac)).list()
+        return if (list.size > 0) list[0] else null
+    }
+
     fun getLightByID(id: Long): DbLight? {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
+    }
+    fun getLightByMac(mac: String): DbLight? {
+        val list = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
+                .where(DbLightDao.Properties.MacAddr.eq(mac)).list()
+        return if (list.size > 0) list[0] else null
     }
 
     fun getCurtainByID(id: Long): DbCurtain? {
         return DaoSessionInstance.getInstance().dbCurtainDao.load(id)
+    }
+
+    fun getCurtainByMac(mac: String): DbCurtain? {
+        val list = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder()
+                .where(DbCurtainDao.Properties.MacAddr.eq(mac)).list()
+        return if (list.size > 0) list[0] else null
     }
 
     fun getSwitchByID(id: Long): DbSwitch? {

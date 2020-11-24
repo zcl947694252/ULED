@@ -104,7 +104,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private val mDisposable = CompositeDisposable()
     private var mConnectDevice: DeviceInfo? = null
     val POSIONANDNUM = "POSIONANDNUM"
-    private var currentShowGroupSetPage = true
     private var isExitGradient = false
     private var isDiyMode = false
     private var isPresetMode = true
@@ -1477,6 +1476,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 val intent = Intent(this, SetDiyColorAct::class.java)
                 intent.putExtra(Constant.IS_CHANGE_COLOR, true)
                 intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![clickPostion])
+                 dstAddress = if (currentShowGroupSetPage) group!!.meshAddr else light!!.meshAddr
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
                 intent.putExtra(Constant.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
@@ -2401,7 +2401,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
          * meshAddr	是	int	目标meshAddr
          * meshType	是	int	mesh地址类型   meshType 彩灯 = 6 组 = 97
          */
-        val subscribe = RouterModel.routeStopDynamic(dstAddress, 6, serId)?.subscribe({
+        var meshType = if (currentShowGroupSetPage) 97 else 6
+        var meshAddr = if (currentShowGroupSetPage) group!!.meshAddr else light!!.meshAddr
+        val subscribe = RouterModel.routeStopDynamic(meshAddr, meshType, serId)?.subscribe({
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))
