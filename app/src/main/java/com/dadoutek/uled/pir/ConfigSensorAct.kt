@@ -101,6 +101,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         setContentView(R.layout.activity_config_pir)
         top_rg_ly.visibility = View.GONE
         telinkApplication = this.application as TelinkApplication
+        isLoginAccount = false
         initToolbar()
         initData()
         initView()
@@ -673,6 +674,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.version = version
         dbSensor.meshAddr = mDeviceInfo.meshAddress
+        dbSensor.openTag = mDeviceInfo!!.openTag
         // dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + mDeviceInfo!!.meshAddress
@@ -705,9 +707,11 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     override fun onDestroy() {
         super.onDestroy()
+        isLoginAccount = true
         if (Constant.IS_ROUTE_MODE)
             currentSensor?.let {
-                routerConnectSensor(it, 1, "connectSensor")
+                routerConnectSensor(it, 1, "disConnectSensor")
+                disposableRouteTimer?.dispose()
             }
         TelinkLightApplication.getApp().removeEventListener(this)
         TelinkLightService.Instance()?.idleMode(true)

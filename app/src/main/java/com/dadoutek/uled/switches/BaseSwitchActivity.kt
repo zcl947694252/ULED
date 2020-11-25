@@ -79,6 +79,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutId())
         mApp = application as TelinkLightApplication
+        isLoginAccount = false
         makePopuwindow()
         initToolbar()
         initView()
@@ -344,6 +345,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        isLoginAccount = true
         if (Constant.IS_ROUTE_MODE)
             switchDate?.let {
                 routerConnectSw(it, 1, "connectSensor")

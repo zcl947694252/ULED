@@ -10,7 +10,7 @@ class RegionAuthorizeDialogAdapter(layoutId: Int, data: List<RegionAuthorizeBean
     override fun convert(helper: BaseViewHolder?, item: RegionAuthorizeBean?) {
         helper?.setText(R.id.item_area_dialog_title,item?.name)
         var iv = helper?.getView<ImageView>(R.id.item_area_dialog_more)
-        if (item?.is_selected!!)
+        if (item?.is_selected==true)
             iv?.setImageResource(R.drawable.icon_checkbox_selected)
         else
             iv?.setImageResource(R.drawable.icon_checkbox_unselected)

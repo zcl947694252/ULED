@@ -380,7 +380,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private fun sendGwResetFactory(frist: Int) {
         isDelete = true
         var labHeadPar = byteArrayOf(frist.toByte(), 0, 0, 0, 0, 0, 0, 0)
-        TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, dbGw?.meshAddr ?: 0, labHeadPar, "1")
+        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, dbGw?.meshAddr ?: 0, labHeadPar, "1")
     }
 
     private fun configNet() {
@@ -927,7 +927,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         } else {
             var labHeadPar = byteArrayOf(dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),//标签开与关
                     dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
-            TelinkLightService.Instance().sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
+            TelinkLightService.Instance()?.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
             LogUtils.v("zcl-----------发送命令0xf6-------")
         }
     }
@@ -978,7 +978,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 if (currentTime - lastTime < 400)
                     delay(400)
                 var paramer = byteArrayOf(gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
-                TelinkLightService.Instance().sendCommandResponse(opcodedelete, dbGw?.meshAddr ?: 0, paramer, "1")
+                TelinkLightService.Instance()?.sendCommandResponse(opcodedelete, dbGw?.meshAddr ?: 0, paramer, "1")
             }
         } else {
             setTimerDelay(gwTagBean, currentTime, 6500)

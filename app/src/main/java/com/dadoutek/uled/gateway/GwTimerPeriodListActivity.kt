@@ -273,7 +273,7 @@ class GwTimerPeriodListActivity : BaseActivity(), EventListener<String> {
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
                                 ?: 0).toByte(), (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
 
-                        TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
+                        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK,
                                 tasksBean?.gwMeshAddr ?: 0, params, "1")
                         LogUtils.v("zcl-----------发送命令0Xf7-------")
                     }

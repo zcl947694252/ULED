@@ -368,7 +368,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         sceneGroupAdapter?.data!![pos].rgbType = rgbType
         val itemGroup = sceneGroupAdapter?.data?.get(currentPosition)
         when (rgbType) {
-            1 -> {
+                1 -> {
                 val presetGradientList = resources.getStringArray(R.array.preset_gradient)
                 itemGroup?.gradientName = presetGradientList[0]
                 rgbGradientId = 1
@@ -959,7 +959,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
                 if (light > 99)
                     light = 99
-                val meshAddress = TelinkApplication.getInstance().connectDevice.meshAddress
+                val meshAddress = TelinkApplication.getInstance().connectDevice?.meshAddress?:0
                 val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
                 val mesL = meshAddress and 0xff
                 val color = list[i].getColor()

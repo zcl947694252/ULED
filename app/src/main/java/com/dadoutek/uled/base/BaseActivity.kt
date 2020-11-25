@@ -368,26 +368,29 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             var jsonObject = JSONObject(msg)
-            when (val cmd = jsonObject.optInt("cmd")) {
-                Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
-                    val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
-                    when (cmd) {
-                        Cmd.singleLogin -> singleDialog(codeBean)//单点登录
-                        Cmd.parseQR -> makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)//推送二维码扫描解析结果
-                        Cmd.unbindRegion -> unbindDialog(codeBean)//解除授权信息
-                        Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
-                        Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
-                        Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
-                        Cmd.tzRouteUserReset -> {
-                            val cmdBean: CmdBodyBean = getCmdBean(intent)
-                            tzRouteUserReset(cmdBean)//用户复位
-                        }
-                        Cmd.tzRouteResetFactory -> {
-                            val cmdBean: CmdBodyBean = getCmdBean(intent)
-                            tzRouterResetFactory(cmdBean)
+            try {
+                when (val cmd = jsonObject.optInt("cmd")) {
+                    Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
+                        val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
+                        when (cmd) {
+                            Cmd.singleLogin -> singleDialog(codeBean)//单点登录
+                            Cmd.parseQR -> makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)//推送二维码扫描解析结果
+                            Cmd.unbindRegion -> unbindDialog(codeBean)//解除授权信息
+                            Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
+                            Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
+                            Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
+                            Cmd.tzRouteUserReset -> {
+                                val cmdBean: CmdBodyBean = getCmdBean(intent)
+                                tzRouteUserReset(cmdBean)//用户复位
+                            }
+                            Cmd.tzRouteResetFactory -> {
+                                val cmdBean: CmdBodyBean = getCmdBean(intent)
+                                tzRouterResetFactory(cmdBean)
+                            }
                         }
                     }
                 }
+            } catch (e: java.lang.Exception) {
 
             }
         }

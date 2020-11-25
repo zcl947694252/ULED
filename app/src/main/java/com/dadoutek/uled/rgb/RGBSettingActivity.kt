@@ -270,8 +270,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
         if (light == null) {
             ToastUtils.showLong(getString(R.string.please_connect_normal_light))
-            val instance = TelinkLightService.Instance()
-            instance?.idleMode(true)
+             TelinkLightService.Instance()?.idleMode(true)
             return
         }
 

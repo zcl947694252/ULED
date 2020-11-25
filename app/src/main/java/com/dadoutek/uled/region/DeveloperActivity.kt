@@ -188,7 +188,7 @@ class DeveloperActivity : BaseActivity() {
     private fun userReset() {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.user_reset))
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
+        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0,
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_CLEAR))
         builder.setPositiveButton(getString(R.string.confirm)) { _, _ ->
             clearData()//删除本地数据

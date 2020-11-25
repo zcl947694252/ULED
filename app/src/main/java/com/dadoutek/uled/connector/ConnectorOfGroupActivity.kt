@@ -285,7 +285,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         this.mApplication = this.application as TelinkLightApplication
         mDataManager = DataManager(this, mApplication!!.mesh.name, mApplication!!.mesh.password)
         val get = this.intent.extras!!.get("group") ?: return
-        this.group = get as DbGroup
+        group = get as DbGroup
     }
 
     override fun onResume() {
@@ -297,8 +297,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     override fun onStop() {
         super.onStop()
-        this.mApplication!!.removeEventListener(this)
-        if (TelinkLightService.Instance() != null)
+        mApplication!!.removeEventListener(this)
             TelinkLightService.Instance()?.disableAutoRefreshNotify()
     }
 
@@ -347,8 +346,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         val mNewDatas: MutableList<DbConnector>? = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-                (newItemPosition)?.id) ?: false;
+                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get(newItemPosition)?.id) ?: false
             }
 
             override fun getOldListSize(): Int {

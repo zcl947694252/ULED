@@ -327,7 +327,6 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         listKeysBean.put(getKeyBean(0x02, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
         listKeysBean.put(getKeyBean(0x03, Opcode.GROUP_CCT_MINUS.toInt()))
 
-
         val third = mutableListOf(4, 5)
         val four: MutableList<Int> = mutableListOf(6, 7)
         /*  val four: MutableList<Int> = if (groupMap.size > 3)
@@ -360,9 +359,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         } else {
             routerConfigEightSw(mDeviceInfo?.id?.toLong() ?: 0L)
         }
-
     }
-
 
     private fun getKeyBean(keyId: Int, featureId: Int, name: String = "", hight8Mes: Int = 0, low8Mes: Int = 0): JSONObject {
         //return JSONObject(["keyId" = keyId, "featureId" = featureId, "reserveValue_A" = hight8Mes, "reserveValue_B" = low8Mes, "name" = name])

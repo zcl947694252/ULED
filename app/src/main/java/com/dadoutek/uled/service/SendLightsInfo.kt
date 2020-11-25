@@ -49,7 +49,6 @@ class SendLightsInfo : Service(), EventListener<String> {
 
     internal var light: Light? = null
     private val bundle: Bundle? = null
-    private var mTelinkLightService: TelinkLightService? = null
     private var retryConnectCount = 0
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
     private var mScanDisposal: Disposable? = null
@@ -86,7 +85,6 @@ class SendLightsInfo : Service(), EventListener<String> {
                     GlobalScope.launch(Dispatchers.Main) {
                         //                        hideLocationServiceDialog()
                     }
-                    mTelinkLightService = TelinkLightService.Instance()
                     if (TelinkLightApplication.getApp().connectDevice == null) {
                         while (TelinkApplication.getInstance()?.serviceStarted == true) {
                             GlobalScope.launch(Dispatchers.Main) {

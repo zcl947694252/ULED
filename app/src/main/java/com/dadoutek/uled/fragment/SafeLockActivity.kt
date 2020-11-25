@@ -97,7 +97,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     if (Constant.IS_ROUTE_MODE)
                         routerLockOrUnlock(status, "lock")
                     else
-                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 1))
+                        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 1))
                 }
 
                 R.id.safe_close -> {
@@ -122,7 +122,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
                     if (Constant.IS_ROUTE_MODE)
                         routerLockOrUnlock(status, "unlock")
                     else
-                        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 2))
+                        TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CONFIG_EXTEND_OPCODE, 0xffff, byteArrayOf(Opcode.CONFIG_EXTEND_SAFE_LOCK, 2))
                 }
             }
         }

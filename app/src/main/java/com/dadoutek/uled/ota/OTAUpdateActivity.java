@@ -208,14 +208,14 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ota_update);
-         progress_view = findViewById(R.id.progress_view);
-         text_info= findViewById(R.id.text_info);
-         select= findViewById(R.id.select);
-         btn_start_update= findViewById(R.id.btn_start_update);
-         tvFile= findViewById(R.id.tvFile);
-         local_version= findViewById(R.id.local_version);
-         server_version= findViewById(R.id.server_version);
-         open_device= findViewById(R.id.open_device);
+        progress_view = findViewById(R.id.progress_view);
+        text_info = findViewById(R.id.text_info);
+        select = findViewById(R.id.select);
+        btn_start_update = findViewById(R.id.btn_start_update);
+        tvFile = findViewById(R.id.tvFile);
+        local_version = findViewById(R.id.local_version);
+        server_version = findViewById(R.id.server_version);
+        open_device = findViewById(R.id.open_device);
 
         btn_start_update.setOnClickListener(this);
         select.setOnClickListener(this);
@@ -275,7 +275,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         assert powerManager != null;
         mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WakeLock");
         addEventListener();
-        TelinkLightService.Instance().enableNotification();
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance != null)
+            instance.enableNotification();
         mTimeFormat = new SimpleDateFormat("HH:mm:ss.S");
 
         toolbar = findViewById(R.id.toolbar);
@@ -299,8 +301,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 bytes = new byte[]{0x01, 0x64, 0x00};
             else
                 bytes = new byte[]{0x00, 0x64, 0x00};
-            TelinkLightService.Instance().sendCommandNoResponse(Opcode.LIGHT_ON_OFF,
-                    lightMeshAddr, bytes);
+            if (instance != null)
+                instance.sendCommandNoResponse(Opcode.LIGHT_ON_OFF, lightMeshAddr, bytes);
         });
     }
 
@@ -333,8 +335,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
     private void addEventListener() {
         TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN, this);
-        TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this);
-        TelinkLightApplication.Companion.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this);
+        TelinkLightApplication.Companion.getApp().addEventListener(LeScanEvent.LE_SCAN_TIMEOUT,
+                this);
+        TelinkLightApplication.Companion.getApp().addEventListener(DeviceEvent.STATUS_CHANGED,
+                this);
         TelinkLightApplication.Companion.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this);
     }
 
@@ -343,15 +347,18 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         log("connectDevice :" + mac);
         btn_start_update.setText(R.string.connecting_tip);
         btn_start_update.setClickable(false);
-        TelinkLightService.Instance().connect(mac, TIME_OUT_CONNECT);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance != null)
+            instance.connect(mac, TIME_OUT_CONNECT);
     }
 
     private void login() {
         log("login");
         String meshName = user.getControlMeshName();
         String pwd = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16);
-        TelinkLightService.Instance().login(Strings.stringToBytes(meshName, 16),
-                Strings.stringToBytes(pwd, 16));
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance != null)
+            instance.login(Strings.stringToBytes(meshName, 16), Strings.stringToBytes(pwd, 16));
     }
 
     @Override
@@ -402,37 +409,37 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private void updateSuccess() {
         doFinish();
         text_info.setVisibility(View.VISIBLE);
-        text_info.setText( getString(R.string.updateSuccess)+lightVersion);
+        text_info.setText(getString(R.string.updateSuccess) + lightVersion);
         open_device.setText(lightVersion);
         btn_start_update.setVisibility(View.GONE);
         btn_start_update.setClickable(true);
-        switch (lightType){
-           case  DeviceType.LIGHT_NORMAL:
-           case  DeviceType.LIGHT_NORMAL_OLD:
-            case  DeviceType.LIGHT_RGB:
+        switch (lightType) {
+            case DeviceType.LIGHT_NORMAL:
+            case DeviceType.LIGHT_NORMAL_OLD:
+            case DeviceType.LIGHT_RGB:
                 DbLight light = DBUtils.INSTANCE.getLightByMeshAddr(lightMeshAddr);
-                light.version =StringUtils.versionResolutionURL(mPath, 2);
-                DBUtils.INSTANCE.saveLight(light,true);
+                light.version = StringUtils.versionResolutionURL(mPath, 2);
+                DBUtils.INSTANCE.saveLight(light, true);
                 break;
-            case  DeviceType.SMART_CURTAIN:
+            case DeviceType.SMART_CURTAIN:
                 DbCurtain curtain = DBUtils.INSTANCE.getCurtainByMeshAddr(lightMeshAddr);
-                curtain.version =StringUtils.versionResolutionURL(mPath, 2);
-                DBUtils.INSTANCE.saveCurtain(curtain,true);
+                curtain.version = StringUtils.versionResolutionURL(mPath, 2);
+                DBUtils.INSTANCE.saveCurtain(curtain, true);
                 break;
-            case  DeviceType.SMART_RELAY:
+            case DeviceType.SMART_RELAY:
                 DbConnector rely = DBUtils.INSTANCE.getRelyByMeshAddr(lightMeshAddr);
-                rely.version =StringUtils.versionResolutionURL(mPath, 2);
-                DBUtils.INSTANCE.saveConnector(rely,true);
+                rely.version = StringUtils.versionResolutionURL(mPath, 2);
+                DBUtils.INSTANCE.saveConnector(rely, true);
                 break;
             case DeviceType.NORMAL_SWITCH:
                 DbSwitch dbSwitch = DBUtils.INSTANCE.getSwitchByMeshAddr(lightMeshAddr);
-                dbSwitch.version =StringUtils.versionResolutionURL(mPath, 2);
-                DBUtils.INSTANCE.saveSwitch(dbSwitch,true,lightType,dbSwitch.getKeys());
+                dbSwitch.version = StringUtils.versionResolutionURL(mPath, 2);
+                DBUtils.INSTANCE.saveSwitch(dbSwitch, true, lightType, dbSwitch.getKeys());
                 break;
             case DeviceType.EIGHT_SWITCH:
                 DbSwitch dbSwitch8 = DBUtils.INSTANCE.getSwitchByMeshAddr(lightMeshAddr);
                 dbSwitch8.setVersion(StringUtils.versionResolutionURL(mPath, 2));
-                DBUtils.INSTANCE.saveSwitch(dbSwitch8,true, dbSwitch8.type, dbSwitch8.getKeys());
+                DBUtils.INSTANCE.saveSwitch(dbSwitch8, true, dbSwitch8.type, dbSwitch8.getKeys());
                 break;
         }
         ToastUtils.showLong(R.string.exit_update);
@@ -483,7 +490,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 mCancelBuilder = new AlertDialog.Builder(this);
                 mCancelBuilder.setTitle(getString(R.string.warning));
                 mCancelBuilder.setMessage(getString(R.string.is_exit_ota));
-                mCancelBuilder.setPositiveButton(getString(android.R.string.ok), (dialog, which) -> {
+                mCancelBuilder.setPositiveButton(getString(android.R.string.ok),
+                        (dialog, which) -> {
                     sendStopMeshOTACommand();
                     Mesh mesh = TelinkLightApplication.Companion.getApp().getMesh();
                     mesh.setOtaDevice(null);
@@ -491,7 +499,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                     dialog.dismiss();
                     finish();
                 });
-                mCancelBuilder.setNegativeButton(getString(android.R.string.cancel), (dialog, which) ->
+                mCancelBuilder.setNegativeButton(getString(android.R.string.cancel), (dialog,
+                                                                                      which) ->
                         dialog.dismiss()
                 );
             }
@@ -602,8 +611,8 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         params.setTimeoutSeconds(TIME_OUT_SCAN);
         if (String.valueOf(lightMacAddr).length() > 16)
             params.setScanMac(String.valueOf(lightMacAddr));
-
-        TelinkLightService.Instance().startScan(params);
+        if (instance != null)
+            instance.startScan(params);
         startScanTimer();
         log("startScan ");
     }
@@ -616,10 +625,10 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             mScanDisposal.dispose();
         }
         mScanDisposal = Observable.timer(TIME_OUT_SCAN, TimeUnit.SECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
-            onScanTimeout();
-        });
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
+                    onScanTimeout();
+                });
     }
 
     private void stopScanTimer() {
@@ -642,7 +651,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             OTA_IS_HAVEN_START = true;
             //            LogUtils.e("zcl-----------升级版本" + mFirmwareData.toString()
             //            +"--------------"+TelinkLightService.Instance().isLogin());
-            TelinkLightService.Instance().startOta(mFirmwareData);
+            TelinkLightService instance = TelinkLightService.Instance();
+            if (instance != null)
+                instance.startOta(mFirmwareData);
         } else {
             //startScan();
             connectOld(lightMacAddr);
@@ -796,7 +807,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
                 connectRetryCount = 0;
                 if (this.mode == MODE_COMPLETE)
                     return;
-                TelinkLightService.Instance().enableNotification();
+                TelinkLightService instance = TelinkLightService.Instance();
+                if (instance != null)
+                    instance.enableNotification();
                 //                parseFile();
                 break;
 
@@ -843,7 +856,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         byte opcode = (byte) 0xC6;
         int address = 0xFFFF;
         byte[] params = new byte[]{(byte) 0xFE, (byte) 0xFF};
-        TelinkLightService.Instance().sendCommandNoResponse(opcode, address, params);
+        TelinkLightService instance = TelinkLightService.Instance();
+        if (instance != null)
+            instance.sendCommandNoResponse(opcode, address, params);
     }
 
     @Override

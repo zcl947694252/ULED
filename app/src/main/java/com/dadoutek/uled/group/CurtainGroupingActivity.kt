@@ -187,14 +187,14 @@ class CurtainGroupingActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun initData() {
-        val get = this.intent.extras?.get("curtain")
+        val get = intent.extras?.get("curtain")
         if (get==null){
             ToastUtils.showShort(getString(R.string.invalid_data))
             finish()
             return
         }
         this.curtain = get as DbCurtain
-        this.gpAdress = this.intent.getIntExtra("gpAddress", 0)
+        this.gpAdress = intent.getIntExtra("gpAddress", 0)
 
         groupsInit = ArrayList()
 

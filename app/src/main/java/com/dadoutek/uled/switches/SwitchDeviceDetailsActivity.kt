@@ -610,7 +610,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                 if (cmdBean.status == 0) {
                     image_bluetooth.setImageResource(R.drawable.icon_cloud)
                     ToastUtils.showShort(getString(R.string.connect_success))
-                    routerGetVersion(mutableListOf(currentDevice!!.meshAddr), 99, "switchVersion")
+                    routerGetVersion(mutableListOf(currentDevice?.meshAddr?:0), 99, "switchVersion")
                 } else {
                     image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
@@ -644,7 +644,6 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                             else
                                 skipeSw(deviceInfo, switchByID?.version ?: "B-01")
                         }
-
                         override fun error(msg: String?) {
                             hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.get_version_fail))

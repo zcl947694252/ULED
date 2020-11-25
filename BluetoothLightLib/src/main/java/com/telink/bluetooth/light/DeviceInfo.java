@@ -44,6 +44,7 @@ public class DeviceInfo implements Parcelable {
     public int productUUID;
     public int status;
     public int rssi;
+    public int openTag;
 
     /**
      * 是否是重新配置 以及 desenor的id
@@ -100,6 +101,7 @@ public class DeviceInfo implements Parcelable {
         boundMac = in.readString();
         belongRegionId = in.readInt();
         belongGroupId = in.readLong();
+        openTag = in.readInt();
     }
 
     public static final Creator<DeviceInfo> CREATOR = new Creator<DeviceInfo>() {
@@ -174,5 +176,6 @@ public class DeviceInfo implements Parcelable {
         dest.writeString(boundMac);
         dest.writeInt(belongRegionId);
         dest.writeLong(belongGroupId);
+        dest.writeInt(openTag);
     }
 }

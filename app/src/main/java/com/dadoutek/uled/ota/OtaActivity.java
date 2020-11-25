@@ -258,7 +258,6 @@ public class OtaActivity extends TelinkBaseActivity implements EventListener<Str
                     this.append("connecting");
                     TelinkLightService instance = TelinkLightService.Instance();
                     if (instance != null) {
-
                         instance.idleMode(true);
                         instance.connect(deviceInfo.macAddress, 10);
                     }

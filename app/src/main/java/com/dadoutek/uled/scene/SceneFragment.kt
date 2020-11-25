@@ -423,19 +423,19 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun initView() {
-        recyclerView!!.layoutManager = GridLayoutManager(activity, 2)
+        recyclerView?.layoutManager = GridLayoutManager(activity, 2)
 
         adaper = SceneRecycleListAdapter(R.layout.template_device_type_item, scenesListData, isDelete)
-        adaper!!.onItemChildClickListener = onItemChildClickListener
-        adaper!!.onItemLongClickListener = onItemChildLongClickListener
-        adaper!!.bindToRecyclerView(recyclerView)
+        adaper?.onItemChildClickListener = onItemChildClickListener
+        adaper?.onItemLongClickListener = onItemChildLongClickListener
+        adaper?.bindToRecyclerView(recyclerView)
 
         var footer = View.inflate(context, R.layout.template_add_help, null)
         addNewScene = footer.findViewById(R.id.main_add_device)
         addNewScene?.text = getString(R.string.create_scene)
         goHelp = footer.findViewById(R.id.main_go_help)
-        addNewScene!!.setOnClickListener(this)
-        goHelp!!.setOnClickListener(this)
+        addNewScene?.setOnClickListener(this)
+        goHelp?.setOnClickListener(this)
 
 
         var emptyView = View.inflate(context, R.layout.empty_view, null)
@@ -451,7 +451,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             if (scenesListData[i].isSelected)
                 scenesListData[i].isSelected = false
         }
-        adaper!!.notifyDataSetChanged()
+        adaper?.notifyDataSetChanged()
         recyclerView?.scrollToPosition(scenesListData.size)
         viewBottom12?.requestFocus()
         LogUtils.v("zcl-----------滑动到-------${scenesListData.size}")

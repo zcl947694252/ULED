@@ -242,7 +242,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     ToastUtils.showShort(getString(R.string.config_night_light_select_group))
                 } else {
                     if (Constant.IS_ROUTE_MODE) {
-                        RouterModel.configDoubleSw(RouterListBody(switchDate!!.id, mutableListOf(leftGroup?.meshAddr ?: 0, rightGroup?.meshAddr
+                        RouterModel.configDoubleSw(RouterListBody(switchDate!!.id, mutableListOf(leftGroup?.meshAddr
+                                ?: 0, rightGroup?.meshAddr
                                 ?: 0), "configDoubleSw"))
                                 ?.subscribe({
                                     //    "errorCode": 90021, "该开关不存在，请重新刷新数据"  "errorCode": 90008,"该开关没有绑定路由，无法配置"
@@ -253,8 +254,8 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                             showLoadingDialog(getString(R.string.please_wait))
                                             disposableTimer?.dispose()
                                             disposableTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                                     .subscribeOn(Schedulers.io())
-                                                                     .observeOn(AndroidSchedulers.mainThread())
+                                                    .subscribeOn(Schedulers.io())
+                                                    .observeOn(AndroidSchedulers.mainThread())
                                                     .subscribe {
                                                         hideLoadingDialog()
                                                         ToastUtils.showShort(getString(R.string.config_fail))
@@ -268,10 +269,10 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                         90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                         90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                         90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                                        else-> ToastUtils.showShort(it.message)
+                                        else -> ToastUtils.showShort(it.message)
                                     }
                                 }, { ToastUtils.showShort(it.message) })
-                    } else{
+                    } else {
                         showLoadingDialog(getString(R.string.please_wait))
                         GlobalScope.launch {
                             setGroupForSwitch()
@@ -392,7 +393,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     @SuppressLint("CheckResult")
     override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
-        if (cmdBean.ser_id=="retryConnectSw")
+        if (cmdBean.ser_id == "retryConnectSw")
             if (cmdBean.finish) {
                 hideLoadingDialog()
                 if (cmdBean.status == 0) {

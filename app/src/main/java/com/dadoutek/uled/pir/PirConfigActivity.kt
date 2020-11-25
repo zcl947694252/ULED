@@ -108,6 +108,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pir_new)
+        isLoginAccount = false
         initView()
         initData()
         initListener()
@@ -373,7 +374,21 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
 
             R.id.pir_config_btn -> {
-                configDevice()
+                if (TelinkLightService.Instance()?.isLogin == true||Constant.IS_ROUTE_MODE)
+                    configDevice()
+                else {
+                    showLoadingDialog(getString(R.string.connecting_tip))
+                    connect(meshAddress = currentSensor?.meshAddr ?: 0, fastestMode = true)
+                            ?.subscribeOn(Schedulers.io())
+                            ?.observeOn(AndroidSchedulers.mainThread())
+                            ?.subscribe({
+                                hideLoadingDialog()
+                                configDevice()
+                            }, {
+                                ToastUtils.showShort(getString(R.string.connect_fail))
+                                hideLoadingDialog()
+                            })
+                }
             }
         }
     }
@@ -411,10 +426,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             }
             else -> {//符合所有条件
                 when {
-                    currentSensor != null ||mDeviceInfo!=null-> {
+                    currentSensor != null || mDeviceInfo != null -> {
                         when {
                             Constant.IS_ROUTE_MODE -> {
                                 //timeUnitType: Int = 0// 1 代表分 0代表秒   triggerAfterShow: Int = 0//0 开 1关 2自定义
+
                                 // triggerKey: Int = 0//0全天    1白天   2夜晚
                                 //mode	是	int	0群组，1场景   condition	是	int	触发条件。0全天，1白天，2夜晚
                                 //durationTimeUnit	是	int	持续时间单位。0秒，1分钟   durationTimeValue	是	int	持续时间
@@ -434,7 +450,8 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                     setLoadingVisbiltyOrGone(View.VISIBLE, this@PirConfigActivity.getString(R.string.configuring_sensor))
                                     sendCommandOpcode(durationTimeValue.toInt())
                                     delay(300)
-                                    mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
+                                    if (!isReConfirm)
+                                        mDeviceInfo?.meshAddress = MeshAddressGenerator().meshAddress.get()
                                     Commander.updateMeshName(newMeshAddr = mDeviceInfo!!.meshAddress,
                                             successCallback = {
                                                 setLoadingVisbiltyOrGone()
@@ -448,19 +465,17 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                                                 setLoadingVisbiltyOrGone()
                                                 //TelinkLightService.Instance()?.idleMode(true)
                                             })
-
                                 }
                             }
                         }
-
                     }
                     else -> {
                         when {
                             Constant.IS_ROUTE_MODE -> routerConnectSensor(currentSensor!!, 0, "retryConnectSensor")
-                            else ->{
+                            else -> {
                                 launch++
                                 when {
-                                    launch%2==0 -> connect()
+                                    launch % 2 == 0 -> connect()
                                     else -> autoConnect()
                                 }
                             }
@@ -537,6 +552,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         if (TextUtils.isEmpty(version))
             version = mDeviceInfo!!.firmwareRevision
         dbSensor.version = version
+        dbSensor.openTag = mDeviceInfo!!.openTag
         if (!isReConfirm)
             dbSensor.productUUID = mDeviceInfo!!.productUUID
         else
@@ -909,9 +925,11 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         allDispoables()
         if (Constant.IS_ROUTE_MODE)
             currentSensor?.let {
-                routerConnectSensor(it, 1, "connectSensor")
+                routerConnectSensor(it, 1, "disConnectSensor")
+                disposableRouteTimer?.dispose()
             }
         TelinkLightService.Instance()?.idleMode(true)
+        isLoginAccount = true
     }
 
     override fun onBackPressed() {

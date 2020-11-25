@@ -746,9 +746,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-
-            LeScanEvent.LE_SCAN_TIMEOUT -> {
-            }
+            LeScanEvent.LE_SCAN_TIMEOUT -> {}
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             MeshEvent.ERROR -> this.onMeshEvent()
             ErrorReportEvent.ERROR_REPORT -> {

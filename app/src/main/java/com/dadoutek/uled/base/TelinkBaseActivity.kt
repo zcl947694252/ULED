@@ -337,10 +337,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
-            if (!TelinkLightService.Instance().isLogin&&isLoginAccount) {
+            if (TelinkLightService.Instance()?.isLogin==false&&isLoginAccount) {
                 ToastUtils.showLong(getString(R.string.connecting_tip))
                 mConnectDisposable?.dispose()
-                mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
+                mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 3)
                         ?.subscribe({
                             LogUtils.d("connection success")
                         }, {

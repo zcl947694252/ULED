@@ -124,6 +124,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         LogUtils.v("zcl直连灯地址${TelinkLightApplication.getApp().connectDevice?.meshAddress}")
         setContentView(R.layout.huuman_body_sensor)
         window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+        isLoginAccount = false
         initToolbar()
         initView()
         makePopuwindow()
@@ -335,9 +336,11 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
 
     override fun onDestroy() {
         super.onDestroy()
+        isLoginAccount = true
             if (Constant.IS_ROUTE_MODE)
                 currentSensor?.let {
-                    routerConnectSensor(it, 1, "connectSensor")
+                    routerConnectSensor(it, 1, "disConnectSensor")
+                    disposableRouteTimer?.dispose()
                 }
         disposableReset?.dispose()
         TelinkLightApplication.getApp().removeEventListener(this)
@@ -1128,6 +1131,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.version = version
+        dbSensor.openTag = mDeviceInfo!!.openTag
         dbSensor.meshAddr = mDeviceInfo.meshAddress
         //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID

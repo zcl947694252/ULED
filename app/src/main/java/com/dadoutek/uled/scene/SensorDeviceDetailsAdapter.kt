@@ -15,6 +15,7 @@ class SensorDeviceDetailsAdapter(layoutResId: Int, data: List<DbSensor>?) : Base
     }
     override fun convert(helper: BaseViewHolder, dbSensor: DbSensor) {
         if (dbSensor != null) {
+            dbSensor.updateIcon()
             helper.setText(R.id.template_device_group_name, dbSensor.name)
             helper.setImageResource(R.id.template_device_icon, dbSensor.icon)
             val iv = helper.getView<ImageView>(R.id.template_device_icon)
