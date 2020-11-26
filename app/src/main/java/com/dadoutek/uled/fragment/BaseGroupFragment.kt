@@ -460,7 +460,15 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 ToastUtils.showShort(getString(R.string.open_faile))
                             }
                 }
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(mContext?.getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                        override fun start() {}
+                        override fun complete() {}
+                        override fun error(msg: String?) {}
+                    })
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -501,7 +509,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         when (view!!.id) {
             R.id.template_device_icon -> {
                 if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
-                    goConnect(false)
+                    goConnect()
                     sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
                 } else
                     if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
@@ -592,7 +600,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                 }
                                 intent?.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
                                 intent?.putExtra("group", currentGroup)
-                                if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
+                                if (!TelinkLightService.Instance().isLogin && !Constant.IS_ROUTE_MODE) {
                                     goConnect()
                                 } else {
                                     startActivityForResult(intent, 2)
@@ -608,25 +616,29 @@ abstract class BaseGroupFragment : BaseFragment() {
             //不能使用group_name否则会造成长按监听无效 跳转组详情
             //  R.id.item_layout -> {
             R.id.template_device_more -> {
-                var intent = Intent()
-                when (groupType) {
-                    Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("light", "cw_light")
+                if (TelinkLightService.Instance()?.isLogin == true||Constant.IS_ROUTE_MODE) {
+                    var intent = Intent()
+                    when (groupType) {
+                        Constant.DEVICE_TYPE_LIGHT_NORMAL -> {
+                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                            intent.putExtra("light", "cw_light")
+                        }
+                        Constant.DEVICE_TYPE_LIGHT_RGB -> {
+                            intent = Intent(mContext, LightsOfGroupActivity::class.java)
+                            intent.putExtra("light", "rgb_light")
+                        }//蓝牙接收器
+                        Constant.DEVICE_TYPE_CONNECTOR -> {
+                            intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
+                        }
+                        Constant.DEVICE_TYPE_CURTAIN -> {
+                            intent = Intent(mContext, CurtainOfGroupActivity::class.java)
+                        }
                     }
-                    Constant.DEVICE_TYPE_LIGHT_RGB -> {
-                        intent = Intent(mContext, LightsOfGroupActivity::class.java)
-                        intent.putExtra("light", "rgb_light")
-                    }//蓝牙接收器
-                    Constant.DEVICE_TYPE_CONNECTOR -> {
-                        intent = Intent(mContext, ConnectorOfGroupActivity::class.java)
-                    }
-                    Constant.DEVICE_TYPE_CURTAIN -> {
-                        intent = Intent(mContext, CurtainOfGroupActivity::class.java)
-                    }
+                    intent.putExtra("group", currentGroup)
+                    startActivityForResult(intent, 2)
+                }else{
+                    goConnect()
                 }
-                intent.putExtra("group", currentGroup)
-                startActivityForResult(intent, 2)
             }
         }
     }

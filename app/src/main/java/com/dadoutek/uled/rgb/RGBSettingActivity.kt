@@ -270,7 +270,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
         if (light == null) {
             ToastUtils.showLong(getString(R.string.please_connect_normal_light))
-             TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.idleMode(true)
             return
         }
 
@@ -302,13 +302,13 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         mDisposable.add(
                 RxPermissions(this)!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                         .subscribeOn(Schedulers.io())
-                                         .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             isDirectConnectDevice(it)
-                        },{
+                        }, {
 
-                        }) )
+                        }))
     }
 
     private fun isDirectConnectDevice(granted: Boolean) {
@@ -318,7 +318,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             else -> {
                 if (Constant.IS_ROUTE_MODE) {
                     startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr, "deviceType" to light!!.productUUID,
-                            "deviceMac" to light!!.macAddr,"version" to light!!.version )
+                            "deviceMac" to light!!.macAddr, "version" to light!!.version)
                     finish()
                 } else {
                     var isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
@@ -664,7 +664,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         setColorMode()
         setDiyColorMode()
 
-        val brightness =isZeroOrHundred(light!!.brightness)
+        val brightness = isZeroOrHundred(light!!.brightness)
         rgb_sbBrightness!!.progress = brightness
         sbBrightness_num!!.text = "$brightness%"
 
@@ -695,7 +695,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         color_g.text = g.toString()
         color_b.text = b.toString()
 
-         w = when {
+        w = when {
             w <= 0 -> 1
             w > 100 -> 100
             else -> w
@@ -1098,7 +1098,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             currentShowGroupSetPage -> group?.brightness = rgb_sbBrightness.progress
                             else -> light?.brightness = rgb_sbBrightness.progress
                         }
-                        rgb_sbBrightness.progress = isZeroOrHundred( rgb_sbBrightness.progress)
+                    rgb_sbBrightness.progress = isZeroOrHundred(rgb_sbBrightness.progress)
                     sbBrightness_num.text = rgb_sbBrightness.progress.toString() + "%"
 
                     stopTracking = false
@@ -1120,7 +1120,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             when {
                 rgb_white_seekbar.progress < 1 -> {
                     briCheckUi(false)
-                    sb_w_bright_num.text ="1%"
+                    sb_w_bright_num.text = "1%"
                 }
                 rgb_white_seekbar.progress == 1 -> {
                     sb_w_bright_less.isEnabled = false
@@ -1303,25 +1303,25 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         isPresetMode = true
         isDiyMode = false
         //应用内置渐变
-        if (clickPostion!=100)
-        if (!Constant.IS_ROUTE_MODE) {
-            applyDisposable?.dispose()
-            applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
-                    .subscribe {
-                        GlobalScope.launch {
-                            for (i in 0..2) {
-                                stopGradient()
-                                delay(50)
+        if (clickPostion != 100)
+            if (!Constant.IS_ROUTE_MODE) {
+                applyDisposable?.dispose()
+                applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
+                        .subscribe {
+                            GlobalScope.launch {
+                                for (i in 0..2) {
+                                    stopGradient()
+                                    delay(50)
+                                }
                             }
+                            positionState = position + 1
+                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                         }
-                        positionState = position + 1
-                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
-                    }
-            postionAndNum?.position = position
-            systemGradientApply(clickPostion)
-        } else {
-            routerSystemGradientApply(buildInModeList[clickPostion].id + 1, speed, "systemApply")
-        }
+                postionAndNum?.position = position
+                systemGradientApply(clickPostion)
+            } else {
+                routerSystemGradientApply(buildInModeList[clickPostion].id + 1, speed, "systemApply")
+            }
     }
 
     private fun systemGradientStop() {
@@ -1372,29 +1372,29 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             toolbar!!.title = getString(R.string.dynamic_gradient)
             rgbDiyGradientAdapter!!.notifyDataSetChanged()
             setDate()
-          /*  when {
-                isDiyMode -> applyDiyGradient(clickPostion)
-                else -> applyModeGradient(clickPostion)
-            }*/
-          /*  if (clickPostion != 100 && diyPosition != 100) {
-                diyGradientList!![diyPosition].isSelect = false//开关状态
-                diyGradientList!![clickPostion].isSelect = true//开关状态
-                diyPosition = clickPostion
-            } else {
-                if (diyPosition != 100)
-                    diyGradientList!![diyPosition].isSelect = true//开关状态
-            }*/
+            /*  when {
+                  isDiyMode -> applyDiyGradient(clickPostion)
+                  else -> applyModeGradient(clickPostion)
+              }*/
+            /*  if (clickPostion != 100 && diyPosition != 100) {
+                  diyGradientList!![diyPosition].isSelect = false//开关状态
+                  diyGradientList!![clickPostion].isSelect = true//开关状态
+                  diyPosition = clickPostion
+              } else {
+                  if (diyPosition != 100)
+                      diyGradientList!![diyPosition].isSelect = true//开关状态
+              }*/
             //isExitGradient = false
             //isDiyMode = true
-           /* changeToDiyPage()
+            /* changeToDiyPage()
 
-            //应用自定义渐变
-            if (diyPosition != 100)
-                GlobalScope.launch {
-                    stopGradient()
-                    delay(200)
-                  ///  Commander.applyDiyGradient(dstAddress, diyGradientList!![diyPosition].id.toInt(), diyGradientList!![diyPosition].speed, firstLightAddress)
-                }*/
+             //应用自定义渐变
+             if (diyPosition != 100)
+                 GlobalScope.launch {
+                     stopGradient()
+                     delay(200)
+                   ///  Commander.applyDiyGradient(dstAddress, diyGradientList!![diyPosition].id.toInt(), diyGradientList!![diyPosition].speed, firstLightAddress)
+                 }*/
         }
     }
 
@@ -1475,7 +1475,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 val intent = Intent(this, SetDiyColorAct::class.java)
                 intent.putExtra(Constant.IS_CHANGE_COLOR, true)
                 intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![clickPostion])
-                 dstAddress = if (currentShowGroupSetPage) group!!.meshAddr else light!!.meshAddr
+                dstAddress = if (currentShowGroupSetPage) group!!.meshAddr else light!!.meshAddr
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
                 intent.putExtra(Constant.DEVICE_TYPE, deviceType)
                 startActivityForResult(intent, 0)
@@ -1491,18 +1491,18 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private fun applyDiyGradient(position: Int) {
         isPresetMode = false
         isDiyMode = true
-        if (clickPostion!=100)
-        if (!Constant.IS_ROUTE_MODE) {
-            GlobalScope.launch {
-                stopGradient()
-                delay(200)
-                Commander.applyDiyGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(),
-                        diyGradientList!![position].speed, firstLightAddress)
+        if (clickPostion != 100)
+            if (!Constant.IS_ROUTE_MODE) {
+                GlobalScope.launch {
+                    stopGradient()
+                    delay(200)
+                    Commander.applyDiyGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(),
+                            diyGradientList!![position].speed, firstLightAddress)
+                }
+                diyOpenGradientResult(clickPostion)
+            } else {
+                routerDiyGradientApply(diyGradientList[clickPostion].id.toInt(), "diyModeApply")
             }
-            diyOpenGradientResult(clickPostion)
-        } else {
-            routerDiyGradientApply(diyGradientList[clickPostion].id.toInt(), "diyModeApply")
-        }
     }
 
     private fun diyOpenGradientResult(position: Int) {
@@ -1586,7 +1586,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                                                 hideLoadingDialog()
                                             }
                                 }
-                                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                                90018 -> {
+                                    DBUtils.deleteLocalData()
+                                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                                    finish()
+                                }
                                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -1681,10 +1686,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             isDiyMode = false
             changeToDiyPage()
         } else {
-           //toolbar.menu.setGroupVisible(0, true)
-           //toolbar.menu.setGroupVisible(1, true)
-           //toolbar.menu.setGroupVisible(2, true)
-           //toolbar.menu.setGroupVisible(3, true)
+            //toolbar.menu.setGroupVisible(0, true)
+            //toolbar.menu.setGroupVisible(1, true)
+            //toolbar.menu.setGroupVisible(2, true)
+            //toolbar.menu.setGroupVisible(3, true)
             rgb_diy.visibility = View.GONE
             rgb_set.visibility = View.VISIBLE
             dynamic_rgb.setTextColor(resources.getColor(R.color.black_nine))
@@ -1738,7 +1743,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             else -> light?.brightness ?: 1
         }
 
-        showBrightness= isZeroOrHundred(showBrightness)
+        showBrightness = isZeroOrHundred(showBrightness)
         ws = isZeroOrHundred(ws)
         w = isZeroOrHundred(w)
 
@@ -2041,7 +2046,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 val opcode: Byte = Opcode.SET_LUM
                 val opcodeW: Byte = Opcode.SET_W_LUM
                 w = isZeroOrHundred(w)
-                brightness = isZeroOrHundred(brightness?:0)
+                brightness = isZeroOrHundred(brightness ?: 0)
 
                 val paramsW: ByteArray = byteArrayOf(w.toByte())
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
@@ -2068,7 +2073,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
         rgb_sbBrightness?.progress = brightness!!
         sb_w_bright_num.text = "$brightness%"
-            sb_w_bright_num.text = "$w%"
+        sb_w_bright_num.text = "$w%"
 
         color_r?.text = red.toString()
         color_g?.text = green.toString()
@@ -2119,9 +2124,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             if (lightList != null && lightList.size > 0)
                 firstLightAddress = lightList[0].meshAddr
         } else {
-           // toolbar.menu.setGroupVisible(0, false)
+            // toolbar.menu.setGroupVisible(0, false)
             //toolbar.menu.setGroupVisible(1, false)
-           // toolbar.menu.setGroupVisible(2, false)
+            // toolbar.menu.setGroupVisible(2, false)
             //toolbar.menu.setGroupVisible(3, false)
             rgb_diy.visibility = View.VISIBLE
             rgb_set.visibility = View.GONE
@@ -2224,7 +2229,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             var g = Color.green(it.color)
                             var b = Color.blue(it.color)
                             it.color = (w shl 24) or (r shl 16) or (g shl 8) or b
-                            DBUtils.saveLight(it,false)
+                            DBUtils.saveLight(it, false)
                         }
                 }
             }
@@ -2310,8 +2315,10 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             }
                 }
                 90018 -> {
+                    DBUtils.deleteLocalData()
                     ToastUtils.showShort(getString(R.string.device_not_exit))
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
                 }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
@@ -2346,7 +2353,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -2380,7 +2392,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -2414,7 +2431,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -2662,7 +2684,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         var blue = B.toByte()
 
         var white = when {
-            currentShowGroupSetPage -> if (group == null) 50 else( group!!.color and 0xff000000.toInt()) shr 24
+            currentShowGroupSetPage -> if (group == null) 50 else (group!!.color and 0xff000000.toInt()) shr 24
             else -> if (light == null) 50 else light!!.color and 0xff000000.toInt() shr 24
         }
 
@@ -2710,7 +2732,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -2832,7 +2859,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private fun sendBrightnessMsg(brightness: Int) {
         val addr: Int = when {
-            currentShowGroupSetPage ->group!!.meshAddr
+            currentShowGroupSetPage -> group!!.meshAddr
             else -> light!!.meshAddr
         }
         if (Constant.IS_ROUTE_MODE) {

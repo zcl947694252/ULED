@@ -63,6 +63,7 @@ import kotlinx.android.synthetic.main.activity_batch_group_four.image_bluetooth
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbar
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbarTv
 import kotlinx.coroutines.*
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
 import java.lang.StringBuilder
 import java.util.*
@@ -76,6 +77,7 @@ import java.util.concurrent.TimeUnit
  * 更新时间   用于冷暖灯,彩灯,窗帘控制器的批量分组$
  */
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
+    private lateinit var batchList: MutableList<Int>
     private var disposableIntervalTime: Disposable? = null
     private var disposableTimer: Disposable? = null
     private var tipReadTimer: TextView? = null
@@ -144,6 +146,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private var isAddGroupEmptyView: Boolean = false
     private var isComplete: Boolean = false
     private var isChange: Boolean = false
+    private var isFirst: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -472,28 +475,31 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         when (deviceType) {
             DeviceType.LIGHT_NORMAL -> {
                 deviceDataLightAll.clear()
-                if (scanningList == null) {
-                    if (gpMeshAddr == 0)
-                        deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
-                    else
-                        DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {//如果组地址有效就说明是分该组内的设备
-                            deviceDataLightAll.addAll(it)
+                when (scanningList) {
+                    null -> {
+                        when (gpMeshAddr) {
+                            0 -> deviceDataLightAll.addAll(DBUtils.getAllNormalLight())
+                            else -> DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {//如果组地址有效就说明是分该组内的设备
+                                deviceDataLightAll.addAll(it)
+                            }
                         }
-                } else {
-                    for (item in scanningList!!) {
-                        val lightByMeshAddr = DBUtils.getLightByMeshAddr(item.meshAddress)
-                        val light: DbLight = lightByMeshAddr ?: DbLight()
+                    }
+                    else -> {
+                        for (item in scanningList!!) {
+                            val lightByMeshAddr = DBUtils.getLightByMeshAddr(item.meshAddress)
+                            val light: DbLight = lightByMeshAddr ?: DbLight()
 
-                        light.macAddr = item.macAddress
-                        light.sixMac = item.sixByteMacAddress
-                        light.meshAddr = item.meshAddress
-                        light.productUUID = item.productUUID
-                        light.meshUUID = item.meshUUID
-                        if (lightByMeshAddr == null)
-                            light.belongGroupId = allLightId
-                        light.name = getString(R.string.device_name) + light.meshAddr
-                        light.rssi = item.rssi
-                        deviceDataLightAll.add(light)
+                            light.macAddr = item.macAddress
+                            light.sixMac = item.sixByteMacAddress
+                            light.meshAddr = item.meshAddress
+                            light.productUUID = item.productUUID
+                            light.meshUUID = item.meshUUID
+                            if (lightByMeshAddr == null)
+                                light.belongGroupId = allLightId
+                            light.name = getString(R.string.device_name) + light.meshAddr
+                            light.rssi = item.rssi
+                            deviceDataLightAll.add(light)
+                        }
                     }
                 }
                 subLightData()
@@ -501,12 +507,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             DeviceType.LIGHT_RGB -> {
                 deviceDataLightAll.clear()
                 when (scanningList) {
-                    null -> if (gpMeshAddr == 0)
-                        deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
-                    else
-                        DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {
+                    null -> when (gpMeshAddr) {
+                        0 -> deviceDataLightAll.addAll(DBUtils.getAllRGBLight())
+                        else -> DBUtils.getLightByGroupMesh(gpMeshAddr)?.let {
                             deviceDataLightAll.addAll(it)
                         }
+                    }
                     else -> for (item in scanningList!!) {
                         val lightByMeshAddr = DBUtils.getLightByMeshAddr(item.meshAddress)
                         val light: DbLight = lightByMeshAddr ?: DbLight()
@@ -525,38 +531,42 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
             DeviceType.SMART_CURTAIN -> {
                 deviceDataCurtainAll.clear()
-                if (scanningList == null)
-                    if (gpMeshAddr == 0)
-                        deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
-                    else
-                        DBUtils.getCurtainByGroupMesh(gpMeshAddr)?.let {
-                            deviceDataCurtainAll.addAll(it)
+                when (scanningList) {
+                    null -> {
+                        when {
+                            gpMeshAddr == 0 -> deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
+                            else -> DBUtils.getCurtainByGroupMesh(gpMeshAddr)?.let {
+                                deviceDataCurtainAll.addAll(it)
+                            }
                         }
-                else for (item in scanningList!!) {
-                    val curtainByMeshAddr = DBUtils.getCurtainByMeshAddr(item.meshAddress)
-                    val device = curtainByMeshAddr ?: DbCurtain()
-                    device.macAddr = item.macAddress
-                    device.meshAddr = item.meshAddress
-                    device.productUUID = item.productUUID
-                    if (curtainByMeshAddr == null)
-                        device.belongGroupId = allLightId
-                    device.name = getString(R.string.device_name) + device.meshAddr
-                    device.rssi = item.rssi
-                    deviceDataCurtainAll.add(device)
+                    }
+                    else -> for (item in scanningList!!) {
+                        val curtainByMeshAddr = DBUtils.getCurtainByMeshAddr(item.meshAddress)
+                        val device = curtainByMeshAddr ?: DbCurtain()
+                        device.macAddr = item.macAddress
+                        device.meshAddr = item.meshAddress
+                        device.productUUID = item.productUUID
+                        if (curtainByMeshAddr == null)
+                            device.belongGroupId = allLightId
+                        device.name = getString(R.string.device_name) + device.meshAddr
+                        device.rssi = item.rssi
+                        deviceDataCurtainAll.add(device)
+                    }
                 }
                 subCurtainData()
             }
             DeviceType.SMART_RELAY -> {
                 deviceDataRelayAll.clear()
-                if (scanningList == null)
-                    if (gpMeshAddr == 0)
-                        deviceDataRelayAll.addAll(DBUtils.getAllRelay())
-                    else
-                        DBUtils.getRelayByGroupMesh(gpMeshAddr)?.let {
-                            deviceDataRelayAll.addAll(it)
+                when (scanningList) {
+                    null -> {
+                        when {
+                            gpMeshAddr == 0 -> deviceDataRelayAll.addAll(DBUtils.getAllRelay())
+                            else -> DBUtils.getRelayByGroupMesh(gpMeshAddr)?.let {
+                                deviceDataRelayAll.addAll(it)
+                            }
                         }
-                else
-                    for (item in scanningList!!) {
+                    }
+                    else -> for (item in scanningList!!) {
                         val relyByMeshAddr = DBUtils.getRelyByMeshAddr(item.meshAddress)
                         val device = relyByMeshAddr ?: DbConnector()
                         device.macAddr = item.macAddress
@@ -568,6 +578,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         device.rssi = item.rssi
                         deviceDataRelayAll.add(device)
                     }
+                }
                 subRelayData()
             }
         }
@@ -876,25 +887,25 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     else
                         autoConnect()
                 } else {
-                    val list = mutableListOf<Int>()
+                    batchList = mutableListOf()
                     when (deviceType) {
                         DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                             deviceDataLightAll.filter { it1 -> it1.isSelected }.forEach { it2 ->
-                                list.add(it2.meshAddr)
+                                batchList.add(it2.meshAddr)
                             }
                         }
                         DeviceType.SMART_CURTAIN -> {
                             deviceDataCurtainAll.filter { it1 -> it1.isSelected }.forEach { it2 ->
-                                list.add(it2.meshAddr)
+                                batchList.add(it2.meshAddr)
                             }
                         }
                         DeviceType.SMART_RELAY -> {
                             deviceDataRelayAll.filter { it1 -> it1.isSelected }.forEach { it2 ->
-                                list.add(it2.meshAddr)
+                                batchList.add(it2.meshAddr)
                             }
                         }
                     }
-                    routerGroupDevice(list, it)
+                    routerGroupDevice(batchList, it)
                 }
             } else {//如果什么操作都没有点击后退出 此相关逻辑已经废弃
                 finish()
@@ -997,17 +1008,52 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     0, 1 -> {
                         if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
                         hideLoadingDialog()
-                        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
-                            override fun start() {}
-                            override fun complete() {
-                                LogUtils.v("zcl-----------拉取成功-------")
-                                groupTzRefresh(bean)
+                        currentGroup!!.meshAddr
+                        batchList.forEach { it1 ->
+                            when (deviceType) {
+                                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
+                                    listGroup.forEach {
+                                        if (it.meshAddr == it1) {
+                                            currentGroup?.let { itgp ->
+                                                it.groupName = DBUtils.getGroupNameByID(itgp.id, this)
+                                                it.hasGroup = true
+                                                it.belongGroupId = itgp.id
+                                                DBUtils.saveLight(it, false)
+                                            }
+                                        }
+                                    }
+                                    lightGroupedAdapterm.notifyDataSetChanged()
+                                }
+                                DeviceType.SMART_CURTAIN -> {
+                                    listGroupCutain.forEach {
+                                        if (it.meshAddr == it1) {
+                                            currentGroup?.let { itgp ->
+                                                it.groupName = DBUtils.getGroupNameByID(itgp.id, this)
+                                                it.hasGroup = true
+                                                it.belongGroupId = itgp.id
+                                                DBUtils.saveCurtain(it, false)
+                                            }
+                                        }
+                                    }
+                                    curtainGroupedAdapterm.notifyDataSetChanged()
+                                }
+                                DeviceType.SMART_RELAY -> {
+                                    listGroupRelay.forEach {
+                                        if (it.meshAddr == it1) {
+                                            currentGroup?.let { itgp ->
+                                                it.groupName = DBUtils.getGroupNameByID(itgp.id, this)
+                                                it.hasGroup = true
+                                                it.belongGroupId = itgp.id
+                                                DBUtils.saveConnector(it, false)
+                                            }
+                                        }
+                                    }
+                                    relayGroupedAdapterm.notifyDataSetChanged()
+                                }
                             }
+                        }
 
-                            override fun error(msg: String?) {
-                                groupTzRefresh(bean)
-                            }
-                        })
+                        groupTzRefresh(bean)
                     }
                 }
                 LogUtils.v("zcl-----------收到路由分组通知-------$bean")
@@ -1891,6 +1937,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         compositeDisposable.dispose()
         isAll = false
         setChecked()
+        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
         disposableIntervalTime?.dispose()
         this.mApplication?.removeEventListener(this)
         isAddGroupEmptyView = false
@@ -2048,7 +2095,21 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         if (fromJson?.finish == true) {
             isAll = false
             setChecked()
-            initData()
+            refreshData()
+            if (gpMeshAddr == 0){
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() {}
+
+                    override fun complete() {
+                        setDevicesData()
+                    }
+
+                    override fun error(msg: String?) {
+                        setDevicesData()
+                    }
+                })
+            }
+            setGroupData()
         } else {
             ToastUtils.showShort(getString(R.string.router_grouping, fromJson?.succeedNow?.size ?: 0))
         }

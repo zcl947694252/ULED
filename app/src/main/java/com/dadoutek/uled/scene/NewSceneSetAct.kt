@@ -67,7 +67,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var brightness: Int = 0
     private var whiteLight: Int = 0
     private var sceneGroupAdapter: SceneGroupAdapter? = null
-    private lateinit var dbScene: DbScene
     private var disposableTimer: Disposable? = null
     private var rgbGradientId: Int = 1
     private var resId: Int = R.drawable.icon_out
@@ -78,7 +77,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var buildInModeList: ArrayList<ItemRgbGradient> = ArrayList()
     private var isOpen: Boolean = true
     private var currentPageIsEdit = false
-    private var scene: DbScene? = null
+    private var dbScene: DbScene? = null
     private var isReconfig = false
     private var isChange = true
     private var isResult = false
@@ -260,10 +259,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
         isReconfig = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
         if (isReconfig && !isResult) {
             showGroupList.clear()
-            scene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
-            edit_name.setText(scene?.name)
+            dbScene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
+            edit_name.setText(dbScene?.name)
             //获取场景具体信息
-            val actions = DBUtils.getActionsBySceneId(scene!!.id)
+            val actions = DBUtils.getActionsBySceneId(dbScene!!.id)
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMeshAddr(actions[i].groupAddr)
                 if (item.id != 0L && item.meshAddr != 0) {
@@ -295,14 +294,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
             isReconfig = showGroupList.isNotEmpty() || groupMeshAddrArrayList.isNotEmpty()
             if (!isReconfig) {
                 ToastUtils.showShort(getString(R.string.gp_deletescene))
-                DBUtils.deleteScene(scene!!)
+                DBUtils.deleteScene(dbScene!!)
             }
         }
 
         when {
             isReconfig -> {
-                toolbarTv.text = scene!!.name
-                editSceneName = scene!!.name
+                toolbarTv.text = dbScene!!.name
+                editSceneName = dbScene!!.name
                 showGpDetailList()
             }
             else -> {
@@ -368,7 +367,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         sceneGroupAdapter?.data!![pos].rgbType = rgbType
         val itemGroup = sceneGroupAdapter?.data?.get(currentPosition)
         when (rgbType) {
-                1 -> {
+            1 -> {
                 val presetGradientList = resources.getStringArray(R.array.preset_gradient)
                 itemGroup?.gradientName = presetGradientList[0]
                 rgbGradientId = 1
@@ -678,9 +677,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private fun showEditListVew() {
         when {
             editSceneName != null -> edit_name.setText(editSceneName)
-            scene != null -> edit_name.setText(scene!!.name)
+            dbScene != null -> edit_name.setText(dbScene!!.name)
         }
-        resId = if (TextUtils.isEmpty(scene?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(scene?.imgName, this)
+        resId = if (TextUtils.isEmpty(dbScene?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(dbScene?.imgName, this)
         scene_icon.setImageResource(resId)
 
         isToolbar = false
@@ -832,12 +831,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
             ex.printStackTrace()
         }
         dbScene = DbScene()
-        dbScene.id = getSceneId()
-        dbScene.name = name
-        dbScene.imgName = sceneIcon
-        dbScene.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
+        dbScene?.id = getSceneId()
+        dbScene?.name = name
+        dbScene?.imgName = sceneIcon
+        dbScene?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
 
-        val belongSceneId = dbScene.id!!
+        val belongSceneId = dbScene?.id!!
         val actionsList = mutableListOf<DbSceneActions>()
         for (i in showGroupList!!.indices) {
             var sceneActions = DbSceneActions()
@@ -871,7 +870,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun afterSaveScene() {
-        DBUtils.saveScene(dbScene, false)
+        dbScene?.let {
+            DBUtils.saveScene(dbScene!!, false)
+        }
+        SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallbackGet)
         hideLoadingDialog()
         finish()
     }
@@ -899,7 +901,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun startAddSceneTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
-        disposableTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong(), TimeUnit.SECONDS)
+        disposableTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong()+2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -959,7 +961,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
                 if (light > 99)
                     light = 99
-                val meshAddress = TelinkApplication.getInstance().connectDevice?.meshAddress?:0
+                val meshAddress = TelinkApplication.getInstance().connectDevice?.meshAddress ?: 0
                 val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
                 val mesL = meshAddress and 0xff
                 val color = list[i].getColor()
@@ -1017,13 +1019,13 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val name = edit_name.text.toString()
         val itemGroups = showGroupList
         val nameList = java.util.ArrayList<Int>()
-        scene?.name = name
-        scene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
-        val belongSceneId = scene?.id!!
+        dbScene?.name = name
+        dbScene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
+        val belongSceneId = dbScene?.id!!
 
         if (!Constant.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.saving))
-            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(scene?.id!!))
+            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(dbScene?.id!!))
         }
         val actionsList = mutableListOf<DbSceneActions>()
         for (i in itemGroups.indices) {
@@ -1048,7 +1050,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         when {
             Constant.IS_ROUTE_MODE -> routerUpdateScene(belongSceneId, actionsList)
             else -> {
-                DBUtils.updateScene(scene!!)
+                DBUtils.updateScene(dbScene!!)
                 Thread.sleep(100)
                 updateSceneSendCommend(belongSceneId)
                 finish()
@@ -1218,6 +1220,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         if (cmdBodyBean?.ser_id == "updateScene") {
             hideLoadingDialog()
             LogUtils.v("zcl-----------收到路由添加通知-------$cmdBodyBean")
+            afterSaveScene()
             when {
                 cmdBodyBean?.finish && cmdBodyBean?.status == 0 -> {//-1 全部失败 1 部分成功
                     ToastUtils.showShort(getString(R.string.config_success))
@@ -1241,7 +1244,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                         DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(item?.id!!))
                         for (i in item.actions.indices)
                             DBUtils.saveSceneActions(item.actions[i], item.id)
-                        LogUtils.v("zcl--------获取服务器场景---$item------${DBUtils.getActionsBySceneId(scene!!.id)}-")
+                        LogUtils.v("zcl--------获取服务器场景---$item------${DBUtils.getActionsBySceneId(dbScene!!.id)}-")
                     }
                     finish()
                 }, {

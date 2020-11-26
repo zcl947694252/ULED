@@ -410,11 +410,14 @@ class BindRouterActivity : TelinkBaseActivity() {
             disposableIntervalTime = Observable.interval(0, 3000, TimeUnit.MILLISECONDS)
                     .subscribe {
                         //   LogUtils.v("zcl-----------收到理由闪烁-------$blinkList---------${blinkList.size}")
-                        RouterModel.routeBatchGpBlink(GroupBlinkBodyBean(blinkList, (currentGroup?.deviceType ?: 0).toInt()))?.subscribe({
-                            // LogUtils.v("zcl----------收到理由闪烁--------成功")
-                        }, {
-                            //  LogUtils.v("zcl----------收到理由闪烁--------失败")
-                        })
+                        if (blinkList.size > 0) {
+                            RouterModel.routeBatchGpBlink(GroupBlinkBodyBean(blinkList, (currentGroup?.deviceType
+                                    ?: 0).toInt()))?.subscribe({
+                                // LogUtils.v("zcl----------收到理由闪烁--------成功")
+                            }, {
+                                //  LogUtils.v("zcl----------收到理由闪烁--------失败")
+                            })
+                        }
                     }
         }
     }

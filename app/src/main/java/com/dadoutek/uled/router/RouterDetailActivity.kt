@@ -5,7 +5,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.Toolbar
+import android.text.TextUtils
 import android.widget.EditText
+import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -61,22 +63,23 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
     }
 
     override fun renameDevice() {
-        val textGp = EditText(this)
-        StringUtils.initEditTextFilter(textGp)
-        textGp.hint =getString(R.string.please_rename)
-         AlertDialog.Builder(this)
-                                     .setTitle(R.string.please_rename)
-                                     .setView(textGp)
-                                     .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                                         if (textGp.text.toString().isEmpty()) {
-                                             ToastUtils.showLong(getString(R.string.plaese_input_device_name))
-                                             return@setPositiveButton
-                                         }
-                                         dialog.dismiss()
-                                         routerRenameDevice(textGp.text.toString())
-                                     }
-                                     .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+        if (!TextUtils.isEmpty(router?.name))
+            renameEt?.setText(router?.name)
+        renameEt?.setSelection(renameEt?.text.toString().length)
+        StringUtils.initEditTextFilter(renameEt)
+        if (this != null && !this.isFinishing) {
+            renameDialog?.dismiss()
+            renameDialog?.show()
+        }
 
+        renameConfirm?.setOnClickListener {    // 获取输入框的内容
+            if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
+                ToastUtils.showLong(getString(R.string.rename_tip_check))
+            } else {
+                val trim = renameEt?.text.toString().trim { it <= ' ' }
+                routerRenameDevice(trim)
+            }
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -86,7 +89,9 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
             router?.name = toString
             DBUtils.saveRouter(router!!,true)
             toolbarTv.text = router?.name
+            renameDialog?.dismiss()
         }, {
+            renameDialog?.dismiss()
             ToastUtils.showShort(it.message)
         })
     }

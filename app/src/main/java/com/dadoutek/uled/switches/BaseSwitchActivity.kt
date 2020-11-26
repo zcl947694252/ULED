@@ -398,7 +398,12 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                 ToastUtils.showShort(getString(R.string.connect_fail))
                             }
                 }
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)

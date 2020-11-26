@@ -229,7 +229,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         showLoadingDialog(resources.getString(R.string.please_wait))
 
         disposableConnectTimer?.dispose()
-        disposableConnectTimer = Observable.timer(500, TimeUnit.MILLISECONDS)
+        disposableConnectTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -473,7 +473,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             DeviceType.GATE_WAY -> {
                 LogUtils.v("zcl----连接类型---$mAddDeviceType----网关-----${DeviceType.GATE_WAY}-----mac---${bestRssiDevice?.macAddress}" +
                         "--------mesh--${bestRssiDevice?.meshAddress}")
-                mAutoConnectDisposable = connect(deviceTypes = elements, macAddress = bestRssiDevice?.macAddress, fastestMode = true,  connectTimeOutTime = 15)
+                mAutoConnectDisposable = connect(deviceTypes = elements, macAddress = bestRssiDevice?.macAddress, fastestMode = true, connectTimeOutTime = 15)
                         ?.subscribe(
                                 {
                                     TelinkLightApplication.getApp().isConnectGwBle = true
@@ -491,7 +491,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             {
                                 onLogin()
                             }, {
-                        // onLogin()
                         hideLoadingDialog()
                         ToastUtils.showLong(getString(R.string.connect_fail))
                         LogUtils.d(it)
@@ -656,12 +655,23 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun initToolbar() {
         toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener {
-            if (isScanning) {
+         /*   if (isScanning) {
                 cancelf.isClickable = true
                 confirmf.isClickable = true
                 popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
             } else {
                 finish()
+            }*/
+            if (isScanning) {
+                AlertDialog.Builder(this)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            doFinish()
+                        }
+                        .setNegativeButton(R.string.btn_cancel) { _, _ -> }
+                        .setMessage(R.string.exit_tips_in_scanning)
+                        .show()
+            } else {
+                doFinish()
             }
         }
     }
@@ -746,7 +756,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_TIMEOUT -> {}
+            LeScanEvent.LE_SCAN_TIMEOUT -> {
+            }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             MeshEvent.ERROR -> this.onMeshEvent()
             ErrorReportEvent.ERROR_REPORT -> {

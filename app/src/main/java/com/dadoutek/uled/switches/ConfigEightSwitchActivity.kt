@@ -26,6 +26,7 @@ import com.dadoutek.uled.switches.bean.KeyBean
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.MeshAddressGenerator
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import kotlinx.android.synthetic.main.eight_switch.*
@@ -825,7 +826,12 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))

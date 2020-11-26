@@ -476,7 +476,7 @@ class DeveloperActivity : BaseActivity() {
                 meshAdre.add(relyList[k].meshAddr)
         }
 
-        if (Constant.IS_ROUTE_MODE) {//todo 暂时没有一键恢复的接口看看怎么用 是否用单个的 窗帘 = 0x10
+        if (Constant.IS_ROUTE_MODE) {
             RouterModel.routeResetFactory(MacResetBody("",0,100,"allFactory"))?.subscribe({
                 LogUtils.v("zcl-----------发送路由一键物理恢复-------")
                 when (it.errorCode) {
@@ -513,13 +513,16 @@ class DeveloperActivity : BaseActivity() {
     }
 
     override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由通知-------$cmdBean")
         if (cmdBean.ser_id=="allFactory"){
             disposableRouteTimer?.dispose()
             hideLoadingDialog()
             when (cmdBean.status) {
                 0 -> {
                     updateLastMeshZero()
-                    syncData()
+                    //syncData()
+                    DBUtils.deleteLocalData()
+                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                 }
                 else ->ToastUtils.showShort(getString(R.string.reset_factory_fail))
             }

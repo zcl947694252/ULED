@@ -368,8 +368,10 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             var jsonObject = JSONObject(msg)
+            LogUtils.v("zcl-----------收到路由总通知-------$jsonObject")
             try {
-                when (val cmd = jsonObject.optInt("cmd")) {
+                val cmd = jsonObject.optInt("cmd")
+                when (cmd) {
                     Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
                         val codeBean: MqttBodyBean = Gson().fromJson(msg, MqttBodyBean::class.java)
                         when (cmd) {
@@ -379,15 +381,15 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
                             Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
                             Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
                             Cmd.gwControlCallback -> receviedGwCmd2500M(codeBean)//推送下发控制指令结果
-                            Cmd.tzRouteUserReset -> {
-                                val cmdBean: CmdBodyBean = getCmdBean(intent)
-                                tzRouteUserReset(cmdBean)//用户复位
-                            }
-                            Cmd.tzRouteResetFactory -> {
-                                val cmdBean: CmdBodyBean = getCmdBean(intent)
-                                tzRouterResetFactory(cmdBean)
-                            }
                         }
+                    }
+                    Cmd.tzRouteUserReset -> {
+                        val cmdBean: CmdBodyBean = getCmdBean(intent)
+                        tzRouteUserReset(cmdBean)//用户复位
+                    }
+                    Cmd.tzRouteResetFactory -> {
+                        val cmdBean: CmdBodyBean = getCmdBean(intent)
+                        tzRouterResetFactory(cmdBean)
                     }
                 }
             } catch (e: java.lang.Exception) {

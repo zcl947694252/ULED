@@ -22,6 +22,7 @@ import com.blankj.utilcode.util.Utils.runOnUiThread
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.routerModel.RouterModel
@@ -31,6 +32,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.Dot
 import com.dadoutek.uled.util.OtherUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.google.gson.Gson
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
@@ -712,7 +714,15 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             }
                         }
             }
-            90018 -> ToastUtils.showShort(mContext.getString(R.string.device_not_exit))
+            90018 -> {
+                DBUtils.deleteLocalData()
+                ToastUtils.showShort(mContext.getString(R.string.device_not_exit))
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                    override fun start() {}
+                    override fun complete() {}
+                    override fun error(msg: String?) {}
+                })
+            }
             90008 -> ToastUtils.showShort(mContext.getString(R.string.no_bind_router_cant_perform))
             90007 -> ToastUtils.showShort(mContext.getString(R.string.gp_not_exit))
             90005 -> ToastUtils.showShort(mContext.getString(R.string.router_offline))

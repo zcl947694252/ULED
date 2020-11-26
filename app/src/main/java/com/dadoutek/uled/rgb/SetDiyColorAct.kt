@@ -31,6 +31,7 @@ import com.dadoutek.uled.model.routerModel.UpdateGradientBean
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
@@ -396,7 +397,12 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                                         }
                             }
                             90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                            90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                            90018 -> {
+                                DBUtils.deleteLocalData()
+                                ToastUtils.showShort(getString(R.string.device_not_exit))
+                                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+                                finish()
+                            }
                             90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                             90005 -> ToastUtils.showShort(getString(R.string.router_offline))

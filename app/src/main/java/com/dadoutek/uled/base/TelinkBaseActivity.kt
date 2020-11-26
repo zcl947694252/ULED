@@ -89,6 +89,7 @@ import java.util.concurrent.TimeUnit
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    private var disposableTimer: Disposable?=null
     open var currentShowGroupSetPage = true
     open var isLoginAccount: Boolean = true
     var isScanningJM: Boolean = false
@@ -337,15 +338,23 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
-            if (TelinkLightService.Instance()?.isLogin==false&&isLoginAccount) {
+            if (TelinkLightService.Instance()?.isLogin == false && isLoginAccount) {
+                TelinkLightService.Instance()?.idleMode(true)
                 ToastUtils.showLong(getString(R.string.connecting_tip))
-                mConnectDisposable?.dispose()
-                mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 3)
-                        ?.subscribe({
-                            LogUtils.d("connection success")
-                        }, {
-                            LogUtils.d("connect failed")
-                        })
+                disposableTimer?.dispose()
+                disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                         .subscribeOn(Schedulers.io())
+                                         .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            mConnectDisposable?.dispose()
+                            mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 3)
+                                    ?.subscribe({
+                                        LogUtils.d("connection success")
+                                    }, {
+                                        LogUtils.d("connect failed")
+                                    })
+                }
+
             }
         }
     }
@@ -578,6 +587,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         disableConnectionStatusListener()
         unbindSe()
         mConnectDisposable?.dispose()
+        disposableTimer?.dispose()
         loadDialog?.dismiss()
         unregisterReceiver(stompRecevice)
         unregisterReceiver(netWorkChangReceiver)
@@ -1573,8 +1583,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         }
             }
             90018 -> {
+                DBUtils.deleteLocalData()
                 ToastUtils.showShort(getString(R.string.device_not_exit))
                 SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                finish()
             }
             90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
@@ -1656,7 +1668,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                                     ToastUtils.showShort(getString(R.string.open_faile))
                             }
                 }
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -1682,8 +1699,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                             }
                 }
                 90018 -> {
+                    DBUtils.deleteLocalData()
                     ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     hideLoadingDialog()
+                    finish()
                 }
                 90008 -> {
                     ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
@@ -1716,8 +1736,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                                     }
                         }
                         90018 -> {
+                            DBUtils.deleteLocalData()
                             hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.device_not_exit))
+                            SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                             finish()
                         }
                         90008 -> {
@@ -1754,7 +1776,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 90997 -> ToastUtils.showShort(getString(R.string.get_versioning))
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90018 -> {
+                    DBUtils.deleteLocalData()
+                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    finish()
+                }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))

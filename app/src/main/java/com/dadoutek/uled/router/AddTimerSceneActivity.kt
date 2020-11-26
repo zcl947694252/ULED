@@ -23,6 +23,7 @@ import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.RouterTimerSceneBean
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.switches.SelectSceneListActivity
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -251,7 +252,12 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
                             }
                             90030 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                             90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
-                            90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                            90018 -> {
+                                DBUtils.deleteLocalData()
+                                ToastUtils.showShort(getString(R.string.device_not_exit))
+                                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+                                finish()
+                            }
                             90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                             90005 -> ToastUtils.showShort(getString(R.string.router_offline))

@@ -122,7 +122,7 @@ object Commander : EventListener<String> {
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, light, paramsKickOut)
                         Thread.sleep(sleepTime)
                     }
-                    DBUtils.deleteAllSensorAndSwitch()//删除人体感应器和开关
+                    //DBUtils.deleteAllSensorAndSwitch()//删除人体感应器和开关
                     Thread.sleep(sleepTime)
                     for (k in lightList.indices) {
                         if (DBUtils.getLightByMeshAddr(lightList[k]) != null) {

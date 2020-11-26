@@ -40,7 +40,7 @@ public class OtherUtils {
      */
     public static String getResourceName(int resid, Context context){
         try {
-            return   context.getResources().getResourceName(resid);
+            return context.getResources().getResourceName(resid);
         }catch (Exception e){
             return   "";
         }
