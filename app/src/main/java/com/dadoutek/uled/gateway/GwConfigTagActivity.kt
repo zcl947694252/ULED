@@ -78,7 +78,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     private var connectCount: Int = 0
     private lateinit var mApp: TelinkLightApplication
     private var deletePosition: Int? = null
-    private var disposableTimer: Disposable? = null
     private var currentTagStr: String? = null
     private var dbGw: DbGateway? = null
     private var tagList: ArrayList<GwTagBean> = arrayListOf()
@@ -624,10 +623,12 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         filter.addAction(LightService.ACTION_STATUS_CHANGED)
         receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
             override fun loginSuccess() {
+                if (!Constant.IS_ROUTE_MODE)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
             }
 
             override fun loginFail() {
+                if (!Constant.IS_ROUTE_MODE)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
             }
 

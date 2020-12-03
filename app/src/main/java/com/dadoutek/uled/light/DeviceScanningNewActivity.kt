@@ -89,7 +89,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private var routerScanCount: Int = 0
     private val TAG = "zcl-DeviceScanningNewActivity"
     private var disposableFind: Disposable? = null
-    private var disposableTimer: Disposable? = null
     private var meshList: MutableList<Int> = mutableListOf()
     private lateinit var dbGw: DbGateway
     private var mConnectDisposal: Disposable? = null
@@ -568,6 +567,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             closeAnimation()
             btn_stop_scan.visibility = View.GONE
             ToastUtils.showLong(getString(R.string.scan_end))
+            if (mAddDeviceType == DeviceType.NORMAL_SWITCH || mAddDeviceType == DeviceType.GATE_WAY) TelinkLightService.Instance().disconnect()
             finish()
         }
     }
@@ -655,13 +655,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun initToolbar() {
         toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener {
-         /*   if (isScanning) {
-                cancelf.isClickable = true
-                confirmf.isClickable = true
-                popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
-            } else {
-                finish()
-            }*/
+            /*   if (isScanning) {
+                   cancelf.isClickable = true
+                   confirmf.isClickable = true
+                   popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+               } else {
+                   finish()
+               }*/
             if (isScanning) {
                 AlertDialog.Builder(this)
                         .setPositiveButton(android.R.string.ok) { _, _ ->

@@ -68,7 +68,6 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListener, OnClickListener {
-    private var disposableTimer: Disposable? = null
     private var sendProgress: Int = 1
     private var tempSpeed: Int = 0
     private var findItemChangeGp: MenuItem? = null

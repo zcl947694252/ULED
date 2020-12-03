@@ -77,6 +77,7 @@ import kotlin.collections.ArrayList
  * 更新描述
  */
 class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
+    private  var trim: String?=null
     private var launch = 0
     private var disposableReset: Disposable? = null
     private var currentSensor: DbSensor? = null
@@ -108,7 +109,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pir_new)
-        isLoginAccount = false
+        TelinkLightApplication.isLoginAccount = false
         initView()
         initData()
         initListener()
@@ -720,12 +721,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
                 ToastUtils.showLong(getString(R.string.rename_tip_check))
             } else {
-                val trim = renameEt?.text.toString().trim { it <= ' ' }
+                 trim = renameEt?.text.toString().trim { it <= ' ' }
                 if (!Constant.IS_ROUTE_MODE) {
                     dbSensor.name = trim
                     saveSensor(dbSensor, false)
                 } else {
-                    routerUpdateSensorName(dbSensor.id, trim)
+                    routerUpdateSensorName(dbSensor.id, trim?:"sensor")
                 }
                 if (!this.isFinishing)
                     renameDialog.dismiss()
@@ -750,6 +751,12 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
+    override fun renameSucess() {
+        ToastUtils.showShort(getString(R.string.rename_success))
+        currentSensor?.name = trim
+        toolbarTv.text = currentSensor?.name
+
+    }
     private fun getControlGroup(): String? {
         var controlGroupListStr = ""
         for (j in showGroupList!!.indices) {
@@ -929,7 +936,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 disposableRouteTimer?.dispose()
             }
         TelinkLightService.Instance()?.idleMode(true)
-        isLoginAccount = true
+        TelinkLightApplication.isLoginAccount = true
     }
 
     override fun onBackPressed() {

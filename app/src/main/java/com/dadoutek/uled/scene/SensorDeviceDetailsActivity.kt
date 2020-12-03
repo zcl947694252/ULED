@@ -62,7 +62,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
@@ -76,7 +75,6 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     private var popVersion: TextView? = null
     private var isLogin: Boolean = false
     private var factory: TextView? = null
-    private var disposableTimer: Disposable? = null
     private var disposable: Disposable? = null
     private val CONNECT_SENSOR_TIMEOUT: Long = 20000        //ms
 
@@ -203,7 +201,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             popupWindow!!.dismiss()
         compositeDisposable.dispose()
         disposableTimer?.dispose()
-        isLoginAccount = true
+        TelinkLightApplication.isLoginAccount = true
         isClick = 5
 //        if (IS_ROUTE_MODE)
 //            currentDevice?.let {
@@ -347,7 +345,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun connectAndConfig() {
-        isLoginAccount = false
+        TelinkLightApplication.isLoginAccount = false
         showLoadingDialog(getString(R.string.please_wait))
         TelinkLightService.Instance()?.idleMode(true)
         Thread.sleep(500)
@@ -471,10 +469,10 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 else -> {
                     if (currentDevice?.openTag == 1) {
                         currentDevice?.openTag == 0
-                        routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "closeSensor")
+                        routerOpenOrCloseSensor((currentDevice?.id?: 0).toInt(),0, "closeSensor")
                     } else {
                         currentDevice?.openTag == 1
-                        routeOpenOrCloseBase(currentDevice?.meshAddr ?: 0, 98, 0, "openSensor")
+                        routerOpenOrCloseSensor((currentDevice?.id?: 0).toInt(), 1, "openSensor")
                     }
                 }
             }
@@ -668,6 +666,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                                 }
                             }
                         }
+                        if (!Constant.IS_ROUTE_MODE)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     }
                 }
@@ -858,10 +857,9 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 LogUtils.v("zcl-----------收到路由连接传感器成功-------$cmdBean")
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.connect_success))
-                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
+                    if (currentDevice!=null)
                     routerGetVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
                 } else {
-                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
                     hideLoadingDialog()
                 }

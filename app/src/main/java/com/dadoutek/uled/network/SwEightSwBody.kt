@@ -15,7 +15,8 @@ import java.io.Serializable
  */
 
 class SwEightBody(
-        val id: Int,
-        val keys: List<KeyBean>,
-        val ser_id: String
+        var id: Int,
+        var keys: List<KeyBean>,
+        var ser_id: String,
+        var type: Int
 ): Serializable

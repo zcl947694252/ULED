@@ -74,6 +74,7 @@ import static java.lang.String.valueOf;
             protected byte[] scanRecord;
             protected String name;
             protected String mac;
+            private boolean isConnecting = false;
 
             public String getVersion() {
                 return version;
@@ -83,7 +84,7 @@ import static java.lang.String.valueOf;
                 this.version = version;
             }
 
-            protected String version="";
+            protected String version = "";
             protected String sixByteMac;
             protected byte[] macBytes;
             protected int type;
@@ -120,7 +121,8 @@ import static java.lang.String.valueOf;
                 this.macBytes[3] = (byte) (Integer.parseInt(strArray[2], 16) & 0xFF);
 
                 long mac4Byte =
-                        (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000 | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
+                        (long) ((macBytes[0] << 24) & 0xFF000000 | (macBytes[1] << 16) & 0x00FF0000
+                                | (macBytes[2] << 8) & 0x0000FF00 | macBytes[3] & 0xFF) & 0xFFFFFFFFL;
 
                 String mac =
                         strArray[5] + ":" + strArray[4] + ":" + strArray[3] + ":" + strArray[2];
@@ -130,7 +132,8 @@ import static java.lang.String.valueOf;
             public Peripheral(BluetoothDevice device, byte[] scanRecord, int rssi) {
                 this.device = device;
                 this.scanRecord = scanRecord;
-               // LogUtils.v("zcl-----------收到广播包-------" + Arrays.bytesToHexString(scanRecord, ","));
+                // LogUtils.v("zcl-----------收到广播包-------" + Arrays.bytesToHexString(scanRecord,
+                // ","));
                 this.rssi = rssi;
                 this.name = device.getName();
                 this.type = device.getType(); //ble
@@ -213,18 +216,23 @@ import static java.lang.String.valueOf;
 
             public void connect(Context context) {
                 this.lastTime = 0;
-                if (this.mConnState.get() == CONN_STATE_IDLE) {
-                    TelinkLog.d("Peripheral#connect " + this.getDeviceName() + " -- " + this.getMacAddress());
-                    this.mConnState.set(CONN_STATE_CONNECTING);
 
-                    this.gatt = this.device.connectGatt(context, false, this,
-                            BluetoothDevice.TRANSPORT_LE);
-                    if (this.gatt == null) {
-                        this.disconnect();
-                        this.mConnState.set(CONN_STATE_IDLE);
-                        TelinkLog.d("Peripheral# gatt NULL onDisconnect:" + this.getDeviceName() + " -- "
-                                + this.getMacAddress());
-                        this.disconnect();
+                if (this.mConnState.get() == CONN_STATE_IDLE/*&&!isConnecting*/) {
+                    isConnecting = true;
+                    synchronized (this) {
+                        disconnect();
+                        TelinkLog.d("Peripheral#connect " + this.getDeviceName() + " -- " + this.getMacAddress());
+                        this.mConnState.set(CONN_STATE_CONNECTING);
+                        this.gatt = this.device.connectGatt(context, false, this,
+                                BluetoothDevice.TRANSPORT_LE);
+                        if (this.gatt == null) {
+                            isConnecting = false;
+                            this.disconnect();
+                            this.mConnState.set(CONN_STATE_IDLE);
+                            TelinkLog.d("Peripheral# gatt NULL onDisconnect:" + this.getDeviceName() + " -- "
+                                    + this.getMacAddress());
+                            this.disconnect();
+                        }
                     }
                 }
             }
@@ -232,6 +240,9 @@ import static java.lang.String.valueOf;
             public void disconnect() {
                 if (this.gatt != null) {
                     this.gatt.disconnect();
+                    refreshDeviceCache(gatt);
+                    closeGatt();
+                    LogUtils.v("zcl--------蓝牙相关---disconnect-------refreshDeviceCache");
                 }
 
                 //        TelinkLog.d("disconnect " + this.getDeviceName() + " -- " + this
@@ -754,105 +765,73 @@ import static java.lang.String.valueOf;
              * Implements BluetoothGattCallback API
              *******************************************************************************/
 
+            @Override
+            public void onConnectionStateChange(BluetoothGatt gatt, int status,
+                                                int newState) {
+                TelinkLog.d("蓝牙相关 onConnectionStateChange  status :" + status + " state : "
+                        + newState);
+                isConnecting = false;
+                switch (newState) {
+                    case BluetoothGatt.STATE_CONNECTED:
+                        //            setMTU(103);
+                        this.mConnState.set(CONN_STATE_CONNECTED);
+                        //            Log.d("dadouhjj", "onConnectionStateChange: "+a);
+                        if (this.gatt == null || !this.gatt.discoverServices()) {
+                            TelinkLog.d("remote service discovery has been stopped status = " + newState);
+                            this.disconnect();
+                        } else {
+                            this.onConnect();
+                        }
+                        break;
+                    case BluetoothGatt.STATE_DISCONNECTED:
+                        synchronized (this.mStateLock) {
+                            refreshDeviceCache(gatt);
+                            if (this.gatt != null) {
+                                closeGatt();
+                                TelinkLog.d("蓝牙相关Peripheral#onConnectionStateChange#onDisconnect " +
+                                        "GattClose");
+                            }
+                            LogUtils.v("zcl--------蓝牙相关---STATE_DISCONNECTED----closeGatt---" + gatt != null);
+                            this.clear();
+                            this.mConnState.set(CONN_STATE_IDLE);
+                            TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect");
+                            this.onDisconnect();
+                        }
+                        break;
+                }
+            }
+
             /**
              * Clears the internal cache and forces a refresh of the services from the * remote
              * device.
              */
 
             public boolean refreshDeviceCache(BluetoothGatt mBluetoothGatt) {
-
                 if (mBluetoothGatt != null) {
-
                     try {
-
                         BluetoothGatt localBluetoothGatt = mBluetoothGatt;
-
                         Method localMethod = localBluetoothGatt.getClass().getMethod("refresh",
                                 new Class[0]);
-
                         if (localMethod != null) {
-
                             boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt,
                                     new Object[0])).booleanValue();
-
                             TelinkLog.d("refreshDeviceCache ret = " + bool);
                             return bool;
                         } else {
                             TelinkLog.d("refreshDeviceCache localMethod == null");
                         }
-
                     } catch (Exception localException) {
-
                         localException.printStackTrace();
-
-                        TelinkLog.d("An exception occured while refreshing device");
-
-                    }
-
-                }
-
-                return false;
-
-            }
-
-            @Override
-            public void onConnectionStateChange(BluetoothGatt gatt, int status,
-                                                int newState) {
-                TelinkLog.d("onConnectionStateChange  status :" + status + " state : "
-                        + newState);
-
-                if (newState == BluetoothGatt.STATE_CONNECTED) {
-                    //            setMTU(103);
-
-                    this.mConnState.set(CONN_STATE_CONNECTED);
-
-                    //            Log.d("dadouhjj", "onConnectionStateChange: "+a);
-
-                    if (this.gatt == null || !this.gatt.discoverServices()) {
-                        TelinkLog.d("remote service discovery has been stopped status = " + newState);
-                        this.disconnect();
-                    } else {
-                        this.onConnect();
-                    }
-
-                } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
-                    synchronized (this.mStateLock) {
-                        refreshDeviceCache();
-                        if (this.gatt != null) {
-                            closeGatt();
-                            TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect Gatt " +
-                                    "Close");
-                        }
-
-                        this.clear();
-                        this.mConnState.set(CONN_STATE_IDLE);
-                        TelinkLog.d("Peripheral#onConnectionStateChange#onDisconnect");
-                        this.onDisconnect();
-                    }
-                }
-            }
-
-            public boolean refreshDeviceCache() {
-                if (gatt != null) {
-                    try {
-                        BluetoothGatt localBluetoothGatt = gatt;
-                        Method localMethod = localBluetoothGatt.getClass().getMethod("refresh",
-                                new Class[0]);
-                        boolean bool =
-                                ((Boolean) localMethod.invoke(localBluetoothGatt, new Object[0])).booleanValue();
-                        LogUtils.v("zcl-----------清除缓存-------" + bool);
-                        return bool;
-                    } catch (Exception localException) {
                         TelinkLog.d("An exception occured while refreshing device");
                     }
                 }
-                LogUtils.v("zcl-----------清除缓存-------false");
                 return false;
             }
 
 
-            private synchronized void closeGatt() {
+            public synchronized void closeGatt() {
                 if (this.gatt != null) {
+                    gatt.disconnect();
                     this.gatt.close();
                     TelinkLog.d("gatt closeGatt " + this.gatt);
                     this.mConnState.set(CONN_STATE_CLOSED);
@@ -1073,7 +1052,7 @@ import static java.lang.String.valueOf;
                                     17] + (char) scanRecord[i + 18]
                                     + (char) scanRecord[i + 19] + (char) scanRecord[i + 20] +
                                     (char) scanRecord[i + 21];*/
-                           LogUtils.v("zcl-----------获取广播版本-------" + version+"--"+ Arrays.bytesToHexString(scanRecord,","));
+                            LogUtils.v("zcl------TelinkBluetoothSDK-----获取广播版本-------" + version + "--" + Arrays.bytesToHexString(scanRecord, ","));
                         }
                     }
                 }

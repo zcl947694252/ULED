@@ -64,7 +64,6 @@ import kotlin.collections.ArrayList
  */
 
 class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
-    private var disposableTimer: Disposable? = null
     private var allLightData: ArrayList<DbLight> = arrayListOf()
     private var lightsData: ArrayList<DbLight> = arrayListOf()
     private var listAdapter: DeviceDetailListAdapter? = null
@@ -123,8 +122,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         super.onResume()
         initData()
         scrollToPosition()
-        if (TelinkLightApplication.getApp().connectDevice == null)
-            autoConnectAll()
+       /* if (TelinkLightApplication.getApp().connectDevice == null)
+            autoConnectAll()*/
     }
 
     override fun editeDeviceAdapter() {
@@ -246,8 +245,11 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             R.id.template_device_icon -> {
                 canBeRefresh = true
                 openOrClose(currentDevice!!)
-                if (!Constant.IS_ROUTE_MODE)//如果不是路由模式则直接更新icon
-                    sendAfterUpdate()
+                if (!Constant.IS_ROUTE_MODE)
+                    if (TelinkLightService.Instance().isLogin)
+                        sendAfterUpdate() //如果不是路由模式则直接更新icon
+                    else
+                        autoConnectAll()
                 // sendTimeZone(currentDevice!!)
             }
             R.id.template_device_card_delete -> {
@@ -422,7 +424,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "deng") {
             LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
-            when (currentDevice?.connectionStatus?:1) {
+            when (currentDevice?.connectionStatus ?: 1) {
                 ConnectionStatus.OFF.value -> this.currentDevice?.connectionStatus = ConnectionStatus.ON.value
                 else -> this.currentDevice?.connectionStatus = ConnectionStatus.OFF.value
             }
@@ -554,7 +556,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         notifyData()
         GlobalScope.launch {  //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2000)
-            if (TelinkLightApplication.getApp().connectDevice == null)
+            if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE)
                 autoConnectAll()
         }
     }
@@ -653,7 +655,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     private fun sortList(arr: java.util.ArrayList<DbLight>): java.util.ArrayList<DbLight> {
-        if (arr==null)
+        if (arr == null)
             return arrayListOf()
         var min: Int
         var temp: DbLight

@@ -18,7 +18,7 @@ public class TelinkLog {
     public final static String TAG = "TelinkBluetoothSDK";
 
     public static boolean ENABLE = true;
-    public static boolean LOG2FILE_ENABLE = false;
+    public static boolean LOG2FILE_ENABLE = true;
     public static String FILE_PREFIX = "TelinkBluetoothSDKLogger";
     private static BufferedWriter mWriter;
 
@@ -125,13 +125,14 @@ public class TelinkLog {
 
     private static void write2File(String log) {
         if (LOG2FILE_ENABLE) {
-            try {
-                mWriter.write(log);
-                mWriter.newLine();
-                mWriter.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            if (mWriter != null)
+                try {
+                    mWriter.write(log);
+                    mWriter.newLine();
+                    mWriter.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
     }
 

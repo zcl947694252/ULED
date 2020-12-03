@@ -56,7 +56,6 @@ private const val CONNECT_TIMEOUT = 5
 
 class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     private var isTouchSw: Boolean = false
-    private var disposableTimer: Disposable? = null
     private var deviceConfigType: Int = 0
     private var groupName: String? = null
     private var currentGroup: DbGroup? = null
@@ -432,9 +431,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                 hideLoadingDialog()
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.connect_success))
-                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
                 } else {
-                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }

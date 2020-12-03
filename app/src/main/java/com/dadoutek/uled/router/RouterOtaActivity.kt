@@ -91,7 +91,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
                     DBUtils.deleteLocalData()
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    //ToastUtils.showShort(getString(R.string.device_not_exit))
                     SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                     finish()
                 }

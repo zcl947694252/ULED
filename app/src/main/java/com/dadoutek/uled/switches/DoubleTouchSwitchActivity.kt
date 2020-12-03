@@ -24,6 +24,8 @@ import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -54,7 +56,6 @@ import java.util.concurrent.TimeUnit
  */
 
 class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
-    private var disposableTimer: Disposable? = null
     private lateinit var localVersion: String
     private var isRetryConfig: String? = null
     private lateinit var mDeviceInfo: DeviceInfo
@@ -398,9 +399,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 hideLoadingDialog()
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.connect_success))
-                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
                 } else {
-                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }
@@ -414,6 +413,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             if (cmdBean.status == 0) {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showShort(getString(R.string.config_success))
+                    updateAllSwitch()
                     if (!isReConfig)
                         showRenameDialog(switchDate, false)
                     else
@@ -424,6 +424,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             }
         }
     }
+
 
     override fun onDestroy() {
         super.onDestroy()

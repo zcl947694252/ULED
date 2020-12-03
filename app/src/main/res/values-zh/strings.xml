@@ -1206,4 +1206,5 @@
     <string name="input_device_code">请输入设备码</string>
     <string name="input_right_code">请输入正确的条形码</string>
     <string name="scan_code">设备码扫描</string>
+    <string name="select_all_group">已勾选所有组</string>
 </resources>

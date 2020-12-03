@@ -15,6 +15,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.telink.bluetooth.TelinkLog;
 import com.telink.bluetooth.event.DeviceEvent;
 import com.telink.bluetooth.event.ErrorReportEvent;
@@ -265,7 +266,7 @@ public class TelinkApplication extends Application {
             return;
 
         this.serviceStarted = true;
-
+        LogUtils.v("zcl-----------开启扫描服务等待广播-------");
         Intent service = new Intent(this.mContext, clazz);
         this.bindService(service, this.mServiceConnection,
                 Context.BIND_AUTO_CREATE);

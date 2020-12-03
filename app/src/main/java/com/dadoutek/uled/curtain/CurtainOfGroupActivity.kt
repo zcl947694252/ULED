@@ -801,6 +801,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
     private fun onServiceDisconnected(event: ServiceEvent) {
         //"onServiceDisconnected")
+        if (TelinkLightService.Instance() == null)
         TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 

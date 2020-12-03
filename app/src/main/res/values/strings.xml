@@ -1198,13 +1198,14 @@
     <string name="get_versioning">Get the version number, please wait</string>
     <string name="cloud_assistant">Cloud assistant</string>
     <string name="no_third_party">Third party platforms that have not been used for the time being</string>
-    <string name="please_set_color">请设置颜色</string>
-    <string name="gp_deletescene">此场景群组已被删除,请重新创建场景</string>
-    <string name="router_list">路由列表</string>
-    <string name="router_connect_ble_fail">路由蓝牙连接失败</string>
-    <string name="no_can_ota_device">没有可升级设备</string>
-    <string name="please_select_color">请选择渐变颜色</string>
-    <string name="input_device_code">请输入设备码</string>
-    <string name="input_right_code">请输入正确的条形码</string>
-    <string name="scan_code">设备码扫描</string>
+    <string name="please_set_color">Please set the color</string>
+    <string name="gp_deletescene">This scene group has been deleted. Please recreate the scene</string>
+    <string name="router_list">The routing list</string>
+    <string name="router_connect_ble_fail">Routing Bluetooth connection failed</string>
+    <string name="no_can_ota_device">There is no upgradeable equipment</string>
+    <string name="please_select_color">Please select the gradient color</string>
+    <string name="input_device_code">Please enter the device code</string>
+    <string name="input_right_code">Please enter the correct barcode</string>
+    <string name="scan_code">Device code scanning</string>
+    <string name="select_all_group">All groups have been checked</string>
 </resources>

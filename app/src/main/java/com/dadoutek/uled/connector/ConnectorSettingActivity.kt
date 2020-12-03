@@ -616,7 +616,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         var status = if (b) 1 else 0
         if (isConfigGroup) {
             if (Constant.IS_ROUTE_MODE) {
-                routeOpenOrCloseBase(currentDbConnector!!.meshAddr, 97, status, "switchGp")
+                routeOpenOrCloseBase(currentGroup!!.meshAddr, 97, status, "switchGp")
             } else {
                 Commander.openOrCloseLights(currentGroup?.meshAddr ?: 0, b)
                 afterSwitchGp(b)

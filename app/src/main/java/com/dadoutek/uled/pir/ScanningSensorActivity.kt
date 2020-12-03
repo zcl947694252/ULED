@@ -44,6 +44,7 @@ import kotlinx.android.synthetic.main.template_scanning_device.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.startActivity
+import java.security.KeyStore
 import java.util.concurrent.TimeUnit
 
 /**
@@ -68,6 +69,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_sensor)
         this.mApplication = this.application as TelinkLightApplication
+        TelinkLightApplication.isLoginAccount = false
         TelinkLightService.Instance()?.disconnect()
         initView()
         initListener()
@@ -221,6 +223,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     override fun onDestroy() {
         super.onDestroy()
         launch?.cancel()
+        TelinkLightApplication.isLoginAccount = true
         this.mApplication?.removeEventListener(this)
     }
 

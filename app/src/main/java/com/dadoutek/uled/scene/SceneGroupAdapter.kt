@@ -716,7 +716,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
             90018 -> {
                 DBUtils.deleteLocalData()
-                ToastUtils.showShort(mContext.getString(R.string.device_not_exit))
+                //ToastUtils.showShort(mContext.getString(R.string.device_not_exit))
                 SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                     override fun start() {}
                     override fun complete() {}

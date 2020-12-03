@@ -52,6 +52,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -67,7 +68,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var brightness: Int = 0
     private var whiteLight: Int = 0
     private var sceneGroupAdapter: SceneGroupAdapter? = null
-    private var disposableTimer: Disposable? = null
     private var rgbGradientId: Int = 1
     private var resId: Int = R.drawable.icon_out
     private var currentPosition: Int = 1000000
@@ -1220,7 +1220,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
         if (cmdBodyBean?.ser_id == "updateScene") {
             hideLoadingDialog()
             LogUtils.v("zcl-----------收到路由添加通知-------$cmdBodyBean")
-            afterSaveScene()
             when {
                 cmdBodyBean?.finish && cmdBodyBean?.status == 0 -> {//-1 全部失败 1 部分成功
                     ToastUtils.showShort(getString(R.string.config_success))
@@ -1239,6 +1238,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 .getSceneList(DBUtils.lastUser?.token)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())?.subscribe({
+                    DBUtils.deleteAllScene()
                     for (item in it) {
                         DBUtils.saveScene(item, true)
                         DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(item?.id!!))

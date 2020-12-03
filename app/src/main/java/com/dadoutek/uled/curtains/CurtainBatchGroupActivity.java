@@ -500,7 +500,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
                 ToastUtils.showLong(R.string.curtain_fail_tip);
                 updateGroupResult(dbLight, dbGroup);
                 if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
-                    ToastUtils.showLong("断开连接");
+                    ToastUtils.showLong( getString(R.string.device_disconnected));
                     hideLoadingDialog();
                 } else {
                     if (index + 1 > selectLights.size() - 1)

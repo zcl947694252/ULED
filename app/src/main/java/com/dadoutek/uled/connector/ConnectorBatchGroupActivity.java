@@ -479,7 +479,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
                 ToastUtils.showLong(R.string.connector_fail_tip);
                 updateGroupResult(dbLight, dbGroup);
                 if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
-                    ToastUtils.showLong("断开连接");
+                    ToastUtils.showLong(getString(R.string.device_disconnected));
                     hideLoadingDialog();
                 } else {
                     if (index + 1 > selectLights.size() - 1)
@@ -1236,6 +1236,7 @@ public class ConnectorBatchGroupActivity extends TelinkMeshErrorDealActivity
      */
     private void onLeScanTimeout() {
         LeBluetooth.getInstance().stopScan();
+        int size = LeBluetooth.getInstance().getAdapter(this).getBondedDevices().size();
         TelinkLightService instance = TelinkLightService.Instance();
         if (instance!=null)
             instance.idleMode(true);

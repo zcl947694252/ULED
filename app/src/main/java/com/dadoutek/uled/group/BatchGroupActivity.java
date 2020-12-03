@@ -455,7 +455,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
 //            updateGroupResult(dbLight, dbGroup);
             ToastUtils.showLong(R.string.group_fail_tip);
             if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
-                ToastUtils.showLong("断开连接");
+                ToastUtils.showLong( getString(R.string.device_disconnected));
                 hideLoadingDialog();
             } else {
                 if (index + 1 > selectLights.size() - 1)

@@ -6,6 +6,7 @@ package com.telink.bluetooth;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
@@ -27,7 +28,7 @@ import java.util.UUID;
 /**
  * 蓝牙扫描接口
  */
-public final class LeBluetooth {
+public final class LeBluetooth extends BluetoothGattCallback {
 
     public static final int SCAN_FAILED_FEATURE_UNSUPPORTED = 4;
     // 未开启定位
@@ -73,6 +74,7 @@ public final class LeBluetooth {
         synchronized (LeBluetooth.class) {
             if (LeBluetooth.mThis == null) {
                 LeBluetooth.mThis = new LeBluetooth();
+
             }
         }
 
@@ -363,6 +365,7 @@ public final class LeBluetooth {
 
         return this.mAdapter;
     }
+
 
     private class LocationCheckTask implements Runnable {
 

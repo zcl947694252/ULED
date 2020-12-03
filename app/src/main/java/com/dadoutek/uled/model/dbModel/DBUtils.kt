@@ -1284,7 +1284,16 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
-
+    fun deleteAllSwitch() {
+        DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
+    }
+    fun deleteAllSensor() {
+        DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
+    }
+    fun deleteAllScene() {
+        DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
+        DaoSessionInstance.getInstance().dbSceneActionsDao.deleteAll()
+    }
 
     fun deleteLocalData() {
         //        DaoSessionInstance.getApp().getDbUserDao().deleteAllSensorAndSwitch();

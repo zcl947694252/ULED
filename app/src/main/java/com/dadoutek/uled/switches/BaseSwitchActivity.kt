@@ -34,6 +34,8 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.othersview.SelectDeviceTypeActivity
 import com.dadoutek.uled.router.RouterOtaActivity
@@ -79,7 +81,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutId())
         mApp = application as TelinkLightApplication
-        isLoginAccount = false
+        TelinkLightApplication.isLoginAccount = false
         makePopuwindow()
         initToolbar()
         initView()
@@ -179,7 +181,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     abstract fun deleteDevice()
 
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "CheckResult")
     fun showRenameDialog(switchDate: DbSwitch?, isEightsW: Boolean) {
         hideLoadingDialog()
         StringUtils.initEditTextFilter(renameEt)
@@ -197,7 +199,6 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         if (this != null && !this.isFinishing) {
             renameDialog?.dismiss()
             renameDialog?.show()
-            SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
         }
     }
 
@@ -248,12 +249,14 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         }
     }
 
-    fun deleteData() {
+    private fun deleteData() {
         hideLoadingDialog()
         ToastUtils.showShort(getString(R.string.delete_switch_success))
         currentSw?.let { DBUtils.deleteSwitch(it) }
         TelinkLightService.Instance()?.idleMode(true)
-
+        TelinkLightService.Instance()?.disconnect()
+        if (Constant.IS_ROUTE_MODE)
+            updateAllSwitch()
         if (TelinkLightApplication.getApp().mesh.removeDeviceByMeshAddress(currentSw?.meshAddr ?: 0))
             TelinkLightApplication.getApp().mesh.saveOrUpdate(this)
         finish()
@@ -269,7 +272,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 when {
                     Constant.IS_ROUTE_MODE -> {
                         startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress, "deviceType" to mDeviceInfo.productUUID,
-                                "deviceMac" to mDeviceInfo.macAddress,"version" to mDeviceInfo!!.firmwareRevision )
+                                "deviceMac" to mDeviceInfo.macAddress, "version" to mDeviceInfo!!.firmwareRevision)
                         finish()
                     }
                     else -> bleOta(mDeviceInfo, type)
@@ -345,12 +348,13 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        isLoginAccount = true
+        TelinkLightApplication.isLoginAccount = true
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         if (Constant.IS_ROUTE_MODE)
             switchDate?.let {
                 routerConnectSw(it, 1, "connectSensor")
             }
-        TelinkLightService.Instance()?.idleMode(true)
     }
 
     fun configReturn() {
@@ -379,6 +383,18 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     @SuppressLint("CheckResult")
+    open fun updateAllSwitch() {
+        NetworkFactory.getApi()
+                .getSwitchList(DBUtils.lastUser?.token)
+                .compose(NetworkTransformer())
+                .subscribe({
+                    DBUtils.deleteAllSwitch()
+                    for (item in it)
+                        DBUtils.saveSwitch(item, true)
+                }, {})
+    }
+
+    @SuppressLint("CheckResult")
     override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl-----------收到连接开关通知-------$cmdBean")
         if (cmdBean.ser_id == "isDisConnect") {
@@ -388,7 +404,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     open fun routerRetrySw(id: Long) {
-        RouterModel.routerConnectSwOrSe(id, 99, 1,"retryConnectSw")?.subscribe({
+        RouterModel.routerConnectSwOrSe(id, 99, 1, "retryConnectSw")?.subscribe({
             when (it.errorCode) {
                 0 -> {
                     disposableRouteTimer?.dispose()
@@ -400,8 +416,8 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 }
                 90018 -> {
                     DBUtils.deleteLocalData()
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
-                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    //ToastUtils.showShort(getString(R.string.delete_switch_success))
+                    updateAllSwitch()
                     finish()
                 }
                 90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))

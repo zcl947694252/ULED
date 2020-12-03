@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
@@ -16,6 +17,7 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.bluetooth.light.DeviceInfo
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -24,6 +26,7 @@ import kotlinx.android.synthetic.main.empty_box_view.*
 import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
+import java.util.concurrent.TimeUnit
 
 /**
  * 描述	      ${搜索连接开关}$
@@ -45,10 +48,17 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scanning_switch)
         this.mApplication = this.application as TelinkLightApplication
+        TelinkLightApplication.isLoginAccount = false
         initView()
         initData()
         initListener()
         startScan()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        disposableTimer?.dispose()
+        TelinkLightApplication.isLoginAccount = true
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -94,11 +104,10 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
             doFinish()
         }
         btn_stop_scan.setOnClickListener {
-            if (isScanning){
+            if (isScanning) {
                 scanFail()
                 doFinish()
-            }
-            else
+            } else
                 startScan()
         }
         scanning_num.setOnClickListener {
@@ -133,24 +142,30 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
 
 
     private fun startScan() {
-        Thread.sleep(500)
         btn_stop_scan.text = getString(R.string.stop_scan)
-        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
         scanning_num.text = getString(R.string.scanning)
         startAnimation()
         image_no_group.visibility = View.GONE
-        val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
-                DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
-        mConnectDisposal = connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
-                retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
-                ?.subscribeOn(Schedulers.io())
-                ?.observeOn(AndroidSchedulers.mainThread())
-                ?.subscribe({
-                    bestRSSIDevice = it
-                    onLogin()
-                }, {
-                    scanFail()
-                })
+
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
+                            DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
+                    connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
+                            retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
+                            ?.subscribeOn(Schedulers.io())
+                            ?.observeOn(AndroidSchedulers.mainThread())
+                            ?.subscribe({
+                                bestRSSIDevice = it
+                                onLogin()
+                            }, {
+                                scanFail()
+                            })
+                }
     }
 
     override fun onResume() {
@@ -166,7 +181,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
     }
 
     private fun onLogin() {
-        count+1
+        count + 1
         hideLoadingDialog()
         if (bestRSSIDevice != null) {
 /*
@@ -188,7 +203,7 @@ class ScanningSwitchActivity : TelinkBaseActivity() {
                 TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.TIME_ZONE, meshAddress, byteArrayOf)
             }*/
 
-            val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress,retryTimes = 2)
+            val disposable = Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress, retryTimes = 2)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({ version ->
                         if (version != null && version != "") {

@@ -89,9 +89,8 @@ import java.util.concurrent.TimeUnit
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
-    private var disposableTimer: Disposable?=null
+    var disposableTimer: Disposable? = null
     open var currentShowGroupSetPage = true
-    open var isLoginAccount: Boolean = true
     var isScanningJM: Boolean = false
     open var lastTime: Long = 0
     private var isShow: Boolean = false
@@ -334,26 +333,27 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
      * 自动重连
      */
     fun autoConnectAll() {
+        TelinkLightService.Instance()?.adapter
         if (Constant.IS_ROUTE_MODE) return
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
-            if (TelinkLightService.Instance()?.isLogin == false && isLoginAccount) {
-                TelinkLightService.Instance()?.idleMode(true)
+            if (TelinkLightService.Instance()?.isLogin == false && TelinkLightApplication.isLoginAccount) {
+                TelinkLightService.Instance()?.disconnect()
                 ToastUtils.showLong(getString(R.string.connecting_tip))
                 disposableTimer?.dispose()
+                mConnectDisposable?.dispose()
                 disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS)
-                         .subscribeOn(Schedulers.io())
-                                         .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            mConnectDisposable?.dispose()
-                            mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 3)
+                            mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 3, fastestMode = true)
                                     ?.subscribe({
                                         LogUtils.d("connection success")
                                     }, {
                                         LogUtils.d("connect failed")
                                     })
-                }
+                        }
 
             }
         }
@@ -579,7 +579,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         } else {
             changeDisplayImgOnToolbar(false)
         }
-        autoConnectAll()
+        //autoConnectAll()
     }
 
     override fun onDestroy() {
@@ -678,6 +678,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
         isShow = false
         showDialogHardDelete?.dismiss()
+
+        disposableTimer?.dispose()
         mConnectDisposable?.dispose()
     }
 
@@ -1154,10 +1156,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16), retryTimes: Long = 2,
-                deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 15, isAutoConnect: Boolean = true): Observable<DeviceInfo>? {
-        // !TelinkLightService.Instance().isLogin 代表只有没连接的时候，才会往下跑，走连接的流程。  mConnectDisposable == null 代表这是第一次执行
-        LogUtils.v("zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}------${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---")
-        return if (/*mConnectDisposable == null &&*/ TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
+                deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 15): Observable<DeviceInfo>? {
+        LogUtils.v("zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}--" +
+                "----${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---")
+        return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
                     ?.doOnSubscribe {
                         mConnectDisposable = it
@@ -1584,7 +1586,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             }
             90018 -> {
                 DBUtils.deleteLocalData()
-                ToastUtils.showShort(getString(R.string.device_not_exit))
+                //ToastUtils.showShort(getString(R.string.device_not_exit))
                 SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                 finish()
             }
@@ -1670,7 +1672,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 90018 -> {
                     DBUtils.deleteLocalData()
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    //ToastUtils.showShort(getString(R.string.device_not_exit))
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
@@ -1678,6 +1680,38 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
+            }
+        }, {
+            LogUtils.v("zcl-----------收到路由失败-------$it")
+            ToastUtils.showShort(it.message)
+        })
+    }
+
+    @SuppressLint("CheckResult")
+    open fun routerOpenOrCloseSensor(id: Int, status: Int, ser_id: String) {
+        RouterModel.routeSwitchSensor(id, status, ser_id)?.subscribe({
+            LogUtils.v("zcl-----------路由请求传感器1开或0关----status${status}---$it")
+            when (it.errorCode) {
+                0 -> {
+                    showLoadingDialog(getString(R.string.please_wait))
+                    disposableRouteTimer?.dispose()
+                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+                            .subscribe {
+                                hideLoadingDialog()
+                                if (status == 1)
+                                    ToastUtils.showShort(getString(R.string.open_faile))
+                                else
+                                    ToastUtils.showShort(getString(R.string.close_faile))
+                            }
+                }
+                90030 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
+                90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+                90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
+                90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
+                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
             }
         }, {
             LogUtils.v("zcl-----------收到路由失败-------$it")
@@ -1700,7 +1734,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 90018 -> {
                     DBUtils.deleteLocalData()
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    //ToastUtils.showShort(getString(R.string.device_not_exit))
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     hideLoadingDialog()
                     finish()
@@ -1738,7 +1772,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         90018 -> {
                             DBUtils.deleteLocalData()
                             hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.device_not_exit))
+                            // ToastUtils.showShort(getString(R.string.device_not_exit))
                             SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                             finish()
                         }
@@ -1778,7 +1812,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
                     DBUtils.deleteLocalData()
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    // ToastUtils.showShort(getString(R.string.device_not_exit))
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
@@ -1848,11 +1882,23 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun routerUpdateSensorName(id: Long, name: String) {
         RouterModel.routeUpdateSensorName(id, name)?.subscribe({
             renameSucess()
+            updateAllSensor()
         }, {
             ToastUtils.showShort(it.message)
         })
     }
 
+    @SuppressLint("CheckResult")
+    open fun updateAllSensor() {
+        NetworkFactory.getApi()
+                .getSensorList(DBUtils.lastUser?.token)
+                .compose(NetworkTransformer())
+                .subscribe({
+                    DBUtils.deleteAllSensor()
+                    for (item in it)
+                        DBUtils.saveSensor(item, true)
+                }, {})
+    }
     open fun renameSucess() {
 
     }

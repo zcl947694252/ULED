@@ -101,7 +101,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         setContentView(R.layout.activity_config_pir)
         top_rg_ly.visibility = View.GONE
         telinkApplication = this.application as TelinkApplication
-        isLoginAccount = false
+        TelinkLightApplication.isLoginAccount = false
         initToolbar()
         initData()
         initView()
@@ -327,6 +327,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
                         Log.e("zcl", "zcl***STATUS_LOGIN***")
                     }
                     LightAdapter.STATUS_LOGOUT -> {
+                        if (!Constant.IS_ROUTE_MODE)
                         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                         Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
                         autoConnectSensor()
@@ -707,7 +708,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
 
     override fun onDestroy() {
         super.onDestroy()
-        isLoginAccount = true
+        TelinkLightApplication.isLoginAccount = true
         if (Constant.IS_ROUTE_MODE)
             currentSensor?.let {
                 routerConnectSensor(it, 1, "disConnectSensor")

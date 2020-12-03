@@ -114,7 +114,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     override fun bindDeviceRouter() {
         val dbGroup = DbGroup()
-        dbGroup.brightness=10000
+        dbGroup.brightness = 10000
         dbGroup.deviceType = DeviceType.NORMAL_SWITCH.toLong()
         var intent = Intent(this, BindRouterActivity::class.java)
         intent.putExtra("group", dbGroup)
@@ -189,18 +189,30 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                 if (isRightPos()) return@setOnClickListener
                 if (IS_ROUTE_MODE) return@setOnClickListener
                 if (currentDevice != null) {
+                    TelinkLightService.Instance()?.disconnect()
                     TelinkLightService.Instance()?.idleMode(true)
+                    Thread.sleep(800)
                     showLoadingDialog(getString(R.string.connecting_tip))
-                    connect(macAddress = currentDevice?.macAddr, retryTimes = 3)
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(31, TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                ToastUtils.showShort(getString(R.string.connect_fail))
+                                hideLoadingDialog()
+                            }
+                    connect(macAddress = currentDevice?.macAddr, retryTimes = 2)
                             ?.subscribe(
                                     {
                                         getDeviceVersion(it)
                                         LogUtils.d("login success")
+                                        disposableTimer?.dispose()
                                     },
                                     {
                                         hideLoadingDialog()
                                         ToastUtils.showShort(it.message)
-                                        LogUtils.d(it)
+                                        disposableTimer?.dispose()
+                                        LogUtils.d("login faile$it")
                                     }
                             )
                 } else {
@@ -243,12 +255,13 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     private fun goConfig() {
         if (isRightPos()) return
         if (currentDevice != null) {
-            TelinkLightService.Instance()?.idleMode(true)
+            TelinkLightService.Instance()?.disconnect()
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableRouteTimer?.dispose()
             if (IS_ROUTE_MODE) {
-                routerConnectSw(currentDevice!!,0,"connectSw")
+                routerConnectSw(currentDevice!!, 0, "connectSw")
             } else {
+                Thread.sleep(800)
                 val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
                         ?.subscribe({
                             onLogin(it)//判断进入那个开关设置界面
@@ -347,7 +360,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             if (it.id.toString() != it.last_authorizer_user_id)
                 ToastUtils.showLong(getString(R.string.author_region_warm))
             else {
-               goSearchSwitch()
+                goSearchSwitch()
 
             }
         }
@@ -439,8 +452,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     private fun isDirectConnectDevice() {
         var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
-        if ((TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == currentDevice?.macAddr)|| IS_ROUTE_MODE) {
-            if (isBoolean|| IS_ROUTE_MODE) {
+        if ((TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == currentDevice?.macAddr) || IS_ROUTE_MODE) {
+            if (isBoolean || IS_ROUTE_MODE) {
                 transformView()
             } else {
                 OtaPrepareUtils.instance().gotoUpdateView(this@SwitchDeviceDetailsActivity, currentDevice?.version, otaPrepareListner)
@@ -608,11 +621,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             disposableRouteTimer?.dispose()
             if (cmdBean.finish) {
                 if (cmdBean.status == 0) {
-                    image_bluetooth.setImageResource(R.drawable.icon_cloud)
                     ToastUtils.showShort(getString(R.string.connect_success))
-                    routerGetVersion(mutableListOf(currentDevice?.meshAddr?:0), 99, "switchVersion")
+                    routerGetVersion(mutableListOf(currentDevice?.meshAddr ?: 0), 99, "switchVersion")
                 } else {
-                    image_bluetooth.setImageResource(R.drawable.bluetooth_no)
                     ToastUtils.showShort(getString(R.string.connect_fail))
                     hideLoadingDialog()
                 }
@@ -644,6 +655,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                             else
                                 skipeSw(deviceInfo, switchByID?.version ?: "B-01")
                         }
+
                         override fun error(msg: String?) {
                             hideLoadingDialog()
                             ToastUtils.showShort(getString(R.string.get_version_fail))

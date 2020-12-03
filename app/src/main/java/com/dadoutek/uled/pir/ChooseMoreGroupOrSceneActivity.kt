@@ -50,15 +50,15 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
         when (type) {
             0 -> {//选群组
                 groupList.forEach {
-                    groupDatumms.add(CheckItemBean(it.id, it.name, false,it.name))
+                    groupDatumms.add(CheckItemBean(it.id, it.name, false, it.name))
                 }
                 template_recycleView?.adapter = groupAdapter
                 groupAdapter.bindToRecyclerView(template_recycleView)
                 toolbarTv.text = getString(R.string.select_group)
             }
-            123->{//代表cw灯彩灯接收器 用于传感器开关  目前仅此再用
-                groupList.filter { it.deviceType !=DeviceType.SMART_CURTAIN.toLong() }.forEach {
-                    groupDatumms.add(CheckItemBean(it.id, it.name, false,it.name))
+            123 -> {//代表cw灯彩灯接收器 用于传感器开关  目前仅此再用
+                groupList.filter { it.deviceType != DeviceType.SMART_CURTAIN.toLong() }.forEach {
+                    groupDatumms.add(CheckItemBean(it.id, it.name, false, it.name))
                 }
                 template_recycleView?.adapter = groupAdapter
                 groupAdapter.bindToRecyclerView(template_recycleView)
@@ -66,7 +66,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
             }
             else -> {
                 sceneList.forEach {
-                    sceneDatumms.add(CheckItemBean(it.id, it.name, false,it.imgName))
+                    sceneDatumms.add(CheckItemBean(it.id, it.name, false, it.imgName))
                 }
 
                 template_recycleView?.adapter = sceneAdapter
@@ -80,7 +80,7 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
         tv_function1.text = getString(R.string.confirm)
-        tv_function1.visibility =View.GONE
+        tv_function1.visibility = View.GONE
         template_recycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
     }
 
@@ -102,16 +102,38 @@ class ChooseMoreGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.On
 
     override fun onItemClick(adapter: BaseQuickAdapter<*, *>?, view: View?, position: Int) {
         if (type == 0 || type == 123) {
-            if (groupDatumms.filter { it.checked }.size==7 && !groupDatumms[position].checked){
-                ToastUtils.showShort(getString(R.string.group_max))
-            }else{
-                groupDatumms[position].checked = !groupDatumms[position].checked
-                groupAdapter.notifyDataSetChanged()
+            when {
+                groupDatumms.filter { it.checked }.size == 7 && !groupDatumms[position].checked -> {
+                    ToastUtils.showShort(getString(R.string.group_max))
+                }
+                else -> {
+                    when (position) {
+                        0 -> {
+                            groupDatumms[0].checked = !groupDatumms[0].checked
+                            if (groupDatumms[0].checked)
+                                for (i in groupDatumms.indices) {
+                                    if (i != 0)
+                                        groupDatumms[i].checked = false
+                                }
+                        }
+                        else -> {
+                            when {
+                                // groupDatumms.size > 0 && groupDatumms[0].checked -> ToastUtils.showShort(getString(R.string.select_all_group))
+                                else -> {
+                                    if (groupDatumms.size > 0)
+                                        groupDatumms[0].checked = false
+                                    groupDatumms[position].checked = !groupDatumms[position].checked
+                                }
+                            }
+                        }
+                    }
+                    groupAdapter.notifyDataSetChanged()
+                }
             }
         } else {
-            if (sceneDatumms.filter { it.checked }.size==7 && !sceneDatumms[position].checked){
+            if (sceneDatumms.filter { it.checked }.size == 7 && !sceneDatumms[position].checked) {
                 ToastUtils.showShort(getString(R.string.group_max))
-            }else{
+            } else {
                 sceneDatumms[position].checked = !sceneDatumms[position].checked
                 sceneAdapter.notifyDataSetChanged()
             }

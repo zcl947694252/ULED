@@ -62,7 +62,6 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class GroupOTAListActivity : TelinkBaseActivity() {
-    private var disposableTimer: Disposable? = null
     private var isOtaing: Boolean = false
     private var currentTime: Long = 0
     private var isStartOta: Boolean = false
@@ -348,7 +347,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
                     DBUtils.deleteLocalData()
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    //ToastUtils.showShort(getString(R.string.device_not_exit))
                     SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                     finish()
                 }

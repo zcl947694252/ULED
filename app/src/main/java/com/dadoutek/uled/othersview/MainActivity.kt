@@ -96,7 +96,6 @@ private const val SCAN_TIMEOUT_SECOND: Int = 10
 private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMainActAndFragment, IGetMessageCallBack {
-    private var mTelinkLightService: TelinkLightService? = null
     private var mConnectDisposal: Disposable? = null
     private var mScanTimeoutDisposal: Disposable? = null
     private val connectFailedDeviceMacList: MutableList<String> = mutableListOf()
@@ -128,7 +127,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
                     BluetoothAdapter.STATE_ON -> {
                         retryConnectCount = 0
-                        autoConnect()
+                       // autoConnect()
                     }
                     BluetoothAdapter.STATE_OFF -> {
                     }
@@ -143,6 +142,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_main)
         mApp = this.application as TelinkLightApplication
+        TelinkLightService.Instance()?.disconnect()
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
@@ -171,10 +171,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         //Constant.IS_ROUTE_MODE = false
-        if (Constant.IS_ROUTE_MODE) {
-            getScanResult()//获取扫描状态
-            getRouterStatus()
-        }
+        getScanResult()//获取扫描状态
+        getRouterStatus()
         getRegionList()
         getAllStatus()
         LogUtils.v("zcl---获取状态------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
@@ -280,19 +278,21 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun getScanResult() {
-        showLoadingDialog(getString(R.string.please_wait))
-        val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
-        val subscribe = RouterModel.getRouteScanningResult()?.subscribe({
-            //status	int	状态。0扫描结束，1仍在扫描
-            if (it?.data != null && it.data.status == 1) {
-                val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
-                intent.putExtra(Constant.DEVICE_TYPE, it)
-                startActivity(intent)
-            }
-        }, {
-            ToastUtils.showShort(it.message)
-            timeDisposable?.dispose()
-        })
+        if (Constant.IS_ROUTE_MODE) {
+            showLoadingDialog(getString(R.string.please_wait))
+            val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
+            val subscribe = RouterModel.getRouteScanningResult()?.subscribe({
+                //status	int	状态。0扫描结束，1仍在扫描
+                if (it?.data != null && it.data.status == 1) {
+                    val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
+                    intent.putExtra(Constant.DEVICE_TYPE, it)
+                    startActivity(intent)
+                }
+            }, {
+                ToastUtils.showShort(it.message)
+                timeDisposable?.dispose()
+            })
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -462,16 +462,15 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     override fun onPause() {
         super.onPause()
-        disableConnectionStatusListener()
+        //disableConnectionStatusListener()
         mCompositeDisposable.clear()
-        mConnectDisposable?.dispose()
+       // mConnectDisposable?.dispose()
         progressBar.visibility = GONE
         try {
             this.unregisterReceiver(mReceiver)
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        stopConnectTimer()
     }
 
 
@@ -497,19 +496,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         deviceFragment.refreshView()
         groupFragment.refreshView()
         sceneFragment.refreshView()
+        if (!Constant.IS_ROUTE_MODE)
         autoConnect()
-//        mTelinkLightService = TelinkLightService.Instance()
-//        if (mTelinkLightService?.adapter?.mLightCtrl?.currentLight?.isConnected != true) {
-//            while (TelinkApplication.getInstance()?.serviceStarted == true) {
-//                GlobalScope.launch(Dispatchers.Main) {
-//                    retryConnectCount = 0
-//                    connectFailedDeviceMacList.clear()
-//                    startScan()
-//                }
-//                break
-//            }
-//
-//        }
     }
 
 
@@ -524,7 +512,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun onLogin() {
         GlobalScope.launch(Dispatchers.Main) {
-            stopConnectTimer()
             if (progressBar?.visibility != GONE)
                 progressBar?.visibility = GONE
         }
@@ -740,12 +727,16 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe({
-                                if (TelinkLightApplication.getApp().connectDevice == null) {
+                                if (TelinkLightService.Instance()?.isLogin == false/*&&TelinkLightApplication.getApp().connectDevice == null*/) {
                                     val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
                                             DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
                                     val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+
                                     if (size > 0) {
-                                        //ToastUtils.showLong(R.string.connecting_tip)
+                                        ToastUtils.showLong(R.string.connecting_tip)
+                                        if (TelinkLightService.Instance() == null)
+                                            TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
+                                       // ToastUtils.showShort(getString(R.string.connecting_tip))
                                         mConnectDisposable?.dispose()
                                         mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
                                                 ?.subscribe({//找回有效设备
@@ -755,7 +746,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                 },
                                                         {
                                                             LogUtils.v("zcl-----------连接失败失败继续连接-------")
-                                                            if (!Constant.IS_ROUTE_MODE)
                                                                 autoConnect()
                                                             LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
                                                         }
@@ -764,7 +754,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         ToastUtils.showShort(getString(R.string.no_connect_device))
                                     }
                                 }
-                            }, { LogUtils.d(it) })
+                            }, { LogUtils.d(it)
+                                autoConnect()
+                            })
             } else {
                 mApp?.startLightService(TelinkLightService::class.java)
                 autoConnect()
@@ -777,9 +769,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     }
 
-    private fun stopConnectTimer() {
-        mConnectDisposable?.dispose()
-    }
 
 
     override fun onStop() {
@@ -799,7 +788,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mDisposable.dispose()
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()
-        mConnectDisposable?.dispose()
+       // mConnectDisposable?.dispose()
         AllenVersionChecker.getInstance().cancelAllMission(this)
         //解绑服务
     }
@@ -808,6 +797,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     private fun onServiceDisconnected(event: ServiceEvent) {
         LogUtils.d("onServiceDisconnected")
+        if (TelinkLightService.Instance() == null)
         TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 

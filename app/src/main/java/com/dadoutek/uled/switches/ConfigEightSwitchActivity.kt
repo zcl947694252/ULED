@@ -813,7 +813,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     @SuppressLint("CheckResult")
     private fun routerConfigEightSw(id: Long) {
         val keys = GsonUtil.stringToList(listKeysBean.toString(), KeyBean::class.java)
-        RouterModel.configEightSw(id, keys, "configEightSw")?.subscribe({
+        RouterModel.configEightSw(id, keys, "configEightSw",configSwitchType)?.subscribe({
             LogUtils.v("zcl-----------收到路由配置八键请求-------$it")
             when (it.errorCode) {
                 0 -> {
@@ -828,7 +828,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
                     DBUtils.deleteLocalData()
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
+                    //ToastUtils.showShort(getString(R.string.device_not_exit))
                     SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                     finish()
                 }
@@ -851,6 +851,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             if (cmdBean.status == 0) {
                 GlobalScope.launch(Dispatchers.Main) {
                     ToastUtils.showShort(getString(R.string.config_success))
+                    if (Constant.IS_ROUTE_MODE)
+                        updateAllSwitch()
                     if (!isReConfig)
                         showRenameDialog(switchDate!!,true)
                     else

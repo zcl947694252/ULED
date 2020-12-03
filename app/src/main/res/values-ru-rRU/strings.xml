@@ -1086,14 +1086,15 @@
     <string name="get_versioning">Возьми номер версии, пожалуйста, позже</string>
     <string name="cloud_assistant">Помощник облака.</string>
     <string name="no_third_party">Платформа третьей стороны, которая временно не используется</string>
-    <string name="please_set_color">请设置颜色</string>
-    <string name="gp_deletescene">此场景群组已被删除,请重新创建场景</string>
-    <string name="router_list">路由列表</string>
-    <string name="router_connect_ble_fail">路由蓝牙连接失败</string>
-    <string name="no_can_ota_device">没有可升级设备</string>
-    <string name="please_select_color">请选择渐变颜色</string>
-    <string name="input_device_code">请输入设备码</string>
-    <string name="input_right_code">请输入正确的条形码</string>
-    <string name="scan_code">设备码扫描</string>
+    <string name="please_set_color">Пожалуйста, установите цвета.</string>
+    <string name="gp_deletescene">Группа сцены удалена, пожалуйста, воссоздайте сцену заново</string>
+    <string name="router_list">Список маршрутов</string>
+    <string name="router_connect_ble_fail">Соединение bluetooth не работает</string>
+    <string name="no_can_ota_device">Нет никакого усовершенствованного оборудования</string>
+    <string name="please_select_color">Пожалуйста, выберите асимптотический цвет</string>
+    <string name="input_device_code">Введите код устройства</string>
+    <string name="input_right_code">Пожалуйста, введите правильный штрих-код</string>
+    <string name="scan_code">Сканирование кода оборудования</string>
+    <string name="select_all_group">Все группы вычеркнуты</string>
 
 </resources>

@@ -79,7 +79,6 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     private var downloadDispoable: Disposable? = null
     private var removeBean: DbGateway? = null
     private var renameEditText: EditText? = null
-    private var disposableTimer: Disposable? = null
     private var isRestSuccess: Boolean = false
     private lateinit var mApp: TelinkLightApplication
     private lateinit var popupWindow: PopupWindow

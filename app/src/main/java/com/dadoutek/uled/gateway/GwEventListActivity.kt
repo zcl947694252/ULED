@@ -92,7 +92,6 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private lateinit var currentGwTag: GwTagBean
     private var deleteBean: GwTagBean? = null
     private var connectCount: Int = 1
-    private var disposableTimer: Disposable? = null
     private lateinit var mApp: TelinkLightApplication
     private var listOne = mutableListOf<GwTagBean>()
     private var listTwo = mutableListOf<GwTagBean>()
@@ -1036,10 +1035,12 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         registerReceiver(receiver, filter)
         receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
             override fun loginSuccess() {
+                if (!Constant.IS_ROUTE_MODE)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
             }
 
             override fun loginFail() {
+                if (!Constant.IS_ROUTE_MODE)
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                 // retryConnect()
             }
@@ -1140,9 +1141,11 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     }
                 }
                 LightAdapter.STATUS_LOGIN -> {
+                    if (!Constant.IS_ROUTE_MODE)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 }
                 LightAdapter.STATUS_LOGOUT -> {
+                    if (!Constant.IS_ROUTE_MODE)
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     if (!isRestSuccess)
                         retryConnect()

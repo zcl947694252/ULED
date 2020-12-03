@@ -66,7 +66,6 @@ class GwLoginActivity : TelinkBaseActivity() {
     private var isRouter: Boolean = false
     private var mac: String? = null
     private var receiver: GwBrocasetReceiver? = null
-    private var disposableTimer: Disposable? = null
     private var dbGw: DbGateway? = null
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -79,7 +79,6 @@ import java.util.concurrent.TimeUnit
 class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>, BaseQuickAdapter.OnItemLongClickListener, BaseQuickAdapter.OnItemClickListener {
     private lateinit var batchList: MutableList<Int>
     private var disposableIntervalTime: Disposable? = null
-    private var disposableTimer: Disposable? = null
     private var tipReadTimer: TextView? = null
     private var tipBottomLy: LinearLayout? = null
     private var popTip: PopupWindow? = null
@@ -199,6 +198,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             }
         }
 
+        if (!Constant.IS_ROUTE_MODE)
         when (TelinkApplication.getInstance().connectDevice) {
             null -> image_bluetooth.setImageResource(R.drawable.bluetooth_no)
             else -> image_bluetooth.setImageResource(R.drawable.icon_bluetooth)

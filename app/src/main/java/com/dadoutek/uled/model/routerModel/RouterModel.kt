@@ -332,8 +332,8 @@ object RouterModel {
     /**
      * 配置场景开关
      */
-    fun configEightSw(id: Long, keys: List<KeyBean>, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().configEightSw(SwEightBody(id.toInt(), keys, ser_id))
+    fun configEightSw(id: Long, keys: List<KeyBean>, ser_id: String, configSwitchType: Int): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configEightSw(SwEightBody(id.toInt(), keys, ser_id,configSwitchType))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

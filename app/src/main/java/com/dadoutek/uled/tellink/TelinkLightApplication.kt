@@ -36,6 +36,7 @@ class TelinkLightApplication : TelinkApplication() {
             return app!!
         }
     var mapBin: Map<String, Int> = HashMap<String, Int>()
+        open var isLoginAccount: Boolean = true
     }
 
     open var refWatcher: RefWatcher? = null
@@ -111,6 +112,7 @@ class TelinkLightApplication : TelinkApplication() {
             }
         }
         //启动LightService
+        if (TelinkLightService.Instance() == null)
         this.startLightService(TelinkLightService::class.java)
     }
 

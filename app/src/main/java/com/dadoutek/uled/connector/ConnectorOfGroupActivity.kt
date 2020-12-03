@@ -815,6 +815,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun onServiceDisconnected(event: ServiceEvent) {
+        if (TelinkLightService.Instance() == null)
         TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 

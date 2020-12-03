@@ -496,7 +496,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
             ToastUtils.showLong(R.string.group_fail_tip);
             updateGroupResult(dbLight, dbGroup);
             if (TelinkLightApplication.Companion.getApp().getConnectDevice() == null) {
-                ToastUtils.showLong("断开连接");
+                ToastUtils.showLong( getString(R.string.device_disconnected));
             } else {
                 if (index + 1 > selectLights.size() - 1)
                     completeGroup(selectLights);
@@ -1077,9 +1077,9 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
     protected void onResume() {
         super.onResume();
         //检测service是否为空，为空则重启
-        if (TelinkLightService.Instance() == null) {
+        if (TelinkLightService.Instance() == null)
             mApplication.startLightService(TelinkLightService.class);
-        }
+
     }
 
     // 如果没有网络，则弹出网络设置对话框
