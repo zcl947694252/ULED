@@ -1023,7 +1023,7 @@
     <string name="scan_result_confirm">Сканирование подтверждено, пожалуйста, позже</string>
     <string name="group_timeout">Оборудование перегружено</string>
     <string name="group_some_fail">Часть оборудования разбита на группы</string>
-    <string name="open_faile">Свет не работает</string>
+    <string name="open_light_faile">Свет не работает</string>
     <string name="delete_group_success">Удаленная группа удалена, в общей сложности %1$s устройства удалены</string>
     <string name="delete_group_some_fail">Блок удаления маршрута не работает, часть устройства не работает</string>
     <string name="config_bri_fail">Яркость конфигурации не работает</string>
@@ -1096,5 +1096,8 @@
     <string name="input_right_code">Пожалуйста, введите правильный штрих-код</string>
     <string name="scan_code">Сканирование кода оборудования</string>
     <string name="select_all_group">Все группы вычеркнуты</string>
+    <string name="commutation_success">电机换向成功</string>
+    <string name="commutation_faile">电机换向失败</string>
+    <string name="open_faile">打开失败</string>
 
 </resources>

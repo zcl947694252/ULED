@@ -458,7 +458,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 }
                 when (cmdBean.status) {
                     0 -> if (group!!.connectionStatus == ConnectionStatus.OFF.value) afterCloseGp() else afterOpenGp()
-                    else -> ToastUtils.showShort(getString(R.string.open_faile))
+                    else -> ToastUtils.showShort(getString(R.string.open_light_faile))
                 }
             }
             "lightSetting" -> {
@@ -468,7 +468,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 }
                 when (cmdBean.status) {
                     0 -> if (light!!.connectionStatus == ConnectionStatus.OFF.value) afterCloseLight() else afterOpenLight()
-                    else -> ToastUtils.showShort(getString(R.string.open_faile))
+                    else -> ToastUtils.showShort(getString(R.string.open_light_faile))
                 }
             }
         }

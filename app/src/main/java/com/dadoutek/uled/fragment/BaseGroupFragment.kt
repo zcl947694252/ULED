@@ -447,6 +447,7 @@ abstract class BaseGroupFragment : BaseFragment() {
             //    "errorCode": 90018,该设备不存在，请重新刷新数据"
             //    "errorCode": 90008,该设备没有绑定路由，无法操作"
             //   "errorCode": 90007该组不存在，请重新刷新数据"
+
             //    errorCode": 90005,"message": "该设备绑定的路由没在线"
             when (it.errorCode) {
                 0 -> {
@@ -457,7 +458,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.open_faile))
+                                ToastUtils.showShort(getString(R.string.open_light_faile))
                             }
                 }
                 90018 -> {
@@ -485,16 +486,16 @@ abstract class BaseGroupFragment : BaseFragment() {
         hideLoadingDialog()
         if (cmdBean.ser_id == "zu" && currentGroup != null) {
             LogUtils.v("zcl------收到路由开关组通知------------$cmdBean")
-            if (currentGroup!!.status == 0) currentGroup?.connectionStatus = 1 else currentGroup?.connectionStatus = 0
+            if (currentGroup!!.connectionStatus == 0) currentGroup?.connectionStatus = 1 else currentGroup?.connectionStatus = 0
             when (cmdBean.status) {
                 0 -> {
-                    when (currentGroup!!.status) {
-                        0 -> groupOpenSuccess(currentPosition)
+                    when (currentGroup!!.connectionStatus) {
+                        1 -> groupOpenSuccess(currentPosition)
                         else -> groupCloseSuccess(currentPosition)
                     }
                     DBUtils.saveGroup(currentGroup!!, true)
                 }
-                else -> ToastUtils.showShort(getString(R.string.open_faile))
+                else -> ToastUtils.showShort(getString(R.string.open_light_faile))
             }
         }
     }
@@ -508,58 +509,32 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         when (view!!.id) {
             R.id.template_device_icon -> {
-                if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
-                    goConnect()
-                    sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
-                } else
-                    if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
-                            || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO) {
-                        if (currentGroup!!.status == 0) {//0关1开
-                            if (Constant.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-                                routeOpenOrClose(currentGroup!!.meshAddr, 97, 1, "zu")
-                            } else {
-                                Commander.openOrCloseLights(dstAddr, true)
+                when {
+                    TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE -> {
+                        goConnect()
+                        sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
+                    }
+                    currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
+                            || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO -> {
+                        when {
+                            Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
+                                var status = if (currentGroup!!.connectionStatus==0) 1 else 0
+                                routeOpenOrClose(currentGroup!!.meshAddr, 97, status, "zu")
+                            }
+                            else -> {
+                                var isopen = currentGroup!!.connectionStatus==0 //0位关闭 则去打开
+                                Commander.openOrCloseCurtain(dstAddr, isopen, false)
                                 groupOpenSuccess(position)
-                            }
-                            if (Constant.IS_ROUTE_MODE)
-                                currentGroup?.connectionStatus = 1
-                        } else {
-                            if (Constant.IS_ROUTE_MODE) {
-                                routeOpenOrClose(currentGroup!!.meshAddr, 97, 0, "zu")
-                            } else {
-                                Commander.openOrCloseLights(dstAddr, false)
-                                groupCloseSuccess(position)
-                            }
-                            if (Constant.IS_ROUTE_MODE)
-                                currentGroup?.connectionStatus = 0
-                        }
-
-                        if (Constant.IS_ROUTE_MODE)
-                            DBUtils.saveGroup(currentGroup!!, true)
-
-                        LogUtils.v("zcl所有组------------------${DBUtils.allGroups[0].connectionStatus}")
-                    } else {
-                        if (currentGroup!!.status == 0) {
-                            if (Constant.IS_ROUTE_MODE) {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-                                routeOpenOrClose(currentGroup!!.meshAddr, currentGroup!!.deviceType.toInt(), 1, "zu")
-                            } else {
-                                Commander.openOrCloseCurtain(dstAddr, true, false)
-                                groupOpenSuccess(position)
-                            }
-                        } else {
-                            when {
-                                Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-                                    routeOpenOrClose(currentGroup!!.meshAddr, 97, 0, "zu")
-                                }
-                                else -> {
-                                    Commander.openOrCloseCurtain(dstAddr, false, false)
-                                    groupCloseSuccess(position)
-                                }
                             }
                         }
                         if (Constant.IS_ROUTE_MODE)
                             DBUtils.saveGroup(currentGroup!!, true)
                     }
+                    currentGroup!!.deviceType == Constant.DEVICE_TYPE_CURTAIN->{
+                        if (Constant.IS_ROUTE_MODE)
+                        routeSwitchCurtain()
+                    }
+                }
             }
 
             R.id.template_device_setting -> {
@@ -639,6 +614,66 @@ abstract class BaseGroupFragment : BaseFragment() {
                 }else{
                     goConnect()
                 }
+            }
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun routeSwitchCurtain() {//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea 换向 = 0x11
+        currentGroup?.let {
+            var opcode =  if (it.connectionStatus==0) 0x0a else 0x0c
+
+            RouterModel.routeControlCurtain(it.meshAddr, 97, opcode, 1, "groupSwCurtain")//换向 = 0x11
+                    ?.subscribe({itr->
+                        LogUtils.v("zcl-----------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
+                        when (itr.errorCode) {
+                            0 -> {
+                                showLoadingDialog(getString(R.string.please_wait))
+                                disposableRouteTimer?.dispose()
+                                disposableRouteTimer = Observable.timer(itr.t.timeout.toLong(), TimeUnit.SECONDS)
+                                        .subscribeOn(Schedulers.io())
+                                        .observeOn(AndroidSchedulers.mainThread())
+                                        .subscribe {
+                                            hideLoadingDialog()
+                                            when (opcode) {
+                                                0x0a -> ToastUtils.showShort(getString(R.string.open_faile))
+                                                0x0c -> ToastUtils.showShort(getString(R.string.close_faile))
+                                            }
+                                        }
+                            }
+                            90018 -> {
+                                DBUtils.deleteLocalData()
+                                //ToastUtils.showShort(getString(R.string.device_not_exit))
+                                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                                    override fun start() {}
+                                    override fun complete() {}
+                                    override fun error(msg: String?) {}
+                                })
+                            }
+                            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                            90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                            else -> ToastUtils.showShort(itr.message)
+                        }
+                    }, {itt->
+                        ToastUtils.showShort(itt.message)
+                    })
+        }
+    }
+
+    override fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由控制通知-------$cmdBean")
+        if (cmdBean.ser_id == "groupSwCurtain") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (currentGroup?.connectionStatus == 0) currentGroup?.connectionStatus = 1 else currentGroup?.connectionStatus = 0
+            if (cmdBean.status == 0)
+            when (currentGroup?.connectionStatus) {
+                1 -> groupOpenSuccess(currentPosition)
+                else -> groupCloseSuccess(currentPosition)
+            }
+            currentGroup?.let {
+            DBUtils.saveGroup(it, true)
             }
         }
     }

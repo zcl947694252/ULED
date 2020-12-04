@@ -138,7 +138,9 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
         finish()
     }
 
-    override fun setDeletePositiveBtn() {}
+    override fun setDeletePositiveBtn() {
+
+    }
 
     override fun editeDeviceAdapter() {}
 

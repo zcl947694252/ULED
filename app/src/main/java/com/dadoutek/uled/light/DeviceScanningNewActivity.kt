@@ -84,6 +84,7 @@ import java.util.concurrent.TimeUnit
  * --如果得到数据的情况下是超时也就是mqtt没有接到但是没有结束 重新计算超时 如果借宿了 确认清除数据 跳转43
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
+    private var isFinisAc: Boolean = false
     private var disposableUpMeshTimer: Disposable? = null
     private var scanRouterTimeoutTime: Long = 0
     private var routerScanCount: Int = 0
@@ -265,7 +266,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             checkNetworkAndSync()
         }
         updateList.clear()
-        routerStopScan(false)
+        isFinisAc = false
+        routerStopScan()
         disposeAllSubscribe()
 
         mApplication?.removeEventListener(this)
@@ -531,7 +533,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
         btn_stop_scan?.setOnClickListener {//停止扫描
             if (Constant.IS_ROUTE_MODE) {
-                routerStopScan(false)
+                isFinisAc = false
+                routerStopScan()
             } else {
                 closeAnimation()
                 list_devices.visibility = View.GONE
@@ -573,7 +576,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     @SuppressLint("CheckResult")
-    private fun routerStopScan(isFinisAc: Boolean) {
+    private fun routerStopScan() {
         if (Constant.IS_ROUTE_MODE)
             RouterModel.routeStopScan(TAG, Constant.SCAN_SERID)
                     ?.subscribe({ itr ->
@@ -1486,6 +1489,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 }
             } else {//如果还在扫描则重新计算超时时间
                 ToastUtils.showShort(getString(R.string.no_device))
+                if (isFinisAc)
+                    finish()
                 scanFail()
             }
         }, {
@@ -1571,7 +1576,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         disposableFind?.dispose()
         disposableTimer?.dispose()
         mConnectDisposal?.dispose()
-        routerStopScan(true)
+        isFinisAc = true
+        routerStopScan()
         disposeAllSubscribe()
         mApplication?.removeEventListener(this)
         SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)

@@ -204,7 +204,6 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     fun deleteSwitch(macAddress: String) {
-
         AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(/*R.string.delete_switch_confirm*/getString(R.string.sure_delete_device2))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     currentSw = DBUtils.getSwitchByMacAddr(macAddress)

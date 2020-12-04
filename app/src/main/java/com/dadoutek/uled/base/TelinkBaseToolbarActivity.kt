@@ -55,6 +55,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
         batchGpAll?.isVisible = batchGpVisible()
         onlineUpdateAll?.isVisible = onlineUpdateAllVisible()
         bindRouter?.isVisible = bindRouterVisible()
+        deleteDeviceAll?.isVisible = deleteDeviceVisible()
 
         toolbar.setOnMenuItemClickListener { itm ->
             DBUtils.lastUser?.let {
@@ -75,6 +76,10 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             }
             true
         }
+    }
+
+    open fun deleteDeviceVisible(): Boolean {
+        return true
     }
 
     open fun onlineUpdateAllVisible(): Boolean {

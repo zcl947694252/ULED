@@ -552,14 +552,14 @@ object RouterModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun routeAddTimerScene( name:String , hour:Int, min :Int, week:Int, sid :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeAddTimerScene(TimerSceneBody(0,name, hour, min , week, sid , ser_id))
+    fun routeAddTimerScene( name:String , hour:Int, min :Int, week:Int, sid :Int,status :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeAddTimerScene(TimerSceneBody(0,name, hour, min , week, sid , status,ser_id))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
     fun routeUpdateTimerScene( id:Int , hour:Int, min :Int, week:Int, sid :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeUpdateTimerScene(TimerSceneBody(id,"", hour, min , week, sid , ser_id))
+        return NetworkFactory.getApi().routeUpdateTimerScene(TimerSceneBody(id,"", hour, min , week, sid ,0, ser_id))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -586,12 +586,25 @@ object RouterModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
+    fun routeUpdateSceneName(id:Int,name: String,imgName:String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routeUpdateSceneName(id,NameBody(name,imgName))
+                // .compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
     fun routeUpdateTimerSceneName(id:Int,name: String): Observable<Response<Any>>? {
         return NetworkFactory.getApi().routeUpdateTimerSceneName(id,NameBody(name))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+    fun routeDelSelf(mac: String): Observable<Response<Any>>? {
+        return NetworkFactory.getApi().routeDelSelf(mac)
+                 //.compose(NetworkTransformer())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
+
     fun routeUpdateRouterName(id:Long,name: String): Observable<Any>? {
         return NetworkFactory.getApi().updateRouter(id,NameBody(name))
                 .compose(NetworkTransformer())

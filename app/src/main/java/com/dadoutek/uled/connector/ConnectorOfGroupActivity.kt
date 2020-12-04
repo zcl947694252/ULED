@@ -466,7 +466,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
                 afterClickIcon()
             } else {
                 if (isOpen == 1)
-                    ToastUtils.showShort(getString(R.string.open_faile))
+                    ToastUtils.showShort(getString(R.string.open_light_faile))
                 else
                     ToastUtils.showShort(getString(R.string.close_faile))
             }

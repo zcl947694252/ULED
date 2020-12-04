@@ -30,6 +30,7 @@ import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.pir.ConfigSensorAct
 import com.dadoutek.uled.pir.HumanBodySensorActivity
 import com.dadoutek.uled.pir.PirConfigActivity
@@ -159,10 +160,21 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
 
     override fun setDeletePositiveBtn() {
         currentDevice?.let {
-            DBUtils.deleteSensor(it)
-            sensorDatas.remove(it)
+            showLoadingDialog(getString(R.string.please_wait))
+            NetworkFactory.getApi().deleteSensor(DBUtils.lastUser?.token, it.id.toInt())
+                    ?.compose(NetworkTransformer())
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({ itr ->
+                        DBUtils.deleteSensor(it)
+                        sensorDatas.remove(it)
+                        adapter?.data?.remove(it)
+                        adapter?.notifyDataSetChanged()
+                        hideLoadingDialog()
+                    }, { itt ->
+                        ToastUtils.showShort(itt.message)
+                    })
         }
-        adapter?.notifyDataSetChanged()
         isEmptyDevice()
     }
 
@@ -483,7 +495,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         }
     }
 
-    override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
+    override fun tzRouteOpenOrCloseSensor(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl------收到路由开关灯通知------------$cmdBean")
         when (cmdBean.ser_id) {
             "closeSensor" -> {
@@ -501,7 +513,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 if (cmdBean.status == 0) {
                     sendOpenIcon(positionCurrent)
                 } else {
-                    ToastUtils.showShort(getString(R.string.open_faile))
+                    ToastUtils.showShort(getString(R.string.open_light_faile))
                 }
             }
         }

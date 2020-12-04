@@ -186,7 +186,6 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         }
 
         renameDialog?.setOnDismissListener {
-
             if (!isReConfig)
                 finish()
         }

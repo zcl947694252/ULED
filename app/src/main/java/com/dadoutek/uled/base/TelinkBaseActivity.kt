@@ -564,7 +564,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val lastUser = lastUser
         lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)//没有上传数据或者当前区域不是自己的区域
-                startTimerUpdate()
+                if (!Constant.IS_ROUTE_MODE)
+                    startTimerUpdate()
         }
 
         if (Constant.IS_ROUTE_MODE)
@@ -920,6 +921,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Cmd.tzRouteConfigWhite -> tzRouterConfigWhite(cmdBean)
                 Cmd.tzRouteConfigBri -> tzRouterConfigBriOrTemp(cmdBean, 0)
                 Cmd.tzRouteConfigTem -> tzRouterConfigBriOrTemp(cmdBean, 1)
+                Cmd.tzRouteOpenOrCloseSensor -> tzRouteOpenOrCloseSensor(cmdBean)
             }
 /*   when (intent?.action) {
                 Constant.GW_COMMEND_CODE -> {
@@ -971,6 +973,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    open fun tzRouteOpenOrCloseSensor(cmdBean: CmdBodyBean) {}
     open fun tzRouteSendVersioning(cmdBean: CmdBodyBean) {}
     open fun tzRouteGetVersioningNum(cmdBean: CmdBodyBean) {}
     open fun tzRouterChangeTimerSceneStatus(cmdBean: CmdBodyBean) {}
@@ -1667,7 +1670,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                             .subscribe {
                                 hideLoadingDialog()
                                 if (productUUID == DeviceType.LIGHT_NORMAL)
-                                    ToastUtils.showShort(getString(R.string.open_faile))
+                                    ToastUtils.showShort(getString(R.string.open_light_faile))
                             }
                 }
                 90018 -> {
@@ -1698,10 +1701,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                             .subscribe {
                                 hideLoadingDialog()
-                                if (status == 1)
+                               /* if (status == 1)
                                     ToastUtils.showShort(getString(R.string.open_faile))
                                 else
-                                    ToastUtils.showShort(getString(R.string.close_faile))
+                                    ToastUtils.showShort(getString(R.string.close_faile))*/
                             }
                 }
                 90030 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
@@ -1899,6 +1902,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         DBUtils.saveSensor(item, true)
                 }, {})
     }
+
     open fun renameSucess() {
 
     }

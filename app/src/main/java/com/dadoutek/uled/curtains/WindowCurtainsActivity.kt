@@ -526,6 +526,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     override fun onSeeking(seekParams: SeekParams) {
                         val i = seekParams.progress
                         val opcode = Opcode.CURTAIN_ON_OFF
+                        value = i
                         if (Constant.IS_ROUTE_MODE)
                             routerControlCurtain(0x15, "configSpeed", false)
                         else {
@@ -543,7 +544,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     override fun onSeeking(seekParams: SeekParams) {
                         val i = seekParams.progress
                         val opcode = Opcode.CURTAIN_ON_OFF
-
+                            value = i
                         if (Constant.IS_ROUTE_MODE)
                             routerControlCurtain(0x15, "configSpeed", false)
                         else {
@@ -581,7 +582,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
             }
         RouterModel.routeControlCurtain(meshAddr, meshType, opcode, value, ser_id)//换向 = 0x11
                 ?.subscribe({
-                    LogUtils.v("zcl-----------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
+                    LogUtils.v("zcl----valu$value-------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
                     when (it.errorCode) {
                         0 -> {
                             showLoadingDialog(getString(R.string.please_wait))
@@ -639,6 +640,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
             when (cmdBean.ser_id) {
                 "inverse" -> {
                     disposableRouteTimer?.dispose()
+                    if (cmdBean.status == 0)
+                        ToastUtils.showShort(getString(R.string.commutation_success))
+                    else
+                        ToastUtils.showShort(getString(R.string.commutation_faile))
                 }
                 "configSpeed" -> {
                     if (cmdBean.status == 0)
@@ -985,10 +990,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun electricCommutation() {
         when {
-            Constant.IS_ROUTE_MODE -> {
-
-                routerControlCurtain(0x11, "inverse", commutationBoolean)
-            }
+            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x11, "inverse", commutationBoolean)
             else -> {
                 when (typeStr) {
                     Constant.TYPE_GROUP -> {

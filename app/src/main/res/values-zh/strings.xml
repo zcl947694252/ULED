@@ -1134,7 +1134,7 @@
     <string name="scan_result_confirm">扫描结果确认中,请稍后</string>
     <string name="group_timeout">设备分组超时</string>
     <string name="group_some_fail">部分设备分组失败</string>
-    <string name="open_faile">路由开灯失败</string>
+    <string name="open_light_faile">路由开灯失败</string>
     <string name="delete_group_success">路由删组成功,共%1$s设备移除该组</string>
     <string name="delete_group_some_fail">路由删组失败,部分设备移除组失败</string>
     <string name="config_bri_fail">配置亮度失败</string>
@@ -1207,4 +1207,7 @@
     <string name="input_right_code">请输入正确的条形码</string>
     <string name="scan_code">设备码扫描</string>
     <string name="select_all_group">已勾选所有组</string>
+    <string name="commutation_success">电机换向成功</string>
+    <string name="commutation_faile">电机换向失败</string>
+    <string name="open_faile">打开失败</string>
 </resources>

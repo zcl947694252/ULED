@@ -31,6 +31,8 @@ import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.rgb.RGBSettingActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
@@ -41,7 +43,8 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.template_search_tool.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -111,8 +114,21 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     override fun setDeletePositiveBtn() {
         currentDevice?.let {
-            DBUtils.deleteLight(it)
-            lightsData.remove(it)
+            showLoadingDialog(getString(R.string.please_wait))
+            NetworkFactory.getApi().deleteLight(DBUtils.lastUser?.token, it.id.toInt())
+                    ?.compose(NetworkTransformer())
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({ itr ->
+                        DBUtils.deleteLight(it)
+                        lightsData.remove(it)
+
+                        listAdapter?.data?.remove(it)
+                        listAdapter?.notifyDataSetChanged()
+                        hideLoadingDialog()
+                    }, { itt ->
+                        ToastUtils.showShort(itt.message)
+                    })
         }
         listAdapter?.notifyDataSetChanged()
         isEmptyDevice()
@@ -122,8 +138,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         super.onResume()
         initData()
         scrollToPosition()
-       /* if (TelinkLightApplication.getApp().connectDevice == null)
-            autoConnectAll()*/
+        /* if (TelinkLightApplication.getApp().connectDevice == null)
+             autoConnectAll()*/
     }
 
     override fun editeDeviceAdapter() {
@@ -432,7 +448,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
             when (cmdBean.status) {
                 0 -> sendAfterUpdate()
-                else -> ToastUtils.showShort(getString(R.string.open_faile))
+                else -> ToastUtils.showShort(getString(R.string.open_light_faile))
             }
         }
     }
@@ -556,7 +572,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         notifyData()
         GlobalScope.launch {  //踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
             delay(2000)
-            if (TelinkLightApplication.getApp().connectDevice == null&&!Constant.IS_ROUTE_MODE)
+            if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE)
                 autoConnectAll()
         }
     }

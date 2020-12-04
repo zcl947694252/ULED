@@ -38,7 +38,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
-import com.dadoutek.uled.ota.OTAConnectorActivity
+import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
@@ -410,9 +410,38 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun transformView() {
-        val intent = Intent(this@ConnectorSettingActivity, OTAConnectorActivity::class.java)
+        /*val intent = Intent(this@ConnectorSettingActivity, OTAConnectorActivity::class.java)
         intent.putExtra(Constant.UPDATE_LIGHT, currentDbConnector)
+        startActivity(intent)*/
+        if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == currentDbConnector?.meshAddr) {
+            skipOta()
+        } else {
+            showLoadingDialog(getString(R.string.please_wait))
+            TelinkLightService.Instance()?.idleMode(true)
+            connect(macAddress = currentDbConnector?.macAddr, meshAddress = currentDbConnector?.meshAddr?:0, connectTimeOutTime = 10, retryTimes = 2)
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({
+                        hideLoadingDialog()
+                        skipOta()
+                        disposableTimer?.dispose()
+                    }, {
+                        disposableTimer?.dispose()
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                    })
+        }
+
+    }
+
+    private fun skipOta() {
+        val intent = Intent(this@ConnectorSettingActivity, OTAUpdateActivity::class.java)
+        intent.putExtra(Constant.OTA_MAC, currentDbConnector?.macAddr)
+        intent.putExtra(Constant.OTA_MES_Add, currentDbConnector?.meshAddr)
+        intent.putExtra(Constant.OTA_VERSION, currentDbConnector?.version)
+        intent.putExtra(Constant.OTA_TYPE, DeviceType.SMART_RELAY)
         startActivity(intent)
         finish()
     }
@@ -646,7 +675,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                     }
                 }
             } else {
-                val string = if (isOpen) getString(R.string.open_faile) else getString(R.string.close_faile)
+                val string = if (isOpen) getString(R.string.open_light_faile) else getString(R.string.close_faile)
                 ToastUtils.showShort(string)
             }
         }

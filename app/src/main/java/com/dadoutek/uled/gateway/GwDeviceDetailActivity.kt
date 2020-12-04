@@ -29,12 +29,15 @@ import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.light.LightAdapter
@@ -106,10 +109,24 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
     override fun setDeletePositiveBtn() {
         currentGw?.let {
-            DBUtils.deleteGateway(it)
-            gwDatas.remove(it)
+            val gattBody = GwGattBody()
+            gattBody.idList = mutableListOf(it.id.toInt())
+            showLoadingDialog(getString(R.string.please_wait))
+            NetworkFactory.getApi().deleteGw(gattBody)
+                    ?.compose(NetworkTransformer())
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({ itr ->
+                        DBUtils.deleteGateway(it)
+                        gwDatas.remove(it)
+
+                        adaper?.data?.remove(it)
+                        adaper?.notifyDataSetChanged()
+                        hideLoadingDialog()
+                    }, { itt ->
+                        ToastUtils.showShort(itt.message)
+                    })
         }
-        adaper?.notifyDataSetChanged()
         isEmptyDevice()
     }
 

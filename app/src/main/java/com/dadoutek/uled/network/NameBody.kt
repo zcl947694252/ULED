@@ -13,6 +13,8 @@ import java.io.Serializable
  * 更新时间   $
  * 更新描述
  */
-data class NameBody(var name:String):Serializable {
-
+data class NameBody(var name:String ,var imgName:String="",var index:Int = 0 ):Serializable {
+    override fun toString(): String {
+        return "NameBody(name='$name', imgName='$imgName', index=$index)"
+    }
 }

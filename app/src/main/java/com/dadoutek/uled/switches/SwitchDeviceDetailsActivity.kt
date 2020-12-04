@@ -30,6 +30,8 @@ import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
@@ -128,10 +130,23 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     override fun setDeletePositiveBtn() {
         currentDevice?.let {
-            DBUtils.deleteSwitch(it)
-            switchData.remove(it)
+            showLoadingDialog(getString(R.string.please_wait))
+            NetworkFactory.getApi().deleteSwitch(DBUtils.lastUser?.token, it.id.toInt())
+                    ?.compose(NetworkTransformer())
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({ itr ->
+                        DBUtils.deleteSwitch(it)
+                        switchData.remove(it)
+
+                        adapter?.data?.remove(it)
+                        adapter?.notifyDataSetChanged()
+                        hideLoadingDialog()
+                    }, { itt ->
+                        ToastUtils.showShort(itt.message)
+                    })
         }
-        adapter?.notifyDataSetChanged()
+
         isEmptyDevice()
     }
 

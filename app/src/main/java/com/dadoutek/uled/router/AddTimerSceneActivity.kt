@@ -81,6 +81,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
         }
         gate_way_repete_mode_ly?.setOnClickListener {
             val intent = Intent(this@AddTimerSceneActivity, GwChoseModeActivity::class.java)
+            intent.putExtra("data", getWeek(mode!!))
             startActivityForResult(intent, requestModeCode)
         }
     }
@@ -98,11 +99,13 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
             hourTime = timerSceneBean?.hour ?: hourTime
             minuteTime = timerSceneBean?.min ?: minuteTime
             mode = getWeekStr(timerSceneBean?.week)
-            gate_way_repete_mode.text = mode
             scene = DBUtils.getSceneByID((timerSceneBean?.sid ?: 0).toLong())
             item_gw_timer_scene.text = scene?.name
+        } else {
+            mode = getString(R.string.only_one)
         }
 
+        gate_way_repete_mode.text = mode
         toolbar_t_center.text = if (!isReConfig)
             getString(R.string.add_timer_scene)
         else
@@ -112,11 +115,11 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
         wheel_time_container.addView(timePicker)
     }
 
-    private  fun getWeekStr(week: Int?): String {
+    private fun getWeekStr(week: Int?): String {
         var tmpWeek = week ?: 0
         val sb = StringBuilder()
         when (tmpWeek) {
-            0b01111111 -> sb.append(getString(R.string.every_day))
+            0b01111111,0b10000000-> sb.append(getString(R.string.every_day))
             0b00000000 -> sb.append(getString(R.string.only_one))
             else -> {
                 var list = mutableListOf(
@@ -127,18 +130,18 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
                         WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
                         WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
                         WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
+                val filter = list.filter { it.selected }
                 for (i in 0 until list.size) {
-                    var weekBean = list[i]
-                    if (weekBean.selected) {
-                        when (i) {
-                            list.size - 1 -> sb.append(weekBean.week)
-                            else -> sb.append(weekBean.week).append(",")
-                        }
-                    }
+                    if (list[i].selected)
+                        sb.append(list[i].week).append(",")
+                }
+                val toString = sb.toString()
+                if (filter.size>1) {
+                    toString.substring(sb.length-2)
                 }
             }
         }
-                return sb.toString()
+        return sb.toString()
     }
 
     private fun initView() {
@@ -196,14 +199,14 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun routerAddSceneTimer() {
-        RouterModel.routeAddTimerScene("$hourTime:$minuteTime", hourTime, minuteTime, getWeek(mode!!), scene!!.id.toInt(), "addTimerScene")?.subscribe({
+        RouterModel.routeAddTimerScene("$hourTime:$minuteTime", hourTime, minuteTime, getWeek(mode!!), scene!!.id.toInt(), 1,"addTimerScene")?.subscribe({
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong() + 2L, TimeUnit.SECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.add_timer_scene_fail))
@@ -237,7 +240,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
     private fun routerUpdateSceneTimer() {
         timerSceneBean?.let {
             RouterModel.routeUpdateTimerScene(timerSceneBean?.id
-                    ?: 0, hourTime, minuteTime, getWeek(mode!!), scene!!.id.toInt(), "updateTimerScene")
+                    ?: 0, hourTime, minuteTime, getWeek(mode!!.replace("6","")), scene!!.id.toInt(), "updateTimerScene")
                     ?.subscribe({
                         LogUtils.v("zcl-----------路由请求刷新定时场景$-------$it")
                         when (it.errorCode) {

@@ -38,7 +38,7 @@ class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerScene
         val sb = StringBuilder()
         var tmpWeek = week ?: 0
         when (tmpWeek) {
-            0b01111111 -> sb.append(mContext.getString(R.string.every_day))
+            0b01111111,0b10000000 -> sb.append(mContext.getString(R.string.every_day))
             0b00000000 -> sb.append(mContext.getString(R.string.only_one))
             else -> {
                 var list = mutableListOf(

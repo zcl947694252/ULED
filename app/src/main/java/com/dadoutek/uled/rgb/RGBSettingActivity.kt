@@ -2975,7 +2975,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 LogUtils.v("zcl------收到路由开关灯通知--------$swOpen----$cmdBean")
                 when (cmdBean.status) {
                     0 -> afterSendOpenOrClose(swOpen)
-                    else -> ToastUtils.showShort(getString(R.string.open_faile))
+                    else -> ToastUtils.showShort(getString(R.string.open_light_faile))
                 }
             }
         }

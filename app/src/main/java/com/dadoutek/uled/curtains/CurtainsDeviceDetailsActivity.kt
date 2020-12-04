@@ -24,10 +24,15 @@ import com.dadoutek.uled.model.dbModel.DbCurtain
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_curtains_device_details.*
 import kotlinx.android.synthetic.main.activity_curtains_device_details.add_device_btn
 import kotlinx.android.synthetic.main.activity_curtains_device_details.no_device_relativeLayout
@@ -72,10 +77,21 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     override fun setDeletePositiveBtn() {
         currentDevice?.let {
-            DBUtils.deleteCurtain(it)
-            curtainDatas.remove(it)
+            showLoadingDialog(getString(R.string.please_wait))
+            NetworkFactory.getApi().deleteCurtain(DBUtils.lastUser?.token, it.id.toInt())
+                    ?.compose(NetworkTransformer())
+                    ?.subscribeOn(Schedulers.io())
+                    ?.observeOn(AndroidSchedulers.mainThread())
+                    ?.subscribe({ itr ->
+                        DBUtils.deleteCurtain(it)
+                        curtainDatas.remove(it)
+                        adapter?.data?.remove(it)
+                        adapter?.notifyDataSetChanged()
+                        hideLoadingDialog()
+                    }, { itt ->
+                        ToastUtils.showShort(itt.message)
+                    })
         }
-        adapter?.notifyDataSetChanged()
         isEmptyDevice()
     }
 

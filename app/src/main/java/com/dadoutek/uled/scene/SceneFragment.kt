@@ -50,6 +50,7 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_switch_device_details.*
 import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
@@ -209,16 +210,17 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             if (Constant.IS_ROUTE_MODE) {
                 RouterModel.routeDelScene(id.toInt())
                         ?.subscribe({
-                            startDelSceneTimeOut(it.t)
                             when (it.errorCode) {
-                                OK, ROUTER_DEL_SCENE_NOT_EXITE, ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE, ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(list, dbScene)
+                                OK->{
+                                    startDelSceneTimeOut(it.t)
+                                }
+                                ROUTER_DEL_SCENE_NOT_EXITE, ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE, ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(list, dbScene)
                                 //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
                                 // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
                                 ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
                                 ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
                                 else -> ToastUtils.showShort(it.message)
                             }
-
                         }, {
                             ToastUtils.showShort(it.message)
                         })

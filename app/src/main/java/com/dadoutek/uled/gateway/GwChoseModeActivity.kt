@@ -53,9 +53,8 @@ class GwChoseModeActivity : TelinkBaseActivity() {
                 WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
 
         for (i in 0 until list!!.size) {
-            var weekBean = list!![i]
-            if (weekBean.selected) {
-                checkedList.add(weekBean)
+            if (list!![i].selected) {
+                checkedList.add(list!![i])
             }
         }
 
@@ -97,13 +96,13 @@ class GwChoseModeActivity : TelinkBaseActivity() {
             else -> {
                 checkedList.sortBy { it.pos }
                 for (i in 0 until checkedList.size) {//until 不包含 尾部 ..包含
-                    if (i == checkedList.size - 1)
-                        sb.append(checkedList[i].week)
-                    else
-                        sb.append(checkedList[i].week).append(",")
-                    if (checkedList.size == 6)
-                        sb.append("6")
+                    when (i) {
+                        checkedList.size - 1 -> sb.append(checkedList[i].week)
+                        else -> sb.append(checkedList[i].week).append(",")
+                    }
                 }
+                if (checkedList.size == 6)
+                    sb.append("6")
             }
         }
         intent.putExtra("data", sb.toString())

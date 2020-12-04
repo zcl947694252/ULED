@@ -107,13 +107,12 @@
         />
 
     <Button
-        android:id="@+id/btn_start_update"
-        android:text="@string/start_update"
-        android:layout_marginTop="15dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+            android:id="@+id/btn_start_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="15dp"
+            android:text="@string/start_update" />
 
     <TextView
         android:id="@+id/tv_version"

@@ -12,9 +12,13 @@ import java.io.Serializable
  * 更新时间   $
  * 更新描述
  */
- class GroupBodyBean(
-    val deviceMeshAddrs: List<Int>,
-    val meshType: Int,
-    val ser_id: String,
-    val targetGroupMeshAddr: Int
-):Serializable
+class GroupBodyBean(
+        val deviceMeshAddrs: List<Int>,
+        val meshType: Int,
+        val ser_id: String,
+        val targetGroupMeshAddr: Int
+) : Serializable {
+    override fun toString(): String {
+        return "GroupBodyBean(deviceMeshAddrs=$deviceMeshAddrs, meshType=$meshType, ser_id='$ser_id', targetGroupMeshAddr=$targetGroupMeshAddr)"
+    }
+}

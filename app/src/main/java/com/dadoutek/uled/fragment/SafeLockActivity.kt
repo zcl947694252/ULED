@@ -173,7 +173,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
         when (cmdBean.ser_id) {
             "safeLockOpen" -> when (cmdBean.status) {
                 0 -> ToastUtils.showShort(getString(R.string.open_light))
-                else -> ToastUtils.showShort(getString(R.string.open_faile))
+                else -> ToastUtils.showShort(getString(R.string.open_light_faile))
             }
             "safeLockClose" -> when (cmdBean.status) {
                 0 -> ToastUtils.showShort(getString(R.string.close_light))

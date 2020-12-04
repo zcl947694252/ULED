@@ -1654,6 +1654,22 @@ public interface RequestInterface {
     Observable<Response> routeUpdateTimerSceneName(@Path("id") int id, @Body NameBody body);
 
     /**
+     * 删除路由，不会发数据给路由，直接删除
+     * https://dev.dadoutek.com/xxxx/router/delete/{macAddr} DELETE
+     * https://dev.dadoutek.com/smartlight_test/router/delete/98f4666c839f
+     */
+    @PUT("router/delete/{macAddr}")
+    Observable<Response> routeDelSelf(@Path("macAddr") String macAddr);
+    /**
+     * https://dev.dadoutek.com/xxxx/scene/update/{id} PUT
+     * index	否	int	排序值
+     * name	否	string	名称
+     * imgName	否	string	图片名称
+     */
+    @PUT("scene/update/{id}")
+    Observable<Response> routeUpdateSceneName(@Path("id") int id, @Body NameBody body);
+
+    /**
      * 通过路由删除组 https://dev.dadoutek.com/xxxx/app/third-party
      * {"data":[{"id": 1,"name": "天猫精灵"}],"errorCode": 0,"message": "get third succeed!"}
      */

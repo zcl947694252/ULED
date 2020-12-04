@@ -44,7 +44,6 @@ import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
 import com.telink.TelinkApplication
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_new_scene_set.*
 import kotlinx.android.synthetic.main.scene_adapter_layout.*
@@ -52,7 +51,6 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -758,10 +756,27 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 if (!currentPageIsEdit)
                     saveScene()
                 else {//添加场景选择分组
+                    if (Constant.IS_ROUTE_MODE)
+                        updateSceneName()
                     showGpDetailList()
                 }
             }
         }
+    }
+
+    @SuppressLint("CheckResult")
+    private fun updateSceneName() {
+        val s = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
+        RouterModel.routeUpdateSceneName((dbScene?.id ?: 0).toInt(), editSceneName!!, s)
+                ?.subscribe({
+                    when (it.errorCode) {
+                        0 -> ToastUtils.showShort(getString(R.string.rename_success))
+                        else -> ToastUtils.showShort(getString(R.string.rename_faile))
+                    }
+                }, {
+                    ToastUtils.showShort(getString(R.string.rename_faile))
+                })
+
     }
 
     private fun saveCurrenEditResult() {
@@ -901,7 +916,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun startAddSceneTimeOut(it: RouterTimeoutBean?) {
         disposableTimer?.dispose()
-        disposableTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong()+2, TimeUnit.SECONDS)
+        disposableTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong() + 2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -1061,6 +1076,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun routerUpdateScene(belongSceneId: Long, actionsList: MutableList<DbSceneActions>) {
+        LogUtils.v("zcl--------更新路由场景参数----------")
         RouterModel.routeUpdateScene(belongSceneId, actionsList, "updateScene")?.subscribe({
             LogUtils.v("zcl-----------更新路由场景成功-------$it")
             when (it.errorCode) {
@@ -1263,7 +1279,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 0 -> {
                     this.showGroupList[currentPosition].isOn = isOpen//更新状态更新ui
                 }
-                else -> ToastUtils.showShort(getString(R.string.open_faile))//恢复原本状态
+                else -> ToastUtils.showShort(getString(R.string.open_light_faile))//恢复原本状态
             }
             sceneGroupAdapter?.notifyItemChanged(currentPosition)
         }

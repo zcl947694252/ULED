@@ -112,7 +112,7 @@ open class BaseFragment : Fragment() {
                     }
                     Cmd.routeUpdateScenes -> {
                     }
-
+                    Cmd.tzRouteContorlCurtain -> tzRouteContorlCurtaine(cmdBean)
                     /**
                      * 控制指令下的通知
                      */
@@ -136,6 +136,10 @@ open class BaseFragment : Fragment() {
                        }
                    }*/
         }
+    }
+
+    open fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {
+
     }
 
     open fun tzRouterApplyScenes(cmdBean: CmdBodyBean) {

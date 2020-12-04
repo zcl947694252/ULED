@@ -20,9 +20,11 @@ import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Constant.*
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.router.adapter.RouterDeviceDetailsAdapter
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
 import kotlinx.android.synthetic.main.activity_switch_device_details.add_device_btn
@@ -66,9 +68,14 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             else -> ToastUtils.showShort(getString(R.string.route_cont_support_ble))
         }
     }
+
     override fun editeDeviceAdapter() {
         adapter!!.changeState(isEdite)
         adapter!!.notifyDataSetChanged()
+    }
+
+    override fun deleteDeviceVisible(): Boolean {
+        return true
     }
 
     override fun setToolbar(): Toolbar {
@@ -86,9 +93,21 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     override fun setDeletePositiveBtn() {
         currentDevice?.let {
-            DBUtils.deleteRouter(it)
-            //添加删除服务器接口
-            routerData.remove(it)
+            RouterModel.routeDelSelf(it.macAddr)
+                    ?.subscribe({ ita ->
+                        LogUtils.v("zcl-----------删除路由-------$ita")
+                        if (ita.errorCode == 0) {
+                            ToastUtils.showShort(getString(R.string.delete_success))
+                            DBUtils.deleteRouter(it)
+                            //添加删除服务器接口
+                            routerData.remove(it)
+                        } else {
+                            ToastUtils.showShort(getString(R.string.delete_device_fail))
+                        }
+                    }, {itt->
+                        LogUtils.v("zcl-----------删除路由失败-------$itt")
+                        ToastUtils.showShort(getString(R.string.delete_device_fail))
+                    })
         }
         adapter.notifyDataSetChanged()
         isEmptyDevice()
@@ -170,7 +189,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     private fun goConfig() {
         if (isRightPos()) return
-        if (!IS_ROUTE_MODE){
+        if (!IS_ROUTE_MODE) {
             ToastUtils.showShort(getString(R.string.route_cont_support_ble))
             return
         }
@@ -292,7 +311,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     private fun transformView() {
         startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to currentDevice!!.productUUID,
-                "deviceMac" to currentDevice!!.macAddr,"version" to currentDevice!!.version )
+                "deviceMac" to currentDevice!!.macAddr, "version" to currentDevice!!.version)
     }
 
 

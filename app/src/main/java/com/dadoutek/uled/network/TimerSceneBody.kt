@@ -19,5 +19,6 @@ data class TimerSceneBody(
         var min: Int = 0,
         var week: Int = 0,
         var sid: Int = 0,
+        var status: Int = 1,
         var ser_id: String? = null
 ) : Serializable

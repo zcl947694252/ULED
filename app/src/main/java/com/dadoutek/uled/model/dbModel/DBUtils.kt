@@ -658,7 +658,7 @@ object DBUtils {
     }
 
     fun getCurtainMeshAddr(meshAddr: Int): ArrayList<DbCurtain> {
-        val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbLightDao.Properties.MeshAddr.eq(meshAddr)).build()
+        val query = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.MeshAddr.eq(meshAddr)).build()
         return ArrayList(query.list())
     }
 
