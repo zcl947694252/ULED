@@ -2,6 +2,7 @@ package com.dadoutek.uled.util
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
@@ -247,6 +248,16 @@ object RecoverMeshDeviceUtil {
                     DBUtils.saveSwitch(switch, isFromServer = false, type = switch.type, keys = switch.keys)
                     LogUtils.v("zcl找回------------$count-------普通-switch-")
                 }
+                DeviceType.GATE_WAY -> {
+                    val switch = DbGateway()
+                    switch.productUUID = productUUID
+                    switch.meshAddr = deviceInfo.meshAddress
+                    switch.name = TelinkLightApplication.getApp().getString(R.string.device_name) + switch.meshAddr
+                    switch.macAddr = get4ByteMac(deviceInfo.macAddress)
+                    switch.version = deviceInfo.firmwareRevision
+                    DBUtils.saveGateWay(switch, false)
+                    LogUtils.v("zcl找回------------$count-------普通-gateway-")
+                }
             }
         } else {//存在责更新版本
             when (productUUID) {
@@ -286,6 +297,13 @@ object RecoverMeshDeviceUtil {
                     db?.let {
                         it.version = deviceInfo.firmwareRevision
                         DBUtils.saveSwitch(it, true)
+                    }
+                }
+                DeviceType.GATE_WAY -> {
+                    val db = DBUtils.getGatewayByMeshAddr(deviceInfo.meshAddress)
+                    db?.let {
+                        it.version = deviceInfo.firmwareRevision
+                        DBUtils.saveGateWay(it, true)
                     }
                 }
             }

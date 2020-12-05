@@ -1254,4 +1254,5 @@
     <string name="commutation_success">电机换向成功</string>
     <string name="commutation_faile">电机换向失败</string>
     <string name="open_faile">打开失败</string>
+    <string name="please_do_this_over_ble">请在蓝牙下进行此操作</string>
 </resources>

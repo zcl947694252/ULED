@@ -271,18 +271,30 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                     if (it.id.toString() != it.last_authorizer_user_id)
                         ToastUtils.showLong(getString(R.string.author_region_warm))
                     else {
+                        if (IS_ROUTE_MODE) {
+                            ToastUtils.showShort(getString(R.string.please_do_this_over_ble))
+                            return@OnItemChildClickListener
+                        }
                         connectGw(0)
                     }
                 }
             }
             R.id.template_device_icon -> {
                 //开关网关通过普通灯的连接状态发送
+                if (IS_ROUTE_MODE) {
+                    ToastUtils.showShort(getString(R.string.please_do_this_over_ble))
+                    return@OnItemChildClickListener
+                }
                 when {
                     TelinkLightApplication.getApp().connectDevice != null -> sendOpenOrCloseGw(true)
                     else -> getGw()
                 }
             }
             R.id.template_device_card_delete -> {
+                if (IS_ROUTE_MODE) {
+                    ToastUtils.showShort(getString(R.string.please_do_this_over_ble))
+                    return@OnItemChildClickListener
+                }
                 val string = getString(R.string.sure_delete_device, currentGw?.name)
                 builder?.setMessage(string)
                 builder?.create()?.show()
@@ -575,7 +587,6 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
         popupWindow.dismiss()
         if (currentGw != null) {
-            if (IS_ROUTE_MODE) return
             Thread.sleep(500)
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableConnect?.dispose()

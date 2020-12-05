@@ -68,6 +68,10 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         deviceAdapter.setOnItemClickListener { _, _, position ->
             when (position) {
                 INSTALL_GATEWAY -> {
+                    if (Constant.IS_ROUTE_MODE){
+                        ToastUtils.showShort(getString(R.string.please_do_this_over_ble))
+                        return@setOnItemClickListener
+                    }
                     installId = INSTALL_GATEWAY
                     showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.Gate_way))
                 }
