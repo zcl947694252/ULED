@@ -84,6 +84,7 @@ import java.util.concurrent.TimeUnit
  * --如果得到数据的情况下是超时也就是mqtt没有接到但是没有结束 重新计算超时 如果借宿了 确认清除数据 跳转43
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
+    private var isOffLine: Boolean = false
     private var isFinisAc: Boolean = false
     private var disposableUpMeshTimer: Disposable? = null
     private var scanRouterTimeoutTime: Long = 0
@@ -267,14 +268,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         }
         updateList.clear()
         isFinisAc = false
-        routerStopScan()
+        if (!isOffLine)
+            routerStopScan()
         disposeAllSubscribe()
 
         mApplication?.removeEventListener(this)
         showLoadingDialog(getString(R.string.please_wait))
-        TelinkLightService.Instance()?.idleMode(true)
+        if (!Constant.IS_ROUTE_MODE)
+            TelinkLightService.Instance()?.idleMode(true)
         disposableConnectTimer?.dispose()
-        disposableConnectTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
+        disposableConnectTimer = Observable.timer(1000, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
@@ -916,7 +919,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 90005 -> {
                     ToastUtils.showShort(getString(R.string.router_offline))
                     scanFail()
-                    stopScanTimer()
+                    isOffLine = true;
+                    //stopScanTimer()
                 }//该账号该区域下没有可用的路由，请检查路由是否上电联网
                 else -> ToastUtils.showShort(it.message)
             }
@@ -977,6 +981,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
+                    isOffLine = false
                     stopScan()
                     ToastUtils.showShort(getString(R.string.router_scan_faile))
                 }
