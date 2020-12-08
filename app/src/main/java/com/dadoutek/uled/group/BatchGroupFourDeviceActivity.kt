@@ -494,6 +494,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             light.meshAddr = item.meshAddress
                             light.productUUID = item.productUUID
                             light.meshUUID = item.meshUUID
+                            light.updateIcon()
                             if (lightByMeshAddr == null)
                                 light.belongGroupId = allLightId
                             light.name = getString(R.string.device_name) + light.meshAddr
@@ -524,6 +525,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             light.belongGroupId = allLightId
                         light.name = getString(R.string.device_name) + light.meshAddr
                         light.rssi = item.rssi
+                        light.updateRgbIcon()
                         deviceDataLightAll.add(light)
                     }
                 }

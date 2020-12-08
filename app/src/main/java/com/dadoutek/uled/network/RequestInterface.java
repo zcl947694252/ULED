@@ -1192,6 +1192,18 @@ public interface RequestInterface {
      */
     @PUT("router/update-custom-dc")
     Observable<Response<RouterTimeoutBean>> routerUpdateCustomGradient(@Body UpdateGradientBean bean);
+    /**
+     * 自定义渐变更新
+     * https://dev.dadoutek.com/xxxx/dynamic-change/update/{id} PUT
+     * 参数名	必选	类型	说明
+     * index	否	int	排序值
+     * name	否	string	名称
+     * speed	否	int	渐变速度
+     * 更新哪些字段填哪些，至少填一个，目前只支持上述字段更新
+     * 为什么要有更新接口？路由模式下数据由服务器生成&更新，部分字段前端不能更新，故原来的add接口不要再用。但是部分字段又不需要走路由逻辑，如name，index，故新增更新接口。
+     */
+    @PUT("dynamic-change/update/{id} ")
+    Observable<Response<RouterTimeoutBean>> routerUpdateGradientNameSpeed(@Path("id") int id,@Body UpdateGradientNameSpeedBean bean);
 
     /**
      * 删除自定义渐变 https://dev.dadoutek.com/xxxx/router/del-custom-dc DELETE
@@ -1403,6 +1415,8 @@ public interface RequestInterface {
      * meshAddr	是	int	目标meshAddr ser_id	是	string	app会话id，推送时回传
      * meshType	是	int	mesh地址类型 brightness	是	int	亮度值
      * "meshAddr" : 1,"brightness": 50,"meshType": 4,"ser_id": "app会话id，自己维护"
+     * brightness	是	int	亮度值
+     * isEnableBright	否	int	亮度开关是否打开，默认开。1开 0关
      * meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
      */
     @FormUrlEncoded
@@ -1410,6 +1424,7 @@ public interface RequestInterface {
     Observable<Response<RouterTimeoutBean>> routeConfigBrightness(@Field("meshAddr") int meshAddr,
                                                                   @Field("meshType") int meshType,
                                                                   @Field("brightness") int brightness,
+                                                                  @Field("isEnableBright") int isEnableBright,
                                                                   @Field("ser_id") String ser_id);
 
     /**
@@ -1439,6 +1454,7 @@ public interface RequestInterface {
      * ser_id	是	string	app会话id，推送时回传
      * meshType	是	int	mesh地址类型
      * color	是	int	原来逻辑生成的color值
+     * isEnableWhiteBright	否	int	是否打开白光开关，默认开。1开 0关
      * "meshAddr" : 1, "meshType": 6,"color": 16777215 // w = 0 , "ser_id": "app会话id，自己维护"
      * meshType彩灯 = 6组 = 97
      */
@@ -1447,6 +1463,7 @@ public interface RequestInterface {
     Observable<Response<RouterTimeoutBean>> routeConfigWhiteNum(@Field("meshAddr") int meshAddr,
                                                                 @Field("meshType") int meshType,
                                                                 @Field("color") int color,
+                                                                @Field("isEnableWhiteBright") int isEnableWhiteBright,
                                                                 @Field("ser_id") String ser_id);
 
     /**

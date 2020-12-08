@@ -146,6 +146,7 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val light = DBUtils.getLightByID(changeId)
+                                LogUtils.v("zcl-----------调节开关添加灯-------$light")
                                 return light?.let { LightModel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
@@ -153,6 +154,7 @@ class SyncDataPutOrGetUtils {
                             }
                             Constant.DB_UPDATE -> {
                                 val light = DBUtils.getLightByID(changeId)
+                                LogUtils.v("zcl-----------调节开关更新灯-------$light")
 
                                 light?.let {
                                     return LightModel.update(token, light, id, changeId.toInt())
@@ -420,6 +422,7 @@ class SyncDataPutOrGetUtils {
                     .flatMap {
                         for (item in it) {
                             DBUtils.saveLight(item, true)//一定不能设置成true否则会造成数据过大oom
+                            LogUtils.v("zcl------调节开关拉取新数据----------$item--")
                         }
                         NetworkFactory.getApi()
                                 .gwList

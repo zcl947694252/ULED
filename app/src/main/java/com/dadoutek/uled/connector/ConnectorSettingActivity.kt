@@ -693,9 +693,9 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun afterSwitchGp(b: Boolean) {
         if (b)
-            currentGroup?.connectionStatus = ConnectionStatus.ON.value
+            currentGroup?.status = ConnectionStatus.ON.value
         else
-            currentGroup?.connectionStatus = ConnectionStatus.OFF.value
+            currentGroup?.status = ConnectionStatus.OFF.value
         DBUtils.saveGroup(currentGroup!!, false)
     }
 

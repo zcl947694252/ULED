@@ -1684,8 +1684,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun routerConfigBrightnesssOrColorTemp(brightness: Boolean) = when {
         brightness -> {//亮度
             when {
-                currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, "gpBri")
-                else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, "lightBri")
+                currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, 1,"gpBri")
+                else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, 1,"lightBri")
             }
         }
         else -> {

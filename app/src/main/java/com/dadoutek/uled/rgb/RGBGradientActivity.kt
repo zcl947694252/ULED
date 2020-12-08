@@ -252,6 +252,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
                 intent.putExtra(Constant.GRADIENT_KEY, diyGradientList!![position])
                 intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
                 intent.putExtra(Constant.DEVICE_TYPE, deviceType)
+                intent.putExtra(Constant.IS_GP, currentShowGroupSetPage)
                 startActivityForResult(intent, 0)
             }
 
@@ -352,6 +353,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
             intent.putExtra(Constant.IS_CHANGE_COLOR, false)
             intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
             intent.putExtra(Constant.DEVICE_TYPE, deviceType)
+            intent.putExtra(Constant.IS_GP, true)
             startActivityForResult(intent, 0)
         } else {
             ToastUtils.showLong(getString(R.string.add_gradient_limit))
@@ -363,6 +365,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
         intent.putExtra(Constant.IS_CHANGE_COLOR, true)
         intent.putExtra(Constant.GRADIENT_KEY, dbDiyGradient)
         intent.putExtra(Constant.DEVICE_TYPE, deviceType)
+        intent.putExtra(Constant.IS_GP, true)
         intent.putExtra(Constant.TYPE_VIEW_ADDRESS, dstAddress)
         startActivityForResult(intent, 0)
     }

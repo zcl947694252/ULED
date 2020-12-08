@@ -155,7 +155,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         if (cmdBean.ser_id == "gpOta") {
             if (cmdBean.status == 0) {
                 disposableRouteTimer?.dispose()
-                startGetVersionTimer(cmdBean.timeout.toLong())
+                startGetVersionTimer(cmdBean.reportTimeout.toLong())
             }
         }
     }

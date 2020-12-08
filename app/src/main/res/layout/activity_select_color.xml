@@ -178,7 +178,7 @@
                 android:id="@+id/rgb_white_seekbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="101"
+                android:max="100"
                 android:min="1"
                 android:visibility="gone"
                 android:padding="6dp" />

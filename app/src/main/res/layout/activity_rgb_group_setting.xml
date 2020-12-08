@@ -241,7 +241,7 @@
                                  android:layout_marginStart="10dp"
                                  android:layout_marginTop="2dp"
                                  android:layout_weight="1"
-                                 android:max="101"
+                                 android:max="100"
                                  android:min="1"
                                  android:progress="99" />
 
@@ -285,6 +285,7 @@
                                  android:layout_marginEnd="8dp"
                                  android:padding="@dimen/dp_8"
                                  android:src="@drawable/add_enabled" />
+
                          <CheckBox
                                  android:id="@+id/cb_white_enable"
                                  android:layout_width="40dp"
@@ -293,9 +294,8 @@
                                  android:layout_marginEnd="@dimen/dp_10"
                                  android:background="@drawable/select_check"
                                  android:button="@null"
+                                 android:checked="false"
                                  android:gravity="center" />
-
-
                      </LinearLayout>
 
                  </LinearLayout>
@@ -347,7 +347,7 @@
                                  android:layout_marginStart="10dp"
                                  android:layout_marginTop="2dp"
                                  android:layout_weight="1"
-                                 android:max="101"
+                                 android:max="100"
                                  android:min="1"
                                  android:progress="99" />
 
@@ -400,7 +400,6 @@
                                  android:background="@drawable/select_check"
                                  android:button="@null"
                                  android:gravity="center" />
-
                      </LinearLayout>
 
                  </LinearLayout>

@@ -15,7 +15,9 @@ import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.DownLoadFileModel
 import com.dadoutek.uled.model.routerModel.RouterModel
+import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.RouterOTAResultBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
@@ -26,6 +28,8 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_batch_group_four.*
 import kotlinx.android.synthetic.main.activity_router_ota.*
 import org.greenrobot.greendao.DbUtils
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 
@@ -95,7 +99,10 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                    finish()
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -126,9 +133,28 @@ class RouterOtaActivity : TelinkBaseActivity() {
              }*/
 
         router_ota_local.text = getString(R.string.local_version, deviceVersion)
-        val otaVersion = getOtaVersion(deviceVersion)
-        router_ota_version.text = getString(R.string.server_version, otaVersion)
+        showLoadingDialog(getString(R.string.please_wait))
+        deviceVersion?.let {
+            DownLoadFileModel.getUrlNew(deviceVersion!!)!!.subscribe(object : NetworkObserver<Any?>() {
+                override fun onNext(s: Any) {
+                    hideLoadingDialog()
+                    val jsonObject = JSONObject(s as Map<*, *>)
+                    try {
+                        val type = jsonObject.getString("type")
+                        val name = jsonObject.getString("version")
+                        router_ota_version.text = getString(R.string.server_version, "$type-$name")
+                    } catch (e: JSONException) {
+                        e.printStackTrace()
+                    }
+                }
 
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    hideLoadingDialog()
+                    ToastUtils.showLong(e.message)
+                }
+            })
+        }
         isRouter = deviceMeshAddress == 100000
         if (isOtaing)
             if (isRouter)

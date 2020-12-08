@@ -263,6 +263,14 @@ object RouterModel {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
+    /**
+     * 更新自定义渐变名字与速度
+     */
+    fun routerUpdateGradientNameSpeed(id:Int,bean: UpdateGradientNameSpeedBean): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routerUpdateGradientNameSpeed(id,bean)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+    }
 
     /**
      * 删除自定义渐变
@@ -401,8 +409,9 @@ object RouterModel {
      * 控制相关开始
      * 调节亮度
      */
-    fun routeConfigBrightness(meshAddr: Int, meshType: Int, brightness: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeConfigBrightness(meshAddr, meshType, brightness, ser_id)
+    fun routeConfigBrightness(meshAddr: Int, meshType: Int, brightness: Int,isEnableBright:Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        LogUtils.v("zcl-----------调节开关亮度-------$isEnableBright----$brightness")
+        return NetworkFactory.getApi().routeConfigBrightness(meshAddr, meshType, brightness,isEnableBright, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -421,8 +430,9 @@ object RouterModel {
      * 控制相关开始
      * 调节白色
      */
-    fun routeConfigWhiteNum(meshAddr: Int, meshType: Int, color: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeConfigWhiteNum(meshAddr, meshType, color, ser_id)
+    fun routeConfigWhiteNum(meshAddr: Int, meshType: Int, color: Int,isEnableWhiteBright :Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
+        LogUtils.v("zcl-----------调节开关白色-------$isEnableWhiteBright---")
+        return NetworkFactory.getApi().routeConfigWhiteNum(meshAddr, meshType, color,isEnableWhiteBright, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }

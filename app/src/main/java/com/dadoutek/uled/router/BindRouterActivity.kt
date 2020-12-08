@@ -73,6 +73,11 @@ class BindRouterActivity : TelinkBaseActivity() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        blinkList.clear()
+        disposableIntervalTime?.dispose()
+    }
     private fun initListener() {
         titleAdapter.setOnItemClickListener { adapter, _, position ->
             for (i in listTitle.indices) {

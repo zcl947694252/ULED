@@ -246,4 +246,22 @@ public class DbDiyGradient implements Parcelable {
     public void setUid(int uid) {
         this.uid = uid;
     }
+
+    @Override
+    public String toString() {
+        return "DbDiyGradient{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", speed=" + speed +
+                ", index=" + index +
+                ", belongRegionId=" + belongRegionId +
+                ", selected=" + selected +
+                ", select=" + select +
+                ", uid=" + uid +
+                ", colorNodes=" + colorNodes +
+                ", daoSession=" + daoSession +
+                ", myDao=" + myDao +
+                '}';
+    }
 }

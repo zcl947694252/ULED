@@ -73,6 +73,7 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun initData() {
         colorNode = intent.getSerializableExtra(Constant.COLOR_NODE_KEY) as? DbColorNode
+        currentShowGroupSetPage = intent.getBooleanExtra(Constant.IS_GP, false)
     }
 
     @SuppressLint("ClickableViewAccessibility", "StringFormatMatches", "SetTextI18n")
@@ -345,7 +346,10 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun changeColor(R: Byte, G: Byte, B: Byte, color: Int, isOnceSet: Boolean) {
         if (Constant.IS_ROUTE_MODE)//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
-            routerConfigRGBNum(colorNode!!.dstAddress, 6, color)
+            when {
+                currentShowGroupSetPage -> routerConfigRGBNum(colorNode!!.dstAddress, 97, color)
+                else -> routerConfigRGBNum(colorNode!!.dstAddress, 6, color)
+            }
         else
             GlobalScope.launch {
                 var red = R
@@ -525,17 +529,17 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         if (thisTime - lastTime >= 300)
             when {
                 isBrightness -> {//亮度
-                    routeConfigBriGpOrLight(colorNode!!.dstAddress, meshType, rgb_sbBrightness.progress, "diyBri")
+                    routeConfigBriGpOrLight(colorNode!!.dstAddress, meshType, rgb_sbBrightness.progress, 1,"diyBri")
                 }
                 else -> {
-                    routeConfigWhiteGpOrLight(colorNode!!.dstAddress, meshType, rgb_white_seekbar.progress, "diywhite")
+                    routeConfigWhiteGpOrLight(colorNode!!.dstAddress, meshType, rgb_white_seekbar.progress, 1,"diywhite")
                 }
             }
 
     }
 
     @SuppressLint("CheckResult")
-    open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int, serId: String) {
+    open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int,isEnableWhiteBright :Int, serId: String) {
         LogUtils.v("zcl----------- zcl-----------发送路由调白色参数-------$white-------")
         var gpColor = colorNode!!.rgbw
 
@@ -544,7 +548,8 @@ class SelectColorGradientAct : TelinkBaseActivity(), View.OnClickListener {
         val blue = gpColor and 0x0000ff
         var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
         //var ws = (color and 0xff000000.toInt()) shr 24//白色
-        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, serId)?.subscribe({
+
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright,serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             when (it.errorCode) {

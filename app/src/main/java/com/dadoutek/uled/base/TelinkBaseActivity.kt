@@ -46,6 +46,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.httpModel.AccountModel
+import com.dadoutek.uled.model.httpModel.DownLoadFileModel.getUrlNew
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.mqtt.IGetMessageCallBack
 import com.dadoutek.uled.mqtt.MqttService
@@ -77,13 +78,15 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_rgb_group_setting.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.singleLine
-import java.lang.StringBuilder
+import org.json.JSONException
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 ///TelinkLog 打印
@@ -230,6 +233,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+
+
     fun getOtaVersion(version: String?): String {
         version?.let {
             val split = version.split("-")
@@ -244,6 +249,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         val sb = StringBuilder()
                         for (j in i.indices) {
                             sb.append(i[j])
+
                             if (j != i.length - 1)
                                 sb.append(".")
                         }
@@ -1540,9 +1546,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     @SuppressLint("CheckResult")
-    open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
+    open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, isEnableBright:Int ,serId: String) {
         LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
-        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, serId)?.subscribe({
+        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, isEnableBright,serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"
             //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据

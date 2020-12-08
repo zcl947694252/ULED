@@ -16,9 +16,7 @@ import java.io.Serializable;
  */
 @Entity
 public class DbLight implements Serializable {
-
     static final long serialVersionUID = -15515456L;
-
     @Id(autoincrement = true)
     private Long id;
     private int meshAddr;
@@ -63,13 +61,17 @@ public class DbLight implements Serializable {
     public int belongRegionId =0;
     public int uid =0;
 
-    @Generated(hash = 1689580939)
+    public int isEnableWhiteLight = 1;
+    public int isEnableBright = 1;
+
+    @Generated(hash = 122297461)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, String sixMac,
             int meshUUID, int productUUID, Long belongGroupId, int index,
             String boundMac, int color, String version, String boundMacName,
             int status, int rssi, boolean isSupportOta, boolean isMostNew,
-            boolean isGetVersion, int belongRegionId, int uid) {
+            boolean isGetVersion, int belongRegionId, int uid,
+            int isEnableWhiteLight, int isEnableBright) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -93,10 +95,28 @@ public class DbLight implements Serializable {
         this.isGetVersion = isGetVersion;
         this.belongRegionId = belongRegionId;
         this.uid = uid;
+        this.isEnableWhiteLight = isEnableWhiteLight;
+        this.isEnableBright = isEnableBright;
     }
 
     @Generated(hash = 2075223479)
     public DbLight() {
+    }
+
+    public int getIsEnableWhiteLight() {
+        return isEnableWhiteLight;
+    }
+
+    public int getIsEnableBright() {
+        return isEnableBright;
+    }
+
+    public void setIsEnableWhiteLight(int isEnableWhiteLight) {
+        this.isEnableWhiteLight = isEnableWhiteLight;
+    }
+
+    public void setIsEnableBright(int isEnableBright) {
+        this.isEnableBright = isEnableBright;
     }
 
     public boolean isGetVersion() {
@@ -328,18 +348,29 @@ public class DbLight implements Serializable {
                 ", brightness=" + brightness +
                 ", colorTemperature=" + colorTemperature +
                 ", macAddr='" + macAddr + '\'' +
+                ", sixMac='" + sixMac + '\'' +
                 ", meshUUID=" + meshUUID +
                 ", productUUID=" + productUUID +
                 ", belongGroupId=" + belongGroupId +
                 ", index=" + index +
+                ", boundMac='" + boundMac + '\'' +
                 ", color=" + color +
-                ", selected=" + selected +
                 ", version='" + version + '\'' +
+                ", boundMacName='" + boundMacName + '\'' +
+                ", selected=" + selected +
                 ", hasGroup=" + hasGroup +
                 ", textColor=" + textColor +
                 ", isSeek=" + isSeek +
                 ", status=" + status +
                 ", icon=" + icon +
+                ", rssi=" + rssi +
+                ", isSupportOta=" + isSupportOta +
+                ", isMostNew=" + isMostNew +
+                ", isGetVersion=" + isGetVersion +
+                ", belongRegionId=" + belongRegionId +
+                ", uid=" + uid +
+                ", isEnableWhiteLight=" + isEnableWhiteLight +
+                ", isEnableBright=" + isEnableBright +
                 '}';
     }
 

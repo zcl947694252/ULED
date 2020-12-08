@@ -38,6 +38,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         public final static Property SlowUpSlowDownSpeed = new Property(11, int.class, "slowUpSlowDownSpeed", false, "SLOW_UP_SLOW_DOWN_SPEED");
         public final static Property RouterName = new Property(12, String.class, "routerName", false, "ROUTER_NAME");
         public final static Property RouterId = new Property(13, String.class, "routerId", false, "ROUTER_ID");
+        public final static Property IsEnableWhiteLight = new Property(14, int.class, "isEnableWhiteLight", false, "IS_ENABLE_WHITE_LIGHT");
+        public final static Property IsEnableBright = new Property(15, int.class, "isEnableBright", false, "IS_ENABLE_BRIGHT");
     }
 
 
@@ -66,7 +68,9 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
                 "\"SLOW_UP_SLOW_DOWN_STATUS\" INTEGER NOT NULL ," + // 10: slowUpSlowDownStatus
                 "\"SLOW_UP_SLOW_DOWN_SPEED\" INTEGER NOT NULL ," + // 11: slowUpSlowDownSpeed
                 "\"ROUTER_NAME\" TEXT," + // 12: routerName
-                "\"ROUTER_ID\" TEXT);"); // 13: routerId
+                "\"ROUTER_ID\" TEXT," + // 13: routerId
+                "\"IS_ENABLE_WHITE_LIGHT\" INTEGER NOT NULL ," + // 14: isEnableWhiteLight
+                "\"IS_ENABLE_BRIGHT\" INTEGER NOT NULL );"); // 15: isEnableBright
     }
 
     /** Drops the underlying database table. */
@@ -112,6 +116,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         if (routerId != null) {
             stmt.bindString(14, routerId);
         }
+        stmt.bindLong(15, entity.getIsEnableWhiteLight());
+        stmt.bindLong(16, entity.getIsEnableBright());
     }
 
     @Override
@@ -151,6 +157,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         if (routerId != null) {
             stmt.bindString(14, routerId);
         }
+        stmt.bindLong(15, entity.getIsEnableWhiteLight());
+        stmt.bindLong(16, entity.getIsEnableBright());
     }
 
     @Override
@@ -174,7 +182,9 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
             cursor.getInt(offset + 10), // slowUpSlowDownStatus
             cursor.getInt(offset + 11), // slowUpSlowDownSpeed
             cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12), // routerName
-            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13) // routerId
+            cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // routerId
+            cursor.getInt(offset + 14), // isEnableWhiteLight
+            cursor.getInt(offset + 15) // isEnableBright
         );
         return entity;
     }
@@ -195,6 +205,8 @@ public class DbGroupDao extends AbstractDao<DbGroup, Long> {
         entity.setSlowUpSlowDownSpeed(cursor.getInt(offset + 11));
         entity.setRouterName(cursor.isNull(offset + 12) ? null : cursor.getString(offset + 12));
         entity.setRouterId(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));
+        entity.setIsEnableWhiteLight(cursor.getInt(offset + 14));
+        entity.setIsEnableBright(cursor.getInt(offset + 15));
      }
     
     @Override

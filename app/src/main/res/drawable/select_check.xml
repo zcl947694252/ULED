@@ -2,7 +2,6 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/choice_on" android:state_checked="true"/>
     <item android:drawable="@drawable/choice_off" android:state_checked="false"/>
-    <item android:drawable="@drawable/choice_on" android:state_selected="true"/>
     <!--<item android:drawable="@mipmap/icon_open" android:state_checked="true"/>
     <item android:drawable="@mipmap/icon_opens" android:state_checked="false"/>
     <item android:drawable="@mipmap/icon_open" android:state_selected="true"/>-->

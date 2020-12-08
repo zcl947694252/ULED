@@ -451,7 +451,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         val addr = showGroupList[position].groupAddress
         if (Constant.IS_ROUTE_MODE) {
-            routeConfigBriGpOrLight(addr, 97, brightness, "configBri")
+            var isEnableBright= if (showGroupList[position].isEnableBright) 1 else 0
+            routeConfigBriGpOrLight(addr, 97, brightness, isEnableBright,"configBri")
         } else {
             val params: ByteArray = byteArrayOf(brightness.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
@@ -472,7 +473,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
         val addr = showGroupList[position].groupAddress
         if (Constant.IS_ROUTE_MODE) {
-            routeConfigWhiteGpOrLight(addr, 97, whiteLight, "configWhite")
+            routeConfigWhiteGpOrLight(addr, 97, whiteLight, showGroupList[position].isEnableWhiteLight,"configWhite")
         } else {
             val params: ByteArray = byteArrayOf(whiteLight.toByte())//设置白色
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
@@ -503,7 +504,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     @SuppressLint("CheckResult")
-    open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int, serId: String) {
+    open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int, isWhiteBright: Boolean, serId: String) {
         LogUtils.v("zcl----------- zcl-----------发送路由调白色参数-------$white-------")
         val group = DBUtils.getGroupByID(meshAddr.toLong())
         var gpColor = group?.color ?: 0
@@ -511,7 +512,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val green = (gpColor and 0x00ff00) shr 8
         val blue = gpColor and 0x0000ff
         var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
-        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, serId)?.subscribe({
+        var isEnableWhiteBright =  if (isWhiteBright) 1 else 0
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright,serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it, 2)
@@ -756,7 +758,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 if (!currentPageIsEdit)
                     saveScene()
                 else {//添加场景选择分组
-                    if (Constant.IS_ROUTE_MODE)
+                    if (Constant.IS_ROUTE_MODE && isReconfig)
                         updateSceneName()
                     showGpDetailList()
                 }
@@ -770,7 +772,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         RouterModel.routeUpdateSceneName((dbScene?.id ?: 0).toInt(), editSceneName!!, s)
                 ?.subscribe({
                     when (it.errorCode) {
-                        0 -> ToastUtils.showShort(getString(R.string.rename_success))
+                        /*0 -> ToastUtils.showShort(getString(R.string.rename_success))*/
                         else -> ToastUtils.showShort(getString(R.string.rename_faile))
                     }
                 }, {
@@ -852,6 +854,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         dbScene?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
 
         val belongSceneId = dbScene?.id!!
+        DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(belongSceneId))
         val actionsList = mutableListOf<DbSceneActions>()
         for (i in showGroupList!!.indices) {
             var sceneActions = DbSceneActions()
@@ -945,6 +948,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             sceneActions.brightness = item.brightness
             sceneActions.colorTemperature = item.temperature
             sceneActions.setColor(item.color)
+            LogUtils.v("zcl--白色-${(item!!.color and 0xff000000.toInt()) shr 24}--亮度${item.brightness}---------色温${item.temperature}----")
         }
         return sceneActions
     }

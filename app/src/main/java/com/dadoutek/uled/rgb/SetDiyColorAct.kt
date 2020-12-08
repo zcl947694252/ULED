@@ -15,6 +15,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -28,6 +29,7 @@ import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.model.routerModel.UpdateGradientBean
+import com.dadoutek.uled.network.UpdateGradientNameSpeedBean
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
@@ -36,6 +38,7 @@ import com.warkiz.widget.IndicatorSeekBar
 import com.warkiz.widget.OnSeekChangeListener
 import com.warkiz.widget.SeekParams
 import io.reactivex.disposables.Disposable
+import kotlinx.android.synthetic.main.activity_ota.*
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
@@ -69,6 +72,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         isChange = intent.getBooleanExtra(Constant.IS_CHANGE_COLOR, false)
         dstAddress = intent.getIntExtra(Constant.TYPE_VIEW_ADDRESS, 0)
         deviceType = intent.getIntExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_RGB)
+        currentShowGroupSetPage = intent.getBooleanExtra(Constant.IS_GP, false)
         if (isChange) {
             diyGradient = intent.getParcelableExtra(Constant.GRADIENT_KEY) as? DbDiyGradient
             colorNodeList = DBUtils.getColorNodeListByDynamicModeId(diyGradient!!.id)
@@ -92,6 +96,17 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 speed = seekParams?.progress ?: 0
                 if (speed == 0)
                     speed = 1
+
+                if (isChange) {
+                    diyGradient?.let {
+                        RouterModel.routerUpdateGradientNameSpeed(it.id.toInt(), UpdateGradientNameSpeedBean(name =it.name,speed = speed))
+                                ?.subscribe({itr->
+                                    LogUtils.v("zcl-----路由渐变设置速度$speed-------$itr")
+                                },{itt->
+                                    ToastUtils.showShort(itt.message)
+                                })
+                    }
+                }
 
                 speed_num.text = "$speed"
                 when {
@@ -346,7 +361,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateNode() {
 
-        if (colorNodeList?.size?:0<=0){
+        if (colorNodeList?.size ?: 0 <= 0) {
             ToastUtils.showShort(getString(R.string.please_set_color))
             return
         }
@@ -359,22 +374,22 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             DBUtils.updateGradient(diyGradient!!)
             val belongDynamicModeId = diyGradient?.id!!
             DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(belongDynamicModeId))
-          /*  for (item in colorNodeList!!) {
-                item.belongDynamicChangeId = belongDynamicModeId
-                DBUtils.saveColorNode(item)
-            }*/
-            for (i in 0..7){
+            /*  for (item in colorNodeList!!) {
+                  item.belongDynamicChangeId = belongDynamicModeId
+                  DBUtils.saveColorNode(item)
+              }*/
+            for (i in 0..7) {
                 colorNodeList!![i].belongDynamicChangeId = belongDynamicModeId
                 DBUtils.saveColorNode(colorNodeList!![i])
             }
 
             var isHaveColorNode = false
             colorNodeList?.forEach {
-                if (it.rgbw!=-1)
+                if (it.rgbw != -1)
                     isHaveColorNode = true
             }
 
-            if (!isHaveColorNode){
+            if (!isHaveColorNode) {
                 ToastUtils.showShort(getString(R.string.please_select_color))
                 return@launch
             }
@@ -386,10 +401,11 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                         //"errorCode": 90020, "该自定义渐变不存在，请重新刷新数据"     "errorCode": 90018,"该设备不存在，请重新刷新数据"
                         //"errorCode": 90008,"该设备没有绑定路由，无法添加自定义渐变"  "errorCode": 90007,"该组不存在，无法操作"
                         //"errorCode": 90005,"以下路由没有上线，无法更新自定义渐变"    "errorCode": 90004, "账号下区域下没有路由，无法操作"
+                        LogUtils.v("zcl-------收到路由更新渐变-----${AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra")}--$it")
                         when (response.errorCode) {
                             0 -> {
                                 disposableTimer?.dispose()
-                                disposableTimer = io.reactivex.Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                disposableTimer = io.reactivex.Observable.timer(response.t.timeout.toLong()+1, TimeUnit.SECONDS)
                                         .subscribe {
                                             ToastUtils.showShort(getString(R.string.update_gradient_fail))
                                             hideLoadingDialog()
@@ -423,7 +439,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun saveNode() {
-        if (colorNodeList?.size?:0<=0){
+        if (colorNodeList?.size ?: 0 <= 0) {
             ToastUtils.showShort(getString(R.string.please_set_color))
             return
         }
@@ -440,11 +456,11 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             DBUtils.saveGradient(diyGradient!!, false)
 
             val belongDynamicModeId = diyGradient!!.id
-          /*  for (item in colorNodeList!!) {
-                item.belongDynamicChangeId = belongDynamicModeId
-                DBUtils.saveColorNode(item)
-            }*/
-            for (i in 0..7){
+            /*  for (item in colorNodeList!!) {
+                  item.belongDynamicChangeId = belongDynamicModeId
+                  DBUtils.saveColorNode(item)
+              }*/
+            for (i in 0..7) {
                 colorNodeList!![i].belongDynamicChangeId = belongDynamicModeId
                 DBUtils.saveColorNode(colorNodeList!![i])
             }
@@ -457,6 +473,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     RouterModel.routerAddGradient(AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra"))?.subscribe({ response ->
                         //    "errorCode": 90018,该设备不存在，请重新刷新数据"  "errorCode": 90008,该设备没有绑定路由，无法添加自定义渐变"
                         //    "errorCode": 90004 账号下区域下没有路由，无法操作""errorCode": 90007,该组不存在，无法操作" "errorCode": 90005,以下路由没有上线，无法添加自定义渐变"
+                        LogUtils.v("zcl--收到路由添加渐变--${AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra")}--$it")
                         when (response.errorCode) {
                             0 -> {
                                 disposableTimer?.dispose()
@@ -584,6 +601,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         val intent = Intent(this, SelectColorGradientAct::class.java)
         colorNodeList!![position].dstAddress = dstAddress
         intent.putExtra(Constant.COLOR_NODE_KEY, colorNodeList!![position])
+        intent.putExtra(Constant.IS_GP, currentShowGroupSetPage)
         startActivityForResult(intent, position)
     }
 

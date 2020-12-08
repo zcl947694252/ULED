@@ -842,7 +842,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(scanRouterTimeoutTime, TimeUnit.SECONDS).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe {
-                    //  skipeType()
+                    skipeType()
                 }
     }
 
@@ -936,6 +936,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (cmdBodyBean.ser_id == TAG) {
             disposableTimer?.dispose()
             if (cmdBodyBean.status == Constant.ALL_SUCCESS) {//扫描成功继续重新计算超时时间
+                scanRouterTimeoutTime = cmdBodyBean.reportTimeout.toLong()
                 routeTimerOut()
                 Constant.SCAN_SERID = cmdBodyBean.scanSerId
             } else {
@@ -1493,7 +1494,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     })
                 }
             } else {//如果还在扫描则重新计算超时时间
-                ToastUtils.showShort(getString(R.string.no_device))
                 if (isFinisAc)
                     finish()
                 scanFail()

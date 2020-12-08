@@ -192,7 +192,12 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
             filter("", false)
         else
             lightList.addAll(DBUtils.getLightByGroupID(group!!.id))
-
+        lightList.forEach {
+            when (it.productUUID) {
+                DeviceType.LIGHT_NORMAL -> it.updateIcon()
+                else -> it.updateRgbIcon()
+            }
+        }
         deviceAdapter?.notifyDataSetChanged()
         setEmptyAndToolbarTV()
     }

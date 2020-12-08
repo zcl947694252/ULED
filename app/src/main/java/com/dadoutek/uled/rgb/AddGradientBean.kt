@@ -21,5 +21,9 @@ class AddGradientBean(
         val meshAddr: Int,
         val meshType: Int,
         val ser_id: String
-) : Serializable
+) : Serializable {
+    override fun toString(): String {
+        return "AddGradientBean(name='$name', type=$type, speed=$speed, colorNodes=$colorNodes, meshAddr=$meshAddr, meshType=$meshType, ser_id='$ser_id')"
+    }
+}
 

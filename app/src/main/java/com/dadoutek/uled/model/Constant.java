@@ -163,6 +163,7 @@ public class Constant implements Serializable {
     public static String ME_FUNCTION = "ME_FUNCTION";
 
     public static String DEVICE_TYPE = "DEVICE_TYPE";
+    public static String IS_GP = "IS_GP";
 
 
     //管理权限本地保存key

@@ -669,7 +669,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     @SuppressLint("CheckResult")
     open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
         LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
-        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, serId)?.subscribe({
+        var isEnableBright = if (brightness==0) 0 else 1
+        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness,isEnableBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it)
@@ -687,7 +688,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         val green = (gpColor and 0x00ff00) shr 8
         val blue = gpColor and 0x0000ff
         var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
-        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, serId)?.subscribe({
+        var isEnableWhiteBright =  if (white ==0) 0 else 1
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright,serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it)
@@ -1629,23 +1631,29 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp()
             else -> GlobalScope.launch { sendCmd(opcode, address, seekBar.progress) }
         }
-        notifyItemChanged(seekBar.tag as Int)
+        notifyItemRangeChanged(seekBar.tag as Int,data.size)
     }
 
     @SuppressLint("SetTextI18n")
     fun changeTextView(seekBar: SeekBar, progress: Int, position: Int) {
         when (seekBar.id) {
             R.id.normal_sbBrightness -> {
-                val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
+                data[position].brightness = progress
+             /*   val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
                 if (tvBrightness != null) {
+                    data[position].brightness = progress
                     tvBrightness?.text = "$progress%"
-                }
+                }*/
+                notifyItemRangeChanged(position,data.size)
             }
             R.id.normal_temperature -> {
-                val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
+                data[position].temperature = progress
+                /*   val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
                 if (tvTemperature != null) {
                     tvTemperature?.text = "$progress%"
-                }
+                    data[position].temperature = progress
+                }*/
+                notifyItemRangeChanged(position,data.size)
             }
             R.id.rgb_sbBrightness -> {
                 val tvBrightnessRGB = getViewByPosition(position, R.id.sbBrightness_num) as TextView?
@@ -1654,13 +1662,18 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         tvBrightnessRGB.text = "1%"
                     else
                         tvBrightnessRGB.text = "$progress%"
-
+                    data[position].brightness = progress
                 }
             }
             R.id.rgb_white_seekbar -> {
                 val tvSbWhiteLight = getViewByPosition(position, R.id.sb_w_bright_num) as TextView?
                 if (tvSbWhiteLight != null) {
                     tvSbWhiteLight.text = "$progress%"
+                    val itemGroup = data[position]
+                    var red = Color.red(itemGroup.color)
+                    var green = Color.green(itemGroup.color)
+                    var blue = Color.red(itemGroup.color)
+                    itemGroup.color = (progress shl 24) or (red shl 16) or (green shl 8) or blue
                 }
             }
         }
