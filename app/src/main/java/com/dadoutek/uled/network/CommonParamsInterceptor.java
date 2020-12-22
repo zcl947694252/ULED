@@ -91,6 +91,7 @@ public class CommonParamsInterceptor implements Interceptor {
                     if (body instanceof FormBody) { // form 表单
                         for (int i = 0; i < ((FormBody) body).size(); i++)
                             rootMap.put(((FormBody) body).encodedName(i), ((FormBody) body).encodedValue(i));
+                        LogUtils.v("zcl-----------发送数据post-------"+new JSONObject(rootMap).toString());
                         requestBody = RequestBody.create(MJSON, new JSONObject(rootMap).toString());
                         builder.post(requestBody);
                     } else if (method.equals("POST")){
@@ -98,6 +99,7 @@ public class CommonParamsInterceptor implements Interceptor {
                         body.writeTo(buffer);
                         String oldJsonParams = buffer.readUtf8();
                         requestBody = RequestBody.create(MJSON, oldJsonParams);
+                        LogUtils.v("zcl-----------发送数据post-------"+oldJsonParams);
                         requestBody.writeTo(buffer);
                         //LogUtils.e("zcl", "zcl******buffer" + buffer.readUtf8());
                         builder.post(requestBody);

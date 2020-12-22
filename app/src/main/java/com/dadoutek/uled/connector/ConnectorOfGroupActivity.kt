@@ -482,6 +482,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private fun showDeleteSingleDialog(dbLight: DbConnector) {
         val builder = android.app.AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.sure_delete_device, dbLight.name))
+        TelinkLightService.Instance()?.idleMode(true)
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             deletePreGroup(dbLight)
             DBUtils.updateGroup(group!!)

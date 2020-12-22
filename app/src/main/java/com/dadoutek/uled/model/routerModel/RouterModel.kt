@@ -399,7 +399,7 @@ object RouterModel {
      *
      */
     fun routeOpenOrCloseSafeLock(status: Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeOpenOrCloseSafeLock(status, ser_id)
+        return NetworkFactory.getApi().routeOpenOrCloseSafeLock(status,ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
@@ -431,7 +431,6 @@ object RouterModel {
      * 调节白色
      */
     fun routeConfigWhiteNum(meshAddr: Int, meshType: Int, color: Int,isEnableWhiteBright :Int, ser_id: String): Observable<Response<RouterTimeoutBean>>? {
-        LogUtils.v("zcl-----------调节开关白色-------$isEnableWhiteBright---")
         return NetworkFactory.getApi().routeConfigWhiteNum(meshAddr, meshType, color,isEnableWhiteBright, ser_id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

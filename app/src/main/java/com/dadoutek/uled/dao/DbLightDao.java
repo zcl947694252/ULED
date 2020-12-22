@@ -47,7 +47,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         public final static Property IsGetVersion = new Property(20, boolean.class, "isGetVersion", false, "IS_GET_VERSION");
         public final static Property BelongRegionId = new Property(21, int.class, "belongRegionId", false, "BELONG_REGION_ID");
         public final static Property Uid = new Property(22, int.class, "uid", false, "UID");
-        public final static Property IsEnableWhiteLight = new Property(23, int.class, "isEnableWhiteLight", false, "IS_ENABLE_WHITE_LIGHT");
+        public final static Property IsEnableWhiteBright = new Property(23, int.class, "isEnableWhiteBright", false, "IS_ENABLE_WHITE_BRIGHT");
         public final static Property IsEnableBright = new Property(24, int.class, "isEnableBright", false, "IS_ENABLE_BRIGHT");
     }
 
@@ -87,7 +87,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
                 "\"IS_GET_VERSION\" INTEGER NOT NULL ," + // 20: isGetVersion
                 "\"BELONG_REGION_ID\" INTEGER NOT NULL ," + // 21: belongRegionId
                 "\"UID\" INTEGER NOT NULL ," + // 22: uid
-                "\"IS_ENABLE_WHITE_LIGHT\" INTEGER NOT NULL ," + // 23: isEnableWhiteLight
+                "\"IS_ENABLE_WHITE_BRIGHT\" INTEGER NOT NULL ," + // 23: isEnableWhiteBright
                 "\"IS_ENABLE_BRIGHT\" INTEGER NOT NULL );"); // 24: isEnableBright
     }
 
@@ -159,7 +159,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         stmt.bindLong(21, entity.getIsGetVersion() ? 1L: 0L);
         stmt.bindLong(22, entity.getBelongRegionId());
         stmt.bindLong(23, entity.getUid());
-        stmt.bindLong(24, entity.getIsEnableWhiteLight());
+        stmt.bindLong(24, entity.getIsEnableWhiteBright());
         stmt.bindLong(25, entity.getIsEnableBright());
     }
 
@@ -225,7 +225,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         stmt.bindLong(21, entity.getIsGetVersion() ? 1L: 0L);
         stmt.bindLong(22, entity.getBelongRegionId());
         stmt.bindLong(23, entity.getUid());
-        stmt.bindLong(24, entity.getIsEnableWhiteLight());
+        stmt.bindLong(24, entity.getIsEnableWhiteBright());
         stmt.bindLong(25, entity.getIsEnableBright());
     }
 
@@ -260,7 +260,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
             cursor.getShort(offset + 20) != 0, // isGetVersion
             cursor.getInt(offset + 21), // belongRegionId
             cursor.getInt(offset + 22), // uid
-            cursor.getInt(offset + 23), // isEnableWhiteLight
+            cursor.getInt(offset + 23), // isEnableWhiteBright
             cursor.getInt(offset + 24) // isEnableBright
         );
         return entity;
@@ -291,7 +291,7 @@ public class DbLightDao extends AbstractDao<DbLight, Long> {
         entity.setIsGetVersion(cursor.getShort(offset + 20) != 0);
         entity.setBelongRegionId(cursor.getInt(offset + 21));
         entity.setUid(cursor.getInt(offset + 22));
-        entity.setIsEnableWhiteLight(cursor.getInt(offset + 23));
+        entity.setIsEnableWhiteBright(cursor.getInt(offset + 23));
         entity.setIsEnableBright(cursor.getInt(offset + 24));
      }
     

@@ -2,13 +2,14 @@ package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
+import com.dadoutek.uled.util.RecoverMeshDeviceUtil
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -31,7 +32,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.StringBuilder
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.experimental.and
@@ -179,6 +179,9 @@ object Commander : EventListener<String> {
                                     DBUtils.deleteAllRGBLight()
                                     DBUtils.deleteAllConnector()
                                     DBUtils.deleteAllCurtain()
+                                    DBUtils.deleteAllSwitch()
+                                    DBUtils.deleteAllSensor()
+                                    DBUtils.deleteAllGateway()
                                     successCallback.invoke()
                                 }
                             } else {
@@ -631,13 +634,15 @@ object Commander : EventListener<String> {
      * 连接并且自动登录
      */
     @JvmStatic
-    fun connect(meshAddr: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
+    fun connect(meshAddr: Int = 0, fastestMode: Boolean = true, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
-                retryTimes: Long = 1, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 8): Observable<DeviceInfo>? {
-
+                retryTimes: Long = 0, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 12): Observable<DeviceInfo>? {
         if (mConnectObservable == null) {
+            TelinkApplication.getInstance().isConnect=true
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
                 TelinkLightService.Instance().idleMode(false)
+                if (macAddress!=null)
+                //TelinkLightService.Instance()?.adapter?.stop()
                 mConnectEmitter = emitter
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
@@ -651,21 +656,28 @@ object Commander : EventListener<String> {
                 connectParams.setPassword(meshPwd)
                 connectParams.autoEnableNotification(true)
                 connectParams.setFastestMode(fastestMode)      //true == 快速模式(不会扫几秒去找信号最好的)
+                connectParams[Parameters.PARAM_OFFLINE_TIMEOUT_SECONDS] = connectTimeOutTime
 
                 TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
                 TelinkLightApplication.getApp().addEventListener(ErrorReportEvent.ERROR_REPORT, this)
-                //LogUtils.d("Commander auto connect meshName = $meshName meshAddr=$meshAddr, mConnectEmitter = $mConnectEmitter, mac = $macAddress")//1367540967
                 TelinkLightService.Instance()?.autoConnect(connectParams)
+                //刷新Notify参数, 重新回到主页时不刷新
+                val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+                refreshNotifyParams.setRefreshRepeatCount(1)
+                refreshNotifyParams.setRefreshInterval(2000)
+                //开启自动刷新Notify
+                TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
+                LogUtils.v("zcl-----------连接失败失败-------connect timeout")
                 it.onError(Throwable("connect timeout"))
             }.doFinally {
                 // LogUtils.d("connect doFinally")
                 mConnectObservable = null
             }.retry(retryTimes)
             return mConnectObservable
-        } else {2
+        } else {
             DeviceType.NORMAL_SWITCH
-            LogUtils.d("in connecting device mode")
+            LogUtils.d("zcl-----------连接失败失败-in connecting device mode")
             return null
         }
     }

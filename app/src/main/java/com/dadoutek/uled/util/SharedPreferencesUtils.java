@@ -154,4 +154,15 @@ public class SharedPreferencesUtils {
         return SharedPreferencesHelper.getInt(TelinkLightApplication.Companion.getApp(),
                 Constant.OTA_TYPE, 1);
     }
+
+    public static void setScanType(Boolean isNewStartScan) {
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.Companion.getApp(),
+                Constant.IS_NEW_START_SCAN,isNewStartScan);
+    }
+    public static boolean getScanType() {
+        boolean aBoolean =
+                SharedPreferencesHelper.getBoolean(TelinkLightApplication.Companion.getApp(),
+                Constant.IS_NEW_START_SCAN, false);
+        return aBoolean;
+    }
 }

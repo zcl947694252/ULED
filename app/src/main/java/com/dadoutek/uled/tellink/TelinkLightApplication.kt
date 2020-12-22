@@ -27,6 +27,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import ua.naiksoftware.stomp.dto.LifecycleEvent
 import java.util.*
+import java.util.logging.Handler
 
 
 class TelinkLightApplication : TelinkApplication() {
@@ -37,6 +38,7 @@ class TelinkLightApplication : TelinkApplication() {
         }
     var mapBin: Map<String, Int> = HashMap<String, Int>()
         open var isLoginAccount: Boolean = true
+        var isConnecting: Boolean = false
     }
 
     open var refWatcher: RefWatcher? = null

@@ -61,12 +61,10 @@ import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
 import com.telink.bluetooth.TelinkLog
-import com.telink.bluetooth.event.ErrorReportEvent
-import com.telink.bluetooth.event.LeScanEvent
-import com.telink.bluetooth.event.NotificationEvent
-import com.telink.bluetooth.event.ServiceEvent
+import com.telink.bluetooth.event.*
 import com.telink.bluetooth.light.DeviceInfo
 import com.telink.bluetooth.light.LeScanParameters
+import com.telink.bluetooth.light.LightAdapter
 import com.telink.util.Event
 import com.telink.util.EventListener
 import com.telink.util.Strings
@@ -81,7 +79,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jetbrains.anko.startActivity
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -127,7 +125,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
                     BluetoothAdapter.STATE_ON -> {
                         retryConnectCount = 0
-                       // autoConnect()
+                        // autoConnect()
                     }
                     BluetoothAdapter.STATE_OFF -> {
                     }
@@ -464,7 +462,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         super.onPause()
         //disableConnectionStatusListener()
         mCompositeDisposable.clear()
-       // mConnectDisposable?.dispose()
+        // mConnectDisposable?.dispose()
         progressBar.visibility = GONE
         try {
             this.unregisterReceiver(mReceiver)
@@ -486,7 +484,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         filter.priority = IntentFilter.SYSTEM_HIGH_PRIORITY - 1
         registerReceiver(mReceiver, filter)
         getBin()
-
+        TelinkLightApplication.isLoginAccount = true
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         //Constant.IS_ROUTE_MODE = false
     }
@@ -497,7 +495,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         groupFragment.refreshView()
         sceneFragment.refreshView()
         if (!Constant.IS_ROUTE_MODE)
-        autoConnect()
+            autoConnect()
     }
 
 
@@ -736,25 +734,24 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         ToastUtils.showLong(R.string.connecting_tip)
                                         if (TelinkLightService.Instance() == null)
                                             TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
-                                       // ToastUtils.showShort(getString(R.string.connecting_tip))
+                                        // ToastUtils.showShort(getString(R.string.connecting_tip))
                                         mConnectDisposable?.dispose()
-                                        mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 5)
+                                        mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 1)
                                                 ?.subscribe({//找回有效设备
                                                     //RecoverMeshDeviceUtil.addDevicesToDb(it)
                                                     onLogin()
                                                     LogUtils.v("zcl-----------连接成功失败-------")
-                                                },
-                                                        {
-                                                            LogUtils.v("zcl-----------连接失败失败继续连接-------")
-                                                                autoConnect()
-                                                            LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
-                                                        }
-                                                )
+                                                }, {
+                                                    LogUtils.v("zcl-----------连接失败失败-------")
+                                                    LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
+                                                //   autoConnect()
+                                                })
                                     } else {
                                         ToastUtils.showShort(getString(R.string.no_connect_device))
                                     }
                                 }
-                            }, { LogUtils.d(it)
+                            }, {
+                                LogUtils.d(it)
                                 autoConnect()
                             })
             } else {
@@ -768,7 +765,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             this.connectMeshAddress = (mApp?.connectDevice?.meshAddress ?: 0x00) and 0xFF
 
     }
-
 
 
     override fun onStop() {
@@ -788,7 +784,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mDisposable.dispose()
         disposableCamera?.dispose()
         mCompositeDisposable.dispose()
-       // mConnectDisposable?.dispose()
+        // mConnectDisposable?.dispose()
         AllenVersionChecker.getInstance().cancelAllMission(this)
         //解绑服务
     }
@@ -798,7 +794,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     private fun onServiceDisconnected(event: ServiceEvent) {
         LogUtils.d("onServiceDisconnected")
         if (TelinkLightService.Instance() == null)
-        TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
+            TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
     }
 
 
@@ -808,6 +804,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
      * @param event
      */
     override fun performed(event: Event<String>) {
+
         when (event.type) {
             NotificationEvent.GET_ALARM -> {
             }
@@ -819,6 +816,19 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             ErrorReportEvent.ERROR_REPORT -> {
                 val info = (event as ErrorReportEvent).args
                 onErrorReportNormal(info)
+            }
+            DeviceEvent.STATUS_CHANGED -> {
+                onDeviceStatusChanged(event as DeviceEvent)
+            }
+        }
+    }
+
+    fun onDeviceStatusChanged(event: DeviceEvent) {
+        val deviceInfo = event.args
+        when (deviceInfo.status) {
+            LightAdapter.STATUS_LOGOUT -> {
+                LogUtils.v("zcl---MainActivity收到登出广播")
+                autoConnect()
             }
         }
     }

@@ -73,7 +73,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     private val SCENE_MAX_COUNT = 100
     private var currentDevice: DbLight? = null
     private var positionCurrent: Int = 0
-    private var canBeRefresh = true
     private val REQ_LIGHT_SETTING: Int = 0x01
     private var acitivityIsAlive = true
     private var installDevice: TextView? = null
@@ -241,31 +240,36 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         if (position < lightsData.size) {
             currentDevice = lightsData[position]
             positionCurrent = position
-            if (Constant.IS_ROUTE_MODE)
-                itemClikMethod(view)
-            else {
-                if (TelinkLightApplication.getApp().connectDevice == null && view.id != R.id.template_device_card_delete) {
-                    GlobalScope.launch(Dispatchers.Main) {
+            itemClikMethod(view)
+        /*    when {
+                Constant.IS_ROUTE_MODE -> itemClikMethod(view)
+                else -> when {
+                    TelinkLightApplication.getApp().connectDevice == null && view.id != R.id.template_device_card_delete -> {
                         autoConnectAll()
+                        sendToGw()
                     }
-                    sendToGw()
-                } else {
-                    itemClikMethod(view)
+                    else -> itemClikMethod(view)
                 }
-            }
+            }*/
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun itemClikMethod(view: View) {
+        val b = TelinkLightService.Instance().isLogin && TelinkLightApplication.getApp().connectDevice != null
         when (view.id) {
             R.id.template_device_icon -> {
-                canBeRefresh = true
-                openOrClose(currentDevice!!)
-                if (!Constant.IS_ROUTE_MODE)
-                    if (TelinkLightService.Instance().isLogin)
-                        sendAfterUpdate() //如果不是路由模式则直接更新icon
-                    else
-                        autoConnectAll()
+                when {
+                    Constant.IS_ROUTE_MODE -> openOrClose(currentDevice!!)
+                    b -> {
+                        openOrClose(currentDevice!!)
+                        sendAfterUpdate()
+                    }
+                    else -> sendToGw()
+                }
+                //如果不是路由模式则直接更新icon
+                //ToastUtils.showShort(getString(R.string.connecting_tip))
+                //autoConnectAll()
                 // sendTimeZone(currentDevice!!)
             }
             R.id.template_device_card_delete -> {
@@ -273,7 +277,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 builder?.setMessage(string)
                 builder?.create()?.show()
             }
-            R.id.template_device_setting -> goSetting()
+            R.id.template_device_setting -> if (b || Constant.IS_ROUTE_MODE) goSetting()
         }
     }
 
@@ -284,20 +288,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         }
         DBUtils.updateLight(lightsData[positionCurrent])
         listAdapter?.notifyDataSetChanged()
-    }
-
-    private fun showDeleteSingleDialog(dbLight: DbLight) {
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage(R.string.sure_delete_device)
-        builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
-            DBUtils.deleteLight(dbLight)
-            lightsData.remove(dbLight)
-            listAdapter?.notifyDataSetChanged()
-            isEmptyDevice()
-        }
-        builder.setNegativeButton(getString(R.string.cancel)) { _, _ -> }
-        val dialog = builder.show()
-        dialog.show()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -559,7 +549,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        canBeRefresh = false
         acitivityIsAlive = false
         disposableTimer?.dispose()
         mConnectDisposable?.dispose()

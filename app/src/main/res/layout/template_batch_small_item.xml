@@ -12,7 +12,7 @@
         tools:layout_editor_absoluteY="25dp">
     <!--BatchGroupFourDeviceActivity  SelectSceneListActivity  HumanBodySensorActivity  PirConfigActivity-->
     <RelativeLayout
-                android:id="@+id/template_device_batch_icon_ly"
+            android:id="@+id/template_device_batch_icon_ly"
             android:layout_width="@dimen/dp_50"
             android:layout_height="50dp"
             android:layout_marginLeft="5dp"
@@ -24,8 +24,8 @@
                 android:id="@+id/template_device_batch_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:contentDescription="@null"
                 android:layout_centerInParent="true"
+                android:contentDescription="@null"
                 android:scaleType="fitXY"
                 android:src="@drawable/icon_group" />
     </RelativeLayout>
@@ -43,9 +43,11 @@
 
     <TextView
             android:id="@+id/template_device_batch_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:singleLine="true"
+            android:layout_marginEnd="@dimen/dp_3"
+            android:gravity="center"
+            android:maxLines="2"
             android:text="@string/device_name"
             android:textColor="@color/black_three"
             android:textSize="13sp"
@@ -56,12 +58,14 @@
 
     <TextView
             android:id="@+id/template_device_batch_title_blow"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:singleLine="true"
-            android:text="1234"
+            android:gravity="center"
+            android:text="1235"
+            android:maxLines="2"
             android:textColor="@color/black_three"
+            android:layout_marginEnd="@dimen/dp_3"
             android:textSize="12sp"
             app:layout_constraintEnd_toEndOf="@+id/template_device_batch_icon_ly"
             app:layout_constraintStart_toStartOf="@+id/template_device_batch_icon_ly"

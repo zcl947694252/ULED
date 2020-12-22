@@ -372,11 +372,9 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     private fun addDevice() {
         val lastUser = DBUtils.lastUser
         lastUser?.let {
-            if (it.id.toString() != it.last_authorizer_user_id)
-                ToastUtils.showLong(getString(R.string.author_region_warm))
-            else {
-                goSearchSwitch()
-
+            when {
+                it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
+                else -> goSearchSwitch()
             }
         }
     }
@@ -424,8 +422,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                         builder?.create()?.show()
                     }
                     R.id.template_device_setting -> goConfig()
-                    else -> {
-                    }
+                    else -> {}
                 }
             }
         }
@@ -631,7 +628,8 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     @SuppressLint("CheckResult")
     override fun tzRouterConnectOrDisconnectSwSeRecevice(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl-----------收到路由连接开关通知-------$cmdBean")
+        LogUtils.v("zcl-----------收到路由连接开关通知--${cmdBean.ser_id == "connectSw"}-----$cmdBean")
+            disposableRouteTimer?.dispose()
         if (cmdBean.ser_id == "connectSw") {
             disposableRouteTimer?.dispose()
             if (cmdBean.finish) {

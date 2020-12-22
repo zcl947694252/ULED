@@ -44,6 +44,7 @@ import com.dadoutek.uled.region.adapter.RegionAuthorizeDialogAdapter
 import com.dadoutek.uled.region.adapter.RegionDialogAdapter
 import com.dadoutek.uled.region.bean.RegionBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
@@ -247,6 +248,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 //startActivity(Intent(this@LoginActivity, MainActivity::class.java))
             }
         }
+        scan_gp.setOnCheckedChangeListener { group, checkedId ->
+            TelinkApplication.getInstance().isNew = checkedId==R.id.scan_new
+            SharedPreferencesUtils.setScanType(TelinkApplication.getInstance().isNew)
+            LogUtils.v("zcl-----------选择新旧方法-------isNew-------${ TelinkApplication.getInstance().isNew}")
+        }
+
         btn_login.setOnClickListener(this)
         forget_password.setOnClickListener(this)
         date_phone.setOnClickListener(this)
@@ -259,7 +266,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun initView() {
         isDebugVisible()
-
+        val scanType = SharedPreferencesUtils.getScanType()
+        when {
+            scanType -> scan_new.isChecked = true
+            else -> scan_old.isChecked= true
+        }
         initToolbar()
         if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
             transformView()
@@ -377,6 +388,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         isPhone = !b
         if (b) {
             qq_btn.visibility = View.GONE
+            scan_gp.visibility = View.GONE
             btn_login.visibility = View.GONE
             google_btn.visibility = View.GONE
             facebook_btn.visibility = View.GONE
@@ -388,6 +400,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             date_phone.setImageResource(R.drawable.icon_up)
         } else {
             qq_btn.visibility = View.VISIBLE
+            scan_gp.visibility = View.VISIBLE
             btn_login.visibility = View.VISIBLE
             google_btn.visibility = View.VISIBLE
             facebook_btn.visibility = View.VISIBLE
@@ -525,12 +538,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         return super.onOptionsItemSelected(item)
     }
 
-
     @SuppressLint("CheckResult")
     private fun login() {
         phone = edit_user_phone_or_email!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
         editPassWord = edit_user_password!!.text.toString().trim { it <= ' ' }.replace(" ".toRegex(), "")
-
+            TelinkLightService.Instance()?.idleMode(true)
         if (!StringUtils.isTrimEmpty(phone) && !StringUtils.isTrimEmpty(editPassWord)) {
             showLoadingDialog(getString(R.string.logging_tip))
              userLogin()

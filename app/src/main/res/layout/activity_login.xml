@@ -21,8 +21,8 @@
         <ImageView
                 android:id="@+id/return_image"
                 android:layout_width="wrap_content"
-                android:layout_marginLeft="25dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
                 android:src="@drawable/icon_return" />
 
         <TextView
@@ -36,7 +36,7 @@
                 android:text="@string/login_account"
                 android:textColor="@color/black_three"
                 android:textSize="30sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
     </LinearLayout>
 
 
@@ -276,7 +276,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/clThirdPartyLogin"
             app:layout_constraintStart_toStartOf="@+id/btn_login"
             app:layout_constraintTop_toTopOf="@+id/sms_password_login"
-            app:layout_constraintVertical_bias="0.465">
+            app:layout_constraintVertical_bias="0.934">
 
         <RadioButton
                 android:id="@+id/login_Teck"
@@ -299,5 +299,47 @@
                 android:layout_weight="1"
                 android:text="dadousmart" />
     </RadioGroup>
+
+    <RadioGroup
+            android:id="@+id/scan_gp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="25dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/select_radius5_w_e"
+            android:orientation="horizontal"
+            android:padding="@dimen/dp_5"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="@+id/login_isTeck"
+            app:layout_constraintStart_toStartOf="@+id/btn_login"
+            app:layout_constraintTop_toTopOf="@+id/sms_password_login"
+            app:layout_constraintVertical_bias="0.25">
+
+
+        <RadioButton
+                android:id="@+id/scan_new"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/select_radius5_w_e"
+                android:button="@null"
+                android:checked="true"
+                android:gravity="center"
+                android:text="isNew" />
+
+        <RadioButton
+                android:id="@+id/scan_old"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/select_radius5_w_e"
+                android:button="@null"
+                android:checked="false"
+                android:gravity="center"
+                android:text="isOld" />
+    </RadioGroup>
+
 
 </android.support.constraint.ConstraintLayout>

@@ -788,7 +788,7 @@ public class BatchGroupActivity extends TelinkMeshErrorDealActivity
             //刷新Notify参数
             LeRefreshNotifyParameters refreshNotifyParams = Parameters.createRefreshNotifyParameters();
             refreshNotifyParams.setRefreshRepeatCount(1);
-            refreshNotifyParams.setRefreshInterval(2000);
+            refreshNotifyParams.setRefreshInterval(800);
             //开启自动刷新Notify
             TelinkLightService instance = TelinkLightService.Instance();
             if (instance != null)

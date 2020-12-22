@@ -1387,12 +1387,12 @@ public interface RequestInterface {
 
 
     /**
-     * 安全锁https://dev.dadoutek.com/xxxx/router/control/device/rgb  POST
+     * 安全锁https://dev.dadoutek.com/xxxx/router/control/safe-lock
      * status	是	int	1开 2关
      * ser_id	是	string	app会话id，推送时回传"status" : 2, "ser_id": "app会话id，自己维护"
      */
     @FormUrlEncoded
-    @POST("router/control/device/rgb")
+    @POST("router/control/safe-lock")
     Observable<Response<RouterTimeoutBean>> routeOpenOrCloseSafeLock(@Field("status") int status,
                                                                      @Field("ser_id") String ser_id);
 
@@ -1675,7 +1675,7 @@ public interface RequestInterface {
      * https://dev.dadoutek.com/xxxx/router/delete/{macAddr} DELETE
      * https://dev.dadoutek.com/smartlight_test/router/delete/98f4666c839f
      */
-    @PUT("router/delete/{macAddr}")
+    @DELETE("router/delete/{macAddr}")
     Observable<Response> routeDelSelf(@Path("macAddr") String macAddr);
     /**
      * https://dev.dadoutek.com/xxxx/scene/update/{id} PUT

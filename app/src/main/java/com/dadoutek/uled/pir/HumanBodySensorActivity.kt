@@ -270,6 +270,10 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
             isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
         if (Constant.IS_ROUTE_MODE){
+            if (TextUtils.isEmpty(currentSensor?.boundMac)){
+                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                return
+            }
             startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
                     "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr,
                     "version" to currentSensor!!.version )
@@ -1131,7 +1135,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
         dbSensor.controlGroupAddr = getControlGroup()
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.version = version
-        dbSensor.openTag = mDeviceInfo!!.openTag
+        dbSensor.status = mDeviceInfo!!.openTag
         dbSensor.meshAddr = mDeviceInfo.meshAddress
         //dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID

@@ -450,6 +450,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     // 如果没有网络，则弹出网络设置对话框
     fun checkNetworkAndSync(activity: Activity?) {
+        if (Constant.IS_ROUTE_MODE){
+            ToastUtils.showShort(getString(R.string.please_do_this_over_ble))
+            return
+        }
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
                     .setTitle(R.string.network_tip_title)
@@ -549,17 +553,22 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 && !DBUtils.dataChangeAllHaveAboutCurtain && DBUtils.allRely.isEmpty() && !DBUtils.dataChangeAllHaveAboutRelay)
         val lastUser = DBUtils.lastUser
         lastUser?.let {
-            if (b1 || it.id.toString() != it.last_authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
-                if (isClickExlogin) {
-                    TelinkLightService.Instance()?.disconnect()
-                    TelinkLightService.Instance()?.idleMode(true)
-                    restartApplication()
+            if (Constant.IS_ROUTE_MODE) {
+                TelinkLightService.Instance()?.disconnect()
+                TelinkLightService.Instance()?.idleMode(true)
+                restartApplication()
+            } else
+                if (b1 || it.id.toString() != it.last_authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
+                    if (isClickExlogin) {
+                        TelinkLightService.Instance()?.disconnect()
+                        TelinkLightService.Instance()?.idleMode(true)
+                        restartApplication()
+                    }
+                    hideLoadingDialog()
+                    Log.e("zcl", "zcl******推出上传其区域数据" + (it.id.toString() == it.last_authorizer_user_id))
+                } else {
+                    checkNetworkAndSync(activity)
                 }
-                hideLoadingDialog()
-                Log.e("zcl", "zcl******推出上传其区域数据" + (it.id.toString() == it.last_authorizer_user_id))
-            } else {
-                checkNetworkAndSync(activity)
-            }
         }
     }
 
@@ -606,6 +615,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     //重启app并杀死原进程
     private fun restartApplication() {
+        TelinkLightService.Instance()?.idleMode(true)
         TelinkApplication.getInstance().removeEventListeners()
         SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
         com.blankj.utilcode.util.AppUtils.relaunchApp()

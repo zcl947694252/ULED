@@ -45,9 +45,6 @@ class BatchSwAdapter(layoutResId: Int, data: MutableList<DbSwitch>) : BaseQuickA
             helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.gray_3))
         }
 
-        when (item?.productUUID) {
-            DeviceType.LIGHT_RGB -> icon.setImageResource(R.drawable.icon_rgb_n)
-            else -> icon.setImageResource(R.drawable.icon_light_n)
-        }
+        icon.setImageResource(R.drawable.icon_switch)
     }
 }

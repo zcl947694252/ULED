@@ -58,15 +58,20 @@ public class DbGroup implements Serializable{
     public int slowUpSlowDownSpeed = 1; //慢中快 1-3-5
     public  String routerName;
     public  String routerId;
-    public int isEnableWhiteLight = 1;
+    public int isEnableWhiteBright = 1;
+
+    public void setIsEnableWhiteBright(int isEnableWhiteBright) {
+        this.isEnableWhiteBright = isEnableWhiteBright;
+    }
+
     public int isEnableBright = 1;
 
-    @Generated(hash = 1165335925)
+    @Generated(hash = 1656121555)
     public DbGroup(Long id, int meshAddr, String name, int brightness,
             int colorTemperature, int belongRegionId, Long deviceType, int index,
             int color, int status, int slowUpSlowDownStatus,
             int slowUpSlowDownSpeed, String routerName, String routerId,
-            int isEnableWhiteLight, int isEnableBright) {
+            int isEnableWhiteBright, int isEnableBright) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -81,7 +86,7 @@ public class DbGroup implements Serializable{
         this.slowUpSlowDownSpeed = slowUpSlowDownSpeed;
         this.routerName = routerName;
         this.routerId = routerId;
-        this.isEnableWhiteLight = isEnableWhiteLight;
+        this.isEnableWhiteBright = isEnableWhiteBright;
         this.isEnableBright = isEnableBright;
     }
 
@@ -89,9 +94,6 @@ public class DbGroup implements Serializable{
     public DbGroup() {
     }
 
-    public void setIsEnableWhiteLight(int isEnableWhiteLight) {
-        this.isEnableWhiteLight = isEnableWhiteLight;
-    }
 
     public void setIsEnableBright(int isEnableBright) {
         this.isEnableBright = isEnableBright;
@@ -284,7 +286,7 @@ public class DbGroup implements Serializable{
                 ", slowUpSlowDownSpeed=" + slowUpSlowDownSpeed +
                 ", routerName='" + routerName + '\'' +
                 ", routerId='" + routerId + '\'' +
-                ", isEnableWhiteLight=" + isEnableWhiteLight +
+                ", isEnableWhiteBright=" + isEnableWhiteBright +
                 ", isEnableBright=" + isEnableBright +
                 '}';
     }
@@ -305,8 +307,8 @@ public class DbGroup implements Serializable{
         this.routerId = routerId;
     }
 
-    public int getIsEnableWhiteLight() {
-        return this.isEnableWhiteLight;
+    public int getIsEnableWhiteBright() {
+        return this.isEnableWhiteBright;
     }
 
     public int getIsEnableBright() {

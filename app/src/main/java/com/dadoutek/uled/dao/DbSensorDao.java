@@ -34,7 +34,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         public final static Property BelongGroupId = new Property(7, Long.class, "belongGroupId", false, "BELONG_GROUP_ID");
         public final static Property Version = new Property(8, String.class, "version", false, "VERSION");
         public final static Property Rssi = new Property(9, int.class, "rssi", false, "RSSI");
-        public final static Property OpenTag = new Property(10, int.class, "openTag", false, "OPEN_TAG");
+        public final static Property Status = new Property(10, int.class, "status", false, "STATUS");
         public final static Property SetType = new Property(11, int.class, "setType", false, "SET_TYPE");
         public final static Property SceneId = new Property(12, int.class, "sceneId", false, "SCENE_ID");
         public final static Property BoundMac = new Property(13, String.class, "boundMac", false, "BOUND_MAC");
@@ -72,7 +72,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
                 "\"BELONG_GROUP_ID\" INTEGER," + // 7: belongGroupId
                 "\"VERSION\" TEXT," + // 8: version
                 "\"RSSI\" INTEGER NOT NULL ," + // 9: rssi
-                "\"OPEN_TAG\" INTEGER NOT NULL ," + // 10: openTag
+                "\"STATUS\" INTEGER NOT NULL ," + // 10: status
                 "\"SET_TYPE\" INTEGER NOT NULL ," + // 11: setType
                 "\"SCENE_ID\" INTEGER NOT NULL ," + // 12: sceneId
                 "\"BOUND_MAC\" TEXT," + // 13: boundMac
@@ -130,7 +130,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             stmt.bindString(9, version);
         }
         stmt.bindLong(10, entity.getRssi());
-        stmt.bindLong(11, entity.getOpenTag());
+        stmt.bindLong(11, entity.getStatus());
         stmt.bindLong(12, entity.getSetType());
         stmt.bindLong(13, entity.getSceneId());
  
@@ -198,7 +198,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             stmt.bindString(9, version);
         }
         stmt.bindLong(10, entity.getRssi());
-        stmt.bindLong(11, entity.getOpenTag());
+        stmt.bindLong(11, entity.getStatus());
         stmt.bindLong(12, entity.getSetType());
         stmt.bindLong(13, entity.getSceneId());
  
@@ -247,7 +247,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
             cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7), // belongGroupId
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // version
             cursor.getInt(offset + 9), // rssi
-            cursor.getInt(offset + 10), // openTag
+            cursor.getInt(offset + 10), // status
             cursor.getInt(offset + 11), // setType
             cursor.getInt(offset + 12), // sceneId
             cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13), // boundMac
@@ -276,7 +276,7 @@ public class DbSensorDao extends AbstractDao<DbSensor, Long> {
         entity.setBelongGroupId(cursor.isNull(offset + 7) ? null : cursor.getLong(offset + 7));
         entity.setVersion(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setRssi(cursor.getInt(offset + 9));
-        entity.setOpenTag(cursor.getInt(offset + 10));
+        entity.setStatus(cursor.getInt(offset + 10));
         entity.setSetType(cursor.getInt(offset + 11));
         entity.setSceneId(cursor.getInt(offset + 12));
         entity.setBoundMac(cursor.isNull(offset + 13) ? null : cursor.getString(offset + 13));

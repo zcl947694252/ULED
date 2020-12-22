@@ -6,6 +6,8 @@ package com.telink.bluetooth.light;
 
 import android.bluetooth.le.ScanFilter;
 
+import com.telink.bluetooth.TelinkLog;
+
 import java.util.List;
 
 /**
@@ -32,6 +34,7 @@ public final class LeScanParameters extends Parameters {
      * @return
      */
     public LeScanParameters setMeshName(String value) {
+        TelinkLog.d(" scan mesh name set name= "+value);
         this.set(Parameters.PARAM_MESH_NAME, value);
         return this;
     }

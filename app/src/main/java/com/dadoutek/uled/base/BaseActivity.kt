@@ -462,6 +462,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
     private fun singleDialog(codeBean: MqttBodyBean) {
         LogUtils.e("zcl_baseMe___________收到登出消息")
         val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+        TelinkLightService.Instance()?.idleMode(true)
         if (codeBean.loginStateKey != DBUtils.lastUser?.login_state_key && boolean) //确保登录时成功的
             checkNetworkAndSync(this@BaseActivity)
     }

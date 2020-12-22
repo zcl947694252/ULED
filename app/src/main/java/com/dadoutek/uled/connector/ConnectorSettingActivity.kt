@@ -545,10 +545,15 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                             else -> {
                                 when {
                                     Constant.IS_ROUTE_MODE -> {
-                                        startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
-                                                "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr,
-                                                "version" to currentDbConnector!!.version)
-                                        finish()
+                                        when {
+                                            TextUtils.isEmpty(currentDbConnector?.boundMac) -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                            else -> {
+                                                startActivity<RouterOtaActivity>("deviceMeshAddress" to currentDbConnector!!.meshAddr,
+                                                        "deviceType" to currentDbConnector!!.productUUID, "deviceMac" to currentDbConnector!!.macAddr,
+                                                        "version" to currentDbConnector!!.version)
+                                                finish()
+                                            }
+                                        }
                                     }
                                     else -> checkPermission()
                                 }

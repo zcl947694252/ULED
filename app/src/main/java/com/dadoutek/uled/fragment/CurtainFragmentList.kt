@@ -1,9 +1,11 @@
 package com.dadoutek.uled.fragment
 
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
+import com.dadoutek.uled.router.bean.CmdBodyBean
 
 class CurtainFragmentList : BaseGroupFragment() {
 
@@ -20,6 +22,19 @@ class CurtainFragmentList : BaseGroupFragment() {
         return list
     }
 
+    override fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由控制通知-------$cmdBean")
+        if (cmdBean.ser_id == "groupSwCurtain") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            currentGroup?.status =    if (currentGroup?.status == 1) 2 else 1
+            if (cmdBean.status == 0)
+                groupSwSuccess(currentPosition, false)//因为窗帘不是connectstatus 使用外面处理
+            currentGroup?.let {
+                DBUtils.saveGroup(it, true)
+            }
+        }
+    }
  /*   private var inflater: LayoutInflater? = null
 
 

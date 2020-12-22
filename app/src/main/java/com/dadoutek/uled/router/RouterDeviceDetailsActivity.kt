@@ -101,6 +101,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                             DBUtils.deleteRouter(it)
                             //添加删除服务器接口
                             routerData.remove(it)
+                            adapter.notifyDataSetChanged()
                         } else {
                             ToastUtils.showShort(getString(R.string.delete_device_fail))
                         }

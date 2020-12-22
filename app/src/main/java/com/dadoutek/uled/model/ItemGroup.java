@@ -12,13 +12,13 @@ public class ItemGroup implements Serializable {
     public int groupAddress = 0;
     public int brightness = 50;
     public int temperature = 50;
-    public int color = 0;
+    public int color = 855638015;
     public String gpName = "";
     public boolean enableCheck=false;
     public boolean checked=false;
     public int deviceType;
     public boolean isOn =true;
-    public boolean isEnableWhiteLight = true;
+    public boolean isEnableWhiteBright = true;
     public boolean isEnableBright = true;
 
     public long sceneId= 1000000;
@@ -41,7 +41,7 @@ public class ItemGroup implements Serializable {
                 ", checked=" + checked +
                 ", deviceType=" + deviceType +
                 ", isOn=" + isOn +
-                ", isEnableWhiteLight=" + isEnableWhiteLight +
+                ", isEnableWhiteBright=" + isEnableWhiteBright +
                 ", isEnableBright=" + isEnableBright +
                 ", rgbType=" + rgbType +
                 ", gradientType=" + gradientType +

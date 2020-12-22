@@ -115,34 +115,6 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
         wheel_time_container.addView(timePicker)
     }
 
-    private fun getWeekStr(week: Int?): String {
-        var tmpWeek = week ?: 0
-        val sb = StringBuilder()
-        when (tmpWeek) {
-            0b01111111,0b10000000-> sb.append(getString(R.string.every_day))
-            0b00000000 -> sb.append(getString(R.string.only_one))
-            else -> {
-                var list = mutableListOf(
-                        WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
-                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
-                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
-                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constant.THURSDAY) != 0),
-                        WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
-                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
-                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
-                val filter = list.filter { it.selected }
-                for (i in 0 until list.size) {
-                    if (list[i].selected)
-                        sb.append(list[i].week).append(",")
-                }
-                val toString = sb.toString()
-                if (filter.size>1) {
-                    toString.substring(sb.length-2)
-                }
-            }
-        }
-        return sb.toString()
-    }
 
     private fun initView() {
         gate_way_repete_mode.text = ""
@@ -199,7 +171,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun routerAddSceneTimer() {
-        RouterModel.routeAddTimerScene("$hourTime:$minuteTime", hourTime, minuteTime, getWeek(mode!!), scene!!.id.toInt(), 1,"addTimerScene")?.subscribe({
+        RouterModel.routeAddTimerScene("$hourTime:$minuteTime", hourTime, minuteTime,getWeek(mode!!.replace("6","")), scene!!.id.toInt(), 1,"addTimerScene")?.subscribe({
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))

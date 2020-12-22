@@ -64,7 +64,7 @@ public class LightAdapter {
     public static final int STATUS_GET_FIRMWARE_FAILURE = 61;
     public static final int STATUS_GET_DEVICE_MAC_COMPLETED = 62;
     public static final int STATUS_GET_DEVICE_MAC_FAILURE = 63;
-    public static final int STATUS_SET_GW_SUCCESS= 64;
+    public static final int STATUS_SET_GW_SUCCESS = 64;
     public static final int STATUS_SET_GW_COMPLETED = 65;
     public static final int STATUS_SET_GW_FAIL = 66;
     public static final int STATUS_DELETE_COMPLETED = 70;
@@ -108,7 +108,7 @@ public class LightAdapter {
     private final AtomicInteger status = new AtomicInteger(-1);
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-//    private final AtomicBoolean isScanStopped = new AtomicBoolean(true);
+    //    private final AtomicBoolean isScanStopped = new AtomicBoolean(true);
 
     protected Callback mCallback;
     protected Context mContext;
@@ -204,35 +204,61 @@ public class LightAdapter {
         this.mScanCallback = new ScanCallback();
 
         this.mLightCtrl = new LightController();
-        this.mLightCtrl.addEventListener(LightController.LightEvent.NOTIFICATION_RECEIVE, this.mNotificationListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_SUCCESS, this.mConnectionListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_FAILURE, this.mConnectionListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_FAILURE_N, this.mConnectionListener);// android N
-        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_SUCCESS, this.mConnectionListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_FAILURE, this.mConnectionListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.RESET_MESH_SUCCESS, this.mResetMeshListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.RESET_MESH_FAILURE, this.mResetMeshListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.NOTIFICATION_RECEIVE,
+                this.mNotificationListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_SUCCESS,
+                this.mConnectionListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_FAILURE,
+                this.mConnectionListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_FAILURE_N,
+                this.mConnectionListener);// android N
+        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_SUCCESS,
+                this.mConnectionListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_FAILURE,
+                this.mConnectionListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.RESET_MESH_SUCCESS,
+                this.mResetMeshListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.RESET_MESH_FAILURE,
+                this.mResetMeshListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.OTA_SUCCESS, this.mOtaListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.OTA_PROGRESS, this.mOtaListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.OTA_PROGRESS,
+                this.mOtaListener);
         this.mLightCtrl.addEventListener(LightController.LightEvent.OTA_FAILURE, this.mOtaListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_SUCCESS, this.mFirmwareListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_FAILURE, this.mFirmwareListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_SUCCESS, this.mDeviceMacListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_FAILURE, this.mDeviceMacListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_SUCCESS, this.mSetGwListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_FAIL, this.mSetGwListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_SUCCESS, this.mGetLtkListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_FAILURE, this.mGetLtkListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.DELETE_SUCCESS, this.mDeleteListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.DELETE_FAILURE, this.mDeleteListener);
-        //this.mLightCtrl.addEventListener(LightController.LightEvent.COMMAND_SUCCESS, this.mCommandListener);
-        //this.mLightCtrl.addEventListener(LightController.LightEvent.COMMAND_FAILURE, this.mCommandListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_SUCCESS,
+                this.mFirmwareListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_FIRMWARE_FAILURE,
+                this.mFirmwareListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_SUCCESS,
+                this.mDeviceMacListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_DEVICE_MAC_FAILURE,
+                this.mDeviceMacListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_SUCCESS,
+                this.mSetGwListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.SET_GW_FAIL,
+                this.mSetGwListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_SUCCESS,
+                this.mGetLtkListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.GET_LTK_FAILURE,
+                this.mGetLtkListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.DELETE_SUCCESS,
+                this.mDeleteListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.DELETE_FAILURE,
+                this.mDeleteListener);
+        //this.mLightCtrl.addEventListener(LightController.LightEvent.COMMAND_SUCCESS, this
+        // .mCommandListener);
+        //this.mLightCtrl.addEventListener(LightController.LightEvent.COMMAND_FAILURE, this
+        // .mCommandListener);
 
-        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_ERROR_REPORT_CONNECT, this.mErrorReportListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_ERROR_REPORT_ATT, this.mErrorReportListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_ERROR_REPORT_WRITE, this.mErrorReportListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_ERROR_REPORT_READ, this.mErrorReportListener);
-        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_ERROR_REPORT_CHECK, this.mErrorReportListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_ERROR_REPORT_CONNECT,
+                this.mErrorReportListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.CONNECT_ERROR_REPORT_ATT,
+                this.mErrorReportListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_ERROR_REPORT_WRITE,
+                this.mErrorReportListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_ERROR_REPORT_READ,
+                this.mErrorReportListener);
+        this.mLightCtrl.addEventListener(LightController.LightEvent.LOGIN_ERROR_REPORT_CHECK,
+                this.mErrorReportListener);
 
 
         this.mThread = new HandlerThread("LightAdapter Thread");
@@ -346,12 +372,13 @@ public class LightAdapter {
             return false;
 
         LightPeripheral light = this.mLightCtrl.getCurrentLight();
-       // light.refreshDeviceCache();
+        // light.refreshDeviceCache();
         if (light == null || !light.isConnected()) {
             return false;
         }
-//        Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light.isConnected());
-//        TelinkLog.e("LightAdapter#login");
+        //        Log.d("Saw", "light = " + light + "\nlight.isConnected() = " + light
+        //        .isConnected());
+        //        TelinkLog.e("LightAdapter#login");
         this.mLightCtrl.login(meshName, password);
         return true;
     }
@@ -405,7 +432,7 @@ public class LightAdapter {
         byte[] password = Strings.stringToBytes(pwd, 16);
 
         // test pwd error
-//        byte[] password = Strings.stringToBytes("321", 16);
+        //        byte[] password = Strings.stringToBytes("321", 16);
 
         this.login(meshName, password);
     }
@@ -448,7 +475,8 @@ public class LightAdapter {
         return this.sendCommandNoResponse(opcode, address, params, null, delay);
     }
 
-    public boolean sendCommandNoResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
+    public boolean sendCommandNoResponse(byte opcode, int address, byte[] params, Object tag,
+                                         int delay) {
 
         if (!this.isStarted.get()) {
             return false;
@@ -458,14 +486,16 @@ public class LightAdapter {
             return false;
 
         if (tag == null) {
-//            Log.d("Test", "***********sendCommand***********");
+            //            Log.d("Test", "***********sendCommand***********");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, delay);
         } else {
-//            Log.d("Test", "***********TEST***********ELSE");
+            //            Log.d("Test", "***********TEST***********ELSE");
             return this.mLightCtrl.sendCommand(opcode, address, params, true, tag, delay);
         }
     }
-    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag, int delay) {
+
+    public boolean sendCommandResponse(byte opcode, int address, byte[] params, Object tag,
+                                       int delay) {
 
         if (!this.isStarted.get()) {
             return false;
@@ -475,10 +505,10 @@ public class LightAdapter {
             return false;
 
         if (tag == null) {
-//            Log.d("Test", "***********sendCommand***********");
+            //            Log.d("Test", "***********sendCommand***********");
             return this.mLightCtrl.sendCommand(opcode, address, params, false, delay);
         } else {
-//            Log.d("Test", "***********TEST***********ELSE");
+            //            Log.d("Test", "***********TEST***********ELSE");
             return this.mLightCtrl.sendCommand(opcode, address, params, false, tag, delay);
         }
     }
@@ -498,7 +528,7 @@ public class LightAdapter {
         TelinkLog.e("LightAdapter#startLeScan");
         this.setMode(MODE_IDLE);
 
-//        stopLeScan();
+        //        stopLeScan();
 
         this.mParams = params;
         this.mCallback = callback;
@@ -553,7 +583,7 @@ public class LightAdapter {
         this.nextLightIndex.set(0);
         this.updateCount.set(0);
         this.lightCount = this.mUpdateLights.size();
-//        this.mLightCtrl.disconnect();
+        //        this.mLightCtrl.disconnect();
         this.setMode(MODE_UPDATE_MESH);
         this.setState(STATE_RUNNING);
         this.enableLoop(true);
@@ -567,19 +597,20 @@ public class LightAdapter {
         }
 
         if (this.getMode() == MODE_AUTO_CONNECT_MESH) {
-            Log.d("Saw", "Return because of MODE_AUTO_CONNECT_MESH  this.mScannedLights.size = " + this.mScannedLights.size());
+            Log.d("Saw",
+                    "Return because of MODE_AUTO_CONNECT_MESH  this.mScannedLights.size = " + this.mScannedLights.size());
             return;
         }
         TelinkLog.e("LightAdapter#autoConnect");
         this.setMode(MODE_IDLE);
 
-//        stopLeScan();
+        //        stopLeScan();
 
         this.mParams = params;
         this.mCallback = callback;
         this.mScannedLights.clear();
         this.mUpdateLights.clear();
-//        this.mLightCtrl.disconnect();
+        //        this.mLightCtrl.disconnect();
         this.lightCount = 0;
         this.updateCount.set(0);
         this.nextLightIndex.set(0);
@@ -602,6 +633,7 @@ public class LightAdapter {
 
     /**
      * 设置扫描间隔
+     *
      * @return
      */
     private boolean startLeScan() {
@@ -675,7 +707,7 @@ public class LightAdapter {
         if (this.getMode() == MODE_IDLE)
             return;
 
-//        Log.d("Saw", getStackTrace());
+        //        Log.d("Saw", getStackTrace());
         TelinkLog.e("LightAdapter#idleMode");
         this.setMode(MODE_IDLE);
         this.status.getAndSet(-1);
@@ -686,7 +718,7 @@ public class LightAdapter {
         }
 
         stopLeScan();
-//        LeBluetooth.getInstance().stopScan();
+        //        LeBluetooth.getInstance().stopScan();
     }
 
     synchronized public void startOta(Parameters params, Callback callback) {
@@ -699,7 +731,7 @@ public class LightAdapter {
         TelinkLog.e("LightAdapter#startOta");
         this.setMode(MODE_IDLE);
 
-//        LeBluetooth.getInstance().stopScan();
+        //        LeBluetooth.getInstance().stopScan();
 
         this.mParams = params;
         this.mCallback = callback;
@@ -775,7 +807,7 @@ public class LightAdapter {
         while (iterator.hasNext()) {
             filter = iterator.next();
             try {
-                 light = filter.filter(device, rssi, scanRecord);
+                light = filter.filter(device, rssi, scanRecord);
             } catch (Exception e) {
                 TelinkLog.e("Advertise Filter Exception : " + filter.toString() + "--" + e.getMessage(), e);
             }
@@ -794,10 +826,12 @@ public class LightAdapter {
 
         Parameters params = this.getParameters();
 
-        List<Integer> targetDevices = mParams.getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);//从parmers内设置需要的类型从此处取出
+        List<Integer> targetDevices = mParams.getIntList(Parameters.PARAM_TARGET_DEVICE_TYPE);
+        //从parmers内设置需要的类型从此处取出
         //如果有要连接的目标设备
         if (targetDevices.size() > 0)
-            if (!targetDevices.contains(light.getProductUUID())) {    //如果目标设备list里不包含当前设备类型，就过滤掉，return false
+            if (!targetDevices.contains(light.getProductUUID())) {    //如果目标设备list
+                // 里不包含当前设备类型，就过滤掉，return false
                 return false;
             }
         if (params == null)
@@ -808,26 +842,29 @@ public class LightAdapter {
             return false;
         byte[] meshName = Strings.stringToBytes(paramsString, 16);
         byte[] meshName1 = light.getMeshName();
+        if (light.getDevice().getAddress().contains("7B:69:E7:05:94:D8"))
+        TelinkLog.d("scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME) + "--mac"+light.getDevice().getAddress()+"---" + Arrays.bytesToString(meshName) + "---" + Arrays.bytesToString(meshName1));
         if (mode == MODE_SCAN_MESH) {
-//            Log.d("SawTest", "scan mesh name = " + params.getString(Parameters.PARAM_MESH_NAME));
 
             String scanMac = params.getString(Parameters.PARAM_SCAN_MAC);
-            boolean b = scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac);
-            Log.v("zcl","lightAdapter 0nLeScan-----"+b+"---"+scanMac);
+            boolean b =
+                    scanMac != null && !scanMac.equals("") && !light.getMacAddress().equals(scanMac);
+            TelinkLog.v("lightAdapter 0nLeScan-----" + b + "---" + scanMac);
             if (b)
                 return false;
 
-            outOfMeshName = Strings.stringToBytes(params.getString(Parameters.PARAM_OUT_OF_MESH), 16);
+            outOfMeshName = Strings.stringToBytes(params.getString(Parameters.PARAM_OUT_OF_MESH),
+                    16);
             if (!Arrays.equals(meshName, meshName1) && !Arrays.equals(outOfMeshName, meshName1))
                 return false;
         } else if (mode == MODE_AUTO_CONNECT_MESH) {
             if (!Arrays.equals(meshName, meshName1))
                 return false;
             String mac = params.getString(Parameters.PARAM_AUTO_CONNECT_MAC);
-            if (!TextUtils.isEmpty(mac)){//如果拿到mac 就使用mac连接  如果没有就是用mesh连接 如果mesh也
+            if (!TextUtils.isEmpty(mac)) {//如果拿到mac 就使用mac连接  如果没有就是用mesh连接 如果mesh也
                 // 没有就连接扫到的第一个设备
-              //  LogUtils.v("zcl---------要链接的mac"+mac+"---------扫描到的mac"+light.getMacAddress());
-                return  mac.equals(light.getMacAddress());
+                //  LogUtils.v("zcl---------要链接的mac"+mac+"---------扫描到的mac"+light.getMacAddress());
+                return mac.equals(light.getMacAddress());
             } else {
                 int meshAddress = params.getInt(Parameters.PARAM_AUTO_CONNECT_MESH_ADDR);
                 return meshAddress == 0 || meshAddress == light.getMeshAddress();
@@ -843,7 +880,8 @@ public class LightAdapter {
         int minLength = 20;
         int position = 7;
 
-//        Log.d("LightAdapter:", "light_mesh_2:  " + "Notify Data=" + Arrays.bytesToHexString(data, "-"));
+        //        Log.d("LightAdapter:", "light_mesh_2:  " + "Notify Data=" + Arrays
+        //        .bytesToHexString(data, "-"));
 
         if (length < minLength)
             return;
@@ -855,7 +893,7 @@ public class LightAdapter {
             return;
 
         int src = (data[3] & 0xFF) + ((data[4] & 0xFF) << 8);
-//        int src = (data[3] ) + ((data[4] ) << 8);
+        //        int src = (data[3] ) + ((data[4] ) << 8);
         byte[] params = new byte[10];
 
         System.arraycopy(data, 10, params, 0, 10);
@@ -881,7 +919,8 @@ public class LightAdapter {
         this.isStarted.getAndSet(value);
     }
 
-    synchronized private void setStatus(int newStatus, boolean ignoreIdleMode, boolean ignoreStatus) {
+    synchronized private void setStatus(int newStatus, boolean ignoreIdleMode,
+                                        boolean ignoreStatus) {
         if (!ignoreIdleMode) {
             if (this.getMode() == MODE_IDLE) {
                 Log.d("Saw", "return cause MODE_IDLE");
@@ -987,27 +1026,27 @@ public class LightAdapter {
         @Override
         public void onStartedScan() {
             scanStartTime = System.currentTimeMillis();
-//            isScanStopped.set(false);
+            //            isScanStopped.set(false);
         }
 
         @Override
         public void onStoppedScan() {
-//            isScanStopped.set(true);
+            //            isScanStopped.set(true);
         }
 
         @Override
         public void onLeScan(BluetoothDevice device, int rssi, byte[] scanRecord) {
-//            TelinkLog.e("Scan : " + device.getName() + "-" + device.getAddress());
+            TelinkLog.e("Scan : " + device.getName() + "-" + device.getAddress());
 
             if (scanEmpty.get()) {
                 scanEmpty.set(false);
             }
             if (mCallback == null || getMode() == MODE_IDLE || getMode() == MODE_UPDATE_MESH)
                 return;
-//            synchronized (LightAdapter.this) {
-                if (mScannedLights.contains(device.getAddress()))
+            //            synchronized (LightAdapter.this) {
+            if (mScannedLights.contains(device.getAddress()))
                 return;
-//            }
+            //            }
             LightPeripheral light = LightAdapter.this.onLeScan(device, rssi, scanRecord);
 
             if (light == null)
@@ -1066,7 +1105,7 @@ public class LightAdapter {
 
                 LightPeripheral light = mLightCtrl.getCurrentLight();
                 login(light);
-//                Log.d("sggs", "onConnected: " + light.getMacAddress());
+                //                Log.d("sggs", "onConnected: " + light.getMacAddress());
             } else {
                 mLightCtrl.requestFirmware();
             }
@@ -1082,8 +1121,11 @@ public class LightAdapter {
             if (mode == MODE_UPDATE_MESH) {
                 setStatus(STATUS_UPDATING_MESH);
 
-                byte[] meshName = Strings.stringToBytes(mParams.getString(Parameters.PARAM_NEW_MESH_NAME), 16);
-                byte[] password = Strings.stringToBytes(mParams.getString(Parameters.PARAM_NEW_PASSWORD), 16);
+                byte[] meshName =
+                        Strings.stringToBytes(mParams.getString(Parameters.PARAM_NEW_MESH_NAME),
+                                16);
+                byte[] password =
+                        Strings.stringToBytes(mParams.getString(Parameters.PARAM_NEW_PASSWORD), 16);
                 byte[] ltk = mParams.getBytes(Parameters.PARAM_LONG_TERM_KEY);
 
                 mLightCtrl.reset(meshName, password, ltk);
@@ -1091,7 +1133,7 @@ public class LightAdapter {
             } else if (mode == MODE_AUTO_CONNECT_MESH) {
                 enableLoop(false);
                 setState(STATE_PENDING);
-//                stopLeScan();
+                //                stopLeScan();
                 mScannedLights.clear();
                 nextLightIndex.set(0);
                 lastLogoutTime = 0;
@@ -1108,7 +1150,8 @@ public class LightAdapter {
 
             } else if (mode == MODE_OTA) {
                 setState(STATE_PENDING);
-                OtaDeviceInfo otaDeviceInfo = (OtaDeviceInfo) mParams.get(Parameters.PARAM_DEVICE_LIST);
+                OtaDeviceInfo otaDeviceInfo =
+                        (OtaDeviceInfo) mParams.get(Parameters.PARAM_DEVICE_LIST);
                 mLightCtrl.startOta(otaDeviceInfo.firmware);
             }
         }
@@ -1132,9 +1175,9 @@ public class LightAdapter {
 
                 setStatus(STATUS_LOGOUT, true);
                 mScannedLights.clear();
-//                mScannedLights.removeTop();
+                //                mScannedLights.removeTop();
                 nextLightIndex.set(0);
-//                lastLogoutTime = 0;
+                //                lastLogoutTime = 0;
                 setState(STATE_RUNNING);
                 enableLoop(true);
             } else if (mode == MODE_OTA) {
@@ -1189,7 +1232,8 @@ public class LightAdapter {
         private void onCommandFailure(Command command) {
 
             if (mCallback != null)
-                mCallback.onCommandResponse(mLightCtrl.getCurrentLight(), getMode(), command, false);
+                mCallback.onCommandResponse(mLightCtrl.getCurrentLight(), getMode(), command,
+                        false);
         }
 
         @Override
@@ -1299,8 +1343,9 @@ public class LightAdapter {
 
         private void onGetDeviceMacFailure() {
             int mode = getMode();
-//            if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
-//                return;
+            //            if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode
+            //            == MODE_OTA)
+            //                return;
             setStatus(STATUS_GET_DEVICE_MAC_FAILURE, true);
         }
 
@@ -1325,6 +1370,7 @@ public class LightAdapter {
                 return;
             setStatus(STATUS_GET_FIRMWARE_COMPLETED, true);
         }
+
         private void onGetFirmwareFailure() {
             int mode = getMode();
             if (mode == MODE_UPDATE_MESH || mode == MODE_AUTO_CONNECT_MESH || mode == MODE_OTA)
@@ -1415,20 +1461,24 @@ public class LightAdapter {
         public void performed(Event<Integer> event) {
             switch (event.getType()) {
                 case LightController.LightEvent.CONNECT_ERROR_REPORT_CONNECT:
-                    reportError(ErrorReportEvent.STATE_CONNECT, ErrorReportEvent.ERROR_CONNECT_COMMON);
+                    reportError(ErrorReportEvent.STATE_CONNECT,
+                            ErrorReportEvent.ERROR_CONNECT_COMMON);
                     break;
                 case LightController.LightEvent.CONNECT_ERROR_REPORT_ATT:
                     reportError(ErrorReportEvent.STATE_CONNECT, ErrorReportEvent.ERROR_CONNECT_ATT);
                     break;
                 case LightController.LightEvent.LOGIN_ERROR_REPORT_WRITE:
 
-                    reportError(ErrorReportEvent.STATE_LOGIN, ErrorReportEvent.ERROR_LOGIN_WRITE_DATA);
+                    reportError(ErrorReportEvent.STATE_LOGIN,
+                            ErrorReportEvent.ERROR_LOGIN_WRITE_DATA);
                     break;
                 case LightController.LightEvent.LOGIN_ERROR_REPORT_READ:
-                    reportError(ErrorReportEvent.STATE_LOGIN, ErrorReportEvent.ERROR_LOGIN_READ_DATA);
+                    reportError(ErrorReportEvent.STATE_LOGIN,
+                            ErrorReportEvent.ERROR_LOGIN_READ_DATA);
                     break;
                 case LightController.LightEvent.LOGIN_ERROR_REPORT_CHECK:
-                    reportError(ErrorReportEvent.STATE_LOGIN, ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK);
+                    reportError(ErrorReportEvent.STATE_LOGIN,
+                            ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK);
                     break;
             }
         }
@@ -1532,7 +1582,7 @@ public class LightAdapter {
             }
             //只有当没有指定mac时，需要这样做。
             boolean fastestMode = mParams.getBoolean(Parameters.PARAM_FATEST_MODE);
-//            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
+            //            String scanMac = mParams.getString(Parameters.PARAM_SCAN_MAC);
             if (!fastestMode) {
                 if (System.currentTimeMillis() - autoConnectScanLastTime < (AUTO_CONNECT_SCAN_TIMEOUT_SECONDS)) {
                     return;
@@ -1540,7 +1590,7 @@ public class LightAdapter {
             }
             int count = mScannedLights.size();
             if (count <= 0) {
-//                this.checkOffLine();
+                //                this.checkOffLine();
                 return;
             }
 
@@ -1556,20 +1606,21 @@ public class LightAdapter {
             Log.d("Saw", "STATE_PENDING ");
 
             setState(STATE_PENDING);
-//            LeBluetooth.getInstance().stopScan();
-//            stopScan();
+            //            LeBluetooth.getInstance().stopScan();
+            //            stopScan();
             stopLeScan();
 
             Log.d("Saw", "stopLeScan() ");
-//            lastLogoutTime = 0;
+            //            lastLogoutTime = 0;
             int timeoutSeconds = mParams.getInt(Parameters.PARAM_TIMEOUT_SECONDS);
-//            LightPeripheral light = mScannedLights.getTop();
-//            LightPeripheral light = mScannedLights.get(0);           // 默认用的是这个
+            //            LightPeripheral light = mScannedLights.getTop();
+            //            LightPeripheral light = mScannedLights.get(0);           // 默认用的是这个
             LightPeripheral light = mScannedLights.getByMaxRssi();  //改为获取信号最好的设备，很关键的改动。
             if (light != null) {
                 Log.d("Saw", "connect(light, timeoutSeconds) ");
                 connect(light, timeoutSeconds);
-                Log.d("Saw", "connect to mac = " + light.getMacAddress() + "    rssi = " + light.getRssi());
+                Log.d("Saw",
+                        "connect to mac = " + light.getMacAddress() + "    rssi = " + light.getRssi());
             } else {
                 Log.d("Saw", "the lastest setState(STATE_RUNNING); ");
                 setState(STATE_RUNNING);
@@ -1614,7 +1665,8 @@ public class LightAdapter {
                 return false;
             }
 
-            int checkOffLineTime = mParams.getInt(Parameters.PARAM_OFFLINE_TIMEOUT_SECONDS, 0) * 1000;
+            int checkOffLineTime =
+                    mParams.getInt(Parameters.PARAM_OFFLINE_TIMEOUT_SECONDS, 0) * 1000;
 
             if (checkOffLineTime <= 0)
                 checkOffLineTime = CHECK_OFFLINE_TIME;
@@ -1656,12 +1708,14 @@ public class LightAdapter {
 
                 if (autoRefreshParams != null) {
                     int delay = autoRefreshParams.getInt(
-                            Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_DELAY, AUTO_REFRESH_NOTIFICATION_DELAY);
+                            Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_DELAY,
+                            AUTO_REFRESH_NOTIFICATION_DELAY);
                     if (delay <= 0)
                         delay = AUTO_REFRESH_NOTIFICATION_DELAY;
 
                     mLightCtrl.updateNotification();
-                    int repeat = autoRefreshParams.getInt(Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_REPEAT, 1);
+                    int repeat =
+                            autoRefreshParams.getInt(Parameters.PARAM_AUTO_REFRESH_NOTIFICATION_REPEAT, 1);
                     if (repeat > 0) {
                         int count = autoRefreshCount + 1;
 
@@ -1785,7 +1839,8 @@ public class LightAdapter {
 
             synchronized (this) {
                 for (LightPeripheral light : this.mPeripherals) {
-//                    Log.d(getClass().getSimpleName(), "light mac = " + light.getMacAddress()+ "     rssi = " + light.getRssi());
+                    //                    Log.d(getClass().getSimpleName(), "light mac = " +
+                    //                    light.getMacAddress()+ "     rssi = " + light.getRssi());
                     if (result == null || light.getRssi() > result.getRssi())
                         result = light;
                 }

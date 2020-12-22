@@ -104,7 +104,10 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     finish()
                 }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90005 -> {
+                    ToastUtils.showShort(getString(R.string.router_offline))
+                    finish()
+                }
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                 else -> ToastUtils.showShort(it.message)
             }
@@ -193,7 +196,10 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     setTimeAndOpenUI(SharedPreferencesUtils.getLastOtaTime())
                 }
                 90004 -> ToastUtils.showShort(getString(R.string.router_not_exit))
-                90001 -> ToastUtils.showShort(getString(R.string.router_offline))
+                90001 -> {
+                    ToastUtils.showShort(getString(R.string.router_offline))
+                    finish()
+                }
                 90029 -> ToastUtils.showShort(getString(R.string.router_version_error))
             }
         }, {
@@ -207,30 +213,30 @@ class RouterOtaActivity : TelinkBaseActivity() {
         when {
             meshAddrs.isEmpty() -> ToastUtils.showShort(getString(R.string.no_can_ota_device))
             else -> RouterModel.toDevicesOTA(meshAddrs, deviceType, currentTimeMillis1, 1, "routerSingle")?.subscribe({
-                    LogUtils.v("zcl---收到路由升级请求---deviceMeshAddress$deviceMeshAddress--time$currentTimeMillis1--deviceTye${deviceType}--$it")
-                    when (it.errorCode) {
-                        0 -> {
-                            isOtaing = true
-                            ToastUtils.showShort(getString(R.string.ota_update_title))
-                            router_ota_start.text = getString(R.string.stop_ota)
-                            otaCount = 0
-                            router_ota_wave_progress_bar?.value = 0f
-                            setTimeAndOpenUI(currentTimeMillis1)
-                        } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
-                        90999 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
-                            isOtaing = false
-                            goScanning()
-                        }
-                        90998 -> {//OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
-                            isOtaing = true
-                            ToastUtils.showShort(getString(R.string.ota_update_title))
-                            setTimeAndOpenUI(SharedPreferencesUtils.getLastOtaTime())
-                        }
-                        else -> ToastUtils.showShort(it.message)
+                LogUtils.v("zcl---收到路由升级请求---deviceMeshAddress$deviceMeshAddress--time$currentTimeMillis1--deviceTye${deviceType}--$it")
+                when (it.errorCode) {
+                    0 -> {
+                        isOtaing = true
+                        ToastUtils.showShort(getString(R.string.ota_update_title))
+                        router_ota_start.text = getString(R.string.stop_ota)
+                        otaCount = 0
+                        router_ota_wave_progress_bar?.value = 0f
+                        setTimeAndOpenUI(currentTimeMillis1)
+                    } //比如扫描时杀掉APP后恢复至扫描页面，OTA时杀掉APP后恢复至OTA等待
+                    90999 -> {//扫描中不能OTA，请稍后。请尝试获取路由模式下状态以恢复上次扫描
+                        isOtaing = false
+                        goScanning()
                     }
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
+                    90998 -> {//OTA中，不能再次进行OTA。请尝试获取路由模式下状态以恢复上次OTA
+                        isOtaing = true
+                        ToastUtils.showShort(getString(R.string.ota_update_title))
+                        setTimeAndOpenUI(SharedPreferencesUtils.getLastOtaTime())
+                    }
+                    else -> ToastUtils.showShort(it.message)
+                }
+            }, {
+                ToastUtils.showShort(it.message)
+            })
         }
     }
 

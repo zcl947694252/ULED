@@ -10,6 +10,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight
+import org.jetbrains.anko.textColor
 
 
 /**
@@ -66,6 +67,8 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRout
             if (routerByMac != null && routerByMac.size >= 1) {
                 groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE
+                groupName.textColor = mContext.getColor(R.color.blue_text)
+                helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.black_three))
             } else groupName.visibility = View.GONE
         }
     }

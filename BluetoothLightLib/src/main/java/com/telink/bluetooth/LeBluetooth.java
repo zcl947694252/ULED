@@ -20,6 +20,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.telink.TelinkApplication;
 import com.telink.util.ContextUtil;
 
 import java.util.List;
@@ -107,25 +108,20 @@ public final class LeBluetooth extends BluetoothGattCallback {
      */
     public void setLeScanCallback(LeScanCallback callback) {
         this.mCallback = callback;
-
-        if (mCallback == null) return;
-
-        if (this.isSupportLollipop()) {
+        if (mCallback == null)
+            return;
+        TelinkLog.d("isSupportLollipop--设置回调函数"+isSupportLollipop());
+      //  if (this.isSupportLollipop()) {
             this.mScanCallback = new ScanCallback() {
-
                 @Override
                 public void onScanResult(int callbackType, ScanResult result) {
                     if (isSupportLollipop()) {
                         byte[] scanRecord = null;
-
                         if (result.getScanRecord() != null)
                             scanRecord = result.getScanRecord().getBytes();
                         if (mCallback != null)
                             mCallback.onLeScan(result.getDevice(), result.getRssi(), scanRecord);
-
-                       // LogUtils.v("Saw蓝牙数据扫描","result.getScanRecord() = " + result.getScanRecord() + ", mCallback = " + mCallback);
                     }
-
                     if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
                         mDelayHandler.removeCallbacks(mLocationCheckTask);
                     }
@@ -139,7 +135,7 @@ public final class LeBluetooth extends BluetoothGattCallback {
                             mCallback.onScanFail(LeBluetooth.SCAN_FAILED_FEATURE_UNSUPPORTED);
                 }
             };
-        } else {
+       // } else {
             this.mLeScanCallback = (device, rssi, scanRecord) -> {
                 if (mCallback != null)
                     mCallback.onLeScan(device, rssi, scanRecord);
@@ -148,7 +144,7 @@ public final class LeBluetooth extends BluetoothGattCallback {
                     mDelayHandler.removeCallbacks(mLocationCheckTask);
                 }
             };
-        }
+      //  }
     }
 
     /**
@@ -210,20 +206,23 @@ public final class LeBluetooth extends BluetoothGattCallback {
         } else {
             ScanSettings.Builder scanSettingsBuilder = new ScanSettings.Builder();
             if (Build.VERSION.SDK_INT >= 23) {
-//                    scanSettingsBuilder.setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES);
+                //                    scanSettingsBuilder.setCallbackType(ScanSettings
+                //                    .CALLBACK_TYPE_ALL_MATCHES);
                 scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_MODE_AGGRESSIVE);
-//                    scanSettingsBuilder.setMatchMode(ScanSettings.MATCH_NUM_FEW_ADVERTISEMENT);
+                //                    scanSettingsBuilder.setMatchMode(ScanSettings
+                //                    .MATCH_NUM_FEW_ADVERTISEMENT);
             }
             //scanSettingsBuilder .setScanMode(ScanSettings.SCAN_MODE_BALANCED);
             scanSettingsBuilder.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);//低延迟
-//                                .setNumOfMatches(5)
+            //                                .setNumOfMatches(5)
             ScanSettings scanSettings = scanSettingsBuilder.build();
-//                mScanner.startScan(mScanCallback);
+            //                mScanner.startScan(mScanCallback);
             mScanner.startScan(scanFilters, scanSettings, mScanCallback);
             for (int i = 0; i < scanFilters.size(); i++) {
 
             }
-            Log.d("Saw", "mScanner.startScan  scanFilters = " + scanFilters + ", mScanCallback = " + mScanCallback);
+            Log.d("Saw", "mScanner.startScan  scanFilters = " + scanFilters + ", mScanCallback = "
+                    + mScanCallback);
             synchronized (this) {
                 mScanning = true;
             }
@@ -247,7 +246,7 @@ public final class LeBluetooth extends BluetoothGattCallback {
                 if (mCallback != null)
                     mCallback.onScanFail(SCAN_FAILED_FEATURE_UNSUPPORTED);
 
-               // Log.d("Saw", "######## mScanner = null, mCallback =  " + mScanCallback);
+                // Log.d("Saw", "######## mScanner = null, mCallback =  " + mScanCallback);
             } else {
                 //Log.d("Saw", "######## mScanner.startScan(mScanCallback) = " + mScanCallback);
                 mScanner.startScan(mScanCallback);
@@ -258,8 +257,8 @@ public final class LeBluetooth extends BluetoothGattCallback {
             }
 
         } else {
-            if (!mAdapter.startLeScan(serviceUUIDs,
-                    mLeScanCallback)) {
+            boolean b = mAdapter.startLeScan(serviceUUIDs, mLeScanCallback);
+            if (!b) {
                 synchronized (this) {
                     mScanning = false;
                 }
@@ -275,13 +274,21 @@ public final class LeBluetooth extends BluetoothGattCallback {
     }
 
     public boolean isSupportLollipop() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mSupportLoScan;
-//        return false;
+        TelinkLog.v("zcl-----------isSupportLollipop-----isConnect--" + TelinkApplication.getInstance().isConnect);
+        if (TelinkApplication.getInstance().isConnect) {
+            TelinkLog.v("zcl-----------isSupportLollipop--isNew-----" + TelinkApplication.getInstance().isNew);
+            if (TelinkApplication.getInstance().isNew)
+                return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mSupportLoScan;
+            else
+                return false;
+        } else
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mSupportLoScan;
+
     }
 
     public boolean isSupportM() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-//        return false;
+        //        return false;
     }
 
     /**

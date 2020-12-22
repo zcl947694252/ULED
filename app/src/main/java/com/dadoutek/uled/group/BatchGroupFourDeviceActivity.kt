@@ -1011,7 +1011,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
                         hideLoadingDialog()
                         currentGroup!!.meshAddr
-                        batchList.forEach { it1 ->
+                        //batchList.forEach { it1 ->
+                        bean.succeedNow.forEach { it1 ->
                             when (deviceType) {
                                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                                     listGroup.forEach {

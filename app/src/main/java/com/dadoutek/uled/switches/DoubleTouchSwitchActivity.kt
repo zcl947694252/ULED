@@ -89,9 +89,9 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             toolbarTv.text = switchDate?.name
             switchDate?.let {
                 val stringToList = GsonUtil.stringToList<Double>(it.controlGroupAddrs)
-                if (stringToList == null /*|| stringToList.size < 2*/) {
-                    ToastUtils.showShort(getString(R.string.invalid_data))
-                    finish()
+                if (stringToList == null || stringToList.size < 2) {
+                    //ToastUtils.showShort(getString(R.string.invalid_data))
+                   //finish()
                 } else {
                     if (stringToList.size >= 2) {
                         val meshL = stringToList[0]

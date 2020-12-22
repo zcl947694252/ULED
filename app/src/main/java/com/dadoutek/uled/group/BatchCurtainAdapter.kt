@@ -10,6 +10,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbCurtain
+import org.jetbrains.anko.textColor
 
 
 /**
@@ -57,6 +58,8 @@ class BatchCurtainAdapter(layoutResId: Int, data: MutableList<DbCurtain>, var is
             LogUtils.v("zcl-----------获取路由名称---${item?.boundMac ?: ""}----${routerByMac!![0].name}")
                 groupName.text = routerByMac[0].name
                 groupName.visibility = View.VISIBLE
+                groupName.textColor = mContext.getColor(R.color.blue_text)
+                helper.setTextColor(R.id.template_device_batch_title, mContext.getColor(R.color.black_three))
             } else groupName.visibility = View.GONE
         }
     }

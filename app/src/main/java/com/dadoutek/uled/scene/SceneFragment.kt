@@ -204,6 +204,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun showDeleteSingleDialog(dbScene: DbScene) {
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
+        TelinkLightService.Instance()?.idleMode(true)
         builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
             val id = dbScene.id!!
             val list = DBUtils.getActionsBySceneId(id)
@@ -239,8 +240,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
-        disposableRouteTimer?.dispose()
         val i = it?.timeout ?: 0
+        disposableRouteTimer?.dispose()
         disposableRouteTimer = Observable.timer(i.toLong()+2L, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

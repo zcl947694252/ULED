@@ -36,7 +36,6 @@ class SyncDataPutOrGetUtils {
         /********************************同步数据之上传数据 */
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
-
             Thread {
                 val dbDataChangeList = DBUtils.dataChangeAll
                 val dbUser = DBUtils.lastUser
@@ -219,6 +218,7 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
+                                LogUtils.v("zcl-----------上传数据传感器-------$sensor")
                                 return sensor?.let { SensorMdodel.add(token, it, id, changeId) }
                             }
                             Constant.DB_DELETE -> {
@@ -226,6 +226,7 @@ class SyncDataPutOrGetUtils {
                             }
                             Constant.DB_UPDATE -> {
                                 val sensor = DBUtils.getSensorByID(changeId)
+                                LogUtils.v("zcl-----------上传数据更新传感器-------$sensor")
                                 sensor?.let { return SensorMdodel.update(token, sensor, changeId.toInt(), id) }
                             }
                         }
@@ -368,7 +369,7 @@ class SyncDataPutOrGetUtils {
         fun syncGetDataStart(dbUser: DbUser, syncCallBack: SyncCallback) {
             val token = dbUser.token
             DBUtils.saveUser(dbUser)
-           // DBUtils.deleteLocalData()
+            // DBUtils.deleteLocalData()
             startGet(token, dbUser.account, syncCallBack)
         }
 
@@ -422,7 +423,8 @@ class SyncDataPutOrGetUtils {
                     .flatMap {
                         for (item in it) {
                             DBUtils.saveLight(item, true)//一定不能设置成true否则会造成数据过大oom
-                            LogUtils.v("zcl------调节开关拉取新数据----------$item--")
+                            if (item.productUUID == 6)
+                                LogUtils.v("zcl------调节开关拉取新数据----${item.color shr 24}------$item--")
                         }
                         NetworkFactory.getApi()
                                 .gwList
@@ -449,6 +451,7 @@ class SyncDataPutOrGetUtils {
                                 .compose(NetworkTransformer())
                     }
                     .flatMap {
+                        LogUtils.v("zcl-----------服务器下拉传感器-------$it")
                         for (item in it) {
                             DBUtils.saveSensor(item, true)
                         }
@@ -488,7 +491,7 @@ class SyncDataPutOrGetUtils {
                                 .compose(NetworkTransformer())
                     }.flatMap {
                         for (item in it) {
-                                DBUtils.saveGroup(item, true)
+                            DBUtils.saveGroup(item, true)
                         }
                         NetworkFactory.getApi()
                                 .getSceneList(token)
@@ -503,13 +506,13 @@ class SyncDataPutOrGetUtils {
                                 //("是不是空的2"+item.id)
                                 DBUtils.saveSceneActions(item.actions[i], item.id)
                             }
-                            LogUtils.v("zcl--------获取服务器场景---${item.name}----------${item.actions}------${DBUtils.getActionsBySceneId(item!!.id)}-")
                         }
                     }
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
                             {
                                 //登录后同步数据完成再上传一次数据
-                                syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
+                                if (!Constant.IS_ROUTE_MODE)
+                                    syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
                                 SharedPreferencesUtils.saveCurrentUserList(accountNow)
                                 GlobalScope.launch(Dispatchers.Main) {
                                     syncCallBack.complete()

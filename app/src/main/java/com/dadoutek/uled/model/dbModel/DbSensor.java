@@ -1,5 +1,6 @@
 package com.dadoutek.uled.model.dbModel;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.telink.bluetooth.light.ConnectionStatus;
 
@@ -28,7 +29,7 @@ public class DbSensor implements Serializable {
     private Long belongGroupId;
     private String version = "";
     public int rssi =1000;
-    private int openTag = 1; //1代表开 0代表关
+    private int status = 1; //1代表开 0代表关
     private int setType = 1; //0代表群组模式 1代表场景模式
     private int sceneId = 0; //场景id
     private String boundMac ="";
@@ -44,11 +45,10 @@ public class DbSensor implements Serializable {
     public String list ="";
     public boolean isGetVersion= false;
 
-
-    @Generated(hash = 1466174835)
+    @Generated(hash = 853875879)
     public DbSensor(Long id, int meshAddr, String name, String controlGroupAddr,
             String macAddr, int productUUID, int index, Long belongGroupId,
-            String version, int rssi, int openTag, int setType, int sceneId,
+            String version, int rssi, int status, int setType, int sceneId,
             String boundMac, String boundMacName, Boolean isChecked,
             boolean selected, boolean isMostNew, boolean isSupportOta,
             int belongRegionId, int uid, String list, boolean isGetVersion) {
@@ -62,7 +62,7 @@ public class DbSensor implements Serializable {
         this.belongGroupId = belongGroupId;
         this.version = version;
         this.rssi = rssi;
-        this.openTag = openTag;
+        this.status = status;
         this.setType = setType;
         this.sceneId = sceneId;
         this.boundMac = boundMac;
@@ -81,6 +81,13 @@ public class DbSensor implements Serializable {
     public DbSensor() {
     }
 
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
 
     public boolean isGetVersion() {
         return isGetVersion;
@@ -114,22 +121,15 @@ public class DbSensor implements Serializable {
     }
 
     public void updateIcon() {
-        if (this.openTag == ConnectionStatus.OFFLINE.getValue()) {
+        if (this.status == ConnectionStatus.OFFLINE.getValue()) {
             this.icon = R.drawable.icon_sensor;
-        } else if (this.openTag == ConnectionStatus.OFF.getValue()) {
+        } else if (this.status == ConnectionStatus.OFF.getValue()) {
             this.icon = R.drawable.icon_sensor_close;
-        } else if (this.openTag == ConnectionStatus.ON.getValue()) {
+        } else if (this.status == ConnectionStatus.ON.getValue()) {
             this.icon = R.drawable.icon_sensor;
         }
     }
 
-    public int getOpenTag() {
-        return openTag;
-    }
-
-    public void setOpenTag(int openTag) {
-        this.openTag = openTag;
-    }
 
     public Long getId() {
         return this.id;
@@ -189,6 +189,7 @@ public class DbSensor implements Serializable {
     }
 
     public void setVersion(String version) {
+        LogUtils.v("zcl-----------保存版本数据-------"+version);
         this.version = version;
     }
 
@@ -221,7 +222,7 @@ public class DbSensor implements Serializable {
                 ", belongGroupId=" + belongGroupId +
                 ", version='" + version + '\'' +
                 ", rssi=" + rssi +
-                ", openTag=" + openTag +
+                ", status=" + status +
                 ", setType=" + setType +
                 ", sceneId=" + sceneId +
                 ", icon=" + icon +

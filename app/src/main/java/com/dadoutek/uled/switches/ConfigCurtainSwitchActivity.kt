@@ -95,6 +95,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     }
 
     override fun goOta() {
+        if (isReConfig)
+            mDeviceInfo.boundMac = switchDate?.boundMac
         deviceOta(mDeviceInfo)
     }
 

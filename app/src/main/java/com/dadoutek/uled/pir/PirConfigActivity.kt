@@ -495,7 +495,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
                 LogUtils.v("zcl-----------收到路由连接传感器成功-------$cmdBean")
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.config_success))
-                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                    //SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 } else {
                     ToastUtils.showShort(getString(R.string.config_fail))
@@ -553,7 +553,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         if (TextUtils.isEmpty(version))
             version = mDeviceInfo!!.firmwareRevision
         dbSensor.version = version
-        dbSensor.openTag = mDeviceInfo!!.openTag
+        dbSensor.status = mDeviceInfo!!.openTag
         if (!isReConfirm)
             dbSensor.productUUID = mDeviceInfo!!.productUUID
         else
@@ -693,6 +693,10 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
             isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
                 if (Constant.IS_ROUTE_MODE) {
+                    if (TextUtils.isEmpty(currentSensor?.boundMac)){
+                        ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        return
+                    }
                     startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
                             "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr, "version" to currentSensor!!.version)
                     finish()

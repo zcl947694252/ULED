@@ -10,14 +10,13 @@ import com.dadoutek.uled.gateway.bean.DbRouter
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import kotlin.collections.ArrayList
 
 /**
  * Created by hejiajun on 2018/5/18.
  */
 
 object DBUtils {
-
+    private var lastClickTime: Long = 0
     val lastUser: DbUser?
         get() {
             val list = DaoSessionInstance.getInstance().dbUserDao.queryBuilder().orderDesc(DbUserDao.Properties.Id).list()
@@ -896,6 +895,16 @@ object DBUtils {
         }
     }
 
+
+    fun isFastDoubleClick( delay: Int =500): Boolean {
+                val time = System.currentTimeMillis()
+                if (time - lastClickTime < delay) {
+                    return true
+                }
+                lastClickTime = time
+                return false
+            }
+
     fun saveCurtain(db: DbCurtain, isFromServer: Boolean) {
         LogUtils.e("zcl保存分组前curtain-------------${DBUtils.getAllCurtains().size}")
         val existList = DaoSessionInstance.getInstance().dbCurtainDao.queryBuilder().where(DbCurtainDao.Properties.MeshAddr.eq(db.meshAddr)).list()
@@ -1009,6 +1018,8 @@ object DBUtils {
         actions.color = sceneActions.color
         actions.deviceType = sceneActions.deviceType
         actions.isOn = sceneActions.isOn
+        actions.isEnableBright = sceneActions.isEnableBright
+        actions.isEnableWhiteBright = sceneActions.isEnableWhiteBright
         actions.rgbType = sceneActions.rgbType
         actions.gradientId = sceneActions.gradientId
         actions.gradientType = sceneActions.gradientType
@@ -1283,6 +1294,12 @@ object DBUtils {
     fun deleteAllSensorAndSwitch() {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
+    }
+    fun deleteColorNodeAll() {
+        DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
+    }
+    fun deleteDiyGradientAll() {
+        DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
     }
     fun deleteAllSwitch() {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()

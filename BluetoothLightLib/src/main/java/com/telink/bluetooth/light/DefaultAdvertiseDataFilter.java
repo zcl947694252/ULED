@@ -78,7 +78,7 @@ public final class DefaultAdvertiseDataFilter implements AdvertiseDataFilter<Lig
                             }
                         }
                     }
-
+                    //TelinkLog.d(" scan mesh name service = "+ Arrays.bytesToString(meshName));
                     LightPeripheral light = new LightPeripheral(device, scanRecord, rssi, meshName, meshAddress,version);
                     light.putAdvProperty(LightPeripheral.ADV_MESH_NAME, meshName);
                     light.putAdvProperty(LightPeripheral.ADV_MESH_ADDRESS, meshAddress);

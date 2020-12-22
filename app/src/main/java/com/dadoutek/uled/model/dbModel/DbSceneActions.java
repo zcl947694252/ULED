@@ -21,7 +21,7 @@ public class DbSceneActions {
     private int colorTemperature;
     @NotNull
     private int brightness;
-    public int color=0;//颜色;
+    public int color=855638015;//颜色;
 
     private boolean isOn = true;
     private boolean isEnableBright = true;
@@ -207,22 +207,6 @@ public class DbSceneActions {
 
     public void setCircleFour(int circleFour) {
         this.circleFour = circleFour;
-    }
-
-    public boolean isEnableBright() {
-        return isEnableBright;
-    }
-
-    public void setEnableBright(boolean enableBright) {
-        isEnableBright = enableBright;
-    }
-
-    public boolean isEnableWhiteBright() {
-        return isEnableWhiteBright;
-    }
-
-    public void setEnableWhiteBright(boolean enableWhiteBright) {
-        isEnableWhiteBright = enableWhiteBright;
     }
 
     public boolean getIsEnableBright() {

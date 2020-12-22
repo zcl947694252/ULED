@@ -100,6 +100,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         speedSeekbar = helper.getView(R.id.speed_seekbar)
         algText = helper.getView(R.id.alg_text)
 
+        var docOneLy = helper.getView<RelativeLayout>(R.id.dot_one_ly)
         var docOne = helper.getView<Dot>(R.id.dot_one)
         var dotRgb = helper.getView<ImageView>(R.id.dot_rgb)
 
@@ -122,21 +123,21 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         cbTotal.isChecked = item.isOn
         cbBright.isChecked = item.isEnableBright
-        cbWhiteLight.isChecked = item.isEnableWhiteLight
+        cbWhiteLight.isChecked = item.isEnableWhiteBright
         var w = (item?.color and 0xff000000.toInt()) shr 24
         var r = Color.red(item?.color!!)
         var g = Color.green(item?.color!!)
         var b = Color.blue(item?.color!!)
         //0x4FFFE0  不在使用  使用0来判断
         docOne.setChecked(true, if (r == 0 && g == 0 && b == 0) {
-            docOne.visibility = View.GONE
+            docOneLy.visibility = View.GONE
             dotRgb.visibility = View.VISIBLE
             TelinkLightApplication.getApp().resources.getColor(R.color.primary)
         } else {
             //0xff0000 shl 8 就是左移八位 转换为0xff000000 左移n位，指 按2进制的位 左移n位， （等于 乘 2的n次方），超出最高位的数则丢掉。 比如0xff000000
             //右移n位，指 按2进制的 位 右移n位， （等于 除以 2的n次方），低于最低位的数则丢掉 。
             //位与是指两个二进制数按对应的位上的两个二进制数相乘，口诀是有0出0，11出1，如10 & 01=00。
-            docOne.visibility = View.VISIBLE
+            docOneLy.visibility = View.VISIBLE
             dotRgb.visibility = View.GONE
             (0x00ff0000 shl 8) or (item.color and 0xffffff)
         })
@@ -174,7 +175,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                             }
                         }
                         when {
-                            item.isEnableWhiteLight -> {
+                            item.isEnableWhiteBright -> {
                                 sbWhiteLightRGB.isEnabled = true
                                 addWhiteLightRGB.isEnabled = true
                                 lessWhiteLightRGB.isEnabled = true
@@ -241,7 +242,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         }
 
         helper.addOnClickListener(R.id.btn_delete)
-                .addOnClickListener(R.id.dot_one)
+                .addOnClickListener(R.id.dot_one_ly)
                 .addOnClickListener(R.id.dot_rgb)
                 .addOnClickListener(R.id.sbBrightness_add)
                 .addOnClickListener(R.id.rg_xx)
@@ -331,7 +332,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
-                        .setGone(R.id.dot_one, false)
+                        .setGone(R.id.dot_one_ly, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -346,7 +347,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
-                        .setGone(R.id.dot_one, false)
+                        .setGone(R.id.dot_one_ly, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -370,7 +371,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
-                        .setGone(R.id.dot_one, false)
+                        .setGone(R.id.dot_one_ly, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -391,7 +392,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 helper.setGone(R.id.oval, true)
                         .setGone(R.id.tv_select_color, false)
                         .setGone(R.id.dot_rgb, false)
-                        .setGone(R.id.dot_one, false)
+                        .setGone(R.id.dot_one_ly, false)
                         .setGone(R.id.rgb_scene, false)
                         .setGone(R.id.top_rg_ly, false)
                         .setGone(R.id.alg_ly, false)
@@ -405,11 +406,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         val currentTime = System.currentTimeMillis()
         val position = seekBar.tag as Int
-
+        LogUtils.v("zcl-------进度条pos-----------$position")
         currentSeekBar = seekBar
         seekBarprogress = progress
         currentPostion = position
-        if (fromUser && !Constant.IS_ROUTE_MODE)
+        if (fromUser /*&& !Constant.IS_ROUTE_MODE*/)
             changeTextView(seekBar, progress, position)
 
         if (currentTime - this.preTime > this.delayTime) {
@@ -669,8 +670,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     @SuppressLint("CheckResult")
     open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
         LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
-        var isEnableBright = if (brightness==0) 0 else 1
-        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness,isEnableBright, serId)?.subscribe({
+        var isEnableBright = if (brightness == 0) 0 else 1
+        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, isEnableBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it)
@@ -688,8 +689,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         val green = (gpColor and 0x00ff00) shr 8
         val blue = gpColor and 0x0000ff
         var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
-        var isEnableWhiteBright =  if (white ==0) 0 else 1
-        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright,serId)?.subscribe({
+        var isEnableWhiteBright = if (white == 0) 0 else 1
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it)
@@ -748,8 +749,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                        7 -> hAddWhite(currentPostion, data)
                        8 -> hLesswihte(currentPostion, data)
                    }*/
-                if (currentSeekBar != null)
-                    changeTextView(currentSeekBar!!, seekBarprogress, currentPostion)
+                //if (currentSeekBar != null)
+                 //   changeTextView(currentSeekBar!!, seekBarprogress, currentPostion)
                 hideLoadingDialog()
             }
             else -> {
@@ -1631,29 +1632,28 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp()
             else -> GlobalScope.launch { sendCmd(opcode, address, seekBar.progress) }
         }
-        notifyItemRangeChanged(seekBar.tag as Int,data.size)
+        notifyItemRangeChanged(seekBar.tag as Int, data.size)
     }
 
     @SuppressLint("SetTextI18n")
     fun changeTextView(seekBar: SeekBar, progress: Int, position: Int) {
         when (seekBar.id) {
             R.id.normal_sbBrightness -> {
-                data[position].brightness = progress
-             /*   val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
-                if (tvBrightness != null) {
-                    data[position].brightness = progress
-                    tvBrightness?.text = "$progress%"
-                }*/
-                notifyItemRangeChanged(position,data.size)
+                LogUtils.v("zcl--进度条-----position$position----------")
+                val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
+                   if (tvBrightness != null) {
+                     //  data[position].brightness = progress
+                       tvBrightness?.text = "$progress%"
+                   }
+                //notifyItemRangeChanged(position, data.size)
             }
             R.id.normal_temperature -> {
-                data[position].temperature = progress
-                /*   val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
+                   val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
                 if (tvTemperature != null) {
                     tvTemperature?.text = "$progress%"
-                    data[position].temperature = progress
-                }*/
-                notifyItemRangeChanged(position,data.size)
+                   // data[position].temperature = progress
+                }
+                //notifyItemRangeChanged(position, data.size)
             }
             R.id.rgb_sbBrightness -> {
                 val tvBrightnessRGB = getViewByPosition(position, R.id.sbBrightness_num) as TextView?

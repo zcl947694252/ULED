@@ -2,6 +2,7 @@ package com.dadoutek.uled.model.dbModel;
 
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -18,6 +19,19 @@ public class DbSensorChild implements Serializable {
     private int productUUID;
     private int index;
     private Long belongGroupId;
+    @Nullable
+    public String version;
+    public int status;
+
+    @Nullable
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(@Nullable String version) {
+        this.version = version;
+    }
+
     @Generated(hash = 82280314)
     public DbSensorChild(Long id, int meshAddr, String name, String controlGroupAddr,
                     String macAddr, int productUUID, int index, Long belongGroupId) {
@@ -81,4 +95,5 @@ public class DbSensorChild implements Serializable {
     public void setBelongGroupId(Long belongGroupId) {
         this.belongGroupId = belongGroupId;
     }
+
 }

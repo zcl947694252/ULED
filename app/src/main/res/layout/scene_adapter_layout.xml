@@ -4,7 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/black_ee">
+        android:background="@color/gray">
 
     <LinearLayout
             android:layout_width="match_parent"
@@ -135,12 +135,20 @@
                         android:layout_marginStart="5dp"
                         android:src="@drawable/icon_rgb"
                         android:visibility="visible" />
+                <RelativeLayout
+                        android:id="@+id/dot_one_ly"
+                        android:layout_width="27dp"
+                        android:layout_height="27dp"
+                        android:background="@color/gray_c"
+                        android:gravity="center">
+                    <com.dadoutek.uled.util.Dot
+                            android:id="@+id/dot_one"
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:background="@color/red_error"
+                            android:visibility="visible" />
+                </RelativeLayout>
 
-                <com.dadoutek.uled.util.Dot
-                        android:id="@+id/dot_one"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:visibility="visible" />
             </LinearLayout>
 
         </LinearLayout>

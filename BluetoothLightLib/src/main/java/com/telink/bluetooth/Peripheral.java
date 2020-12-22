@@ -1052,7 +1052,7 @@ import static java.lang.String.valueOf;
                                     17] + (char) scanRecord[i + 18]
                                     + (char) scanRecord[i + 19] + (char) scanRecord[i + 20] +
                                     (char) scanRecord[i + 21];*/
-                            LogUtils.v("zcl------TelinkBluetoothSDK-----获取广播版本-------" + version + "--" + Arrays.bytesToHexString(scanRecord, ","));
+                            LogUtils.v("zcl------TelinkBluetoothSDK-----首页相关获取广播版本-------" + version + "--" + Arrays.bytesToHexString(scanRecord, ","));
                         }
                     }
                 }

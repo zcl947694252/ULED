@@ -13,6 +13,7 @@ data class CmdBodyBean(
     val meshAddr: Int,
     val success: Boolean,
     val reportTimeout: Int,
+    val timeout: Int,
     val version: String
 ):Serializable{
     override fun toString(): String {

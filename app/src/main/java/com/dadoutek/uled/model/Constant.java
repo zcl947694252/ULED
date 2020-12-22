@@ -164,7 +164,7 @@ public class Constant implements Serializable {
 
     public static String DEVICE_TYPE = "DEVICE_TYPE";
     public static String IS_GP = "IS_GP";
-
+    public static final String IS_NEW_START_SCAN = "IS_NEW_START_SCAN";
 
     //管理权限本地保存key
     public static int SWITCH_PIR_ADDRESS = 0xFF;

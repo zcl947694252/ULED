@@ -409,7 +409,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
     private void updateSuccess() {
         doFinish();
         text_info.setVisibility(View.VISIBLE);
-        text_info.setText(getString(R.string.updateSuccess) + lightVersion);
+        text_info.setText(getString(R.string.updateSuccess));
         open_device.setText(lightVersion);
         btn_start_update.setVisibility(View.GONE);
         btn_start_update.setClickable(true);

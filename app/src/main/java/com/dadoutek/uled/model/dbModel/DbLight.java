@@ -1,5 +1,6 @@
 package com.dadoutek.uled.model.dbModel;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.google.gson.annotations.Expose;
 import com.telink.bluetooth.light.ConnectionStatus;
@@ -61,17 +62,17 @@ public class DbLight implements Serializable {
     public int belongRegionId =0;
     public int uid =0;
 
-    public int isEnableWhiteLight = 1;
+    public int isEnableWhiteBright = 1;
     public int isEnableBright = 1;
 
-    @Generated(hash = 122297461)
+    @Generated(hash = 697736828)
     public DbLight(Long id, int meshAddr, String name, String groupName,
             int brightness, int colorTemperature, String macAddr, String sixMac,
             int meshUUID, int productUUID, Long belongGroupId, int index,
             String boundMac, int color, String version, String boundMacName,
             int status, int rssi, boolean isSupportOta, boolean isMostNew,
             boolean isGetVersion, int belongRegionId, int uid,
-            int isEnableWhiteLight, int isEnableBright) {
+            int isEnableWhiteBright, int isEnableBright) {
         this.id = id;
         this.meshAddr = meshAddr;
         this.name = name;
@@ -95,7 +96,7 @@ public class DbLight implements Serializable {
         this.isGetVersion = isGetVersion;
         this.belongRegionId = belongRegionId;
         this.uid = uid;
-        this.isEnableWhiteLight = isEnableWhiteLight;
+        this.isEnableWhiteBright = isEnableWhiteBright;
         this.isEnableBright = isEnableBright;
     }
 
@@ -103,16 +104,16 @@ public class DbLight implements Serializable {
     public DbLight() {
     }
 
-    public int getIsEnableWhiteLight() {
-        return isEnableWhiteLight;
+    public int getIsEnableWhiteBright() {
+        return isEnableWhiteBright;
+    }
+
+    public void setIsEnableWhiteBright(int isEnableWhiteBright) {
+        this.isEnableWhiteBright = isEnableWhiteBright;
     }
 
     public int getIsEnableBright() {
         return isEnableBright;
-    }
-
-    public void setIsEnableWhiteLight(int isEnableWhiteLight) {
-        this.isEnableWhiteLight = isEnableWhiteLight;
     }
 
     public void setIsEnableBright(int isEnableBright) {
@@ -199,6 +200,8 @@ public class DbLight implements Serializable {
     }
 
     public void setBrightness(int brightness) {
+        if (brightness==0||brightness==1)
+            LogUtils.v("zcl-----------调节开关输出错误-------");
         this.brightness = brightness;
     }
 
@@ -369,7 +372,7 @@ public class DbLight implements Serializable {
                 ", isGetVersion=" + isGetVersion +
                 ", belongRegionId=" + belongRegionId +
                 ", uid=" + uid +
-                ", isEnableWhiteLight=" + isEnableWhiteLight +
+                ", isEnableWhiteBright=" + isEnableWhiteBright +
                 ", isEnableBright=" + isEnableBright +
                 '}';
     }

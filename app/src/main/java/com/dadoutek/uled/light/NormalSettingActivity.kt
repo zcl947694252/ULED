@@ -1516,6 +1516,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             else -> {
                 when {
                     Constant.IS_ROUTE_MODE -> {
+                        if (TextUtils.isEmpty(light?.boundMac)){
+                            ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            return
+                        }
                         startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr, "deviceType" to DeviceType.LIGHT_NORMAL,
                                 "deviceMac" to light!!.macAddr, "version" to light!!.version)
                         finish()

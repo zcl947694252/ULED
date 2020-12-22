@@ -86,6 +86,19 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             false
         }
 
+        when {
+            Constant.IS_OPEN_AUXFUN -> {
+                ll_r.visibility = View.VISIBLE
+                ll_b.visibility = View.VISIBLE
+                ll_g.visibility = View.VISIBLE
+            }
+            else -> {
+                ll_r.visibility = View.GONE
+                ll_b.visibility = View.GONE
+                ll_g.visibility = View.GONE
+            }
+        }
+
         ll_r.setOnClickListener(this)
         ll_b.setOnClickListener(this)
         ll_g.setOnClickListener(this)
@@ -363,14 +376,11 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private val barChangeListener = object : SeekBar.OnSeekBarChangeListener {
-
         private var preTime: Long = 0
         private val delayTime = Constant.MAX_SCROLL_DELAY_VALUE
-
         override fun onStopTrackingTouch(seekBar: SeekBar) {
             stopTracking = true
             this.onValueChange(seekBar, seekBar.progress, true)
-            //("seekBarstop" + seekBar.progress)
         }
 
         override fun onStartTrackingTouch(seekBar: SeekBar) {
@@ -379,10 +389,8 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
             this.onValueChange(seekBar, seekBar.progress, true)
         }
 
-        override fun onProgressChanged(seekBar: SeekBar, progress: Int,
-                                       fromUser: Boolean) {
+        override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             val currentTime = System.currentTimeMillis()
-
             if (currentTime - this.preTime > this.delayTime) {
                 this.onValueChange(seekBar, progress, true)
                 this.preTime = currentTime
@@ -391,9 +399,7 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
 
         @SuppressLint("StringFormatInvalid")
         private fun onValueChange(view: View, progress: Int, immediate: Boolean) {
-
             var addr = itemGroup!!.groupAddress
-
             val opcode: Byte
             val params: ByteArray
 
@@ -406,8 +412,8 @@ class SelectColorAct : TelinkBaseActivity(), View.OnClickListener {
                 val green = (color and 0x00ff00) shr 8
                 val blue = color and 0x0000ff
                 val w = progress
-                wValue = w
 
+                wValue = w
                 itemGroup?.color = (w shl 24) or (red shl 16) or (green shl 8) or blue
 
                 tv_brightness_w.text = getString(R.string.w_bright, progress.toString() + "")

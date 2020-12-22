@@ -144,8 +144,11 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         var intent = Intent()
+        if (DBUtils.isFastDoubleClick(500))
+            return@OnItemClickListener
         when (deviceTypeList[position].installType) {
             Constant.INSTALL_NORMAL_LIGHT -> {//跳转冷暖灯
+
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_NORMAL_LIGHT)
             }

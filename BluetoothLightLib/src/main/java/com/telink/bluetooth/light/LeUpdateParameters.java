@@ -4,6 +4,8 @@
  */
 package com.telink.bluetooth.light;
 
+import com.telink.bluetooth.TelinkLog;
+
 import java.util.Arrays;
 
 /**
@@ -40,6 +42,7 @@ public final class LeUpdateParameters extends Parameters {
      * @return
      */
     public LeUpdateParameters setNewMeshName(String value) {
+        TelinkLog.d(" scan mesh name set newname= "+value);
         this.set(PARAM_NEW_MESH_NAME, value);
         return this;
     }
@@ -63,6 +66,7 @@ public final class LeUpdateParameters extends Parameters {
      */
     public LeUpdateParameters setNewPassword(String value) {
         this.set(PARAM_NEW_PASSWORD, value);
+        TelinkLog.d(" scan mesh name set pwd= "+value);
         return this;
     }
 

@@ -364,6 +364,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         val deviceTypes = mutableListOf(currentDevice?.productUUID ?: DeviceType.NIGHT_LIGHT)
         if (IS_ROUTE_MODE)
             currentDevice?.let {
+                if (it.id == 0L)
+                    return@let
                 routerConnectSensor(it, 0, "connectSensor")
             }
         else {
@@ -411,13 +413,13 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 val hight = (currentDevice?.meshAddr ?: 0 shr 8) and 0xff
                 val gattBody = GwGattBody()
                 var gattPar: ByteArray
-                if (currentDevice?.openTag == 1) {
-                    currentDevice?.openTag == 0
+                if (currentDevice?.status == 1) {
+                    currentDevice?.status == 0
                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                             0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0)//0关闭
                     gattBody.ser_id = Constant.SER_ID_SENSOR_OFF
                 } else {
-                    currentDevice?.openTag == 1
+                    currentDevice?.status == 1
                     gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF, 0x11, 0x02,
                             0x02, 1, 0, 0, 0, 0, 0, 0, 0, 0)//打开
                     gattBody.ser_id = SER_ID_SENSOR_ON
@@ -443,7 +445,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
-            if (currentDevice?.openTag == 1) {
+            if (currentDevice?.status == 1) {
                 sendCloseIcon(positionCurrent)
                 byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
             } else {
@@ -466,12 +468,12 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         if (currentDevice?.version != null && (currentDevice?.version ?: "0").contains("NPR")) {//2.0 11位固定为2  12位0 关闭，1 打开
             when {
                 !IS_ROUTE_MODE -> {
-                    val byteArrayOf = if (currentDevice?.openTag == 1) {
-                        currentDevice?.openTag == 0
+                    val byteArrayOf = if (currentDevice?.status == 1) {
+                        currentDevice?.status == 0
                         sendCloseIcon(position)
                         byteArrayOf(2, 0, 0, 0, 0, 0, 0, 0)//0关闭
                     } else {
-                        currentDevice?.openTag == 1
+                        currentDevice?.status == 1
                         sendOpenIcon(position)
                         byteArrayOf(2, 1, 0, 0, 0, 0, 0, 0)//1打开
                     }
@@ -479,12 +481,12 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                             ?: 0, byteArrayOf)
                 }
                 else -> {
-                    if (currentDevice?.openTag == 1) {
-                        currentDevice?.openTag == 0
-                        routerOpenOrCloseSensor((currentDevice?.id?: 0).toInt(),0, "closeSensor")
+                    if (currentDevice?.status == 1) {
+                        currentDevice?.status == 0
+                        routerOpenOrCloseSensor((currentDevice?.id ?: 0).toInt(), 0, "closeSensor")
                     } else {
-                        currentDevice?.openTag == 1
-                        routerOpenOrCloseSensor((currentDevice?.id?: 0).toInt(), 1, "openSensor")
+                        currentDevice?.status == 1
+                        routerOpenOrCloseSensor((currentDevice?.id ?: 0).toInt(), 1, "openSensor")
                     }
                 }
             }
@@ -520,17 +522,23 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
     private fun sendOpenIcon(position: Int) {
-        sensorDatas[position].openTag = 1
+        sensorDatas[position].status = 1
         sensorDatas[position].updateIcon()
-        DBUtils.saveSensor(sensorDatas[position], true)
+        //DBUtils.saveSensor(sensorDatas[position], true)
         adapter?.notifyDataSetChanged()
+        DBUtils.saveSensor(sensorDatas[position],false)
+        if (IS_ROUTE_MODE)
+        updateServiceSensor()
         ToastUtils.showShort(getString(R.string.open))
     }
 
     private fun sendCloseIcon(position: Int) {
-        sensorDatas[position].openTag = 0
+        sensorDatas[position].status = 0
         sensorDatas[position].updateIcon()
-        DBUtils.saveSensor(sensorDatas[position], true)
+        DBUtils.saveSensor(sensorDatas[position],false)
+        //DBUtils.saveSensor(sensorDatas[position], true)
+        if (IS_ROUTE_MODE)
+            updateServiceSensor()
         adapter?.notifyDataSetChanged()
         ToastUtils.showShort(getString(R.string.close))
     }
@@ -678,8 +686,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                                 }
                             }
                         }
-                        if (!Constant.IS_ROUTE_MODE)
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                        if (!IS_ROUTE_MODE)
+                            toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     }
                 }
             }
@@ -736,7 +744,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                         startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
                     // doFinish()
                 } else {
-                    connectAndConfig()
+                    ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }
         }
@@ -757,7 +765,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             deviceInfo.meshAddress = it.meshAddr
             deviceInfo.macAddress = it.macAddr
             deviceInfo.productUUID = it.productUUID
-            deviceInfo.openTag = it.openTag
+            deviceInfo.status = it.status
             deviceInfo.id = it.id.toInt()
             deviceInfo.isConfirm = 1
         }
@@ -798,8 +806,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         val mNewData: MutableList<DbSensor>? = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldData?.get(oldItemPosition)?.id?.equals(mNewData?.get
-                (newItemPosition)?.id) ?: false
+                return mOldData?.get(oldItemPosition)?.id?.equals(mNewData?.get(newItemPosition)?.id) ?: false
             }
 
             override fun getOldListSize(): Int {
@@ -852,6 +859,21 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         adapter?.notifyDataSetChanged()
     }
 
+    @SuppressLint("CheckResult")
+    private fun updateServiceSensor() {
+        DBUtils.deleteAllSensor()
+        NetworkFactory.getApi()
+                .getSensorList(DBUtils.lastUser?.token)
+                .compose(NetworkTransformer())
+                .subscribe({
+                    for (item in it) {
+                        DBUtils.saveSensor(item, true)
+                    }
+                }, {
+                    ToastUtils.showShort(it.message)
+                })
+    }
+
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         disposableTimer?.dispose()
         when (gwStompBean.ser_id.toInt()) {
@@ -869,8 +891,8 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 LogUtils.v("zcl-----------收到路由连接传感器成功-------$cmdBean")
                 if (cmdBean.status == 0) {
                     ToastUtils.showShort(getString(R.string.connect_success))
-                    if (currentDevice!=null)
-                    routerGetVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
+                    if (currentDevice != null)
+                        routerGetVersion(mutableListOf(currentDevice!!.meshAddr), 98, "sensorVersion")
                 } else {
                     ToastUtils.showShort(getString(R.string.connect_fail))
                     hideLoadingDialog()
@@ -886,7 +908,9 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 if (routerVersion.status == 0) {
                     disposableRouteTimer?.dispose()
                     currentDevice?.version = routerVersion.succeedNow[0].version
-                    DBUtils.saveSensor(currentDevice!!, false)
+                    currentDevice?.let {
+                        DBUtils.saveSensor(currentDevice!!, false)
+                    }
                     makeDeviceInfo()
                     hideLoadingDialog()
                     if (currentDevice?.version == "" || currentDevice?.version == null)

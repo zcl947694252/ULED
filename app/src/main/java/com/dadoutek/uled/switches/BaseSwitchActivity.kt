@@ -270,6 +270,10 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
             else -> {
                 when {
                     Constant.IS_ROUTE_MODE -> {
+                        if (TextUtils.isEmpty(mDeviceInfo?.boundMac)){
+                            ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            return
+                        }
                         startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress, "deviceType" to mDeviceInfo.productUUID,
                                 "deviceMac" to mDeviceInfo.macAddress, "version" to mDeviceInfo!!.firmwareRevision)
                         finish()

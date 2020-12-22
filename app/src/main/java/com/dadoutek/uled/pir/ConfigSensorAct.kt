@@ -250,6 +250,10 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
             isMostNew(currentSensor?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
         if (Constant.IS_ROUTE_MODE){
+            if (TextUtils.isEmpty(currentSensor?.boundMac)){
+                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                return
+            }
             startActivity<RouterOtaActivity>("deviceMeshAddress" to currentSensor!!.meshAddr,
                     "deviceType" to currentSensor!!.productUUID, "deviceMac" to currentSensor!!.macAddr,
                     "version" to currentSensor!!.version )
@@ -404,6 +408,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")
         version = intent.getStringExtra("version")
         isReConfirm = mDeviceInfo.isConfirm == 1
+
         if (isReConfirm) {
             currentSensor = DBUtils.getSensorByMeshAddr(mDeviceInfo.meshAddress)
             toolbarTv.text = currentSensor?.name
@@ -675,7 +680,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         dbSensor.macAddr = mDeviceInfo.macAddress
         dbSensor.version = version
         dbSensor.meshAddr = mDeviceInfo.meshAddress
-        dbSensor.openTag = mDeviceInfo!!.openTag
+        dbSensor.status = mDeviceInfo!!.openTag
         // dbSensor.meshAddr = Constant.SWITCH_PIR_ADDRESS
         dbSensor.productUUID = mDeviceInfo.productUUID
         dbSensor.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + mDeviceInfo!!.meshAddress

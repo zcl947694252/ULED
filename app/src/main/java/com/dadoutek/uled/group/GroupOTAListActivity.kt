@@ -138,8 +138,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     }
 
     private fun startGetVersionTimer(t: Long) {
-        disposableRouteTimer?.dispose()
         LogUtils.v("zcl-----------执行路由获取版本超时重置-------$t")
+        disposableRouteTimer?.dispose()
         disposableRouteTimer = Observable.timer(t + 1L, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -155,7 +155,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         if (cmdBean.ser_id == "gpOta") {
             if (cmdBean.status == 0) {
                 disposableRouteTimer?.dispose()
-                startGetVersionTimer(cmdBean.reportTimeout.toLong())
+                startGetVersionTimer(cmdBean.timeout.toLong())
             }
         }
     }

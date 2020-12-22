@@ -87,8 +87,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName: String? = null
     private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
-    private val DATA_LIST_KEY = "DATA_LIST_KEY"
-    private val SCENE_KEY = "SCENE_KEY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -259,6 +257,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             showGroupList.clear()
             dbScene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
             edit_name.setText(dbScene?.name)
+            resId = if (TextUtils.isEmpty(dbScene?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(dbScene?.imgName, this)
             //获取场景具体信息
             val actions = DBUtils.getActionsBySceneId(dbScene!!.id)
             for (i in actions.indices) {
@@ -272,8 +271,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     itemGroup.temperature = actions[i].colorTemperature
                     itemGroup.color = actions[i].color
                     itemGroup.isOn = actions[i].isOn
-                    itemGroup.isEnableBright = actions[i].isEnableBright()
-                    itemGroup.isEnableWhiteLight = actions[i].isEnableWhiteBright()
+                    itemGroup.isEnableBright = actions[i].isEnableBright
+                    itemGroup.isEnableWhiteBright = actions[i].isEnableWhiteBright
                     item.checked = true
                     itemGroup.rgbType = actions[i].rgbType
                     itemGroup.gradientId = actions[i].gradientId
@@ -346,7 +345,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             when (view.id) {
                 R.id.btn_delete -> delete(adapter, position)
                 R.id.dot_rgb -> changeToColorSelect(position)
-                R.id.dot_one -> changeToColorSelect(position)
+                R.id.dot_one_ly -> changeToColorSelect(position)
                 R.id.rg_xx -> open(position)
                 R.id.rg_yy -> close(position)
                 R.id.alg_text -> showPopMode(position)
@@ -375,7 +374,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
             0 -> {
                 itemGroup?.brightness = 50
-                itemGroup?.color = (50 shl 24) or (0 shl 16) or (0 shl 8) or 0
+                itemGroup?.color = (50 shl 24) or (255 shl 16) or (255 shl 8) or 255
                 itemGroup?.temperature = 50
                 itemGroup?.checked = true
                 itemGroup?.enableCheck = false
@@ -400,7 +399,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             if (!Constant.IS_ROUTE_MODE)
                 showGroupList[position].isOn = false
             showGroupList[position].isEnableBright = false
-            showGroupList[position].isEnableWhiteLight = false
+            showGroupList[position].isEnableWhiteBright = false
             cb_bright.isChecked = false
             cb_bright.isEnabled = false
             cb_white_light.isChecked = false
@@ -413,7 +412,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 showGroupList[position].isOn = true
             isOpen = true
             showGroupList[position].isEnableBright = true
-            showGroupList[position].isEnableWhiteLight = true
+            showGroupList[position].isEnableWhiteBright = true
             cb_bright.isChecked = true
             cb_bright.isEnabled = true
             cb_white_light.isChecked = true
@@ -462,18 +461,18 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun switchWhiteLight(position: Int) {
         when {
-            showGroupList[position].isEnableWhiteLight -> {//enableWhiteLight(false)
+            showGroupList[position].isEnableWhiteBright -> {//enableWhiteLight(false)
                 whiteLight = 0
-                showGroupList[position].isEnableWhiteLight = false
+                showGroupList[position].isEnableWhiteBright = false
             }
             else -> {//enableWhiteLight(true)
                 whiteLight = showGroupList[position].temperature
-                showGroupList[position].isEnableWhiteLight = true
+                showGroupList[position].isEnableWhiteBright = true
             }
         }
         val addr = showGroupList[position].groupAddress
         if (Constant.IS_ROUTE_MODE) {
-            routeConfigWhiteGpOrLight(addr, 97, whiteLight, showGroupList[position].isEnableWhiteLight,"configWhite")
+            routeConfigWhiteGpOrLight(addr, 97, whiteLight, showGroupList[position].isEnableWhiteBright,"configWhite")
         } else {
             val params: ByteArray = byteArrayOf(whiteLight.toByte())//设置白色
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
@@ -524,7 +523,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     override fun tzRouterConfigBriOrTemp(cmdBean: CmdBodyBean, isBri: Int) {
         LogUtils.v("zcl-----------收到路由亮度色温白光通知-------$cmdBean---$isBri")
-        disposableRouteTimer?.dispose()
         hideLoadingDialog()
 
         disposableRouteTimer?.dispose()
@@ -542,7 +540,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                         ToastUtils.showShort(getString(R.string.config_color_temp_fail))
                     }
                     2 -> {
-                        showGroupList[currentPosition].isEnableWhiteLight = whiteLight == 0
+                        showGroupList[currentPosition].isEnableWhiteBright = whiteLight == 0
                         ToastUtils.showShort(getString(R.string.config_white_fail))
                     }
                 }
@@ -772,7 +770,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         RouterModel.routeUpdateSceneName((dbScene?.id ?: 0).toInt(), editSceneName!!, s)
                 ?.subscribe({
                     when (it.errorCode) {
-                        /*0 -> ToastUtils.showShort(getString(R.string.rename_success))*/
+                        0 -> {}
                         else -> ToastUtils.showShort(getString(R.string.rename_faile))
                     }
                 }, {
@@ -918,11 +916,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun startAddSceneTimeOut(it: RouterTimeoutBean?) {
-        disposableTimer?.dispose()
-        disposableTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong() + 2, TimeUnit.SECONDS)
+        disposableRouteTimer?.dispose()
+        disposableRouteTimer = io.reactivex.Observable.timer((it?.timeout ?: 0).toLong() + 2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
+                    hideLoadingDialog()
                     ToastUtils.showShort(getString(R.string.add_scene_fail))
                 }
     }
@@ -944,7 +943,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
         } else {
             sceneActions.setIsEnableBright(item.isEnableBright)
-            sceneActions.setIsEnableWhiteBright(item.isEnableWhiteLight)
+            sceneActions.setIsEnableWhiteBright(item.isEnableWhiteBright)
             sceneActions.brightness = item.brightness
             sceneActions.colorTemperature = item.temperature
             sceneActions.setColor(item.color)
@@ -988,6 +987,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 var green = color and 0x00ff00 shr 8
                 var blue = color and 0x0000ff
                 var w = color shr 24
+                if (red==0&&green==0&&blue==0){
+                    red = 255
+                    green =255
+                    blue =255
+                }
                 var type = list[i].deviceType
                 params = when (type) {
                     SMART_CURTAIN, SMART_RELAY -> {
@@ -1005,6 +1009,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 }
                 //dest address
+                LogUtils.v("zcl--color$color-red$red----green$green----------blue$blue-")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
             }
         } while (count < 3)
@@ -1042,10 +1047,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
         dbScene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
         val belongSceneId = dbScene?.id!!
 
-        if (!Constant.IS_ROUTE_MODE) {
+        if (!Constant.IS_ROUTE_MODE)
             showLoadingDialog(getString(R.string.saving))
+
             DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(dbScene?.id!!))
-        }
         val actionsList = mutableListOf<DbSceneActions>()
         for (i in itemGroups.indices) {
             var sceneActions = DbSceneActions()
@@ -1080,11 +1085,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun routerUpdateScene(belongSceneId: Long, actionsList: MutableList<DbSceneActions>) {
-        LogUtils.v("zcl--------更新路由场景参数----------")
+        LogUtils.v("zcl--------更新路由场景参数---belongSceneId---$belongSceneId----$actionsList")
         RouterModel.routeUpdateScene(belongSceneId, actionsList, "updateScene")?.subscribe({
             LogUtils.v("zcl-----------更新路由场景成功-------$it")
             when (it.errorCode) {
                 NetworkStatusCode.OK -> {
+                    showLoadingDialog(getString(R.string.please_wait))
                     startAddSceneTimeOut(it.t)
                 }//更新超时
                 //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
@@ -1131,6 +1137,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
             var red = color and 0xff0000 shr 16
             var green = color and 0x00ff00 shr 8
             var blue = color and 0x0000ff
+            if (red==0&&green==0&&blue==0){
+                red = 255
+                green =255
+                blue =255
+            }
             var w = color shr 24
             val connectDevice = TelinkApplication.getInstance().connectDevice
             connectDevice?.let {
@@ -1155,6 +1166,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     }
                     else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
                 }
+                LogUtils.v("zcl--color$color-red$red----green$green----------blue$blue-")
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, list[i].groupAddr, params)
             }
         }
@@ -1226,7 +1238,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             when {
                 routerScene?.finish && routerScene?.status == 0 -> {//-1 全部失败 1 部分成功
                     ToastUtils.showShort(getString(R.string.config_success))
-                    disposableTimer?.dispose()
+                    disposableRouteTimer?.dispose()
                     hideLoadingDialog()
                     afterSaveScene()
                     getNewScenes()
@@ -1243,7 +1255,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             when {
                 cmdBodyBean?.finish && cmdBodyBean?.status == 0 -> {//-1 全部失败 1 部分成功
                     ToastUtils.showShort(getString(R.string.config_success))
-                    disposableTimer?.dispose()
+                    disposableRouteTimer?.dispose()
                     hideLoadingDialog()
                     getNewScenes()
                 }

@@ -79,14 +79,14 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 abstract class BaseGroupFragment : BaseFragment() {
-    private var disposableRouteTimer: Disposable? = null
+    var disposableRouteTimer: Disposable? = null
     private var seehelp: TextView? = null
     private var seeHelp2: TextView? = null
     private var addGroupTv: TextView? = null
     private var mConnectDisposable: Disposable? = null
-    private var currentPosition: Int = 0
+    var currentPosition: Int = 0
     private var disposableTimer: Disposable? = null
-    private var currentGroup: DbGroup? = null
+    var currentGroup: DbGroup? = null
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
     private var recyclerView: RecyclerView? = null
@@ -625,7 +625,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     @SuppressLint("CheckResult")
     private fun routeSwitchCurtain() {//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea 换向 = 0x11
         currentGroup?.let {
-            var opcode = if (it.connectionStatus == 0) 0x0a else 0x0c
+            var opcode = if (it.status == 1) 0x0c else 0x0a
 
             RouterModel.routeControlCurtain(it.meshAddr, 97, opcode, 1, "groupSwCurtain")//换向 = 0x11
                     ?.subscribe({ itr ->
@@ -662,20 +662,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                     }, { itt ->
                         ToastUtils.showShort(itt.message)
                     })
-        }
-    }
-
-    override fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {
-        LogUtils.v("zcl-----------收到路由控制通知-------$cmdBean")
-        if (cmdBean.ser_id == "groupSwCurtain") {
-            disposableRouteTimer?.dispose()
-            hideLoadingDialog()
-            if (currentGroup?.connectionStatus == 0) currentGroup?.connectionStatus = 1 else currentGroup?.connectionStatus = 0
-            if (cmdBean.status == 0)
-                groupSwSuccess(currentPosition, true)
-            currentGroup?.let {
-                DBUtils.saveGroup(it, true)
-            }
         }
     }
 
@@ -819,7 +805,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 ?.subscribe({}, { LogUtils.d("connect failed") })
     }
 
-    private fun groupSwSuccess(position: Int, isChnage: Boolean) {
+    fun groupSwSuccess(position: Int, isChnage: Boolean) {
         if (isChnage)
             currentGroup?.connectionStatus = if (currentGroup!!.connectionStatus == 0) ConnectionStatus.ON.value   else ConnectionStatus.OFF.value
         groupAdapter?.notifyItemChanged(position)

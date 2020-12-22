@@ -171,8 +171,7 @@ object RecoverMeshDeviceUtil {
      */
     fun addDevicesToDb(deviceInfo: DeviceInfo): Boolean {
         val productUUID = deviceInfo.productUUID
-            if (productUUID == DeviceType.GATE_WAY)
-            return false
+
         val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
         LogUtils.v("zcl找回-----------添加设备-------${!isExist}-----$deviceInfo")
         if (!isExist) {//mesh不存在并且是找回是设备

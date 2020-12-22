@@ -5,7 +5,9 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.WeekBean
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.RouterTimerSceneBean
+import org.greenrobot.greendao.DbUtils
 
 
 /**
@@ -24,22 +26,22 @@ class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerScene
         var minStr = if (min < 10) "0$min" else min.toString()
         var hourStr = if (hour < 10) "0$hour" else hour.toString()
 
-        val value = "${hourStr ?: 0}:${minStr ?: 0}"
+        val value = "${hourStr}:${minStr}"
         helper?.addOnClickListener(R.id.item_event_ly)
                 ?.addOnClickListener(R.id.item_event_switch)
                 ?.setText(R.id.item_event_title, value)
                 ?.setText(R.id.item_event_week, getWeekStr(item?.week))
-                ?.setText(R.id.item_event_name, item?.sname)
+                ?.setText(R.id.item_event_name, DBUtils.getSceneByID(item!!.sid.toLong())?.name)
                 ?.setVisible(R.id.item_event_name, true)
                 ?.setChecked(R.id.item_event_switch, item?.status == 1)
     }
 
-    private fun getWeekStr(week: Int?): String {
-        val sb = StringBuilder()
+    open fun getWeekStr(week: Int?): String {
         var tmpWeek = week ?: 0
-        when (tmpWeek) {
-            0b01111111,0b10000000 -> sb.append(mContext.getString(R.string.every_day))
-            0b00000000 -> sb.append(mContext.getString(R.string.only_one))
+        val sb = StringBuilder()
+        var str  =  when (tmpWeek) {
+            0b01111111,0b10000000-> sb.append(mContext.getString(R.string.every_day)).toString()
+            0b00000000 -> sb.append(mContext.getString(R.string.only_one)).toString()
             else -> {
                 var list = mutableListOf(
                         WeekBean(mContext.getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
@@ -49,18 +51,14 @@ class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerScene
                         WeekBean(mContext.getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
                         WeekBean(mContext.getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
                         WeekBean(mContext.getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
-                for (i in 0 until list!!.size) {
-                    var weekBean = list!![i]
-                    if (weekBean.selected) {
-                        if (i == list!!.size - 1)
-                            sb.append(weekBean.week)
-                        else
-                            sb.append(weekBean.week).append(",")
-                    }
+                for (i in 0 until list.size) {
+                    if (list[i].selected)
+                        sb.append(list[i].week).append(",")
                 }
+                sb.toString().substring(0,sb.length-1)
             }
         }
-        return sb.toString()
+        return str
     }
 
 

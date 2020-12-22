@@ -167,7 +167,7 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             Constant.INSTALL_GATEWAY -> {//路由不支持网关
                 when {
                     DBUtils.getAllGateWay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
-                    Constant.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.dissupport))
+                    Constant.IS_ROUTE_MODE -> ToastUtils.showShort(getString(R.string.please_do_this_over_ble))
                     else -> startActivity<GroupOTAListActivity>("DeviceType" to DeviceType.GATE_WAY)
                 }
             }

@@ -7,9 +7,11 @@ import android.widget.TextView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.util.DensityUtil
 import com.dadoutek.uled.util.OtherUtils
+import org.greenrobot.greendao.DbUtils
 
 
 /**
@@ -24,7 +26,7 @@ import com.dadoutek.uled.util.OtherUtils
 class SceneItemAdapter(resId: Int, data: MutableList<DbScene>) : BaseQuickAdapter<DbScene, BaseViewHolder>(resId, data) {
     override fun convert(helper: BaseViewHolder?, item: DbScene?) {
         var icon = if (TextUtils.isEmpty(item?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(item?.imgName, mContext)
-        helper?.setText(R.id.template_device_batch_title, item?.name)
+        helper?.setText(R.id.template_device_batch_title, OtherUtils.ToDBC(item?.name?:""))
                 ?.setImageResource(R.id.template_device_batch_icon,icon)
                 ?.setVisible(R.id.template_device_batch_selected, true)
             val ly = helper?.getView<ImageView>(R.id.template_device_batch_icon)

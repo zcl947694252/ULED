@@ -132,6 +132,7 @@ class SafeLockActivity : TelinkBaseActivity(), View.OnClickListener {
     @SuppressLint("CheckResult")
     private fun routerLockOrUnlock(status: Int, serid: String) {
         RouterModel.routeOpenOrCloseSafeLock(status, serid)?.subscribe({
+            LogUtils.v("zcl-----------收到路由锁定-------status----$status----lock ----1-----unlock-----0")
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))

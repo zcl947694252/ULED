@@ -29,6 +29,8 @@ import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.model.routerModel.UpdateGradientBean
+import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.network.UpdateGradientNameSpeedBean
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
@@ -99,10 +101,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
                 if (isChange) {
                     diyGradient?.let {
-                        RouterModel.routerUpdateGradientNameSpeed(it.id.toInt(), UpdateGradientNameSpeedBean(name =it.name,speed = speed))
-                                ?.subscribe({itr->
+                        RouterModel.routerUpdateGradientNameSpeed(it.id.toInt(), UpdateGradientNameSpeedBean(name = it.name, speed = speed))
+                                ?.subscribe({ itr ->
                                     LogUtils.v("zcl-----路由渐变设置速度$speed-------$itr")
-                                },{itt->
+                                }, { itt ->
                                     ToastUtils.showShort(itt.message)
                                 })
                     }
@@ -402,10 +404,11 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                         //"errorCode": 90008,"该设备没有绑定路由，无法添加自定义渐变"  "errorCode": 90007,"该组不存在，无法操作"
                         //"errorCode": 90005,"以下路由没有上线，无法更新自定义渐变"    "errorCode": 90004, "账号下区域下没有路由，无法操作"
                         LogUtils.v("zcl-------收到路由更新渐变-----${AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra")}--$it")
+                        LogUtils.v("zcl-------收到路由更新渐变请求------$it")
                         when (response.errorCode) {
                             0 -> {
                                 disposableTimer?.dispose()
-                                disposableTimer = io.reactivex.Observable.timer(response.t.timeout.toLong()+1, TimeUnit.SECONDS)
+                                disposableTimer = io.reactivex.Observable.timer(response.t.timeout.toLong() + 1, TimeUnit.SECONDS)
                                         .subscribe {
                                             ToastUtils.showShort(getString(R.string.update_gradient_fail))
                                             hideLoadingDialog()
@@ -445,21 +448,15 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
         showLoadingDialog(getString(R.string.save_gradient_dialog_tip))
         Thread {
-            diyGradient = DbDiyGradient()
 
+            diyGradient = DbDiyGradient()
             diyGradient?.id = getGradientId()
             diyGradient?.name = editName.text.toString().trim()
             diyGradient?.type = NODE_MODE_RGB_GRADIENT
             diyGradient?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
             diyGradient?.speed = speed
-
             DBUtils.saveGradient(diyGradient!!, false)
-
             val belongDynamicModeId = diyGradient!!.id
-            /*  for (item in colorNodeList!!) {
-                  item.belongDynamicChangeId = belongDynamicModeId
-                  DBUtils.saveColorNode(item)
-              }*/
             for (i in 0..7) {
                 colorNodeList!![i].belongDynamicChangeId = belongDynamicModeId
                 DBUtils.saveColorNode(colorNodeList!![i])
@@ -473,7 +470,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     RouterModel.routerAddGradient(AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra"))?.subscribe({ response ->
                         //    "errorCode": 90018,该设备不存在，请重新刷新数据"  "errorCode": 90008,该设备没有绑定路由，无法添加自定义渐变"
                         //    "errorCode": 90004 账号下区域下没有路由，无法操作""errorCode": 90007,该组不存在，无法操作" "errorCode": 90005,以下路由没有上线，无法添加自定义渐变"
-                        LogUtils.v("zcl--收到路由添加渐变--${AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra")}--$it")
+                        LogUtils.v("zcl--收到路由添加渐变--${AddGradientBean(it.name, it.type, it.speed, it.colorNodes, dstAddress, deviceType, "addGra")}--$response")
                         when (response.errorCode) {
                             0 -> {
                                 disposableTimer?.dispose()
@@ -671,12 +668,29 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         if (cmdBean.status == 0) {
             disposableTimer?.dispose()
             setResult(Activity.RESULT_OK)
+            lookService()
             finish()
         } else when (cmdBean.cmd) {
             Cmd.tzRouteAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
             Cmd.tzRouteUpdateGradient -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
         }
 
+    }
+
+    @SuppressLint("CheckResult")
+    private fun lookService() {
+        NetworkFactory.getApi()
+                .getGradientList(DBUtils.lastUser?.token)
+                .compose(NetworkTransformer())
+                .subscribe({
+                    var sb = StringBuilder()
+                    it.forEach { itg ->
+                        sb.append(itg.name).append("==id==").append(itg.id).append("----")
+                    }
+                    LogUtils.v("zcl----------路由删除后服务器渐变-------${sb}")
+                }, {
+
+                })
     }
 
 }

@@ -62,6 +62,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.startActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -528,7 +529,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         val opcode = Opcode.CURTAIN_ON_OFF
                         value = i
                         if (Constant.IS_ROUTE_MODE)
-                            routerControlCurtain(0x15, "configSpeed", false)
+                            routerControlCurtain(0x15, "configSpeed")
                         else {
                             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, i.toByte(), Opcode.CURTAIN_PACK_END)
                             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -546,7 +547,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         val opcode = Opcode.CURTAIN_ON_OFF
                             value = i
                         if (Constant.IS_ROUTE_MODE)
-                            routerControlCurtain(0x15, "configSpeed", false)
+                            routerControlCurtain(0x15, "configSpeed")
                         else {
                             val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x15, i.toByte(), Opcode.CURTAIN_PACK_END)
                             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
@@ -564,7 +565,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("CheckResult")//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea 换向 = 0x11
-    private fun routerControlCurtain(opcode: Int, ser_id: String, isInverser: Boolean) {
+    private fun routerControlCurtain(opcode: Int, ser_id: String ,isInverser: Boolean = false) {
         var meshType = if (typeStr == Constant.TYPE_GROUP) 97 else curtain!!.productUUID
         var macAddr = if (typeStr == Constant.TYPE_GROUP) "97" else curtain!!.macAddr
         var meshAddr = if (typeStr == Constant.TYPE_GROUP) curtainGroup!!.meshAddr else curtain!!.meshAddr
@@ -572,17 +573,17 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         if (isInverser)
             commutationBoolean = when {
                 commutationBoolean -> {
-                    value = 1
+                    value = 0//开
                     false
                 }
                 else -> {
-                    value = 0
+                    value = 1 //关
                     true
                 }
             }
         RouterModel.routeControlCurtain(meshAddr, meshType, opcode, value, ser_id)//换向 = 0x11
                 ?.subscribe({
-                    LogUtils.v("zcl----valu$value-------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
+                    LogUtils.v("zcl----valu$value-----commutationBoolean$commutationBoolean--收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
                     when (it.errorCode) {
                         0 -> {
                             showLoadingDialog(getString(R.string.please_wait))
@@ -595,7 +596,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                         when (opcode) {
                                             0x0a -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                             0x0b -> ToastUtils.showShort(getString(R.string.pause_faile))
-                                            0x0c -> ToastUtils.showShort(getString(R.string.close_faile))
+                                            0x0c -> ToastUtils.showShort(getString(R.string.off_faile))
                                             0x15 -> ToastUtils.showShort(getString(R.string.speed_faile))
                                             0xec -> ToastUtils.showShort(getString(R.string.reset_factory_fail))
                                             0xea -> ToastUtils.showShort(getString(R.string.reset_curtain_fail))
@@ -639,6 +640,8 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
             when (cmdBean.ser_id) {
                 "inverse" -> {
+                    curtain!!.inverse = !curtain!!.inverse
+                    DBUtils.updateCurtain(curtain!!)
                     disposableRouteTimer?.dispose()
                     if (cmdBean.status == 0)
                         ToastUtils.showShort(getString(R.string.commutation_success))
@@ -706,6 +709,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     else -> {
                         when {
                             Constant.IS_ROUTE_MODE -> {
+                                if (TextUtils.isEmpty(curtain?.boundMac)){
+                                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                    return
+                                }
                                 startActivity<RouterOtaActivity>("deviceMeshAddress" to curtain!!.meshAddr, "deviceType" to curtain!!.productUUID,
                                         "deviceMac" to curtain!!.macAddr, "version" to curtain!!.version)
                                 finish()
@@ -860,7 +867,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0xEA.toByte(), 0x00, Opcode.CURTAIN_PACK_END)
         val opcode = Opcode.CURTAIN_ON_OFF
         if (Constant.IS_ROUTE_MODE)
-            routerControlCurtain(0xEA, "curtainReset", false)
+            routerControlCurtain(0xEA, "curtainReset")
         when (typeStr) {
             Constant.TYPE_GROUP -> TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
             else -> TelinkLightService.Instance()?.sendCommandNoResponse(opcode, ctAdress!!, params)
@@ -970,6 +977,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     fun deleteData() {
+
         hideLoadingDialog()
         if (typeStr == Constant.TYPE_GROUP) {
             if (curtainGroup != null)
@@ -984,13 +992,18 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                 }
             }
+       /* if (Constant.IS_ROUTE_MODE){
+            DBUtils.deleteLocalData()
+            //ToastUtils.showShort(getString(R.string.device_not_exit))
+            SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+        }*/
         finish()
     }
 
 
     private fun electricCommutation() {
         when {
-            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x11, "inverse", commutationBoolean)
+            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x11, "inverse", true)
             else -> {
                 when (typeStr) {
                     Constant.TYPE_GROUP -> {
@@ -1041,7 +1054,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0B, 0x00, Opcode.CURTAIN_PACK_END)
         val opcode = Opcode.CURTAIN_ON_OFF
         when {
-            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x0B, "pauseCur", false)
+            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x0B, "pauseCur")
             else -> {
                 when (typeStr) {
                     Constant.TYPE_GROUP -> TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -1068,7 +1081,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         val params = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
         val opcode = Opcode.CURTAIN_ON_OFF
         when {
-            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x0C, "offCur", false)
+            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x0C, "offCur")
             else -> {
                 if (typeStr == Constant.TYPE_GROUP) {
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)
@@ -1096,7 +1109,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
         val opcode = Opcode.CURTAIN_ON_OFF
 
         when {
-            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x0A, "openCur", false)
+            Constant.IS_ROUTE_MODE -> routerControlCurtain(0x0A, "openCur")
             else -> {
                 if (typeStr == Constant.TYPE_GROUP) {
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, curtainGroup!!.meshAddr, params)

@@ -18,6 +18,8 @@ object SensorMdodel {
         dbChild.name=sensor.name
         dbChild.id=sensor.id
         dbChild.index=sensor.index
+        dbChild.version=sensor.version
+        dbChild.status=sensor.status
         if(sensor.controlGroupAddr!=null){
             dbChild.list=sensor.controlGroupAddr
         }else{
@@ -42,6 +44,8 @@ object SensorMdodel {
         dbChild.name=dbSensor.name
         dbChild.id=dbSensor.id
         dbChild.index=dbSensor.index
+        dbChild.version=dbSensor.version
+        dbChild.status=dbSensor.status
         if(dbSensor.controlGroupAddr!=null){
             dbChild.list=dbSensor.controlGroupAddr
         }else{

@@ -45,6 +45,8 @@ public class TelinkApplication extends Application {
     public final EventBus<String> mEventBus = new EventBus<>();
     public Context mContext;
     public boolean serviceStarted;
+    public boolean isNew = true;
+    public boolean isConnect = false;
     protected boolean serviceConnected;
     protected final ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
