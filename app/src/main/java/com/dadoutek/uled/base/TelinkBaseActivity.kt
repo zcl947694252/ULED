@@ -3,12 +3,12 @@ package com.dadoutek.uled.base
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.bluetooth.BluetoothAdapter
+import android.content.*
+import android.content.pm.PackageManager
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
@@ -16,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.annotation.RequiresApi
+import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
@@ -47,6 +48,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.httpModel.AccountModel
+import com.dadoutek.uled.model.httpModel.UpdateModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.mqtt.IGetMessageCallBack
 import com.dadoutek.uled.mqtt.MqttService
@@ -89,6 +91,8 @@ import java.util.concurrent.TimeUnit
 ///TelinkLog 打印
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
+    private var dispos: Disposable? = null
+    private var receiver: BluetoothListenerReceiver? = null
     var disposableTimer: Disposable? = null
     open var currentShowGroupSetPage = true
     var isScanningJM: Boolean = false
@@ -162,8 +166,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     var popReNameView: View? = null
     lateinit var renameDialog: Dialog
     var disposableRouteTimer: Disposable? = null
-    var mHandlerBase =  android.os.Handler()
-    @SuppressLint("ShowToast")
+    var mHandlerBase = android.os.Handler()
+
+    @SuppressLint("ShowToast", "CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
@@ -182,14 +187,22 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
-
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            dispos = RxPermissions(this).request(Manifest.permission.READ_PHONE_STATE).subscribe({}, {})
+        }
 //        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
 //            TelinkLightApplication.getApp().initStompClient()
-
+        receiver = BluetoothListenerReceiver()
+        registerReceiver(receiver, makeFilter())
         serviceConnection?.mqttService?.init()
         bindService()
     }
 
+    open fun makeFilter(): IntentFilter? {
+        val filter = IntentFilter()
+        filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+        return filter
+    }
 
     open fun isZeroOrHundred(ws: Int): Int {
         var ws1 = ws
@@ -339,7 +352,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
-            if (TelinkLightService.Instance()?.isLogin == false &&TelinkLightApplication.getApp().connectDevice==null&& TelinkLightApplication.isLoginAccount) {
+            if (TelinkLightService.Instance()?.isLogin == false && TelinkLightApplication.getApp().connectDevice == null && TelinkLightApplication.isLoginAccount) {
                 TelinkLightService.Instance()?.disconnect()
                 ToastUtils.showLong(getString(R.string.connecting_tip))
                 Thread.sleep(800)
@@ -469,7 +482,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
      * 改变Toolbar上的图片和状态
      * @param isConnected       是否是连接状态
      */
-    fun changeDisplayImgOnToolbar(isConnected: Boolean) {
+    open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
         LogUtils.v("zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
         if (Constant.IS_ROUTE_MODE)
             toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
@@ -508,7 +521,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
-    private  fun onDeviceStatusChanged(event: DeviceEvent) {
+    private fun onDeviceStatusChanged(event: DeviceEvent) {
         val deviceInfo = event.args
         when (deviceInfo.status) {
             LightAdapter.STATUS_LOGIN -> {
@@ -555,6 +568,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             unbindSe()
             bindService()
         }
+
+        LogUtils.v("zcl-----------前台后台-resum------${isForeground(this)}")
+        checkVersionAvailable()
+
         if (!LeBluetooth.getInstance().enable(applicationContext) && !Constant.IS_ROUTE_MODE)
             TmtUtils.midToastLong(this, getString(R.string.open_blutooth_tip))
         val lastUser = lastUser
@@ -568,7 +585,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
 
         if (LeBluetooth.getInstance().isEnabled) {
-            if (TelinkLightApplication.getApp().connectDevice != null/*lightService?.isLogin == true*/) {
+            if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightService.Instance().isLogin) {
                 changeDisplayImgOnToolbar(true)
             } else {
                 changeDisplayImgOnToolbar(false)
@@ -579,10 +596,40 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         //autoConnectAll()
     }
 
+    private fun checkVersionAvailable() {
+        var version = packageName(this)
+        if (netWorkCheck(this))
+            UpdateModel.run {
+                isVersionAvailable(0, version)
+                        .subscribe({
+                            if (!it.isUsable) {
+                                loginOutMethod()
+                            }
+                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", it.isUsable)
+                        }, {
+                            //ToastUtils.showLong(R.string.get_server_version_fail)
+                        })
+            }
+    }
+
+    open fun packageName(context: Context): String {
+        val manager = context.packageManager
+        var name: String? = null
+        try {
+            val info = manager.getPackageInfo(context.packageName, 0)
+            name = info.versionName
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        return name!!
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         disableConnectionStatusListener()
+        unregisterReceiver(receiver)
         unbindSe()
+        dispos?.dispose()
         mHandlerBase.removeCallbacksAndMessages(null)
         mConnectDisposable?.dispose()
         disposableTimer?.dispose()
@@ -681,6 +728,28 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         mConnectDisposable?.dispose()
     }
 
+    override fun onStop() {
+        super.onStop()
+        val foreground = isForeground(this)
+        if (!foreground) {
+            unbindSe()
+            bindService()
+        }
+    }
+
+    /*判断应用是否在前台*/
+    @SuppressLint("ServiceCast")
+    open fun isForeground(context: Context): Boolean {
+        val am: ActivityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val tasks: List<ActivityManager.RunningTaskInfo> = am.getRunningTasks(1)
+        if (tasks.isNotEmpty()) {
+            val topActivity: ComponentName = tasks[0].topActivity
+            if (topActivity.packageName == context.packageName) {
+                return true
+            }
+        }
+        return false
+    }
 
     /**
      * 检查网络上传数据
@@ -733,7 +802,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     //重启app并杀死原进程
     open fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         AppUtils.relaunchApp()
     }
 
@@ -816,8 +885,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
-
             //var jsonObject = JSONObject(msg)
+            LogUtils.v("zcl------------------收到信息长连接---cmdbean$cmdBean")
             when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
                     val codeBean = Gson().fromJson(msg, MqttBodyBean::class.java)
@@ -1033,6 +1102,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     private fun singleDialog(codeBean: MqttBodyBean) {
         val boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+        LogUtils.v("zcl-------确保登录时成功的单点登录---------key${codeBean.loginStateKey != lastUser?.login_state_key}--$boolean")
         if (codeBean.loginStateKey != lastUser?.login_state_key && boolean) //确保登录时成功的
             loginOutMethod()
     }
@@ -1049,40 +1119,45 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     }
 
-    open fun loginOutMethod() {
-        if (!NetWorkUtils.isNetworkAvalible(this)) {
-            AlertDialog.Builder(this)
-                    .setTitle(R.string.network_tip_title)
-                    .setMessage(R.string.net_disconnect_tip_message)
-                    .setPositiveButton(android.R.string.ok
-                    ) { _, _ ->
-                        // 跳转到设置界面
-                        this.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
-                    }.create().show()
-        } else {
-            SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-                override fun start() {
-                    showLoadingDialog(getString(R.string.tip_start_sync))
+    open fun loginOutMethod() = if (!NetWorkUtils.isNetworkAvalible(this)) {
+        AlertDialog.Builder(this)
+                .setTitle(R.string.network_tip_title)
+                .setMessage(R.string.net_disconnect_tip_message)
+                .setPositiveButton(android.R.string.ok
+                ) { _, _ ->
+                    // 跳转到设置界面
+                    this.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
+                }.create().show()
+    } else {
+        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+            override fun start() {
+                showLoadingDialog(getString(R.string.tip_start_sync))
+            }
+
+            override fun complete() {
+                hideLoadingDialog()
+                val b = this@TelinkBaseActivity.isFinishing
+                val showing = singleLogin?.isShowing
+                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
+                TelinkLightService.Instance()?.idleMode(true)
+                var isShowSingleForeground = if (!isForeground(this@TelinkBaseActivity))//不是前台
+                    !b && showing != null && !showing
+                else
+                    !b && showing != null && !showing && isShow //是前台
+                LogUtils.v("zcl-----------前台后台执行-------$isShowSingleForeground")
+                if (isShowSingleForeground) {
+                    singleLogin?.dismiss()
+                    singleLogin?.show()
                 }
 
-                override fun complete() {
-                    hideLoadingDialog()
-                    val b = this@TelinkBaseActivity.isFinishing
-                    val showing = singleLogin?.isShowing
-                    SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
-                    if (!b && showing != null && !showing && isShow) {
-                        singleLogin?.dismiss()
-                        singleLogin?.show()
-                    }
-                }
+            }
 
-                override fun error(msg: String) {
-                    hideLoadingDialog()
-                    if (msg != "null")
-                        ToastUtils.showLong(msg)
-                }
-            })
-        }
+            override fun error(msg: String) {
+                hideLoadingDialog()
+                if (msg != "null")
+                    ToastUtils.showLong(msg)
+            }
+        })
     }
 
 
@@ -1166,9 +1241,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     }?.doFinally {
                         mConnectDisposable = null
                     }?.doOnError {
-                       // TelinkLightService.Instance()?.idleMode(false)
+                        // TelinkLightService.Instance()?.idleMode(false)
                         LogUtils.v("zcl-----------连接失败失败-------doOnError")
-                       // ToastUtils.showShort(getString(R.string.connect_fail))
+                        // ToastUtils.showShort(getString(R.string.connect_fail))
                     }
         } else {
             LogUtils.v("zcl-----------连接失败失败继续连接-------")
@@ -1902,7 +1977,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     @SuppressLint("CheckResult")
     open fun updateAllSensor() {
         NetworkFactory.getApi()
-                .getSensorList(DBUtils.lastUser?.token)
+                .getSensorList(lastUser?.token)
                 .compose(NetworkTransformer())
                 .subscribe({
                     DBUtils.deleteAllSensor()
@@ -1922,8 +1997,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun getWeekStr(week: Int?): String {
         var tmpWeek = week ?: 0
         val sb = StringBuilder()
-       var str  =  when (tmpWeek) {
-            0b01111111,0b10000000-> sb.append(getString(R.string.every_day)).toString()
+        var str = when (tmpWeek) {
+            0b01111111, 0b10000000 -> sb.append(getString(R.string.every_day)).toString()
             0b00000000 -> sb.append(getString(R.string.only_one)).toString()
             else -> {
                 var list = mutableListOf(
@@ -1938,9 +2013,36 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     if (list[i].selected)
                         sb.append(list[i].week).append(",")
                 }
-                    sb.toString().substring(0,sb.length-1)
+                sb.toString().substring(0, sb.length - 1)
             }
         }
         return str
+    }
+
+    inner class BluetoothListenerReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                BluetoothAdapter.ACTION_STATE_CHANGED -> {
+                    LogUtils.v("zcl-----------监听蓝牙-------${intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)}")
+                    when (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, 0)) {
+                        BluetoothAdapter.STATE_TURNING_ON -> {
+                            LogUtils.v("zcl-----------监听蓝牙正在打开-------")
+                        }
+                        BluetoothAdapter.STATE_TURNING_OFF -> {
+                            LogUtils.v("zcl-----------监听蓝牙正在关闭-------")
+                        }
+                        BluetoothAdapter.STATE_OFF -> {
+                            LogUtils.v("zcl-----------监听蓝牙关闭-------")
+                        }
+                        BluetoothAdapter.STATE_ON -> {
+                            if (!DBUtils.isFastDoubleClick(1000)) {
+                                autoConnectAll()
+                                LogUtils.v("zcl-----------监听蓝牙开启执行自动连接-------")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

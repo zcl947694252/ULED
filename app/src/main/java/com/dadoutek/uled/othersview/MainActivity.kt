@@ -57,6 +57,7 @@ import com.dadoutek.uled.scene.SceneFragment
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
+import com.dadoutek.uled.util.DeviceUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.telink.TelinkApplication
 import com.telink.bluetooth.LeBluetooth
@@ -140,6 +141,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         super.onCreate(savedInstanceState)
         this.setContentView(R.layout.activity_main)
         mApp = this.application as TelinkLightApplication
+        TelinkApplication.getInstance().isNew = SharedPreferencesUtils.getScanType()
+
         TelinkLightService.Instance()?.disconnect()
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
@@ -147,7 +150,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         //MqttManger.initMqtt() bindService()
         //if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
         //TelinkLightApplication.getApp().initStompClient()
-
+        changeDisplayImgOnToolbar(false)
         if (Constant.isDebug) {//如果是debug模式可以切换 并且显示
             when (SharedPreferencesHelper.getInt(this, Constant.IS_SMART, 0)) {
                 0 -> DEFAULT_MESH_FACTORY_NAME = "dadousmart"
@@ -160,7 +163,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener { getRouterStatus() }
+        main_toast.setOnClickListener {LogUtils.v("zcl-----------isSupportLollipop获取扫描方式-------${SharedPreferencesUtils.getScanType()}")}
 
         LogUtils.v("zcl---改变参数meshName-------$DEFAULT_MESH_FACTORY_NAME----改变参数url----${Constant.BASE_URL}")
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
@@ -343,7 +346,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     private fun LogOutAndExitApp() {
-        SharedPreferencesHelper.putBoolean(this@MainActivity, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         mApp?.removeEventListeners()
         TelinkLightService.Instance()?.idleMode(true)
         //重启app并杀死原进程
@@ -404,17 +407,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
 
-    private fun packageName(context: Context): String {
-        val manager = context.packageManager
-        var name: String? = null
-        try {
-            val info = manager.getPackageInfo(context.packageName, 0)
-            name = info.versionName
-        } catch (e: NameNotFoundException) {
-            e.printStackTrace()
-        }
-        return name!!
-    }
 
 
     /**

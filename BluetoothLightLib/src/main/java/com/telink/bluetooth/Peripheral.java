@@ -1047,26 +1047,15 @@ import static java.lang.String.valueOf;
                                 if (i5 != 0)
                                     version = version + (char) scanRecord[j];
                             }
-                                    /*
-                                    valueOf((char) scanRecord[i + 16]) + (char) scanRecord[i +
-                                    17] + (char) scanRecord[i + 18]
-                                    + (char) scanRecord[i + 19] + (char) scanRecord[i + 20] +
-                                    (char) scanRecord[i + 21];*/
                             LogUtils.v("zcl------TelinkBluetoothSDK-----首页相关获取广播版本-------" + version + "--" + Arrays.bytesToHexString(scanRecord, ","));
                         }
                     }
                 }
-        /*        String version =
-                        valueOf((char) scanRecord[39]) + (char) scanRecord[40] + (char)
-                        scanRecord[41]
-                                + (char) scanRecord[42] + (char) scanRecord[43] + (char)
-                                scanRecord[44];*/
                 return version;
             }
 
 
             private final class CommandContext {
-
                 public Command command;
                 public Command.Callback callback;
                 public long time;

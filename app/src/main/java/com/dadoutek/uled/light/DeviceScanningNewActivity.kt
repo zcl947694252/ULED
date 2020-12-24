@@ -90,6 +90,7 @@ import java.util.concurrent.TimeUnit
  * --如果得到数据的情况下是超时也就是mqtt没有接到但是没有结束 重新计算超时 如果借宿了 确认清除数据 跳转43
  */
 class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<String> {
+    private var startConnect: Boolean = false
     private var isOffLine: Boolean = false
     private var isFinisAc: Boolean = false
     private var disposableUpMeshTimer: Disposable? = null
@@ -240,7 +241,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    autoConnect(mutableListOf(mAddDeviceType))
+                    // autoConnect(mutableListOf(mAddDeviceType))
+                    autoConnect2()
                 }
 
         // list_devices?.visibility = View.VISIBLE
@@ -496,41 +498,84 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                             LogUtils.d(it)
                         })
             }
-            else ->{
+            else -> {
                 val meshAddress = when {
-                    mAddedDevices.size>0 -> mAddedDevices[0].meshAddress
+                    mAddedDevices.size > 0 -> mAddedDevices[0].meshAddress
                     else -> bestRssiDevice!!.meshAddress
                 }
                 val macAddress = when {
-                    mAddedDevices.size>0 -> mAddedDevices[0].macAddress
+                    mAddedDevices.size > 0 -> mAddedDevices[0].macAddress
                     else -> bestRssiDevice!!.macAddress
                 }
-            if (TelinkLightApplication.getApp().connectDevice == null) {
-                if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected != true){
-                    TelinkLightService.Instance()?.idleMode(true)
-                    TelinkLightService.Instance()?.disconnect()
-                    Thread.sleep(800)
-                    mAutoConnectDisposable = connect(deviceTypes = elements, meshAddress = meshAddress,macAddress = macAddress, fastestMode = true)
-                            ?.subscribe({
-                                onLogin()
-                            }, {
-                                hideLoadingDialog()
-                                ToastUtils.showLong(getString(R.string.connect_fail))
-                                LogUtils.d(it)
-                                onLogin()
-                            })
-                }
-                else
-                    loginMes()
+                if (TelinkLightApplication.getApp().connectDevice == null) {
+                    if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected != true) {
+                        TelinkLightService.Instance()?.idleMode(true)
+                        Thread.sleep(800)
+                        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
+                                DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
+                        mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 3, fastestMode = true)
+                                ?.subscribe({
+                                    onLogin()
+                                }, {
+                                    hideLoadingDialog()
+                                    ToastUtils.showLong(getString(R.string.connect_fail))
+                                    LogUtils.d(it)
+                                    onLogin()
+                                })
+                    } else
+                        loginMes()
 
-            } else {
-                TelinkLightApplication.getApp().isConnectGwBle = true
-                onLogin()
+                } else {
+                    TelinkLightApplication.getApp().isConnectGwBle = true
+                    onLogin()
+                }
             }
-        }}
+        }
     }
+
+    /**
+     * 自动重连
+     * 此处用作设备登录
+     */
+    private fun autoConnect2() {
+        if (TelinkLightService.Instance() != null) {
+            if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
+                showLoadingDialog(resources.getString(R.string.connecting_tip))
+                closeAnimation()
+                startConnect = true
+
+                val meshName = lastUser!!.controlMeshName
+
+                //自动重连参数
+                val connectParams = Parameters.createAutoConnectParameters()
+                connectParams.setMeshName(meshName)
+                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
+                connectParams.autoEnableNotification(true)
+                //连接，如断开会自动重连
+                Thread {
+                    TelinkLightService.Instance().autoConnect(connectParams)
+                }.start()
+            }
+            TelinkLightApplication.getApp().isConnectGwBle = true
+            //刷新Notify参数
+            val refreshNotifyParams = Parameters.createRefreshNotifyParameters()
+            refreshNotifyParams.setRefreshRepeatCount(2)
+            refreshNotifyParams.setRefreshInterval(1000)
+            //开启自动刷新Notify
+            TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+            disposableTimer?.dispose()
+            disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        ToastUtils.showShort(getString(R.string.connect_fail))
+                        hideLoadingDialog()
+                    }
+        }
+    }
+
     private fun loginMes() {
-        val account = DBUtils.lastUser?.account
+        val account = lastUser?.account
         val pwd = NetworkFactory.md5(NetworkFactory.md5(account) + account).substring(0, 16)
         TelinkLightService.Instance().login(Strings.stringToBytes(account, 16)
                 , Strings.stringToBytes(pwd, 16))
@@ -650,7 +695,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                                             finish()
                                         }
                             }
-                            NetworkStatusCode.ROUTER_STOP ->{
+                            NetworkStatusCode.ROUTER_STOP -> {
                                 LogUtils.v("zcl------是否是点击返回-isFinisAc---$isFinisAc--------")
                                 if (!isFinisAc) //路由停止
                                     skipeType()
@@ -800,7 +845,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun onResume() {
         super.onResume()
         stopTimerUpdate()
-        disableConnectionStatusListener()//停止监听 否则扫描到新设备会自动创建新的对象
+        //disableConnectionStatusListener()//停止监听 否则扫描到新设备会自动创建新的对象
         if (TelinkLightService.Instance() == null) //检测service是否为空，为空则重启
             mApplication?.startLightService(TelinkLightService::class.java)
     }
@@ -1265,6 +1310,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             }
 
             LightAdapter.STATUS_LOGIN -> {
+                if (startConnect)
+                    onLogin()
             }
         }
     }

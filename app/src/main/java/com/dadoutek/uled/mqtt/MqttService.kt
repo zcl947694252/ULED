@@ -14,6 +14,8 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.DeviceUtils
+import com.tbruyelle.rxpermissions2.RxPermissions
 import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.*
 
@@ -23,7 +25,7 @@ class MqttService : Service() {
 
     private var conOpt: MqttConnectOptions? = null
 
-    private val imei = com.dadoutek.uled.util.DeviceUtils.getIMEI(TelinkLightApplication.getApp().mContext)
+    open var imei =DeviceUtils.getIMEI(TelinkLightApplication.getApp().mContext)
     private var clientId: String = NetworkFactory.md5((DBUtils.lastUser?.id ?: 0).toString() + imei).substring(8, 24) //客户端标识MD5加密一定是32位
     private var topics = "app/emit/${DBUtils.lastUser?.id}"
     private val host = "${Constant.HOST2}:${Constant.PORT}"
@@ -59,7 +61,7 @@ class MqttService : Service() {
     private val mqttCallback = object : MqttCallback {
         override fun messageArrived(topic: String, message: MqttMessage) {
             val data = message.payload
-             LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message ?.toString()}");
+            LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message?.toString()}");
             val intent = Intent()
             intent.action = Constant.LOGIN_OUT
             intent.putExtra(Constant.LOGIN_OUT, message.toString())
@@ -96,6 +98,11 @@ class MqttService : Service() {
     }
 
     open fun init() {
+        if (imei=="未授权")
+            imei = TelinkLightApplication.getApp().randomImei
+
+        LogUtils.v("zcl----------imei--------$imei")
+
         // 服务器地址（协议+地址+端口号）
         val uri = host
         client = MqttAndroidClient(this, uri, clientId)

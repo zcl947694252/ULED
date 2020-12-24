@@ -272,7 +272,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             else -> scan_old.isChecked= true
         }
         initToolbar()
-        if (SharedPreferencesHelper.getBoolean(this@LoginActivity, Constant.IS_LOGIN, false)) {
+        if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)) {
             transformView()
         }
 

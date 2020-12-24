@@ -60,7 +60,7 @@ public class TelinkApplication extends Application {
         }
     };
 
-    protected DeviceInfo mCurrentConnect;
+    public DeviceInfo mCurrentConnect;
     private BroadcastReceiver mLightReceiver;
 
     public static TelinkApplication getInstance() {
@@ -76,6 +76,9 @@ public class TelinkApplication extends Application {
      */
     public DeviceInfo getConnectDevice() {
         return mCurrentConnect;
+    }
+    public void setConnectDeviceNull() {
+         mCurrentConnect = null;
     }
 
     @Override

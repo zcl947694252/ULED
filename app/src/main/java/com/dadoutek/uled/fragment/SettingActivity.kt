@@ -192,7 +192,7 @@ class SettingActivity : TelinkBaseActivity() {
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         DBUtils.deleteAllData()
         CleanUtils.cleanInternalSp()
         CleanUtils.cleanExternalCache()

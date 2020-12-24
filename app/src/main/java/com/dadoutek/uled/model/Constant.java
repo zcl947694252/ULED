@@ -44,9 +44,9 @@ public class Constant implements Serializable {
 
     public static final int MAX_GROUP_COUNT = 250;
     public static final int MAX_VALUE = 100;
-    public static final int MAX_SCROLL_DELAY_VALUE = 40;
 
-    //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
+    public static final int MAX_SCROLL_DELAY_VALUE = 40;
+   //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
 
     public static final String GROUPS_KEY = "LastGroups";
     public static final String COLOR_NODE_KEY = "COLOR_NODE_KEY";

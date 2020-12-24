@@ -46,7 +46,7 @@ public class DeviceUtils {
 
     public static String getIMEI(Context ctx) {
         if (ActivityCompat.checkSelfPermission(ctx, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            return "未授权！";
+            return "未授权";
         }
         return ((TelephonyManager) ctx.getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
     }

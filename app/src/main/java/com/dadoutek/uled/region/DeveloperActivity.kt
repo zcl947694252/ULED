@@ -345,7 +345,7 @@ class DeveloperActivity : BaseActivity() {
         showLoadingDialog(getString(R.string.clear_data_now))
         UserModel.deleteAllData(dbUser.token)!!.subscribe({
             LogUtils.e("zcl-----------$it")
-            SharedPreferencesHelper.putBoolean(this@DeveloperActivity, Constant.IS_LOGIN, false)
+            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
             DBUtils.deleteAllData()
             CleanUtils.cleanInternalSp()
             CleanUtils.cleanExternalCache()

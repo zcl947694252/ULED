@@ -110,41 +110,41 @@ public final class LeBluetooth extends BluetoothGattCallback {
         this.mCallback = callback;
         if (mCallback == null)
             return;
-        TelinkLog.d("isSupportLollipop--设置回调函数"+isSupportLollipop());
-      //  if (this.isSupportLollipop()) {
-            this.mScanCallback = new ScanCallback() {
-                @Override
-                public void onScanResult(int callbackType, ScanResult result) {
-                    if (isSupportLollipop()) {
-                        byte[] scanRecord = null;
-                        if (result.getScanRecord() != null)
-                            scanRecord = result.getScanRecord().getBytes();
-                        if (mCallback != null)
-                            mCallback.onLeScan(result.getDevice(), result.getRssi(), scanRecord);
-                    }
-                    if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
-                        mDelayHandler.removeCallbacks(mLocationCheckTask);
-                    }
+        TelinkLog.d("isSupportLollipop--设置回调函数" + isSupportLollipop());
+        //  if (this.isSupportLollipop()) {
+        this.mScanCallback = new ScanCallback() {
+            @Override
+            public void onScanResult(int callbackType, ScanResult result) {
+                if (isSupportLollipop()) {
+                    byte[] scanRecord = null;
+                    if (result.getScanRecord() != null)
+                        scanRecord = result.getScanRecord().getBytes();
+                    if (mCallback != null)
+                        mCallback.onLeScan(result.getDevice(), result.getRssi(), scanRecord);
                 }
-
-                @Override
-                public void onScanFailed(int errorCode) {
-                    Log.d("Saw", "##### onScanFailed = " + errorCode);
-                    if (errorCode != ScanCallback.SCAN_FAILED_ALREADY_STARTED)
-                        if (mCallback != null)
-                            mCallback.onScanFail(LeBluetooth.SCAN_FAILED_FEATURE_UNSUPPORTED);
-                }
-            };
-       // } else {
-            this.mLeScanCallback = (device, rssi, scanRecord) -> {
-                if (mCallback != null)
-                    mCallback.onLeScan(device, rssi, scanRecord);
-
                 if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
                     mDelayHandler.removeCallbacks(mLocationCheckTask);
                 }
-            };
-      //  }
+            }
+
+            @Override
+            public void onScanFailed(int errorCode) {
+                Log.d("Saw", "##### onScanFailed = " + errorCode);
+                if (errorCode != ScanCallback.SCAN_FAILED_ALREADY_STARTED)
+                    if (mCallback != null)
+                        mCallback.onScanFail(LeBluetooth.SCAN_FAILED_FEATURE_UNSUPPORTED);
+            }
+        };
+        // } else {
+        this.mLeScanCallback = (device, rssi, scanRecord) -> {
+            if (mCallback != null)
+                mCallback.onLeScan(device, rssi, scanRecord);
+
+            if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
+                mDelayHandler.removeCallbacks(mLocationCheckTask);
+            }
+        };
+        //  }
     }
 
     /**
@@ -274,9 +274,8 @@ public final class LeBluetooth extends BluetoothGattCallback {
     }
 
     public boolean isSupportLollipop() {
-        TelinkLog.v("zcl-----------isSupportLollipop-----isConnect--" + TelinkApplication.getInstance().isConnect);
+        TelinkLog.v("zcl----isSupportLollipop--isNew-----" + TelinkApplication.getInstance().isNew+"---------isConnect---"+ TelinkApplication.getInstance().isConnect);
         if (TelinkApplication.getInstance().isConnect) {
-            TelinkLog.v("zcl-----------isSupportLollipop--isNew-----" + TelinkApplication.getInstance().isNew);
             if (TelinkApplication.getInstance().isNew)
                 return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mSupportLoScan;
             else

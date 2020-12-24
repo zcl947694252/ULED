@@ -162,7 +162,7 @@ public class SharedPreferencesUtils {
     public static boolean getScanType() {
         boolean aBoolean =
                 SharedPreferencesHelper.getBoolean(TelinkLightApplication.Companion.getApp(),
-                Constant.IS_NEW_START_SCAN, false);
+                Constant.IS_NEW_START_SCAN, true);
         return aBoolean;
     }
 }

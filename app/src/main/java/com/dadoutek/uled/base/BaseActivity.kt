@@ -278,7 +278,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
     //重启app并杀死原进程
     fun restartApplication() {
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(this, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         AppUtils.relaunchApp()
     }
 

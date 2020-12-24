@@ -667,6 +667,7 @@ object Commander : EventListener<String> {
                 refreshNotifyParams.setRefreshInterval(2000)
                 //开启自动刷新Notify
                 TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
+
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 LogUtils.v("zcl-----------连接失败失败-------connect timeout")
                 it.onError(Throwable("connect timeout"))

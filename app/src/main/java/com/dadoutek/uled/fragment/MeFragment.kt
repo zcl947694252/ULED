@@ -102,7 +102,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         override fun complete() {
             hideLoadingDialog()
             if (isClickExlogin) {
-                SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+                SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
                 TelinkLightService.Instance()?.disconnect()
                 TelinkLightService.Instance()?.idleMode(true)
 
@@ -120,8 +120,6 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                         .setTitle(R.string.sync_error_exlogin)
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
-                            SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
-                            TelinkLightService.Instance()?.idleMode(true)
                             dialog.dismiss()
                             restartApplication()
                         }.setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ ->
@@ -554,14 +552,10 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (Constant.IS_ROUTE_MODE) {
-                TelinkLightService.Instance()?.disconnect()
-                TelinkLightService.Instance()?.idleMode(true)
                 restartApplication()
             } else
                 if (b1 || it.id.toString() != it.last_authorizer_user_id) {//没有上传数据或者当前区域不是自己的区域
                     if (isClickExlogin) {
-                        TelinkLightService.Instance()?.disconnect()
-                        TelinkLightService.Instance()?.idleMode(true)
                         restartApplication()
                     }
                     hideLoadingDialog()
@@ -603,7 +597,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         }
 
         showLoadingDialog(getString(R.string.clear_data_now))
-        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         DBUtils.deleteAllData()
         CleanUtils.cleanInternalSp()
         CleanUtils.cleanExternalCache()
@@ -615,9 +609,12 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     //重启app并杀死原进程
     private fun restartApplication() {
+        TelinkLightService.Instance()?.disconnect()
         TelinkLightService.Instance()?.idleMode(true)
+        Thread.sleep(500)
+        TelinkLightApplication.getApp().setConnectDeviceNull()
         TelinkApplication.getInstance().removeEventListeners()
-        SharedPreferencesHelper.putBoolean(activity, Constant.IS_LOGIN, false)
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         com.blankj.utilcode.util.AppUtils.relaunchApp()
     }
 

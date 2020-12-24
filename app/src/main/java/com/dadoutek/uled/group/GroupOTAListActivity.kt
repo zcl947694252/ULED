@@ -175,6 +175,8 @@ class GroupOTAListActivity : TelinkBaseActivity() {
                         if (device.size > 0) {
                             device[0].version = cmdBean.version
                             device[0].isGetVersion = true
+
+
                             DBUtils.saveLight(device[0], true)
                         }
                     }

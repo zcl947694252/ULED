@@ -85,7 +85,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
 
         //判断是否是第一次使用app，启动导航页
         mIsFirstData = SharedPreferencesHelper.getBoolean(this@SplashActivity, IS_FIRST_LAUNCH, true)
-        mIsLogging = SharedPreferencesHelper.getBoolean(this@SplashActivity, Constant.IS_LOGIN, false)
+        mIsLogging = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         if (mIsLogging) {
             ActivityUtils.startActivityForResult(this, MainActivity::class.java, 0)
             finish()
