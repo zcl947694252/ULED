@@ -71,6 +71,10 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         initData()
         initView()
         initListener()
+     for (i  in 0..10){
+         LogUtils.v("zcl-----------获取正常数据-------${i}")
+     }
+
     }
 
     private fun initListener() {
@@ -104,7 +108,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                     else -> {
                         isGuide = false
                         when (dialog_pop?.visibility) {
-                            View.GONE ->showPopupMenu()
+                            View.GONE -> showPopupMenu()
                             else -> hidePopupMenu()
                         }
                     }
@@ -119,7 +123,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         emptyGroupView = LayoutInflater.from(context).inflate(R.layout.empty_box_view, null)
         deviceAdapter.onItemClickListener = onItemClickListener
         deviceAdapter.bindToRecyclerView(rvDevice)
-        deviceAdapter.emptyView =emptyGroupView
+        deviceAdapter.emptyView = emptyGroupView
 
         install_device?.setOnClickListener(onClick)
         create_group?.setOnClickListener(onClick)
@@ -188,21 +192,21 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
      */
     private fun initAdapterData() {
         deviceTypeList.clear()
-        isAddDevice(R.string.normal_light,DBUtils.getAllNormalLight().size,DeviceType.LIGHT_NORMAL    ,    Constant.INSTALL_NORMAL_LIGHT)
-        isAddDevice(R.string.rgb_light,DBUtils.getAllRGBLight().size,DeviceType.LIGHT_RGB             , Constant.INSTALL_RGB_LIGHT)
-        isAddDevice(R.string.switch_title,DBUtils.getAllSwitch().size,DeviceType.NORMAL_SWITCH         ,     Constant.INSTALL_SWITCH)
-        isAddDevice(R.string.sensor,DBUtils.getAllSensor().size,DeviceType.SENSOR                     , Constant.INSTALL_SENSOR)
-        isAddDevice(R.string.curtain,DBUtils.getAllCurtains().size,DeviceType.SMART_CURTAIN           , Constant.INSTALL_CURTAIN)
-        isAddDevice(R.string.relay,DBUtils.getAllRelay().size,DeviceType.SMART_RELAY                  , Constant.INSTALL_CONNECTOR)
-        isAddDevice(R.string.Gate_way,DBUtils.getAllGateWay().size,DeviceType.GATE_WAY                , Constant.INSTALL_GATEWAY)
-        isAddDevice(R.string.router,DBUtils.getAllRouter().size,DeviceType.ROUTER                , Constant.INSTALL_ROUTER)
+        isAddDevice(R.string.normal_light, DBUtils.getAllNormalLight().size, DeviceType.LIGHT_NORMAL, Constant.INSTALL_NORMAL_LIGHT)
+        isAddDevice(R.string.rgb_light, DBUtils.getAllRGBLight().size, DeviceType.LIGHT_RGB, Constant.INSTALL_RGB_LIGHT)
+        isAddDevice(R.string.switch_title, DBUtils.getAllSwitch().size, DeviceType.NORMAL_SWITCH, Constant.INSTALL_SWITCH)
+        isAddDevice(R.string.sensor, DBUtils.getAllSensor().size, DeviceType.SENSOR, Constant.INSTALL_SENSOR)
+        isAddDevice(R.string.curtain, DBUtils.getAllCurtains().size, DeviceType.SMART_CURTAIN, Constant.INSTALL_CURTAIN)
+        isAddDevice(R.string.relay, DBUtils.getAllRelay().size, DeviceType.SMART_RELAY, Constant.INSTALL_CONNECTOR)
+        isAddDevice(R.string.Gate_way, DBUtils.getAllGateWay().size, DeviceType.GATE_WAY, Constant.INSTALL_GATEWAY)
+        isAddDevice(R.string.router, DBUtils.getAllRouter().size, DeviceType.ROUTER, Constant.INSTALL_ROUTER)
 
         deviceAdapter.notifyDataSetChanged()
     }
 
     private fun isAddDevice(strId: Int, size: Int, deviceType: Int, installType: Int) {
         if (size > 0)
-            deviceTypeList.add(DeviceItem(getString(strId), size, deviceType,installType))
+            deviceTypeList.add(DeviceItem(getString(strId), size, deviceType, installType))
     }
 
 
@@ -319,6 +323,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
             }
         }
     }
+
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_GROUP_ALLON -> {
@@ -334,13 +339,13 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
-        when(v?.id){
-            R.id.main_go_help->{
+        when (v?.id) {
+            R.id.main_go_help -> {
                 var intent = Intent(context, InstructionsForUsActivity::class.java)
-                intent.putExtra(Constant.WB_TYPE,"#add-and-configure")
+                intent.putExtra(Constant.WB_TYPE, "#add-and-configure")
                 startActivity(intent)
             }
-            R.id.main_add_device->{
+            R.id.main_add_device -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
                     if (it.id.toString() != it.last_authorizer_user_id)

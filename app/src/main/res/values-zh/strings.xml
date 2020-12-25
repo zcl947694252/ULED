@@ -1211,4 +1211,6 @@
     <string name="commutation_faile">电机换向失败</string>
     <string name="open_faile">打开失败</string>
     <string name="please_do_this_over_ble">请在蓝牙下进行此操作</string>
+    <string name="compatible_scan">兼容模式</string>
+    <string name="normal_scan">常规模式</string>
 </resources>

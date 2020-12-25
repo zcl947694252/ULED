@@ -440,6 +440,7 @@ object DBUtils {
     fun getLightByID(id: Long): DbLight? {
         return DaoSessionInstance.getInstance().dbLightDao.load(id)
     }
+
     fun getLightByMac(mac: String): DbLight? {
         val list = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .where(DbLightDao.Properties.MacAddr.eq(mac)).list()
@@ -525,7 +526,6 @@ object DBUtils {
             else -> dbCurtianList[0]
         }
     }
-
 
 
     fun getEightSwitchByMeshAddr(meshAddr: Int): DbEightSwitch? {
@@ -894,16 +894,6 @@ object DBUtils {
             }
         }
     }
-
-
-    fun isFastDoubleClick( delay: Int =500): Boolean {
-                val time = System.currentTimeMillis()
-                if (time - lastClickTime < delay) {
-                    return true
-                }
-                lastClickTime = time
-                return false
-            }
 
     fun saveCurtain(db: DbCurtain, isFromServer: Boolean) {
         LogUtils.e("zcl保存分组前curtain-------------${DBUtils.getAllCurtains().size}")
@@ -1295,18 +1285,23 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
+
     fun deleteColorNodeAll() {
         DaoSessionInstance.getInstance().dbColorNodeDao.deleteAll()
     }
+
     fun deleteDiyGradientAll() {
         DaoSessionInstance.getInstance().dbDiyGradientDao.deleteAll()
     }
+
     fun deleteAllSwitch() {
         DaoSessionInstance.getInstance().dbSwitchDao.deleteAll()
     }
+
     fun deleteAllSensor() {
         DaoSessionInstance.getInstance().dbSensorDao.deleteAll()
     }
+
     fun deleteAllScene() {
         DaoSessionInstance.getInstance().dbSceneDao.deleteAll()
         DaoSessionInstance.getInstance().dbSceneActionsDao.deleteAll()
@@ -1603,4 +1598,11 @@ object DBUtils {
         }
     }
 
+    fun isFastDoubleClick(delay: Int = 500): Boolean {
+        val time = System.currentTimeMillis()
+        if (time - lastClickTime < delay)
+            return true
+        lastClickTime = time
+        return false
+    }
 }

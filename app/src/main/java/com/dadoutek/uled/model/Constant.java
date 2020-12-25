@@ -193,8 +193,6 @@ public class Constant implements Serializable {
     public static String TYPE_LOGIN = "TYPE_LOGIN";
 
     //导航页标签
-    public static String TAG_SceneFragment = "SceneFragment";
-
     public static final int INSTALL_NORMAL_LIGHT = 0;
     public static final int INSTALL_RGB_LIGHT = 1;
     public static final int INSTALL_SWITCH = 2;

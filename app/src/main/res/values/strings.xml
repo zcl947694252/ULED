@@ -1208,8 +1208,10 @@
     <string name="input_right_code">Please enter the correct barcode</string>
     <string name="scan_code">Device code scanning</string>
     <string name="select_all_group">All groups have been checked</string>
-    <string name="commutation_success">电机换向成功</string>
-    <string name="commutation_faile">电机换向失败</string>
-    <string name="open_faile">打开失败</string>
-    <string name="please_do_this_over_ble">请在蓝牙下进行此操作</string>
+    <string name="commutation_success">Motor reversing successfully</string>
+    <string name="commutation_faile">Motor commutation failure</string>
+    <string name="open_faile">open fail</string>
+    <string name="please_do_this_over_ble">Please do this over Bluetooth</string>
+    <string name="compatible_scan">Compatibility mode</string>
+    <string name="normal_scan">Conventional mode</string>
 </resources>

@@ -317,6 +317,17 @@
             app:layout_constraintTop_toTopOf="@+id/sms_password_login"
             app:layout_constraintVertical_bias="0.25">
 
+        <RadioButton
+                android:id="@+id/scan_old"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/select_radius5_w_e"
+                android:button="@null"
+                android:checked="false"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:text="@string/normal_scan"/>
 
         <RadioButton
                 android:id="@+id/scan_new"
@@ -327,18 +338,9 @@
                 android:button="@null"
                 android:checked="true"
                 android:gravity="center"
-                android:text="isNew" />
+                android:textSize="12sp"
+                android:text="@string/compatible_scan"/>
 
-        <RadioButton
-                android:id="@+id/scan_old"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/select_radius5_w_e"
-                android:button="@null"
-                android:checked="false"
-                android:gravity="center"
-                android:text="isOld" />
     </RadioGroup>
 
 
