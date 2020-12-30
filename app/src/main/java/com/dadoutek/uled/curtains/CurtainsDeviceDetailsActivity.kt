@@ -102,7 +102,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
 
     override fun bindDeviceRouter() {
         val dbGroup = DbGroup()
-        dbGroup.brightness=10000
+        dbGroup.brightness = 10000
         dbGroup.deviceType = DeviceType.SMART_CURTAIN.toLong()
         var intent = Intent(this, BindRouterActivity::class.java)
         intent.putExtra("group", dbGroup)
@@ -318,15 +318,15 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
             R.id.create_scene -> {
                 dialog_curtain?.visibility = View.GONE
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(getString(R.string.device_not_connected))
-                } else {
-                    if (nowSize >= SCENE_MAX_COUNT) {
-                        ToastUtils.showLong(R.string.scene_16_tip)
-                    } else {
-                        val intent = Intent(this, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
-                        startActivity(intent)
+                when (TelinkLightApplication.getApp().connectDevice) {
+                    null -> ToastUtils.showLong(getString(R.string.device_not_connected))
+                    else -> when {
+                        nowSize >= SCENE_MAX_COUNT -> ToastUtils.showLong(R.string.scene_16_tip)
+                        else -> {
+                            val intent = Intent(this, NewSceneSetAct::class.java)
+                            intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                            startActivity(intent)
+                        }
                     }
                 }
             }
@@ -388,7 +388,7 @@ class CurtainsDeviceDetailsActivity : TelinkBaseToolbarActivity(), View.OnClickL
         currentDevice = curtainDatas?.get(position)
         positionCurrent = position
         when {
-            TelinkLightApplication.getApp().connectDevice == null&&!IS_ROUTE_MODE -> autoConnectAll()
+            TelinkLightApplication.getApp().connectDevice == null && !IS_ROUTE_MODE -> autoConnectAll()
             else -> {
                 when (view.id) {
                     R.id.template_device_card_delete -> {

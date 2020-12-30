@@ -37,6 +37,7 @@ import kotlinx.android.synthetic.main.fragment_new_device.*
 import kotlinx.android.synthetic.main.popwindow_install_deive_list.*
 import kotlinx.android.synthetic.main.template_add_help.*
 import kotlinx.android.synthetic.main.toolbar.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -205,8 +206,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     }
 
     private fun isAddDevice(strId: Int, size: Int, deviceType: Int, installType: Int) {
-        if (size > 0)
-            deviceTypeList.add(DeviceItem(getString(strId), size, deviceType, installType))
+        if (size > 0) deviceTypeList.add(DeviceItem(getString(strId), size, deviceType, installType))
     }
 
 
@@ -233,25 +233,23 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                 showInstallDeviceList()
             }
             R.id.create_group -> {
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                } else {
-                    // addNewGroup()
-                    popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0)
+                when (TelinkLightApplication.getApp().connectDevice) {
+                    null ->ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    else -> popMain.showAtLocation(viewContent, Gravity.CENTER, 0, 0) // addNewGroup()
                 }
             }
             R.id.create_scene -> {
                 val nowSize = DBUtils.sceneList.size
-                if (TelinkLightApplication.getApp().connectDevice == null) {
-                    ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
-                } else {
-                    if (nowSize >= SCENE_MAX_COUNT) {
-                        ToastUtils.showLong(R.string.scene_16_tip)
-                    } else {
-                        val intent = Intent(activity, NewSceneSetAct::class.java)
-                        intent.putExtra(Constant.IS_CHANGE_SCENE, false)
-                        startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
-                    }
+                when (TelinkLightApplication.getApp().connectDevice) {
+                    null -> ToastUtils.showLong(activity!!.getString(R.string.device_not_connected))
+                    else -> when {
+                            nowSize >= SCENE_MAX_COUNT -> ToastUtils.showLong(R.string.scene_16_tip)
+                            else -> {
+                                val intent = Intent(activity, NewSceneSetAct::class.java)
+                                intent.putExtra(Constant.IS_CHANGE_SCENE, false)
+                                startActivityForResult(intent, CREATE_SCENE_REQUESTCODE)
+                            }
+                        }
                 }
             }
         }
@@ -259,16 +257,17 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
     fun myPopViewClickPosition(x: Float, y: Float) {
         if (x < dialog_pop?.left ?: 0 || y < dialog_pop?.top ?: 0 || y > dialog_pop?.bottom ?: 0) {
-            if (dialog_pop?.visibility == View.VISIBLE) {
-                Thread {
-                    //避免点击过快点击到下层View
-                    Thread.sleep(100)
-                    GlobalScope.launch(Dispatchers.Main) {
-                        hidePopupMenu()
-                    }
-                }.start()
-            } else if (dialog_pop == null) {
-                hidePopupMenu()
+            when {
+                dialog_pop?.visibility == View.VISIBLE -> {
+                    Thread {
+                        //避免点击过快点击到下层View
+                        Thread.sleep(100)
+                        GlobalScope.launch(Dispatchers.Main) {
+                            hidePopupMenu()
+                        }
+                    }.start()
+                }
+                dialog_pop == null -> hidePopupMenu()
             }
         }
     }
@@ -315,7 +314,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
             Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制组全开成功-------")
                 hideLoadingDialog()
-
             }
             Constant.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
@@ -329,7 +327,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
             Constant.SER_ID_GROUP_ALLON -> {
                 LogUtils.v("zcl-----------远程控制组全开成功-------")
                 hideLoadingDialog()
-
             }
             Constant.SER_ID_GROUP_ALLOFF -> {
                 LogUtils.v("zcl-----------远程控制组全关成功-------")
@@ -348,11 +345,12 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
             R.id.main_add_device -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        var intent = Intent(context, SelectDeviceTypeActivity::class.java)
-                        startActivity(intent)
+                    when {
+                        it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
+                        else -> {
+                            var intent = Intent(context, SelectDeviceTypeActivity::class.java)
+                            startActivity(intent)
+                        }
                     }
                 }
             }

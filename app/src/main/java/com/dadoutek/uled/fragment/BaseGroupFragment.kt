@@ -472,7 +472,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                         override fun error(msg: String?) {}
                     })
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
@@ -654,7 +655,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                                     override fun error(msg: String?) {}
                                 })
                             }
-                            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            90008 -> {hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                             else -> ToastUtils.showShort(itr.message)
@@ -740,7 +742,8 @@ abstract class BaseGroupFragment : BaseFragment() {
                         deleteComplete()
                     }
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
                 else -> ToastUtils.showShort(it.message)

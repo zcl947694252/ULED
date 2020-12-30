@@ -545,7 +545,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                     override fun onSeeking(seekParams: SeekParams) {
                         val i = seekParams.progress
                         val opcode = Opcode.CURTAIN_ON_OFF
-                            value = i
+                        value = i
                         if (Constant.IS_ROUTE_MODE)
                             routerControlCurtain(0x15, "configSpeed")
                         else {
@@ -565,7 +565,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     @SuppressLint("CheckResult")//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea 换向 = 0x11
-    private fun routerControlCurtain(opcode: Int, ser_id: String ,isInverser: Boolean = false) {
+    private fun routerControlCurtain(opcode: Int, ser_id: String, isInverser: Boolean = false) {
         var meshType = if (typeStr == Constant.TYPE_GROUP) 97 else curtain!!.productUUID
         var macAddr = if (typeStr == Constant.TYPE_GROUP) "97" else curtain!!.macAddr
         var meshAddr = if (typeStr == Constant.TYPE_GROUP) curtainGroup!!.meshAddr else curtain!!.meshAddr
@@ -609,7 +609,10 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                             finish()
                         }
-                        90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        90008 -> {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                        }
                         90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                         90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                         else -> ToastUtils.showShort(it.message)
@@ -702,14 +705,16 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateOTA() {
         when {
-            versionText.text != null && versionText.text != "" ->
+            curtain?.boundMac == "" || curtain?.boundMac == null -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+
+            versionText.text != null && versionText.text != "" -> {
                 when {
                     !isSuportOta(curtain?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
                     isMostNew(curtain?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
                     else -> {
                         when {
                             Constant.IS_ROUTE_MODE -> {
-                                if (TextUtils.isEmpty(curtain?.boundMac)){
+                                if (TextUtils.isEmpty(curtain?.boundMac)) {
                                     ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                     return
                                 }
@@ -721,6 +726,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         }
                     }
                 }
+            }
             else -> Toast.makeText(this, R.string.number_no, Toast.LENGTH_LONG).show()
         }
     }
@@ -992,11 +998,11 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                         setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
                 }
             }
-       /* if (Constant.IS_ROUTE_MODE){
-            DBUtils.deleteLocalData()
-            //ToastUtils.showShort(getString(R.string.device_not_exit))
-            SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
-        }*/
+        /* if (Constant.IS_ROUTE_MODE){
+             DBUtils.deleteLocalData()
+             //ToastUtils.showShort(getString(R.string.device_not_exit))
+             SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+         }*/
         finish()
     }
 

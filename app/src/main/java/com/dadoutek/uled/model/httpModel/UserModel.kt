@@ -25,7 +25,6 @@ object UserModel {
                 .allModeStatus
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
-
                 .doOnNext {}
                 .observeOn(AndroidSchedulers.mainThread())
     }

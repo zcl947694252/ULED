@@ -423,7 +423,8 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                     updateAllSwitch()
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 ->{hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
             }

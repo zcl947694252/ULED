@@ -37,6 +37,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.WeekBean
+import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
@@ -85,7 +86,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
+import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 ///TelinkLog 打印
@@ -1244,7 +1247,17 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         // TelinkLightService.Instance()?.idleMode(false)
                         LogUtils.v("zcl-----------连接失败失败-------doOnError")
                         // ToastUtils.showShort(getString(R.string.connect_fail))
-                    }
+                    }/*?.doOnNext {
+                        it.boundMac = when (it.productUUID) {
+                            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> DBUtils.getLightByID(it.id.toLong())?.boundMac
+                            DeviceType.NORMAL_SWITCH, DeviceType.EIGHT_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH,
+                            DeviceType.DOUBLE_SWITCH, DeviceType.NORMAL_SWITCH2 -> DBUtils.getSwitchByID(it.id.toLong())?.boundMac
+                            DeviceType.SENSOR,DeviceType.NIGHT_LIGHT->DBUtils.getSensorByID(it.id.toLong())?.boundMac
+                            DeviceType.SMART_CURTAIN->DBUtils.getCurtainByID(it.id.toLong())?.boundMac
+                            DeviceType.SMART_RELAY->DBUtils.getConnectorByID(it.id.toLong())?.boundMac
+                            else -> DBUtils.getLightByID(it.meshAddress.toLong())?.boundMac
+                        }
+                    }*/
         } else {
             LogUtils.v("zcl-----------连接失败失败继续连接-------")
             LogUtils.d("autoConnect Commander = ${mConnectDisposable?.isDisposed}, isLogin = ${TelinkLightService.Instance()?.isLogin}")
@@ -1601,7 +1614,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         deleteGpSuccess()
                     }
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
                 else -> ToastUtils.showShort(it.message)
@@ -1669,7 +1685,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                 finish()
             }
-            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+            90008 -> {
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+            }
             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
             else -> ToastUtils.showShort(it.message)
@@ -1721,7 +1740,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     ToastUtils.showShort(getString(R.string.device_not_exit))
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                 else -> ToastUtils.showShort(it.message)
@@ -1755,7 +1777,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
@@ -1787,7 +1812,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
                 90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -1902,7 +1930,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -1946,7 +1977,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     ToastUtils.showShort(getString(R.string.device_not_exit))
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
             }

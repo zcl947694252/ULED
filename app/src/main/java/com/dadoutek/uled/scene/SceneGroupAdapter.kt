@@ -726,7 +726,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     override fun error(msg: String?) {}
                 })
             }
-            90008 -> ToastUtils.showShort(mContext.getString(R.string.no_bind_router_cant_perform))
+            90008 -> {
+                hideLoadingDialog()
+                ToastUtils.showShort(mContext.getString(R.string.no_bind_router_cant_perform))
+            }
             90007 -> ToastUtils.showShort(mContext.getString(R.string.gp_not_exit))
             90005 -> ToastUtils.showShort(mContext.getString(R.string.router_offline))
             else -> ToastUtils.showShort(it.message)
@@ -750,7 +753,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                        8 -> hLesswihte(currentPostion, data)
                    }*/
                 //if (currentSeekBar != null)
-                 //   changeTextView(currentSeekBar!!, seekBarprogress, currentPostion)
+                //   changeTextView(currentSeekBar!!, seekBarprogress, currentPostion)
                 hideLoadingDialog()
             }
             else -> {
@@ -1641,17 +1644,17 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             R.id.normal_sbBrightness -> {
                 LogUtils.v("zcl--进度条-----position$position----------")
                 val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
-                   if (tvBrightness != null) {
-                     //  data[position].brightness = progress
-                       tvBrightness?.text = "$progress%"
-                   }
+                if (tvBrightness != null) {
+                    //  data[position].brightness = progress
+                    tvBrightness?.text = "$progress%"
+                }
                 //notifyItemRangeChanged(position, data.size)
             }
             R.id.normal_temperature -> {
-                   val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
+                val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
                 if (tvTemperature != null) {
                     tvTemperature?.text = "$progress%"
-                   // data[position].temperature = progress
+                    // data[position].temperature = progress
                 }
                 //notifyItemRangeChanged(position, data.size)
             }

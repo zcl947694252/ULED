@@ -234,12 +234,15 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        if (TextUtils.isEmpty(p0.toString())) {
-            sms_login.isClickable = false
-            sms_login.background = getDrawable(R.drawable.btn_rec_black_c8)
-        } else {
-            sms_login.isClickable = true
-            sms_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+        when {
+            TextUtils.isEmpty(p0.toString()) -> {
+                sms_login.isClickable = false
+                sms_login.background = getDrawable(R.drawable.btn_rec_black_c8)
+            }
+            else -> {
+                sms_login.isClickable = true
+                sms_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+            }
         }
     }
 
@@ -260,8 +263,7 @@ class VerificationCodeActivity : TelinkBaseActivity(), View.OnClickListener, Tex
                 countryCode = toString
                 ccp_tv.text = countryName + countryNumber
             }
-            else -> {
-            }
+            else -> {}
         }
     }
 }

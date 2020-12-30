@@ -163,7 +163,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             main_toast.visibility = GONE
         }
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
-        main_toast.setOnClickListener {LogUtils.v("zcl-----------isSupportLollipop获取扫描方式-------${SharedPreferencesUtils.getScanType()}")}
+        main_toast.setOnClickListener { LogUtils.v("zcl-----------isSupportLollipop获取扫描方式-------${SharedPreferencesUtils.getScanType()}") }
 
         LogUtils.v("zcl---改变参数meshName-------$DEFAULT_MESH_FACTORY_NAME----改变参数url----${Constant.BASE_URL}")
         main_toast.text = DEFAULT_MESH_FACTORY_NAME
@@ -230,15 +230,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                         }
                                         2 -> {
                                             var gpId = when (productUUID) {
-                                                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
-                                                    DBUtils.getLightByMac(otaDataOne.macAddr)?.belongGroupId
-                                                }
-                                                DeviceType.SMART_CURTAIN -> {
-                                                    DBUtils.getCurtainByMac(otaDataOne.macAddr)?.belongGroupId
-                                                }
-                                                DeviceType.SMART_RELAY -> {
-                                                    DBUtils.getConnectorByMac(otaDataOne.macAddr)?.belongGroupId
-                                                }
+                                                DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMac(otaDataOne.macAddr)?.belongGroupId
+                                                DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByMac(otaDataOne.macAddr)?.belongGroupId
+                                                DeviceType.SMART_RELAY -> DBUtils.getConnectorByMac(otaDataOne.macAddr)?.belongGroupId
                                                 else -> DBUtils.getLightByMac(otaDataOne.macAddr)?.belongGroupId
                                             }
                                             val groupByID = DBUtils.getGroupByID(gpId ?: 0)
@@ -264,7 +258,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
     @SuppressLint("CheckResult")
     private fun getAllStatus() {
-        if (Constant.IS_ROUTE_MODE)
             UserModel.getModeStatus()?.subscribe({
                 LogUtils.v("zcl-----------获取状态服务器返回-------$it")
                 Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
@@ -278,11 +271,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             })
     }
 
+    @SuppressLint("CheckResult")
     private fun getScanResult() {
         if (Constant.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.please_wait))
             val timeDisposable = Observable.timer(1500, TimeUnit.MILLISECONDS).subscribe { hideLoadingDialog() }
-            val subscribe = RouterModel.getRouteScanningResult()?.subscribe({
+            RouterModel.getRouteScanningResult()?.subscribe({
                 //status	int	状态。0扫描结束，1仍在扫描
                 if (it?.data != null && it.data.status == 1) {
                     val intent = Intent(this@MainActivity, DeviceScanningNewActivity::class.java)
@@ -405,8 +399,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         })
             }
     }
-
-
 
 
     /**
@@ -671,6 +663,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                         TelinkLightService.Instance().idleMode(true)
                         bestRSSIDevice = null   //扫描前置空信号最好设备。
                         //扫描参数
+
                         val account = DBUtils.lastUser?.account
 
                         val scanFilters = ArrayList<ScanFilter>()
@@ -711,49 +704,52 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             showOpenLocationServiceDialog()
         } else {
             hideLocationServiceDialog()
-            if (TelinkApplication.getInstance()?.serviceStarted == true) {
-                if (!this@MainActivity.isFinishing)
-                    RxPermissions(this@MainActivity).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({
-                                if (TelinkLightService.Instance()?.isLogin == false/*&&TelinkLightApplication.getApp().connectDevice == null*/) {
-                                    val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
-                                            DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
-                                    val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
-
-                                    if (size > 0) {
-                                        ToastUtils.showLong(R.string.connecting_tip)
-                                        if (TelinkLightService.Instance() == null)
-                                            TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
-                                        // ToastUtils.showShort(getString(R.string.connecting_tip))
-                                        mConnectDisposable?.dispose()
-                                        mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 1)
-                                                ?.subscribe({//找回有效设备
-                                                    //RecoverMeshDeviceUtil.addDevicesToDb(it)
-                                                    onLogin()
-                                                    LogUtils.v("zcl-----------连接成功失败-------")
-                                                }, {
-                                                    LogUtils.v("zcl-----------连接失败失败-------")
-                                                    LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
-                                                //   autoConnect()
-                                                })
-                                    } else {
-                                        ToastUtils.showShort(getString(R.string.no_connect_device))
+            when (TelinkApplication.getInstance()?.serviceStarted) {
+                true -> {
+                    if (!this@MainActivity.isFinishing)
+                        RxPermissions(this@MainActivity).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({
+                                    if (TelinkLightService.Instance()?.isLogin == false/*&&TelinkLightApplication.getApp().connectDevice == null*/) {
+                                        val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD,
+                                                DeviceType.LIGHT_RGB, DeviceType.SMART_RELAY, DeviceType.SMART_CURTAIN)
+                                        val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
+    
+                                        when {
+                                            size > 0 -> {
+                                                ToastUtils.showLong(R.string.connecting_tip)
+                                                if (TelinkLightService.Instance() == null)
+                                                    TelinkLightApplication.getApp().startLightService(TelinkLightService::class.java)
+                                                //ToastUtils.showShort(getString(R.string.connecting_tip))
+                                                mConnectDisposable?.dispose()
+                                                mConnectDisposable = connect(deviceTypes = deviceTypes, fastestMode = false, retryTimes = 1)
+                                                        ?.subscribe({//找回有效设备
+                                                            //RecoverMeshDeviceUtil.addDevicesToDb(it)
+                                                            onLogin()
+                                                            LogUtils.v("zcl-----------连接成功失败-------")
+                                                        }, {
+                                                            LogUtils.v("zcl-----------连接失败失败-------")
+                                                            LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
+                                                            //   autoConnect()
+                                                        })
+                                            }
+                                            else -> ToastUtils.showShort(getString(R.string.no_connect_device))
+                                        }
                                     }
-                                }
-                            }, {
-                                LogUtils.d(it)
-                                autoConnect()
-                            })
-            } else {
-                mApp?.startLightService(TelinkLightService::class.java)
-                autoConnect()
+                                }, {
+                                    LogUtils.d(it)
+                                    autoConnect()
+                                })
+                }
+                else -> {
+                    mApp?.startLightService(TelinkLightService::class.java)
+                    autoConnect()
+                }
             }
         }
 
-        val deviceInfo = mApp?.connectDevice
-        if (deviceInfo != null)
+        if (mApp?.connectDevice != null)
             this.connectMeshAddress = (mApp?.connectDevice?.meshAddress ?: 0x00) and 0xFF
 
     }

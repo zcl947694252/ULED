@@ -768,6 +768,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
             deviceInfo.status = it.status
             deviceInfo.id = it.id.toInt()
             deviceInfo.isConfirm = 1
+            deviceInfo.boundMac = it.boundMac
         }
         settingType = NORMAL_SENSOR
     }

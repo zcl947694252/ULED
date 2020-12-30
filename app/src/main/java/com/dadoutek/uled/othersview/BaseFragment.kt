@@ -1,5 +1,6 @@
 package com.dadoutek.uled.othersview
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -18,17 +19,21 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import android.widget.TextView
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DBUtils
+import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
@@ -253,24 +258,25 @@ open class BaseFragment : Fragment() {
      */
     open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
         GlobalScope.launch(Dispatchers.Main) {
-            if (Constant.IS_ROUTE_MODE)
-                toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
-            else {
-                if (isConnected) {
-                    toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_bluetooth)
-                    toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = false
-                    //meFragment 不存在toolbar 所以要拉出来
-                    setLoginChange()
-                } else {
-                    if (toolbar != null) {
-                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.bluetooth_no)
-                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = true
-                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setOnClickListener {
-                            val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
-                            dialog.show()
+            when {
+                Constant.IS_ROUTE_MODE -> toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
+                else -> {
+                    if (isConnected) {
+                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_bluetooth)
+                        toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = false
+                        //meFragment 不存在toolbar 所以要拉出来
+                        setLoginChange()
+                    } else {
+                        if (toolbar != null) {
+                            toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.bluetooth_no)
+                            toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.isEnabled = true
+                            toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setOnClickListener {
+                                val dialog = BluetoothConnectionFailedDialog(activity, R.style.Dialog)
+                                dialog.show()
+                            }
                         }
+                        setLoginOutChange()
                     }
-                    setLoginOutChange()
                 }
             }
         }
@@ -338,15 +344,21 @@ open class BaseFragment : Fragment() {
 //        context?.registerReceiver(changeRecevicer, filter)
     }
 
+    @SuppressLint("CheckResult")
     override fun onResume() {
         super.onResume()
         enableConnectionStatusListener()
-
-        if (TelinkLightApplication.getApp().connectDevice != null) {
-            changeDisplayImgOnToolbar(true)
-        } else {
-            changeDisplayImgOnToolbar(false)
-        }
+        UserModel.getModeStatus()?.subscribe({
+            LogUtils.v("zcl-----------获取状态服务器返回-------$it")
+            Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
+            changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
+        }, {
+            Constant.IS_OPEN_AUXFUN = false
+        })
+      /*  when {
+            TelinkLightApplication.getApp().connectDevice != null -> changeDisplayImgOnToolbar(true)
+            else -> changeDisplayImgOnToolbar(false)
+        }*/
     }
 
     override fun onPause() {

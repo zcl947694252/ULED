@@ -421,7 +421,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                                 SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
                                 finish()
                             }
-                            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            90008 -> {
+                                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                hideLoadingDialog()
+                            }
                             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                             90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -474,13 +477,17 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                         when (response.errorCode) {
                             0 -> {
                                 disposableTimer?.dispose()
-                                disposableTimer = io.reactivex.Observable.timer(1500, TimeUnit.MILLISECONDS)
+                                disposableTimer = io.reactivex.Observable.timer(response.t.timeout.toLong(), TimeUnit.MILLISECONDS)
                                         .subscribe {
-                                            showLoadingDialog(getString(R.string.add_gradient_fail))
+                                            hideLoadingDialog()
+                                            ToastUtils.showShort(getString(R.string.add_gradient_fail))
                                         }
                             }
                             900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                            90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            90008 -> {
+                                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                hideLoadingDialog()
+                            }
                             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                             90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
                             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -670,11 +677,12 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             setResult(Activity.RESULT_OK)
             lookService()
             finish()
-        } else when (cmdBean.cmd) {
-            Cmd.tzRouteAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
-            Cmd.tzRouteUpdateGradient -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
+        } else {
+            when (cmdBean.cmd) {
+                Cmd.tzRouteAddGradient -> ToastUtils.showShort(getString(R.string.add_gradient_fail))
+                Cmd.tzRouteUpdateGradient -> ToastUtils.showShort(getString(R.string.update_gradient_fail))
+            }
         }
-
     }
 
     @SuppressLint("CheckResult")

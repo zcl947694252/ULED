@@ -51,16 +51,14 @@ import com.dadoutek.uled.othersview.ViewPagerAdapter
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.util.DataManager
-import com.dadoutek.uled.util.GuideUtils
-import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.*
 import com.telink.bluetooth.light.ConnectionStatus
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
+import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -220,7 +218,7 @@ class GroupListFragment : BaseFragment() {
         toolbarTv = viewContent.findViewById(R.id.toolbarTv)
         toolbarTv!!.setText(R.string.group_title)
 
-       // allLightText = viewContent.findViewById(R.id.textView6)
+        // allLightText = viewContent.findViewById(R.id.textView6)
         val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
 
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
@@ -260,8 +258,8 @@ class GroupListFragment : BaseFragment() {
          onText?.setOnClickListener(onClick)
          offText?.setOnClickListener(onClick)*/
         btnDelete.setOnClickListener(onClick)
-       // allLightText?.setOnClickListener(onClick)
-       // groupAllLy?.setOnClickListener(onClick)
+        // allLightText?.setOnClickListener(onClick)
+        // groupAllLy?.setOnClickListener(onClick)
         return viewContent
     }
 
@@ -447,14 +445,14 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
-            @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(isOpen: Boolean) {
         val gateWay = DBUtils.getAllGateWay()
-        if (gateWay.size>0)
-        GwModel.getGwList()?.subscribe({
+        if (gateWay.size > 0)
+            GwModel.getGwList()?.subscribe({
                 TelinkLightApplication.getApp().offLine = true
                 hideLoadingDialog()
-            it.forEach { db ->
+                it.forEach { db ->
                     //网关在线状态，1表示在线，0表示离线
                     if (db.state == 1)
                         TelinkLightApplication.getApp().offLine = false
@@ -479,7 +477,7 @@ class GroupListFragment : BaseFragment() {
                         gattBody.ser_id = Constant.SER_ID_GROUP_ALLOFF
                     }
 
-                    val s =  Base64Utils.encodeToStrings(gattPar)
+                    val s = Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
                     gattBody.cmd = Constant.CMD_MQTT_CONTROL
                     gattBody.meshAddr = allGroup!!.meshAddr
@@ -490,18 +488,18 @@ class GroupListFragment : BaseFragment() {
             }, {
                 hideLoadingDialog()
                 ToastUtils.showShort(getString(R.string.gw_not_online))
-        })
+            })
     }
 
     @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
-                disposableTimer?.dispose()
-                LogUtils.v("zcl-----------远程控制-------$it")
-            },{
-                disposableTimer?.dispose()
-                ToastUtils.showShort(it.message)
-                LogUtils.v("zcl-----------远程控制-------${it.message}")
+            disposableTimer?.dispose()
+            LogUtils.v("zcl-----------远程控制-------$it")
+        }, {
+            disposableTimer?.dispose()
+            ToastUtils.showShort(it.message)
+            LogUtils.v("zcl-----------远程控制-------${it.message}")
         })
     }
 
@@ -513,18 +511,18 @@ class GroupListFragment : BaseFragment() {
         //点击任何一个选项跳转页面都隐藏引导
         hidePopupMenu()
         when (it.id) {
-          /*  R.id.group_all_ly -> {
-                if (TelinkLightApplication.getApp().connectDevice != null) {
-                    val intentSetting = Intent(context, NormalSettingActivity::class.java)
-                    intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
-                    intentSetting.putExtra("group", DBUtils.allGroups[0])
-                    startActivityForResult(intentSetting, 1)
-                } else {
-                    ToastUtils.showShort(getString(R.string.device_not_connected))
-                    val activity = activity as MainActivity
-                    activity.autoConnect()
-                }
-            }*/
+            /*  R.id.group_all_ly -> {
+                  if (TelinkLightApplication.getApp().connectDevice != null) {
+                      val intentSetting = Intent(context, NormalSettingActivity::class.java)
+                      intentSetting.putExtra(Constant.TYPE_VIEW, Constant.TYPE_GROUP)
+                      intentSetting.putExtra("group", DBUtils.allGroups[0])
+                      startActivityForResult(intentSetting, 1)
+                  } else {
+                      ToastUtils.showShort(getString(R.string.device_not_connected))
+                      val activity = activity as MainActivity
+                      activity.autoConnect()
+                  }
+              }*/
             R.id.install_device -> {
                 showInstallDeviceList()
             }
@@ -608,7 +606,7 @@ class GroupListFragment : BaseFragment() {
 
                 if (deleteList.size > 0) {
                     android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?))
-                            .setMessage(getString(R.string.delete_group_confirm,deleteList[0].name))
+                            .setMessage(getString(R.string.delete_group_confirm, deleteList[0].name))
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 //showLoadingDialog(getString(R.string.deleting))
                                 val intent = Intent("delete")
@@ -619,9 +617,9 @@ class GroupListFragment : BaseFragment() {
                             .show()
                 }
             }
-         /*   R.id.textView6 -> {
-                Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
-            }*/
+            /*   R.id.textView6 -> {
+                   Toast.makeText(activity, R.string.device_page, Toast.LENGTH_LONG).show()
+               }*/
         }
     }
 
@@ -705,8 +703,8 @@ class GroupListFragment : BaseFragment() {
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     var lightList: MutableList<DbLight> = ArrayList()
 
@@ -795,6 +793,7 @@ class GroupListFragment : BaseFragment() {
             }
         }
     }
+
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
         when (gwStompBean.ser_id.toInt()) {
             Constant.SER_ID_GROUP_ALLON -> {

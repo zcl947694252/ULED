@@ -199,10 +199,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         }
 
         if (!Constant.IS_ROUTE_MODE)
-        when (TelinkApplication.getInstance().connectDevice) {
-            null -> image_bluetooth.setImageResource(R.drawable.bluetooth_no)
-            else -> image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
-        }
+            when (TelinkApplication.getInstance().connectDevice) {
+                null -> image_bluetooth.setImageResource(R.drawable.bluetooth_no)
+                else -> image_bluetooth.setImageResource(R.drawable.icon_bluetooth)
+            }
 
         emptyGroupView = LayoutInflater.from(this).inflate(R.layout.empty_group_view, null)
         btnAddGroups = emptyGroupView!!.findViewById(R.id.add_groups_btn)
@@ -497,7 +497,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             light.updateIcon()
                             if (lightByMeshAddr == null)
                                 light.belongGroupId = allLightId
-                            light.name = getString(R.string.device_name) + light.meshAddr
+                            light.name = when {
+                                Constant.IS_ROUTE_MODE -> item.deviceName
+                                else -> getString(R.string.device_name) + light.meshAddr
+                            }
                             light.rssi = item.rssi
                             deviceDataLightAll.add(light)
                         }
@@ -523,7 +526,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         light.meshUUID = item.meshUUID
                         if (lightByMeshAddr == null)
                             light.belongGroupId = allLightId
-                        light.name = getString(R.string.device_name) + light.meshAddr
+                        light.name = when {
+                            Constant.IS_ROUTE_MODE -> item.deviceName
+                            else -> getString(R.string.device_name) + light.meshAddr
+                        }
                         light.rssi = item.rssi
                         light.updateRgbIcon()
                         deviceDataLightAll.add(light)
@@ -550,7 +556,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         device.productUUID = item.productUUID
                         if (curtainByMeshAddr == null)
                             device.belongGroupId = allLightId
-                        device.name = getString(R.string.device_name) + device.meshAddr
+                        device.name = when {
+                            Constant.IS_ROUTE_MODE -> item.deviceName
+                            else -> getString(R.string.device_name) + device.meshAddr
+                        }
                         device.rssi = item.rssi
                         deviceDataCurtainAll.add(device)
                     }
@@ -576,7 +585,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                         device.productUUID = item.productUUID
                         if (relyByMeshAddr == null)
                             device.belongGroupId = allLightId
-                        device.name = getString(R.string.device_name) + device.meshAddr
+                        device.name = when {
+                            Constant.IS_ROUTE_MODE -> item.deviceName
+                            else -> getString(R.string.device_name) + device.meshAddr
+                        }
                         device.rssi = item.rssi
                         deviceDataRelayAll.add(device)
                     }
@@ -968,9 +980,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 }
                 NetworkStatusCode.DEVICE_NOT_BINDROUTER -> {
                     hideLoadingDialog()
-                    if (itR.t != null) {
-                        showNoBound(itR)
-                    }
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+//                    if (itR.t != null)
+//                        showNoBound(itR)
                 }
             }
             LogUtils.v("zcl-----------收到路由新成果-------$it")
@@ -993,7 +1005,6 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             str.append(name).append(",")
             nameLists.add(name ?: "")
         }
-        ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
         onlyNameAdapter.notifyDataSetChanged()
         popTip?.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
     }
@@ -2099,7 +2110,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             isAll = false
             setChecked()
             refreshData()
-            if (gpMeshAddr == 0){
+            if (gpMeshAddr == 0) {
                 SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                     override fun start() {}
 

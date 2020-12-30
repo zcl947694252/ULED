@@ -251,11 +251,11 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                                 if (deleteSwitch.meshAddr == mConnectDevice?.meshAddress) {
                                     GlobalScope.launch {
                                         delay(2500)//踢灯后没有回调 状态刷新不及时 延时2秒获取最新连接状态
-                                        if (this@SwitchDeviceDetailsActivity == null ||
-                                                this@SwitchDeviceDetailsActivity.isDestroyed ||
-                                                this@SwitchDeviceDetailsActivity.isFinishing || !acitivityIsAlive) {
-                                        } else
-                                            connect()
+                                        when {
+                                            this@SwitchDeviceDetailsActivity == null || this@SwitchDeviceDetailsActivity.isDestroyed ||
+                                                    this@SwitchDeviceDetailsActivity.isFinishing || !acitivityIsAlive -> {}
+                                            else -> connect()
+                                        }
                                     }
                                 }
                             }
@@ -657,6 +657,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                     deviceInfo.meshAddress = currentDevice?.meshAddr ?: 0
                     deviceInfo.firmwareRevision = currentDevice?.version
                     deviceInfo.productUUID = currentDevice?.productUUID ?: 0
+                    deviceInfo.boundMac = currentDevice?.boundMac ?: ""
                     SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                         override fun start() {}
 

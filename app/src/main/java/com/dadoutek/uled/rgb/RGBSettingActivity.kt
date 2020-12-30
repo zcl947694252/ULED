@@ -1602,7 +1602,8 @@ else
                                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                                     finish()
                                 }
-                                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                90008 -> {hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2348,7 +2349,8 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 ->{hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
@@ -2388,7 +2390,8 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2428,7 +2431,8 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2467,7 +2471,8 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2775,7 +2780,8 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                90008 -> {hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
