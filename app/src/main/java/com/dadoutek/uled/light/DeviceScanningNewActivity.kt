@@ -794,7 +794,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun initData() {
-        val intent = intent
         // mAddDeviceType = intent.getIntExtra(Constant.DEVICE_TYPE, DeviceType.LIGHT_NORMAL)
         val serializable = intent.getIntExtra(Constant.DEVICE_TYPE, 0)
         mAddDeviceType = if (serializable == 0) DeviceType.LIGHT_NORMAL else serializable
@@ -804,13 +803,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         allLightId = DBUtils.getGroupByMeshAddr(0xffff).id?.toLong() ?: 0
         mApplication = this.application as TelinkLightApplication
 
-        if (mAddDeviceType == DeviceType.NORMAL_SWITCH) {
-            groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.NORMAL_SWITCH))
-            groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.NORMAL_SWITCH2))
-            groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SCENE_SWITCH))
-            groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN_SWITCH))
-        } else
-            groups.addAll(DBUtils.getGroupsByDeviceType(mAddDeviceType))
+        when (mAddDeviceType) {
+            DeviceType.NORMAL_SWITCH -> {
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.NORMAL_SWITCH))
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.NORMAL_SWITCH2))
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SCENE_SWITCH))
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN_SWITCH))
+            }
+            else -> groups.addAll(DBUtils.getGroupsByDeviceType(mAddDeviceType))
+        }
 
         var title = when (mAddDeviceType) {
             DeviceType.LIGHT_NORMAL -> getString(R.string.normal_light)
@@ -823,22 +824,23 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
             else -> getString(R.string.normal_light)
         }
         toolbarTv?.text = title
-
-        if (groups.size > 0) {
-            for (i in groups.indices) {
-                if (i == groups.size - 1) { //选中最后一个组
-                    groups[i].checked = true
-                    currentGroupIndex = i
-                    SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
-                            Constant.DEFAULT_GROUP_ID, currentGroupIndex)
-                } else {
-                    groups[i].checked = false
-                }
+        when {
+            groups.size > 0 -> {
+                for (i in groups.indices)
+                    when (i) {
+                        groups.size - 1 -> { //选中最后一个组
+                            groups[i].checked = true
+                            currentGroupIndex = i
+                            SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(), Constant.DEFAULT_GROUP_ID, currentGroupIndex)
+                        }
+                        else -> groups[i].checked = false
+                    }
+                initHasGroup = true
             }
-            initHasGroup = true
-        } else {
-            initHasGroup = false
-            currentGroupIndex = -1
+            else -> {
+                initHasGroup = false
+                currentGroupIndex = -1
+            }
         }
     }
 
@@ -866,8 +868,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_TIMEOUT -> {
-            }
+            LeScanEvent.LE_SCAN_TIMEOUT -> {}
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             MeshEvent.ERROR -> this.onMeshEvent()
             ErrorReportEvent.ERROR_REPORT -> {
@@ -879,42 +880,20 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun onErrorReport(info: ErrorReportInfo) {
         when (info.stateCode) {
-            ErrorReportEvent.STATE_SCAN -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> {
-                        LogUtils.e("蓝牙未开启")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_ADV -> {
-                        LogUtils.e("无法收到广播包以及响应包")
-                    }
-                    ErrorReportEvent.ERROR_SCAN_NO_TARGET -> {
-                        LogUtils.e("未扫到目标设备")
-                    }
-                }
+            ErrorReportEvent.STATE_SCAN -> when (info.errorCode) {
+                ErrorReportEvent.ERROR_SCAN_BLE_DISABLE -> LogUtils.e("蓝牙未开启")
+                ErrorReportEvent.ERROR_SCAN_NO_ADV -> LogUtils.e("无法收到广播包以及响应包")
+                ErrorReportEvent.ERROR_SCAN_NO_TARGET -> LogUtils.e("未扫到目标设备")
             }
-            ErrorReportEvent.STATE_CONNECT -> {
-                when (info.errorCode) {
-                    ErrorReportEvent.ERROR_CONNECT_ATT -> {
-                        LogUtils.e("未读到att表")
-                    }
-                    ErrorReportEvent.ERROR_CONNECT_COMMON -> {
-                        LogUtils.e("未建立物理连接")
-                    }
-                }
+            ErrorReportEvent.STATE_CONNECT -> when (info.errorCode) {
+                ErrorReportEvent.ERROR_CONNECT_ATT -> LogUtils.e("未读到att表")
+                ErrorReportEvent.ERROR_CONNECT_COMMON -> LogUtils.e("未建立物理连接")
             }
             ErrorReportEvent.STATE_LOGIN -> {
                 when (info.errorCode) {
-                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> {
-                        LogUtils.e("value check失败： 密码错误")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> {
-                        LogUtils.e("read login data 没有收到response")
-                    }
-                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> {
-
-
-                        LogUtils.e("write login data 没有收到response")
-                    }
+                    ErrorReportEvent.ERROR_LOGIN_VALUE_CHECK -> LogUtils.e("value check失败： 密码错误")
+                    ErrorReportEvent.ERROR_LOGIN_READ_DATA -> LogUtils.e("read login data 没有收到response")
+                    ErrorReportEvent.ERROR_LOGIN_WRITE_DATA -> LogUtils.e("write login data 没有收到response")
                 }
                 finish()
             }
