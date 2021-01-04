@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_ee"
+        android:orientation="vertical">
+
+    <include
+            android:id="@+id/top_title"
+            layout="@layout/toolbar" />
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        <LinearLayout
+                android:id="@+id/data_view_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+            <TextView
+                    android:id="@+id/tv_scene_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="20dp"
+                    android:gravity="center_vertical"
+                    android:singleLine="true"
+                    android:text="@string/scene_name_show"
+                    android:textColor="@color/primary"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/scene_gp_detail_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:elevation="20dp" />
+        </LinearLayout>
+
+        <LinearLayout
+                android:id="@+id/edit_data_view_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="@string/tv_scene_name"
+                        android:textColor="@color/black_three"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <EditText
+                        android:id="@+id/edit_name"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="20dp"
+                        android:background="@null"
+                        android:hint="@string/plaese_input_scene_name"
+                        android:lines="1"
+                        android:maxLength="16"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textColorHint="#c8c8c8"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+
+            <LinearLayout
+                    android:id="@+id/select_icon_ly"
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:background="@color/white"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
+                        android:text="@string/select_icon_dot"
+                        android:textColor="@color/black_three"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                        android:id="@+id/scene_icon"
+                        android:layout_width="40dp"
+                        android:layout_height="@dimen/dp_40"
+                        android:src="@drawable/icon_out" />
+
+                <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:src="@drawable/icon_arrow" />
+            </LinearLayout>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="10dp"
+                    android:background="@color/black_ee"
+                    android:gravity="center_vertical"
+                    android:text="@string/group_list"
+                    android:textColor="@color/black_nine"
+                    android:textSize="15sp" />
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <TextView
+                        android:id="@+id/guide_location"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:gravity="center"
+                        android:textSize="13sp" />
+
+                <android.support.v7.widget.RecyclerView
+                        android:id="@+id/scene_gp_bottom_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:elevation="10dp" />
+
+            </RelativeLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="#00000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+        <Button
+                android:id="@+id/confirm"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginLeft="38dp"
+                android:layout_marginRight="38dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/btn_rec_blue_bt"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:text="@string/confirm"
+                android:textColor="@color/black_three"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent" />
+    </android.support.constraint.ConstraintLayout>
+</LinearLayout>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/bnve_device"
+        android:icon="@drawable/icon_device_unselected"
+        android:title="@string/device" />
+    <item
+        android:id="@+id/bnve_group"
+        android:icon="@drawable/icon_group_def"
+        android:title="@string/group_title" />
+    <item
+        android:id="@+id/bnve_scene"
+        android:icon="@drawable/icon_scene_def"
+        android:title="@string/scene_name" />
+    <!--<item-->
+        <!--android:id="@+id/bnve_light"-->
+        <!--android:icon="@drawable/ic_bottom_lightbulb"-->
+        <!--android:title="@string/light" />-->
+    <item
+        android:id="@+id/bnve_account"
+        android:icon="@drawable/icon_my_def"
+        android:title="@string/me" />
+</menu>

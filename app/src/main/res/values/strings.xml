@@ -1,0 +1,1217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string-array name="trigger_lux_array" translatable="false">
+        <item>0</item>
+        <item>2</item>
+        <item>10</item>
+        <item>50</item>
+    </string-array>
+
+    <string-array name="light_light_time_list">
+        <item>10s</item>
+        <item>20s</item>
+        <item>30s</item>
+        <item>40s</item>
+        <item>50s</item>
+        <item>1min</item>
+        <item>2min</item>
+        <item>3min</item>
+        <item>4min</item>
+        <item>5min</item>
+    </string-array>
+
+    <string-array name="startup_mode">
+        <item>Turn on</item>
+        <item>Turn off</item>
+    </string-array>
+
+    <string-array name="switch_mode">
+        <item>Instant</item>
+        <item>Gradient</item>
+    </string-array>
+
+    <string-array name="delay_unit">
+        <item>Minute</item>
+        <item>Second</item>
+    </string-array>
+
+
+    <string-array name="country_code_list" tools:ignore="InconsistentArrays">
+        <item>Angola                     *+244  </item>
+        <item>Afghanistan                *+93   </item>
+        <item>Albania                    *+355  </item>
+        <item>Algeria                    *+213  </item>
+        <item>Andorra                    *+376  </item>
+        <item>Anguilla                   *+1264 </item>
+        <item>Antigua and Barbuda        *+1268 </item>
+        <item>Argentina                  *+54   </item>
+        <item>Armenia                    *+374  </item>
+        <item>Ascension                  *+247  </item>
+        <item>Australia                  *+61   </item>
+        <item>Austria                    *+43   </item>
+        <item>Azerbaijan                 *+994  </item>
+        <item>Bahamas                    *+1242 </item>
+        <item>Bahrain                    *+973  </item>
+        <item>Bangladesh                 *+880  </item>
+        <item>Barbados                   *+1246 </item>
+        <item>Belarus                    *+375  </item>
+        <item>Belgium                    *+32   </item>
+        <item>Belize                     *+501  </item>
+        <item>Benin                      *+229  </item>
+        <item>BermudaIs.                 *+1441 </item>
+        <item>Bolivia                    *+591  </item>
+        <item>Botswana                   *+267  </item>
+        <item>Brazil                     *+55   </item>
+        <item>Brunei                     *+673  </item>
+        <item>Bulgaria                   *+359  </item>
+        <item>Burkina-faso               *+226  </item>
+        <item>Burma                      *+95   </item>
+        <item>Burundi                    *+257  </item>
+        <item>Cameroon                   *+237  </item>
+        <item>Canada                     *+1    </item>
+        <item>Cayman Is.                 *+1345 </item>
+        <item>Central African Republic   *+236  </item>
+        <item>Chad                       *+235  </item>
+        <item>Chile                      *+56   </item>
+        <item>China                      *+86   </item>
+        <item>Colombia                   *+57   </item>
+        <item>Congo                      *+242  </item>
+        <item>Cook Is.                   *+682  </item>
+        <item>Costa Rica                 *+506  </item>
+        <item>Cuba                       *+53   </item>
+        <item>Cyprus                     *+357  </item>
+        <item>Czech Republic             *+420  </item>
+        <item>Denmark                    *+45   </item>
+        <item>Djibouti                   *+253  </item>
+        <item>Dominica Rep.              *+1890 </item>
+        <item>Ecuador                    *+593  </item>
+        <item>Egypt                      *+20   </item>
+        <item>EISalvador                 *+503  </item>
+        <item>Estonia                    *+372  </item>
+        <item>Ethiopia                   *+251  </item>
+        <item>Fiji                       *+679  </item>
+        <item>Finland                    *+358  </item>
+        <item>France                     *+33   </item>
+        <item>French Guiana              *+594  </item>
+        <item>Gabon                      *+241  </item>
+        <item>Gambia                     *+220  </item>
+        <item>Georgia                    *+995  </item>
+        <item>Germany                    *+49   </item>
+        <item>Ghana                      *+233  </item>
+        <item>Gibraltar                  *+350  </item>
+        <item>Greece                     *+30   </item>
+        <item>Grenada                    *+1809 </item>
+        <item>Guam                       *+1671 </item>
+        <item>Guatemala                  *+502  </item>
+        <item>Guinea                     *+224  </item>
+        <item>Guyana                     *+592  </item>
+        <item>Haiti                      *+509  </item>
+        <item>Honduras                   *+504  </item>
+        <item>Hongkong                   *+852  </item>
+        <item>Hungary                    *+36   </item>
+        <item>Iceland                    *+354  </item>
+        <item>India                      *+91   </item>
+        <item>Indonesia                  *+62   </item>
+        <item>Iran                       *+98   </item>
+        <item>Iraq                       *+964  </item>
+        <item>Ireland                    *+353  </item>
+        <item>Israel                     *+972  </item>
+        <item>Italy                      *+39   </item>
+        <item>IvoryCoast                 *+225  </item>
+        <item>Jamaica                    *+1876 </item>
+        <item>Japan                      *+81   </item>
+        <item>Jordan                     *+962  </item>
+        <item>Kampuchea (Cambodia )      *+855  </item>
+        <item>Kazakstan                  *+327  </item>
+        <item>Kenya                      *+254  </item>
+        <item>Korea                      *+82   </item>
+        <item>Kuwait                     *+965  </item>
+        <item>Kyrgyzstan                 *+996  </item>
+        <item>Laos                       *+856  </item>
+        <item>Latvia                     *+371  </item>
+        <item>Lebanon                    *+961  </item>
+        <item>Lesotho                    *+266  </item>
+        <item>Liberia                    *+231  </item>
+        <item>Libya                      *+218  </item>
+        <item>Liechtenstein              *+423  </item>
+        <item>Lithuania                  *+370  </item>
+        <item>Luxembourg                 *+352  </item>
+        <item>Macao                      *+853  </item>
+        <item>Madagascar                 *+261  </item>
+        <item>Malawi                     *+265  </item>
+        <item>Malaysia                   *+60   </item>
+        <item>Maldives                   *+960  </item>
+        <item>Mali                       *+223  </item>
+        <item>Malta                      *+356  </item>
+        <item>Mariana Is                 *+1670 </item>
+        <item>Martinique                 *+596  </item>
+        <item>Mauritius                  *+230  </item>
+        <item>Mexico                     *+52   </item>
+        <item>Moldova, Republic of       *+373  </item>
+        <item>Monaco                     *+377  </item>
+        <item>Mongolia                   *+976  </item>
+        <item>Montserrat Is              *+1664 </item>
+        <item>Morocco                    *+212  </item>
+        <item>Mozambique                 *+258  </item>
+        <item>Namibia                    *+264  </item>
+        <item>Nauru                      *+674  </item>
+        <item>Nepal                      *+977  </item>
+        <item>Netheriands Antilles       *+599  </item>
+        <item>Netherlands                *+31   </item>
+        <item>NewZealand                 *+64   </item>
+        <item>Nicaragua                  *+505  </item>
+        <item>Niger                      *+227  </item>
+        <item>Nigeria                    *+234  </item>
+        <item>North Korea                *+850  </item>
+        <item>Norway                     *+47   </item>
+        <item>Oman                       *+968  </item>
+        <item>Pakistan                   *+92   </item>
+        <item>Panama                     *+507  </item>
+        <item>Papua New Cuinea           *+675  </item>
+        <item>Paraguay                   *+595  </item>
+        <item>Peru                       *+51   </item>
+        <item>Philippines                *+63   </item>
+        <item>Poland                     *+48   </item>
+        <item>French Polynesia           *+689  </item>
+        <item>Portugal                   *+351  </item>
+        <item>PuertoRico                 *+1787 </item>
+        <item>Qatar                      *+974  </item>
+        <item>Reunion                    *+262  </item>
+        <item>Romania                    *+40   </item>
+        <item>Russia                     *+7    </item>
+        <item>Saint Lueia                *+1758 </item>
+        <item>Saint Vincent              *+1784 </item>
+        <item>Samoa Eastern              *+684  </item>
+        <item>Samoa Western              *+685  </item>
+        <item>San Marino                 *+378  </item>
+        <item>Sao Tome and Principe      *+239  </item>
+        <item>Saudi Arabia               *+966  </item>
+        <item>Senegal                    *+221  </item>
+        <item>Seychelles                 *+248  </item>
+        <item>Sierra Leone               *+232  </item>
+        <item>Singapore                  *+65   </item>
+        <item>Slovakia                   *+421  </item>
+        <item>Slovenia                   *+386  </item>
+        <item>Solomon Is                 *+677  </item>
+        <item>Somali                     *+252  </item>
+        <item>South Africa               *+27   </item>
+        <item>Spain                      *+34   </item>
+        <item>Sri Lanka                  *+94   </item>
+        <item>St.Lucia                   *+1758 </item>
+        <item>St.Vincent                 *+1784 </item>
+        <item>Sudan                      *+249  </item>
+        <item>Suriname                   *+597  </item>
+        <item>Swaziland                  *+268  </item>
+        <item>Sweden                     *+46   </item>
+        <item>Switzerland                *+41   </item>
+        <item>Syriaw                     *+963  </item>
+        <item>Taiwan                     *+886  </item>
+        <item>Tajikstan                  *+992  </item>
+        <item>Tanzania                   *+255  </item>
+        <item>Thailand                   *+66   </item>
+        <item>Togo                       *+228  </item>
+        <item>Tonga                      *+676  </item>
+        <item>Trinidad and Tobago        *+1809 </item>
+        <item>Tunisia                    *+216  </item>
+        <item>Turkey                     *+90   </item>
+        <item>Turkmenistan               *+993  </item>
+        <item>Uganda                     *+256  </item>
+        <item>Ukraine                    *+380  </item>
+        <item>United Arab Emirates       *+971  </item>
+        <item>United Kiongdom            *+44   </item>
+        <item>United States of America   *+1    </item>
+        <item>Uruguay                    *+598  </item>
+        <item>Uzbekistan                 *+233  </item>
+        <item>Venezuela                  *+58   </item>
+        <item>Vietnam                    *+84   </item>
+        <item>Yemen                      *+967  </item>
+        <item>Yugoslavia                 *+381  </item>
+        <item>South Africa               *+27   </item>
+        <item>Zimbabwe                   *+263  </item>
+        <item>Zaire                      *+243  </item>
+        <item>Zambia                     *+260  </item>
+    </string-array>
+
+    <string-array name="preset_gradient">   
+        <item>Colorful gradient</item>        
+        <item>Red gradient</item>        
+        <item>Green gradient</item>        
+        <item>Blue gradient</item>        
+        <item> Yellow gradient</item>        
+        <item> Cyan gradient</item>        
+        <item> Purple gradient</item>
+        <item>white gradient </item>
+        <item> Red green gradient</item>
+        <item> Red blue gradient</item>
+        <item> Green blue gradient</item>
+    </string-array>
+
+    <!-- Activity Labels -->
+    <string name="app_name">ULed</string>
+    <string name="activity_device_grouping">Device Grouping</string>
+    <string name="filter_vcode">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <!-- DeviceSchema Setting -->
+    <string name="device_setting_temperature">Color Temperature:%1$s</string>
+
+    <!-- DeviceSchema Grouping -->
+
+    <!-- Scan DeviceSchema -->
+    <string name="device_scan_scan">Scan Device</string>
+
+    <!-- GroupSchema Setting -->
+    <string name="group_setting_header">Group Setting</string>
+
+    <!-- MeshSchema Add -->
+
+
+    <string name="select_file">Select file(%s)</string>
+    <string name="ota_prepare_title">OTA Prepare</string>
+    <string name="ota_update_title">OTA Processing</string>
+    <string name="progress_ota">OTA Progress: %s </string>
+    <string name="progress_mesh_ota">MeshOTA Progress: %s</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="add_groups">Add Group</string>
+    <string name="set_group">CONFIRM GROUPING</string>
+    <string name="loading">Loading</string>
+    <string name="scan_end">No device found!</string>
+    <string name="connecting_tip">Connecting... Later, please</string>
+    <string name="grouping_completed">Grouping completed</string>
+    <string name="openBluetooth">Open Bluetooth, Play the smart light!</string>
+    <string name="me">Me</string>
+    <string name="grouping_wait_tip">There are currently %1$s lights grouping, please wait!</string>
+    <string name="start_group_bt">Start grouping</string>
+    <string name="have_lamp_no_group_tip">There are no lights grouping, please complete the grouping operation</string>
+    <string name="sure_group">Confirm Grouping</string>
+    <string name="selected_lamp_tip">Please Select at Least ONE Light to Group</string>
+    <string name="select_group_tip">Please Select at Least ONE group</string>
+    <string name="much_lamp_tip">Supports up to 32768 lights</string>
+    <string name="restart_bluetooth">System Bluetooth is abnormal, please restart your phone bluetooth</string>
+    <string name="chear_cache">Clear all Data</string>
+    <string name="clean_tip">Cache empty, App Reboot soon</string>
+    <string name="confirm">Confirm</string>
+    <string name="rename_tip_check">Input contains special characters, please modify</string>
+    <string name="scan_lights_num">Total: %1$s lights are currently scanned</string>
+    <string name="title_scanned_device_num">%1$d devices have been added:</string>
+    <string name="click_double_exit">Press again to exit the program</string>
+    <string name="empty_cache_tip">Need to physically reset the light before clearing the data and start clearing the data?</string>
+    <string name="factory_reset">Factory reset</string>
+    <string name="add_str_group">Add group</string>
+    <string name="creat_group_fail_tip">Failed to create, group name already exists!</string>
+    <string name="create_new_group">Create a new group</string>
+    <string name="btn_rename_light">Rename</string>
+    <string name="connect_success">Connection succeeded!</string>
+    <string name="connect_fail">Disconnect </string>
+    <string name="device_not_connected">Please check bluetooth!</string>
+    <string name="please_wait">Please wait…</string>
+
+
+    <string name="search">Search</string>
+    <string name="complete">Done</string>
+    <string name="not_found_switch">No switch found</string>
+    <string name="searching">Searching…</string>
+    <string name="select_group">Select group</string>
+    <string name="please_select_group">Please select a group at least</string>
+    <string name="group_failed">Grouping failed, please check whether the equipment to be grouped is powered on</string>
+    <string name="connected">Connected</string>
+    <string name="scene_apply">Apply</string>
+    <string name="scene_edit">Edit</string>
+    <string name="create_scene">Add Scene</string>
+    <string name="tv_scene_name">Input name:</string>
+    <string name="plaese_input_scene_name">Please enter the scene name</string>
+    <string name="scene_tip">Please add at least one group</string>
+    <string name="scene_name">Scenes</string>
+    <string name="group_select">Please Choose a Group:</string>
+    <string name="scene1">Scene 1</string>
+    <string name="scene_set">Scene assignment</string>
+    <string name="setting_switch">Configuring switch…</string>
+    <string name="configuring_sensor">Configuring sensor…</string>
+    <string name="config_fail">Configuration failed</string>
+    <string name="tip_switch">Please add Scene first</string>
+
+    <string name="tip_add_gp">Please add a group first!</string>
+    <string name="developer_mode">Enter developer mode</string>
+    <string name="edit_phone">PhoneNumber</string>
+    <string name="registing">Registering</string>
+    <string name="register_success">Registration success</string>
+    <string name="phone_input_error">Malformed phone number</string>
+    <string name="tip_register_input_error">Username or password cannot contain special characters</string>
+    <string name="register_title_name">Register</string>
+    <string name="login_account">Login</string>
+    <string name="logging_tip">Logging in</string>
+    <string name="login_success">Login success</string>
+    <string name="login_fail">Login failed</string>
+    <string name="name_or_password_error">Wrong user name or password!</string>
+    <string name="select_country">Choose a country</string>
+    <string name="add_timing_label">Add timing label</string>
+    <string name="open_location_service">Please open "Location service"</string>
+    <string name="send_verification">Send the verification code</string>
+    <string name="VerificationCode">Verification code</string>
+    <string name="send_message_success">Sent successfully</string>
+    <string name="send_message_fail">Failed to send</string>
+    <string name="verification_code_error">Verification code error</string>
+    <string name="successful_verification">Successful verification</string>
+    <string name="exit_login">Logout</string>
+    <string name="forget_password">Forget PW</string>
+    <string name="verification_phone">Verify your phone</string>
+    <string name="update_password">Change Password</string>
+    <string name="tip_update_password_success">Change success</string>
+    <string name="not_grouped">No Group</string>
+    <string name="tip_add_group">Please add a group first</string>
+    <string name="scanning">Scanning</string>
+    <string name="upload_data">Upload data</string>
+    <string name="exit_tips_in_scanning">Do you really want to quit scanning?</string>
+    <string name="login_timeout">Login timeout</string>
+    <string name="account_not_exist">Account not exist</string>
+    <string name="account_exist">Account already exists</string>
+    <string name="unknown_network_error">Unknown network error</string>
+    <string name="network_error">Network Error</string>
+    <string name="network_unavailable">Network unavailable.Check your network settings.</string>
+    <string name="network_time_out">Network connection timed out, please try again.</string>
+    <string name="delete_group_confirm">Sure delete group :%1$s?</string>
+    <string name="phone_or_password_can_not_be_empty">Phone number cannot be empty!</string>
+    <string name="group_not_change_tip">Group unchanged, determine to exit?</string>
+    <string name="require_permission_reason">We need to this permission to allow the app uses Bluetooth</string>
+    <string name="i_know">I konw</string>
+    <string name="exit">Exit</string>
+    <string name="saving">Saving…</string>
+    <string name="delete_name">delete</string>
+    <string name="open_blutooth">Bluetooth on</string>
+    <string name="empty_tip">No lights, click to add</string>
+    <string name="grouping_fail">Group failed</string>
+    <string name="add_scene_gp_tip">Please Choose a Group</string>
+    <string name="group_fail_tip">Some devices failed to group, please check whether the devices to be grouped are powered on and try again!</string>
+    <string name="one_click_reset">Reset all lights</string>
+    <string name="reset_all_now">Restoring factory settings</string>
+    <string name="tip_reset_sure">Are you sure to restore all devices (except switches and sensors)?</string>
+    <string name="scene_16_tip">Up to 100 Scenes!</string>
+    <string name="server_exception">Server exception</string>
+    <string name="start_sync">Start to download data…</string>
+    <string name="sync_now">Download data…</string>
+    <string name="tip_start_sync">Start syncing. . .</string>
+    <string name="upload_data_success">Upload data success</string>
+    <string name="network_tip_title">Network status prompt</string>
+    <string name="net_disconnect_tip_message">Network Unavailable. Please check your network!</string>
+    <string name="regetCount">Resend(%1$d) </string>
+    <string name="reget">Resend</string>
+    <string name="question_1">2. How to reset my lights?</string>
+    <string name="question_1_anser1">(1) uled app reset: This method will directly reset the lights to the factory settings through the App. Please ensure that the lights are connected.</string>
+    <string name="qustion_2_anser2">(2)Light: Connect to power supply for 6 second, disconnect to power supply for 6s, repeat about 5-6 times until the light flashes.
+        Switch: Connect to power supply and simultaneously press the upper left button and the lower right button of the 4 buttons. The led  will blink.
+        Sensor: Connect to power supply for 3 second, disconnect to power supply for 3 second, repeat about 5-6 times until the sensor flashes.</string>
+    <string name="common_question">Q&amp;A</string>
+    <string name="question_2">3. Some Huawei phones have Bluetooth instability</string>
+    <string name="question2_answer">Huawei WAS-AL00, Huawei P9 is not recommended as a control terminal</string>
+    <string name="question_3">4. Can not control, not connect</string>
+    <string name="question3_answer">Some mobile phones may be used for too long and the Bluetooth may become unusable. You can try to turn off the Bluetooth of your phone and then turn it on. Even some low-end models need to restart the phone to use Bluetooth.</string>
+    <string name="group_limit">Add up to 255 groups up to the current limit</string>
+    <string name="data_empty">Data is empty</string>
+    <string name="clear_data_now">Clearing data. . .</string>
+    <string name="clear_fail">Clear failed</string>
+    <string name="backup_failed">Backup data failed</string>
+    <string name="upload_data_failed">Upload failed</string>
+    <string name="phone_cannot_be_empty">Phone cannot be empty</string>
+    <string name="deleting">Deleting…</string>
+    <string name="move_out_some_lights_in_group_failed">Lights in some groups failed to move out of the group</string>
+    <string name="delay_minute">Delay(min)</string>
+    <string name="delay_seconds">Delay(s)</string>
+    <string name="minimum_brightness_percentage">Final brightness(%)</string>
+    <string name="trigger_lux">Trigger illumination(lux)</string>
+    <string name="params_cannot_be_empty">Params cannot be empty</string>
+    <string name="button1">Button 1</string>
+    <string name="button2">Button 2</string>
+    <string name="button3">Button 3</string>
+    <string name="button4">Button 4</string>
+    <string name="light_version">Version</string>
+    <string name="change_account">Switch account</string>
+    <string name="grouping">Grouping…</string>
+    <string name="sync_error_exlogin">Sync failed, some data may be lost, still exit?</string>
+    <string name="switch_version">Version:</string>
+    <string name="group_fail">Group failed, Bluetooth is not connected, please check Bluetooth status</string>
+    <string name="delete">Delete</string>
+    <string name="select_all">All</string>
+    <string name="cancel">Cancel</string>
+    <string name="input_groupAdress">Please enter a group name</string>
+    <string name="not_find_pir">Sensor not found</string>
+    <string name="max_tip_brightness">Final brightness cannot exceed 99%</string>
+    <string name="time_max_tip">The delay should not exceed 255 minutes or 255 seconds</string>
+    <string name="first_address">First：https://www.coolapk.com/apk/181682</string>
+    <string name="second_address">Second：https://play.google.com/store/apps/details?id=com.dadoutek.uled</string>
+    <string name="question0">1.Where can I update my app?</string>
+    <string name="update_group">Edit Group</string>
+    <string name="the_last_version">It is the latest version!</string>
+    <string name="updateSuccess">Update succeed!</string>
+    <string name="update_fail">Update failed!</string>
+    <string name="start_update">Start update</string>
+    <string name="tip_select_file">Please select an update file first!</string>
+    <string name="otaing">Updating…</string>
+    <string name="update_tip_user">Do not quit or disconnect during the update process</string>
+    <string name="exit_update">Exit the update page after 2s</string>
+    <string name="get_server_version_fail">Get server version...</string>
+    <string name="download_pack_fail">Update package download failed</string>
+    <string name="verification_version">Verifying version…</string>
+    <string name="verification_version_success">Verify succeed!</string>
+    <string name="verification_version_fail">Verify failed!</string>
+    <string name="downloading">Downloading:</string>
+    <string name="local_version">Current firmware version: %1$s</string>
+    <string name="server_version">New firmware version: %1$s</string>
+    <string name="start_scan">Scanning…</string>
+    <string name="update_firmware_tip2">Please be close to the lights when updating!</string>
+    <string name="trigger_mode">Trigger mode</string>
+    <string name="register">Register</string>
+    <string name="set_password">Set password</string>
+    <string name="update_permission_tip">Please allow some permissions</string>
+    <string name="switch_mode">Light-open mode</string>
+    <string name="delay_unit">Delay-time unit</string>
+    <string name="edit">Edit</string>
+    <string name="long_click_select_color_tip">*Long press to save, tap to apply</string>
+    <string name="account">Account:</string>
+    <string name="rssi_low">Weak signal</string>
+
+        
+        
+    <string name="btn_jump_over">Skip </string>
+        
+        
+    <string name="select_device_tip">Choose your devices </string>
+        
+    <string name="normal_light">CW Light </string>
+        
+    <string name="rgb_light">RGBLight</string>
+        
+        
+        
+    <string name="warning">Warning </string>
+        
+    <string name="is_exit_ota">OTA is in progress, do you really want to quit? </string>
+        
+        
+    <string name="repeat_name">The group name already exists. Please re-enter the group name </string>
+        
+    <string name="dynamic_rgb">Gradient</string>
+        
+        
+    <string name="dynamic_gradient">Gradient</string>
+        
+    <string name="stop">Stop</string>
+        
+    <string name="please_rename">Please enter a name </string>
+        
+        
+    <string name="firmware_version">Firmware version: </string>
+        
+    <string name="ota">OTA</string>
+        
+
+    <!--通用-->
+        
+        
+    <string name="group">group </string>
+
+    <string name="group_title">Group </string>
+        
+    <string name="setting">SET </string>
+
+        <!--组列表页面-->
+        
+    <string name="allLight">All lights </string>
+        
+    <string name="group_list_on"> ON </string>
+        
+    <string name="group_list_off">OFF</string>
+        
+        
+        
+    <string name="switch_title">Switch</string>
+
+
+    <string name="apply_scene">Click here to apply the scene </string>
+        
+    <string name="jump_out_guide_tip"> Confirm to skip the guide page? </string>
+
+    <string name="do_you_really_want_to_cancel">Do you really want to cancel the
+        installation</string>
+    <string name="scene_name_show">Scene:%1$s</string>
+    <string name="device_disconnected">device disconnected</string>
+    <string name="tip_config_switch_success">After successful installation, the blue light at the bottom of the switch will blink and disconnect.
+        Please unplug the USB cable on the switch before using the switch. If the switch does not have a USB interface,
+        it is not necessary to perform the operation of unplugging the USB cable.</string>
+    <string name="install_success">Successful installation</string>
+    <string name="stop_scan">Stop scan</string>
+    <string name="sure_delete">Confirm deleting this scene？</string>
+    <string name="w_bright">White Brightness:</string>
+    <string name="light_light_tip">Please switch the night light to the configuration mode first.</string>
+    <string name="delay_time">delay-time</string>
+    <string name="tip_night_light_group_limite_tip">Up to 8 groups can be choice</string>
+    <string name="current_select_group">Selected Group:</string>
+    <string name="selected">YES</string>
+    <string name="unSelect">NO</string>
+    <string name="save_scene_tip">Do you want to save the scene?</string>
+    <string name="get_update_file">Get the upgrade package…</string>
+    <string name="mode_preset">Built-in mode</string>
+    <string name="mode_diy">customize mode</string>
+    <string name="please_check_group">Please select a group:</string>
+    <string name="save">Save</string>
+    <string name="name_not_null_tip">Name cannot be empty</string>
+    <string name="mode_str">Mode</string>
+    <string name="save_gradient_dialog_tip">Save gradient…</string>
+    <string name="add_gradient_limit">You can only add up to 6 gradients!</string>
+    <string name="color_checked_set">Select color</string>
+    <string name="one_click_group">One-click grouping</string>
+    <string name="update_gradient">Modify the gradient</string>
+    <string name="add_gradient">Add gradient</string>
+    <string name="config_night_light_select_group">Please select at least one group</string>
+    <string name="tip_phone_ble_off">Bluetooth is off, upgrade failed</string>
+    <string name="instruction_manual">user\'s manual: http://www.dadoutek.com/app/README/index.html</string>
+    <string name="retry_ota">Re-upgrade</string>
+    <string name="get_code_ing">Get verification...</string>
+    <string name="create_scene_select">Create a scene</string>
+    <string name="normal_light_describe"> Monochrome temperature, dual color temperature light </string>
+    <string name="rgb_light_describe">RGB lights, RGBW lights</string>
+    <string name="switch_describe"> Dimming color switch, scene switch, glass switch </string>
+    <string name="sensor">Sensor </string>
+    <string name="sensor_describe">Night light, PIR</string>
+    <string name="add_device_new">Add New Device </string>
+    <string name="update_name_gp"> modify the group name </string>
+    <string name="curtain">Curtain </string>    
+    <string name="smart_curtain">Smart Curtains</string>
+    <string name="device">Device </string>
+    <string name="install_tip2">First step\nPlease make sure the device is connected to the power </string>
+    <string name="install_tip3">Step 2\nPlease make sure the device is not connected to the network</string>
+    <string name="install_tip4">Step 3\nAdd devices via Bluetooth search</string>
+    <string name="switch_tip2">First step\nPlug the USB into the switch</string>
+    <string name="switch_tip3">Step 2\nPress any button</string>
+    <string name="switch_tip4">Step 3\nThe indicator on the right side of the bottom of the switch will be always on.</string>
+    <string name="install_tip5">If you encounter problems, please try the following steps to reset the device </string>
+    <string name="guide_tip_reset_light"> Lamp: Connect the power for 6 seconds, disconnect the power for 6 seconds, repeat 5–6 times until the light flashes. </string>
+    <string name="guide_tip_reset_switch"> panel switch: Connect the power supply while holding down the upper left button and the lower right button in the switch button. The blue light will always be on during the period. </string>
+    <string name="guide_tip_reset_sensor">Sensor (with key) : press and hold the side reset key until the light flashes.\n Sensor (no button) : turn on the power for 3 seconds, turn off the power for 3 seconds, repeat about 5-6 times until the sensor flashes. </string>
+    <string name="guide_tip_reset_curtain">Curtain: Long press the button at the bottom of the curtain for 5 seconds. The indicator is always on. Let go and press the button again until the indicator flashes for 3 times. </string>
+    <string name="guide_tip_reset_relay">Bluetooth receiver: long press the white button of the receiver for 5 seconds, until the bluetooth receiver flashes. </string>
+    <string name="guide_tip_reset_gateway">Gateway: Long press the white button of the gateway for 5 seconds until the gateway blinks.</string>
+    <!--窗帘相关-->
+    <string name="up">up</string>
+    <string name="down">down</string>
+    <string name="pause">pause</string>
+    <string name="not_type">not type</string>
+    <string name="commutation">Motor commutator</string>
+    <string name="details">Details</string>
+    <string name="restart">Click restart</string>
+    <string name="successful_resumption">Successful Resumption</string>
+
+    <string name="title_curtain_lights_num">Scanning %1$d</string>
+
+    <string name="delete_switch_confirm"> After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete switch?</string>
+
+    <string name="delete_switch_success">Delete successfully, please power on again after power off</string>
+
+    <string name="have_curtain_no_group_tip">There are no curtain grouping, please complete the grouping operation</string>
+
+    <string name="grouping_curtain_wait_tip">There are currently %1$s curtain grouping, please wait!</string>
+    <string name="selected_curtain_tip">Please Select at Least ONE Curtain to Group</string>
+    <string name="curtain_fail_tip">There is a curtain grouped failed, please check and try again!</string>
+
+    <string name="hand_recovery">Hand recovery</string>
+    <string name="software_restart">Device restart</string>
+    <string name="slow_up_the_cache">Slow up the cache</string>
+
+    <string name="slow_up_the_cache_cancel">cancel slow up the cache</string>
+
+    <string name="hand_cancel">Hand cancel</string>
+
+    <string name="delete_user">Make sure to delete the phone number？</string>
+
+    <string name="relay">Receiver</string>
+
+
+    <string name="title_connector_lights_num">Scanning %1$d</string>
+    <string name="have_connector_no_group_tip">There are no connector grouping, please complete the grouping operation</string>
+    <string name="grouping_connector_wait_tip">There are currently %1$s connector grouping, please wait!</string>
+    <string name="selected_connector_tip">Please Select at Least ONE Connector to Group</string>
+    <string name="connector_fail_tip">There is a connector grouped failed, please check and try again!</string>
+
+
+    <string name="batch_group">Regroup</string>
+
+    <string name="developer_mode_close">Enter developer mode close</string>
+
+    <string name="sms_sign">Sign in with SMS verification code</string>
+    <string name="third_party">Third party sign</string>
+    <string name="please_phone_number">Please enter the phone number</string>
+    <string name="please_password">Please enter your login password</string>
+    <string name="no_account">No account yet, please</string>
+
+
+    <string name="brightness">Brightness</string>
+    <string name="color_temperature">Color temp</string>
+    <string name="brightness_adjustment">Brightness：</string>
+    <string name="color_temperature_adjustment">Color Temperature：</string>
+
+    <string name="welcome_register">Hello, welcome to register</string>
+    <string name="please_code">please enter verification code</string>
+    <string name="please_again_password">Please the login password again.</string>
+    <string name="get_verification_code">get code</string>
+    <string name="new_password">Please enter your new password</string>
+    <string name="number">Qty</string>
+    <string name="for_connector">Connector</string>
+    <string name="for_gateway">Gateway</string>
+    <string name="login_password">Login with a password</string>
+    <string name="online_upgrade">OTA</string>
+
+    <string name="tips">Tips</string>
+    <string name="create_now">create now</string>
+    <string name="tips_message">You do not have a group yet, are you creating it?</string>
+    <string name="add_group">Add group</string>
+
+    <string name="total">Total</string>
+    <string name="piece">piece</string>
+
+    <string name="gradient_mode">Gradient mode</string>
+    <string name="color_mode">Color mode</string>
+    <string name="stop_model">stop</string>
+    <string name="white_light_regulation">White light:</string>
+    <string name="bright_regulation">Bright:</string>
+    <string name="mode_name">Name:</string>
+    <string name="please_mode_name">please enter mode name:</string>
+    <string name="no_color">No</string>
+    <string name="speed_regulation">Speed regulation:</string>
+    <string name="delete_model">Are you sure you want to delete this mode?</string>
+
+    <string name="choose_color">choose color:</string>
+    <string name="group_list">Group list</string>
+    <string name="bluetooth">Bluetooth connection failed？There may be some problems：</string>
+    <string name="one_tip">1.Bluetooth is off.</string>
+    <string name="two_tip">2.No device was found nearby.</string>
+    <string name="three_tip">3.System bluetooth failure.</string>
+    <string name="four_tip">4.The positioning function is not turned on in android 6.0.</string>
+    <string name="five_tip">5.The above problem is still not solved, restart APP.</string>
+    <string name="open_it">Open it</string>
+    <string name="restart_it">Restart it</string>
+    <string name="relocation">Afresh set</string>
+    <string name="cannot_rgb_null">RGB values cannot be null</string>
+    <string name="rgb_max">RGB value should not be greater than 255</string>
+    <string name="number_no">Version number not obtained</string>
+    <string name="instructions_for_use">APP instruction manual</string>
+    <string name="no_password">The current account has not created a password. Please log in using SMS.</string>
+    <string name="enter_confirmation_code">Verification code</string>
+    <string name="send_code">Verification code sent to</string>
+    <string name="follow_the_steps">Follow the steps to retrieve your password.</string>
+    <string name="reacquire">Reacquire</string>
+    <string name="next">Next</string>
+    <string name="enter_password">Enter password</string>
+    <string name="please_your_password">Please enter your login password</string>
+    <string name="password_you_set_again">Please confirm the login password you set again.</string>
+    <string name="password_you_set">Please enter the login password you set.</string>
+    <string name="equipment_quantity">Equipment Quantity：</string>
+    <string name="use_the_works">Use Area</string>
+    <string name="delete_network">Delete Area</string>
+    <string name="share_network">Share Area</string>
+    <string name="update_name">Update Name</string>
+    <string name="current_account">Current account:</string>
+    <string name="all">All</string>
+    <string name="password_cannot">Password cannot be empty</string>
+
+    <string name="all_day">All day</string>
+    <string name="day_time">Daytime</string>
+    <string name="night">Night</string>
+
+    <string name="light_on">Turn on </string>
+    <string name="light_off">Turn off </string>
+
+    <string name="startMinute">Min</string>
+    <string name="second">Sec</string>
+
+    <string name="moment">Instant</string>
+    <string name="gradient">Gradient</string>
+
+
+    <string name="custom_brightness">Custom brightness</string>
+
+    <string name="target_brightness">Please enter the target brightness</string>
+
+    <string name="triggering_conditions">Triggering conditions :</string>
+    <string name="trigger_after">Trigger after :</string>
+    <string name="duration_time">Duration time :</string>
+    <string name="light_open_mode">Light-open mode :</string>
+    <string name="choose_group">Choose group :</string>
+    <string name="brightness_cannot">Brightness cannot be zero</string>
+    <string name="brightness_cannot_be_greater_than">Brightness cannot be greater than 100</string>
+    <string name="delay_time_unit">Delay time unit :</string>
+    <string name="ten_second">10s</string>
+    <string name="twenty_second">20s</string>
+    <string name="thirty_second">30s</string>
+    <string name="forty_second">40s</string>
+    <string name="fifty_second">50s</string>
+    <string name="one_minute">1min</string>
+    <string name="two_minute">2min</string>
+    <string name="three_minute">3min</string>
+    <string name="four_minute">4min</string>
+    <string name="five_minute">5min</string>
+    <string name="auto_regist_account">login automatic registration account</string>
+    <string name="input_pwd">Enter Password</string>
+
+    <string name="trigger_mode_text">Trigger mode :</string>
+    <string name="delay_time_unit_text">Delay time unit :</string>
+    <string name="area">Region</string>
+    <string name="refresh_qr_code">Refresh qr code</string>
+    <string name="cur_network_owner">Current network owner:</string>
+    <string name="developer">Developer model</string>
+    <string name="update_version">version upgrade</string>
+    <string name="version_disabled">This version is not available</string>
+    <string name="in_use">in_use</string>
+    <string name="creater_name">Creator: </string>
+    <string name="bluetooth_open_connet">Bluetooth is not connected, it is connecting</string>
+    <string name="input_region_name">Please enter a zone name</string>
+
+    <string name="developer_mode_open">Developer mode is on</string>
+    <string name="apply">apply</string>
+    <string name="in_apply">applied</string>
+    <string name="scene_apply_success"> Apply success</string>
+    <string name="network">authorization management</string>
+    <string name="transfer_accounts">Transfer A/C</string>
+    <string name="start_change_region">Start switching area</string>
+    <string name="error_change_region">Failed to switch zone</string>
+    <string name="success_change_region">Switching region successful</string>
+    <string name="timer">Count down</string>
+    <string name="error_api_no_perission">Invoke the unauthorized API interface</string>
+    <string name="error_unkown"> Unknown Error</string>
+    <string name="error_system">System error</string>
+    <string name="error_http_500">Server error</string>
+    <string name="error_http_404">Server resource not found</string>
+    <string name="error_http_400">Bad request</string>
+    <string name="error_socket_timeout">Network timeout</string>
+    <string name="error_socket_unreachable">Unable to connect to server</string>
+    <string name="error_http">Network connection error</string>
+    <string name="QR_cancel">Undo qr code</string>
+    <string name="QR_canceled">The qr code has been revoked</string>
+    <string name="QR_expired">The qr code is invalid, please regenerate it</string>
+    <string name="unbind_network">Unbund network</string>
+    <string name="more">More</string>
+    <string name="change_region">Make sure to switch to region :</string>
+    <string name="total_device">(%1$s devices in total)</string>
+    <string name="share_person">Number of participants: %1$s per person</string>
+    <string name="to_receive">To_receive</string>
+    <string name="see_more">See more</string>
+    <string name="me_net_num">Personal network (%1$s)</string>
+    <string name="received_net_num">Received networks (%1$s)</string>
+    <string name="pick_up">pick_up</string>
+    <string name="see_qr">View qr code</string>
+    <string name="input_new_region_name">Please enter a new zone name</string>
+    <string name="share_person_num_b">Number of participants: (%1$s)</string>
+    <string name="unbond">unbond</string>
+    <string name="warm_unbind_config">Are you sure you want to revoke the authorization of %1$s?</string>
+    <string name="warm_unbind_authorize_config">Are you sure you want to remove the %1$s authorization zone?</string>
+    <string name="parse_result">Parse the result :%1$s</string>
+    <string name="fail_parse_qr">Failed to parse qr code</string>
+    <string name="unbundling_success">Unbundling success</string>
+    <string name="unbundling_fail">Unbundling failure</string>
+    <string name="scan_success">Scan success</string>
+    <string name="cancel_authorization">Authorized user cancels authorization</string>
+    <string name="authorization_exprize">The QR code has expired</string>
+    <string name="unauthorization_leve">Unauthorized authorization level</string>
+    <string name="region_one_code">A single region can generate only one code at a time. Please cancel the authorization code or transfer code first</string>
+    <string name="can_not_parse">Unable to parse </string>
+    <string name="can_not_parse_mine">Unable to parse self-generated code</string>
+
+    <string name="accept_authrozation">This user has been authorized</string>
+    <string name="user_locked">User locked</string>
+    <string name="permission_denfied">Insufficient permission to operate</string>
+    <string name="region_not_exist">This region does not exist, please switch to another region</string>
+    <string name="single_login_warm">Your ULED account has been logged in on other devices. If this is not your operation, please change the password as soon as possible</string>
+    <string name="other_device_login">Other device login reminders</string>
+    <string name="author_region_receviced">The area you share has been received</string>
+    <string name="author_account_receviced">Your Shared account has been received</string>
+    <string name="recevicer">receiver:</string>
+    <string name="hint">Hint</string>
+    <string name="please_select_area">Please select area</string>
+    <string name="please_input_region_name">Please enter a zone name</string>
+    <string name="author_region_unAuthorized">The authorizer disauthorized the zone %1$s</string>
+    <string name="licensor">Licensor:</string>
+    <string name="please_restore_device">Please restore all devices in the area to factory Settings before deleting the area</string>
+    <string name="please_connect_normal_light">Please connect the  lights</string>
+    <string name="please_connect_curtain">Please connect the curtain</string>
+    <string name="scanning_timeout">Scan timeout</string>
+    <string name="reset_factory_success">The factory has been restored successfully. The equipment light flashes within 3 seconds. Please try again if not</string>
+    <string name="reset_factory_fail">Factory Settings restored fail,please power-on to try again</string>
+    <string name="please_read_carefully">Please read %1$s S carefully</string>
+    <string name="please_sure_all_device_power_on">Please ensure all devices are  powered on (except sensor, switch)</string>
+    <string name="reset_factory_all_device">This will restore factory Settings(except sensor, switch) to all powered on devices.</string>
+    <string name="have_question_look_notice">If you have any other questions, please check the app description</string>
+    <string name="reset_warm_red">It can be added again by adding devices after factory Settings have been restored.</string>
+    <string name="connect_fail2">Connection failed, please try again</string>
+    <string name="clear_one">It is recommended to restore factory Settings first and then clear the data to avoid unexpected errors</string>
+    <string name="clear_two">Local and cloud data will be erased and unrecoverable.</string>
+    <string name="region_warm">Scan the qr code below to transfer the account</string>
+    <string name="cancel_timer">Expiration countdown:</string>
+    <string name="authorization_warm">The receiver will have only control, not management</string>
+    <string name="get_version_fail">Failed to get device version number</string>
+    <string name="please_select_update_file">Select OTA files to upgrade</string>
+    <string name="choose_device">Device List <!--(Long press change name)--></string>
+    <string name="choose_group_change">Group List</string>
+    <string name="no_group_device_num">Ungrouped (%1$s)</string>
+    <string name="grouped_num">grouped(%1$s)</string>
+    <string name="author_region_warm">Insufficient permissions, the current area for the authorization area you only use permissions</string>
+    <string name="beta_version">(beta version) : https://www.pgyer.com/dadou</string>
+    <string name="no_device">No Device</string>
+    <string name="compatible_mode">compatible_mode</string>
+    <string name="direck_light">Direct light:</string>
+    <string name="get_data_please_wait">Loading data, please wait</string>
+    <string name="grouping_success_tip">After changing the grouping, enter the associated scenario and save again!</string>
+    <string name="timeout_period_is_empty">The timeout period is empty</string>
+    <string name="timeout_time_less_ten">The timeout time is not less than 10 seconds</string>
+    <string name="timeout_255">The timeout cannot be greater than 255 seconds</string>
+    <string name="timeout_1m">The timeout cannot be less than 1 startMinute</string>
+    <string name="timeout_255_big">The timeout cannot be greater than 255 minutes</string>
+    <string name="compatibility_mode">if the light does not flash, please turn on the compatibility mode.</string>
+    <string name="rename_faile">Rename failed</string>
+    <string name="delete_region_tip">Delete the area first restore the existing equipment in the area to factory.</string>
+    <string name="no_have_bin">There is no bin file of this type</string>
+    <string name="device_name">Device:</string>
+    <string name="search_icon">&#xe63c;</string>
+    <string name="no_search_result">Sorry, there is no relevant content</string>
+    <string name="change_match_type">Try a different keyword</string>
+    <string name="physical_recovery">Physical restore factory Settings</string>
+    <string name="no_found_device">No additional devices were found nearby</string>
+    <string name="please">Whether to try</string>
+    <string name="begin_scan">Start scanning</string>
+    <string name="click_retry">Click retry</string>
+    <string name="frist_out_age">Connection successful, power off within %1$sS</string>
+    <string name="frist_power_on">Please power on after %1$s</string>
+    <string name="second_power_on">Please power on within %1$s seconds,waiting for the connection</string>
+    <string name="scan_retry">Re-Scan </string>
+    <string name="transfer_region">Transfer Region</string>
+    <string name="region_transfer_code_invalid">Area handover qr code is invalid</string>
+    <string name="transfer_region_code">Scan the qr code below to hand over your account</string>
+    <string name="see_region_qr">Transfer Code</string>
+    <string name="transfer_network_region">Transfer Area</string>
+    <string name="transfer_region_success">The area you handed over has been accepted</string>
+    <string name="make_code_fail">Failed to create qr code</string>
+    <string name="please_near_light">Please close to the light</string>
+    <string name="near_light_ok">I am near the light</string>
+    <string name="old_light_rest">The current firmware version is lower, please try the following steps to reset the device:</string>
+    <string name="warm_notice">Tips: if you have any other questions, please refer to the APP instructions.</string>
+    <string name="config_success">Configuration is successful</string>
+    <string name="normal_swith">Ordinary switch</string>
+    <string name="scene_switch">Scene switch</string>
+    <string name="curtain_switch">Curtain switch</string>
+    <string name="night_light">Night light</string>
+    <string name="click_config">Config</string>
+    <string name="choose_scene">Select the scene</string>
+    <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
+    <string name="select_type">Please select type</string>
+    <string name="group_switch">Group switch</string>
+    <string name="close">close</string>
+    <string name="brightness_add">brightness+</string>
+    <string name="color_temperature_add">cct+</string>
+    <string name="brightness_minus">brightness-</string>
+    <string name="color_temperature_minus">cct-</string>
+    <string name="click_config_tip">Click the configure button to complete the configuration</string>
+    <string name="change_mode_8k">switching mode</string>
+    <string name="times_mode">Timer_Mode</string>
+    <string name="time_pattern_mode">Cyclical pattern </string>
+    <string name="event_list">Even List</string>
+    <string name="repetition">repetition</string>
+    <string name="chose_time">Chose time</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="tag1">Lable 1</string>
+    <string name="Gate_way">Gateway</string>
+    <string name="every_day">Everyday</string>
+    <string name="only_one">Only once</string>
+    <string name="please_select_scene">Please select the scene</string>
+    <string name="timer_exists">The timing time already exists</string>
+    <string name="invalid_data">Invalid data. Please try again </string>
+    <string name="gate_way_time_max">The gateway timer has reached the maximum number of creation</string>
+    <string name="add_time">Add timing task</string>
+    <string name="add_times">Add  task</string>
+    <string name="add_times2">Add a loop task</string>
+    <string name="to">To</string>
+    <string name="startTime">7:40</string>
+    <string name="endTime">8:00</string>
+    <string name="standing_time">Standing time</string>
+    <string name="standing_time_num">Stay time :%1$s per minute</string>
+    <string name="minute">Minute</string>
+    <string name="no_get_device_info">Device information not obtained, please try again</string>
+    <string name="have_time_task">The response task already exists in this time period, please select another time</string>
+    <string name="please_chose_right_time">The start time cannot be greater than the end time, please choose again</string>
+    <string name="timer_period_set">Task list </string>
+    <string name="please_select_standing_time">Please select your stay time</string>
+    <string name="please_setting_least_one">Please configure the scene for at least one time period</string>
+    <string name="open_gps_tip">In order to scan the device and detect that the positioning is not open, do you want to open the positioning?</string>
+    <string name="go_open">To open</string>
+    <string name="config_gate_way">Configure gateway</string>
+    <string name="wifi_account">WIFI Account</string>
+    <string name="wifi_pwd">WIFI Password</string>
+    <string name="wifi_account_hinit">Please enter WIFI account</string>
+    <string name="wifi_pwd_hinit">Please enter WIFI password</string>
+    <string name="config_net">Configure the network</string>
+    <string name="wifi_cannot_be_empty">WIFI account and WIFI password cannot be empty</string>
+    <string name="config_WIFI_FAILE">WIFI configuration failed, please retry the power</string>
+    <string name="config_setting_gw_wifi">Please wait while the wifi network is being configured</string>
+    <string name="no_this_bin">The bin file is not available on the resource server, please contact the administrator</string>
+    <string name="no_new_app_version">There is no bin file on the resource server, please contact the administrator. There is no need to update the current updated version of app</string>
+    <string name="mesh_error">mesh password error 70000</string>
+    <string name="no_have_type">Type not included</string>
+    <string name="ERROR_MESH_NOT_ENOUGH">Insufficient mesh address</string>
+    <string name="ERROR_GW_OR_ACCOUNT_NOT_EXIST">The gateway does not exist/there is no gateway under the account</string>
+    <string name="ERROR_GW_UNONLIN">The gateway is not online / the gateway is not online at all</string>
+    <string name="ERROR_GW_BASE64">base64 String decoding failed</string>
+    <string name="ERROR_SERVER_BUSYNEWSS">Server busy</string>
+    <string name="ERROR_SERVER_CRASH">Server crash</string>
+    <string name="gw_not_online">The gateway is not online</string>
+    <string name="tag_mutex">This tag conflicts with the %1$s tag. Please close the tag before starting it</string>
+    <string name="label">Label</string>
+    <string name="get_time_zone_fail">Failed to obtain time zone information</string>
+    <string name="config_gate_way_fail">Configuration gateway failed</string>
+    <string name="delete_gate_way_label_fail">Failed to remove the gateway label</string>
+    <string name="delete_gate_way_task_fail">The delete gateway task failed</string>
+    <string name="send_gate_way_label_head_fail">Failed to send tag header</string>
+    <string name="config_gate_way_tp_task_fail">Failed to configure the gateway loop mode time period</string>
+    <string name="config_gate_way_t_task_fail">Failed to configure the gateway timing mode time</string>
+    <string name="gate_way_label_switch_fail">Gateway label task switch failed</string>
+    <string name="gate_way_switch_fail">Gateway switch failed</string>
+    <string name="delete_device_confim">After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete Gateway?</string>
+    <string name="config_WIFI">ConfigGateWIFI</string>
+    <string name="gate_way_offline">Gateway offline</string>
+    <string name="gateway_reset_confim">After reset, config data will be deleted, Confirm the reset operate</string>
+    <string name="user_reset">User reset</string>
+    <string name="reset_user_success">User reset successfully</string>
+    <string name="slow_up_slowly">Slow up slowly</string>
+    <string name="slow">slow</string>
+    <string name="mid">middle</string>
+    <string name="fast">fast</string>
+    <string name="recovery_active_equipment">Recovery of active equipment</string>
+    <string name="left">Left:</string>
+    <string name="right">Right:</string>
+    <string name="single_brighress_group_switch">Dimmer double switch</string>
+    <string name="eight_switch">Multifunction switch</string>
+    <string name="double_switch">DoubleGroup Switch</string>
+    <string name="delete_device">Delete Device</string>
+    <string name="delete_device_tip">Whether or not to delete?</string>
+    <string name="delete_device_hard_tip">Delete failed, whether to force delete?</string>
+    <string name="add_cycle_label">Add a loop tag</string>
+    <string name="change_device_name">Modify device name</string>
+    <string name="scene_list">Cue List</string>
+    <string name="user_reset_tip">Whether to perform user reset?</string>
+    <string name="user_reset_tip2">Reset failed, whether to force user reset?</string>
+    <string name="gw_user_reset_switch_success">The user gateway reset succeeded</string>
+    <string name="select_mode">select mode</string>
+    <string name="mode_choice">mode selection:</string>
+    <string name="select_gradient">selection gradient</string>
+    <string name="safe_lock">Safe lock</string>
+    <string name="open">Open</string>
+    <string name="safe_lock1">Lock :(click open to lock, and the lock completion light will turn off)</string>
+    <string name="lock">Lock</string>
+    <string name="safe_lock2">Unlock :(click "off" to unlock, and the unlock light will open)</string>
+    <string name="unlock">Unlock</string>
+    <string name="user_reset_faile">Gateway user reset failed</string>
+    <string name="choose_scene_dot">Choose scene :</string>
+    <string name="open_light">Open light</string>
+    <string name="close_light">Close light</string>
+    <string name="open_blutooth_tip">Please turn on bluetooth</string>
+    <string name="find_device_num">Number of recovered devices:</string>
+    <string name="user_reset_all1">The user reset clears the configured grouping and scenario information。</string>
+    <string name="user_reset_all2">Local and cloud data will be erased and unrecoverable!</string>
+    <string name="user_reset_all3">If you have any other questions, please check the APP instructions.</string>
+    <string name="physical_recovery_one">This operation does not reset the light under this account.</string>
+    <string name="physical_recovery_two">This operation will reset all energized devices (switch, except sensor) in the region of the device that interacts with the APP.</string>
+    <string name="group_mode">Group mode</string>
+    <string name="scene_mode">Scene mode</string>
+    <string name="see_help">View help</string>
+    <string name="group_max">Maximum 7 groups are supported</string>
+    <string name="dissupport">This batch of equipment does not support switching function</string>
+    <string name="china_code">China+86</string>
+    <string name="select_country_area">Country/area code selection</string>
+    <string name="have_account">Existing account login</string>
+    <string name="create_account">Create new account</string>
+    <string name="privacy_statement">Privacy statement</string>
+    <string name="privacy_statement_content">Uled smart platform understands the importance of your privacy to you and fully respects it.The mobile phone number registered on Uled platform is only used for the operation of Uled smart products.Without your consent, we will not access or process your content data for any purpose except as required by applicable laws and regulations.</string>
+    <string name="user_agreement_context">《User agreement and privacy notes》have been agreed.</string>
+    <string name="not_use">Not to use</string>
+    <string name="read_agreen">Please read the agreement for approval</string>
+    <string name="user_agreement">User agreement and privacy statement</string>
+    <string name="verification_code_login">Verification code Login</string>
+    <string name="no_connect_device">No automatic connection!</string>
+    <string name="select_icon_dot">Select the icon:</string>
+    <string name="select_icon">Choose lcon</string>
+    <string name="group_ota">Group to upgrade</string>
+    <string name="get_bin_fail">Failed to get the  file</string>
+    <string name="dissupport_ota">Otas are not supported in this release</string>
+    <string name="get_version_success">This version does not support OTA capture of device version success</string>
+    <string name="delete_device_fail">Device deletion failed</string>
+    <string name="delete_success">deleted successfully</string>
+    <string name="edite_device">Edit Device</string>
+    <string name="cancel_edite">Cancel the editor</string>
+    <string name="sure_delete_device">Are you sure to delete  device:%1$s?</string>
+    <string name="confim_stop_scan">Are you sure you want to exit the scan?</string>
+    <string name="add_device">Add Device</string>
+    <string name="set_color">Set colors</string>
+    <string name="config_return">Are you sure to exit the configuration?</string>
+    <string name="selected_group">The selected group</string>
+    <string name="choosed_scene">The selected scene</string>
+    <string name="please_setting_least_one_gp">Please select at least one group</string>
+    <string name="please_setting_least_one_scene">Please select at least one scene</string>
+    <string name="sure_delete_device2">Are you sure you want delete this device?</string>
+    <string name="light_sw">Light switch</string>
+    <string name="touch_sw">Touch switch</string>
+    <string name="touch_double_sw">Touch two sets of switches</string>
+    <string name="bt_scene_sw">Touch scene switch</string>
+    <string name="scene_sw">Scene switch</string>
+    <string name="model_list">Model list</string>
+    <string name="seven_color">Colorful gradient</string>
+    <string name="delete_group">Delete Group</string>
+    <string name="bluetooth_scan">Start scan</string>
+    <string name="bluetooth_mode">Bluetooth Mode</string>
+    <string name="route_mode">Route Mode</string>
+    <string name="work_mode">Work Mode</string>
+    <string name="bind_reouter">Bind router</string>
+    <string name="please_select_router">Please select a router</string>
+    <string name="please_select_sw_at_leaset">Please select at least one switch</string>
+    <string name="please_select_sensor_at_leaset">Please select at least one sensor</string>
+    <string name="router">Router</string>
+    <string name="qr_not_null">One-dimensional code cannot be empty</string>
+    <string name="routing_network">Router access</string>
+    <string name="please_check_device_code">Please check the equipment code:</string>
+    <string name="router_offline">Route is offline and cannot be performed</string>
+    <string name="router_added">The router has been added</string>
+    <string name="route_code_error">The router has been added that the device code is not a router device code, please contact the supplier that the device code is not a router device code, please contact the supplier</string>
+    <string name="route_other_add">The router has been added by others</string>
+    <string name="device_code_cannot_be_empty">The router device code cannot be empty</string>
+    <string name="router_access_in_fail">The router failed to connect</string>
+
+
+    <string name="router_access_in_success">The router has successfully connected</string>
+    <string name="auxfun">Auxfun</string>
+    <string name="config_WIFI_success">Wifi configuration is successful</string>
+    <string name="router_scan_faile">The route scan failed. Please check the route and try again</string>
+    <string name="stop_scan_fail">Stop scan failed</string>
+    <string name="route_can_not_stop">Can not stop at this time, please wait</string>
+    <string name="gp_not_exit">The target group does not exist. Refresh the group data</string>
+    <string name="device_type_not_match">The device cannot be grouped into this group, the productUUID of the device does not match the deviceType of the group</string>
+    <string name="please_config_all">Please complete all key configurations</string>
+    <string name="right_phone_num">Please fill in the correct cell phone number</string>
+    <string name="submit_error_code">The user submitted a verification code error for verification</string>
+    <string name="verification_code_invalid">Verification failed 3 times, verification code is invalid, please request again</string>
+    <string name="salt_error">Please get the salt value first or the salt value is wrong or the salt value is expired</string>
+    <string name="input_rgb_num">Enter the color RGB value</string>
+    <string name="router_grouping">In groups, please hold on. %1$s devices have been successfully grouped</string>
+    <string name="binding_router">Bind routing</string>
+    <string name="bind_success">Binding success</string>
+    <string name="bind_fail">Route binding failed</string>
+    <string name="please_select_device_at_leaset">Please select at least one device to bind to</string>
+    <string name="router_del_gp">In delete group, please wait a moment, %1$s devices have been successfully removed and reorganized</string>
+    <string name="delete_gp_fail">Delete group fail</string>
+    <string name="add_scene_fail">Add scene fail</string>
+    <string name="all_gp_cont_del">Delete failed. Default group cannot be deleted</string>
+    <string name="route_scan_cant_ota">OTA cannot be used in the scan, please wait.Try to get the status in routing mode to restore the last scan</string>
+    <string name="route_otaing_cont_to_ota">In OTA, OTA cannot be performed again.Try to get the state in routing mode to restore the last OTA</string>
+    <string name="loacal_del">Local deletion</string>
+    <string name="region_no_router">There is no route under this account in this area, so it cannot be operated</string>
+    <string name="delete_scene_fail">Delete scene failed</string>
+    <string name="no_bind_router_cant_version">The selected devices are not bound to the route, so the version number cannot be obtained. Please go to bind the route first</string>
+    <string name="get_version_success_num">Gets the device version number. Currently, five devices have refreshed the version number</string>
+    <string name="sanning_to_scan_activity">OTA cannot be used in the scan. It will jump to the scan interface after 2 seconds</string>
+    <string name="no_this_device_type">ScanType not included:</string>
+    <string name="transfer_accounts_code_exit_cont_scan">Cannot scan while handover code exists</string>
+    <string name="otaing_to_ota_activity">Scan cannot be performed in OTA. Jump to OTA interface after 2 seconds</string>
+    <string name="mesh_not_enought">The meshAddr address is not enough to scan the equipment</string>
+    <string name="no_router_use">There is no route available under this account in this area. Please check whether the route is connected to the Internet</string>
+    <string name="ota_finish">OTA upgrade stop</string>
+    <string name="routing_update">Routing update</string>
+    <string name="router_ota_num">Current number of upgraded devices:</string>
+    <string name="no_bind_router_cant_perform">The device is not bound to a route and cannot do this</string>
+    <string name="add_gradient_fail">Failed to add custom gradient</string>
+    <string name="update_gradient_fail">Failed to update custom gradient</string>
+    <string name="device_not_exit">The device does not exist, please refresh the data</string>
+    <string name="gradient_not_exit">The custom gradient does not exist, please refresh the data</string>
+    <string name="del_gradient_fail">Failed to remove gradient</string>
+    <string name="scene_cont_exit_to_refresh">If a scenario does not exist, refresh the scenario list</string>
+    <string name="router_stop_scan_faile">Stop routing scan failed</string>
+    <string name="scan_result_confirm">The scan results are confirmed, please wait</string>
+    <string name="group_timeout">Device packet timeout</string>
+    <string name="group_some_fail">Some devices failed to group</string>
+    <string name="open_light_faile">Routing failed to turn on lights</string>
+    <string name="delete_group_success">The routing deletion group was successful and the %1$s device removed the group</string>
+    <string name="delete_group_some_fail">Routing delete group failed, part of the device removal group failed</string>
+    <string name="config_bri_fail">Failed to configure brightness</string>
+    <string name="config_color_temp_fail">The routing configuration color temperature failed</string>
+    <string name="slow_close_faile">Slow start and close failed</string>
+    <string name="slow_close_success">Slow start and close successfully</string>
+    <string name="slow_open_faile">Slow start and slow out failed to start</string>
+    <string name="slow_speed_success">Slow start and slow stop speed is adjusted successfully</string>
+    <string name="slow_speed_faile">Slow start and slow out speed adjustment failed</string>
+    <string name="transfer_accounts_code_exit_cont_perform">The handover code has been generated. This operation is not supported at this time. Please delete the handover code and try again</string>
+    <string name="add_group_fail">Failed to add group</string>
+    <string name="scene_apply_fail">Scenario application fails</string>
+    <string name="speed_minus">speed-</string>
+    <string name="speed_add">speed+</string>
+    <string name="forward">forward</string>
+    <string name="reversed">reversed</string>
+    <string name="brightness_fail">Brightness adjustment failure</string>
+    <string name="config_white_fail">Failed to configure white light</string>
+    <string name="close_faile">Turn off the light failure</string>
+    <string name="unlock_fail">Unlock the failure</string>
+    <string name="lock_fail">Locking failure</string>
+    <string name="router_mode_cant_perform">This operation cannot be performed in the routing state</string>
+    <string name="get_router_empty">The routing-related data is empty</string>
+    <string name="congfig_rgb_fail">Failed to configure color lamp RGB value</string>
+    <string name="gradient_apply_fail">Gradient application failed</string>
+    <string name="gradient_stop_fail">Tween stop failed</string>
+    <string name="update_scene_fail">Scenario modification failed</string>
+    <string name="speed_faile">Speed regulation failure</string>
+    <string name="pause_faile">Suspension of failure</string>
+    <string name="off_faile">Close the failure</string>
+    <string name="ota_success">OTA upgrade successful</string>
+    <string name="ota_fail">OTA upgrade failed</string>
+    <string name="stop_ota">Stop the upgrade</string>
+    <string name="reset_curtain_success">Curtain restarts successfully</string>
+    <string name="reset_curtain_fail">Curtain restart failed</string>
+    <string name="ota_stop_fail">OTA stop upgrade failed</string>
+    <string name="no_get_version">The device did not get a version number</string>
+    <string name="version_error">Version of the abnormal</string>
+    <string name="router_ota_faile">Route upgrade failed</string>
+    <string name="router_load_bin_faile">Routing failed to download bin file</string>
+    <string name="router_time_out">Routing reply timeout</string>
+    <string name="startTime_not_exit">The record for the start does not exist</string>
+    <string name="router_version_error">The route version number is not correct. Please get the route version number first and try again</string>
+    <string name="router_not_exit">Route does not exist, please refresh the route list</string>
+    <string name="ota_all_num">Total Number:</string>
+    <string name="ota_success_num"> Success number:</string>
+    <string name="ota_fail_num">Failed number:</string>
+    <string name="route_cont_support_ble">The routing device does not support Bluetooth mode</string>
+    <string name="timer_scene">Timing scenario</string>
+    <string name="add_timer_scene">Add timing scenario</string>
+    <string name="add_timer_scene_fail">Failed to add timing scenario</string>
+    <string name="add_timer_scene_success">Added timing scenario successfully</string>
+    <string name="dissupport_gp_ota">Group upgrades are not supported on current devices</string>
+    <string name="timer_scene_open_faile">Timed scene failed to open</string>
+    <string name="timer_scene_close_faile">Timer scenario shutdown failed</string>
+    <string name="delete_timerscne_fail">Failed to delete timing scenario</string>
+    <string name="update_timer_scene">Update timing scenario</string>
+    <string name="plaese_input_device_name">Please enter the device name</string>
+    <string name="rename_success">Rename successful</string>
+    <string name="get_versioning">Get the version number, please wait</string>
+    <string name="cloud_assistant">Cloud assistant</string>
+    <string name="no_third_party">Third party platforms that have not been used for the time being</string>
+    <string name="please_set_color">Please set the color</string>
+    <string name="gp_deletescene">This scene group has been deleted. Please recreate the scene</string>
+    <string name="router_list">The routing list</string>
+    <string name="router_connect_ble_fail">Routing Bluetooth connection failed</string>
+    <string name="no_can_ota_device">There is no upgradeable equipment</string>
+    <string name="please_select_color">Please select the gradient color</string>
+    <string name="input_device_code">Please enter the device code</string>
+    <string name="input_right_code">Please enter the correct barcode</string>
+    <string name="scan_code">Device code scanning</string>
+    <string name="select_all_group">All groups have been checked</string>
+    <string name="commutation_success">Motor reversing successfully</string>
+    <string name="commutation_faile">Motor commutation failure</string>
+    <string name="open_faile">open fail</string>
+    <string name="please_do_this_over_ble">Please do this over Bluetooth</string>
+    <string name="compatible_scan">Compatibility mode</string>
+    <string name="normal_scan">Conventional mode</string>
+</resources>

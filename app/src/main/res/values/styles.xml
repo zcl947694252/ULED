@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar" />
+    <style name="Optimize_white_scereen" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="android:windowBackground">@drawable/splash</item>
+       <!-- <item name="android:windowTranslucentStatus">true</item>-->
+    </style>
+
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">#18B4ED</item>
+        <item name="colorControlNormal">@color/black_ee</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:navigationBarColor">@color/primary</item>
+
+        <item name="android:windowEnableSplitTouch">false</item>
+        <item name="android:splitMotionEvents">false</item>
+
+    </style>
+
+    <style name="CustomCheckboxTheme" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:drawableStart">@drawable/checkbox_style</item>
+        <item name="android:button">@null</item>
+    </style>
+
+    <style name="FullHeightDialog" parent="Theme.AppCompat.Light.Dialog.MinWidth">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowMinWidthMinor">30%</item>
+        <item name="android:windowMinWidthMajor">30%</item>
+
+    </style>
+
+    <style name="FullHeightDialogNew" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button.Colored</item>
+        <item name="android:textColorPrimary">@color/primary_text</item>
+        <item name="android:textColorSecondary">@color/secondary_text</item>
+        <item name="android:navigationBarColor">@color/primary</item>
+        <item name="android:popupTheme">@style/ToolBarTheme</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <!--设置给Toolbar的风格-->
+    <style name="ToolBarTheme" parent="@style/ThemeOverlay.AppCompat.Light">
+        <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>
+    </style>
+
+    <!--设置toolbar弹出菜单的位置-->
+    <style name="OverflowMenuStyle" parent="Widget.AppCompat.Light.PopupMenu.Overflow">
+        <!--设置不覆盖锚点-->
+        <item name="overlapAnchor">false</item>
+    </style>
+
+    <style name="ActionSheetDialogBase">
+        <item name="titleTextColor">#d4000000</item>
+        <item name="titleTextSize">20dp</item>
+        <item name="titleHeight">42dp</item>
+        <item name="titleDivider">@drawable/divider_bg</item>
+        <item name="titleDividerInset">18dp</item>
+        <item name="titleDividerHeight">1px</item>
+        <item name="messageTextColor">#73000000</item>
+        <item name="messageTextSize">12sp</item>
+        <item name="messageHeight">42dp</item>
+        <item name="messageDivider">@drawable/divider_bg</item>
+        <item name="messageDividerInset">18dp</item>
+        <item name="messageDividerHeight">1px</item>
+        <item name="itemTextColor">#d4000000</item>
+        <item name="itemTextSize">15sp</item>
+        <item name="itemDivider">@drawable/divider_bg</item>
+        <item name="itemDividerInset">18dp</item>
+        <item name="itemDividerHeight">1px</item>
+        <item name="itemHeight">48dp</item>
+        <item name="positiveTextColor">#de2b2b</item>
+        <item name="positiveTextSize">15sp</item>
+        <item name="positiveHeight">48dp</item>
+        <item name="cancelTextColor">#de2b2b</item>
+        <item name="cancelTextSize">15sp</item>
+        <item name="cancelHeight">48dp</item>
+        <item name="cancelTopMargins">8dp</item>
+        <item name="cancelBackground">@drawable/radios</item>
+        <item name="sheetMargins">8dp</item>
+        <item name="contentBackground">@drawable/radios</item>
+        <item name="windowAnimations">@style/ActionSheetDialogAnimation</item>
+    </style>
+
+    <style name="ActionSheetDialogAnimation" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/action_sheet_dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/action_sheet_dialog_exit</item>
+    </style>
+
+
+    <style name="ActionSheetTextBase">
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="ActionSheetTextBase.Title">
+
+        <item name="android:textSize">20sp</item>
+        <item name="android:textColor">#d4000000</item>
+    </style>
+
+    <style name="ActionSheetTextBase.Message">
+        <item name="android:minHeight">42dp</item>
+        <item name="android:textColor">#73000000</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="ActionSheetTextBase.Content">
+
+    </style>
+
+    <style name="ActionSheetTextBase.Cancel">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#00beb4</item>
+        <item name="android:text">取消</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:background">@drawable/radios</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="DialogTheme" parent="@android:style/Theme.Dialog">
+
+        <!-- 边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!-- 是否浮现在activity之上 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 半透明 -->
+        <item name="android:windowIsTranslucent">false</item>+
+        <!-- 无标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 背景透明 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- 模糊 -->
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="SeekBarStyle">
+        <item name="android:splitTrack">false</item>
+        <item name="android:maxHeight">9dp</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:progressDrawable">@drawable/light_switch_set</item>
+        <item name="android:thumb">@drawable/seekbar_thumb_check</item>
+    </style>
+
+    <style name="Dialog" parent="@android:style/Theme.Dialog">
+        <!-- 边框 -->
+        <!--<item name="android:windowFrame">@null</item>-->
+        <!--&lt<!&ndash; 是否浮现在activity之上 &ndash;&gt;-->
+        <!--<item name="android:windowIsFloating">true</item>-->
+        <!--&lt<!&ndash; 半透明 &ndash;&gt;-->
+        <!--<item name="android:windowIsTranslucent">true</item>-->
+        <!--&lt<!&ndash; 无标题 &ndash;&gt;-->
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <!--<item name="android:background">@android:color/transparent</item>-->
+        <!--&lt<!&ndash; 背景透明 &ndash;&gt;-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--&lt<!&ndash; 模糊 &ndash;&gt;-->
+        <!--<item name="android:backgroundDimEnabled">true</item>-->
+        <!--&lt<!&ndash; 遮罩层 &ndash;&gt;-->
+        <!--<item name="android:backgroundDimAmount">0.5</item>-->
+    </style>
+
+    <style name="AnimBottom" parent="@android:style/Animation">
+        <item name="android:windowEnterAnimation">@anim/push_bottom_in</item>
+        <item name="android:windowExitAnimation">@anim/push_buttom_out</item>
+    </style>
+
+    <style name="MyDialogStyleBottom" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowAnimationStyle">@style/AnimBottom</item>
+        <item name="android:windowFrame">@null</item>
+        <!-- 边框 -->
+        <item name="android:windowIsFloating">true</item>
+        <!-- 是否浮现在activity之上 -->
+        <item name="android:windowIsTranslucent">true</item>
+        <!-- 半透明 -->
+        <item name="android:windowNoTitle">true</item>
+        <!-- 无标题 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!-- 背景透明 -->
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <!-- 模糊 -->
+    </style>
+
+    <style name="ButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/blue_background</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:background">@drawable/device_list</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:padding">@dimen/dp_10</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">60dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+
+    <!--按钮设置 应用属性-->
+    <style name="ButtonBluStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:background">@drawable/btn_rec_blue</item>
+        <item name="android:layout_width">55dp</item>
+        <item name="android:layout_height">25dp</item>
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+
+
+
+    <style name="VerificationButtonStyle" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/blue_background</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:background">@drawable/get_code_btn</item>
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">25dp</item>
+        <item name="android:layout_marginRight">4dp</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:foreground">?android:attr/selectableItemBackgroundBorderless</item>
+    </style>
+
+    <style name="SpinnerButton" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">@color/blue_background</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:layout_height">35dp</item>
+        <item name="android:layout_width">193dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/spinner_bg</item>
+    </style>
+
+
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="BaseDialog" parent="android:Theme.Light">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+
+    </style>
+
+    <style name="Text_Title">
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#333333</item>
+    </style>
+
+    <style name="transparent_dialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+
+    <declare-styleable name="VerCodeInputView">
+        <attr name="box" format="integer" />
+        <attr name="inputPadding" format="dimension"/>
+        <attr name="child_v_padding" format="dimension"/>
+        <attr name="inputWidth" format="dimension"/>
+        <attr name="child_height" format="dimension"/>
+        <attr name="padding" format="dimension"/>
+        <attr name="box_bg_focus" format="reference"/>
+        <attr name="box_bg_normal" format="reference"/>
+        <attr name="inputType" format="string"/>
+        <attr name="inputNum" format="integer"/>
+        <attr name="inputBg" format="reference"/>
+        <attr name="inputTxtColor" format="color|reference" />
+        <!--输入框文字大小-->
+        <attr name="inputTxtSize" format="dimension|reference" />
+    </declare-styleable>
+</resources>

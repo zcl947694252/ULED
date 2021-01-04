@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/dp_10"
+    android:paddingEnd="@dimen/dp_10"
+    android:background="@drawable/popwindow_install_background"
+    android:orientation="vertical"
+   >
+
+    <TextView
+        android:id="@+id/switch_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/relocation"
+        android:textColor="@color/white"
+        android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/ota"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/ota"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/rename"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:text="@string/btn_rename_light"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:visibility="visible"/>
+
+    <TextView
+        android:id="@+id/deleteBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/factory_reset"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/configGwNet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="4dp"
+            android:visibility="gone"
+        android:text="@string/config_net"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/deleteBtnNoFactory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/delete_device"
+        android:textColor="@color/white"
+            android:visibility="gone"
+        android:textSize="16sp" />
+
+    <TextView
+            android:id="@+id/pop_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="4dp"
+            android:text="@string/firmware_version"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:textSize="16sp" />
+
+
+</LinearLayout>

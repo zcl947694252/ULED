@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:layout_editor_absoluteY="25dp">
+
+    <ImageView
+        android:id="@+id/img_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/icon_sensor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="20dp"
+        />
+
+    <ImageView
+        android:id="@+id/tv_setting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:padding="5dp"
+        android:src="@drawable/icon_device_setting"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toEndOf="@+id/tv_rgb_color"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/template_device_name_n"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/device_name"
+        android:textColor="@color/black_three"
+        android:textSize="17sp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/img_light"
+        android:singleLine="true"
+        />
+
+    <TextView
+        android:id="@+id/tv_rgb_color"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/icon_circle"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        android:layout_marginBottom="15dp"
+        />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="name"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/template_device_name_n"
+        android:singleLine="true"
+        android:textColor="@color/black_three"
+        />
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#7777"
+        android:gravity="center"
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="@dimen/dp_50"
+            android:orientation="vertical">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rect_white_h"
+                android:gravity="center_horizontal"
+                android:minHeight="150dp"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_15"
+                    android:layout_marginBottom="@dimen/dp_10"
+                    android:drawableTop="@drawable/icon_prompt"
+                    android:gravity="center"
+                    android:text="@string/hint"
+                    android:textColor="@color/red"
+                    android:textSize="18sp" />
+
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/gray" />
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/tip_recycle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:maxHeight="400dp"
+                    android:minHeight="150dp"
+                    android:orientation="vertical"
+                    android:paddingBottom="@dimen/dp_30" />
+        </LinearLayout>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/gray" />
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+
+            <include layout="@layout/template_bottom_btn" />
+
+            <TextView
+                    android:id="@+id/read_timer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/rect_r15_bottom_graye"
+                    android:gravity="center"
+                    android:text="@string/please_read_carefully"
+                    android:textColor="@color/text_red"
+                    android:textSize="16sp"
+                    android:visibility="visible" />
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
+</RelativeLayout>

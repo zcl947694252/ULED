@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f5f5f5"
+        android:orientation="vertical">
+
+    <include
+            android:id="@+id/topView"
+            layout="@layout/toolbar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+            android:id="@+id/main_sv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/topView"
+            android:scrollbars="none">
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#f5f5f5"
+                android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                    android:id="@+id/rvDevice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dp_10"
+                    android:padding="5dp"
+                    android:minHeight="330dp" />
+
+            <include layout="@layout/template_add_help" />
+
+            <include
+                    android:id="@+id/dialog_pop"
+                    layout="@layout/popwindow_install_deive_list"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_alignParentEnd="true"
+                    android:visibility="gone" />
+        </RelativeLayout>
+
+    </ScrollView>
+</RelativeLayout>

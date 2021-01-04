@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#88888888"
+        android:gravity="center"
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:id="@+id/pop_view"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rect_r15_bottom_graye"
+            android:minHeight="150dp"
+            android:orientation="vertical">
+
+        <TextView
+                android:id="@+id/code_warm_hinit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/dp_15"
+                android:gravity="center"
+                android:padding="@dimen/dp_10"
+                android:text="@string/hint"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="normal" />
+
+        <TextView
+                android:id="@+id/code_warm_title"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="@dimen/dp_3"
+                android:text="@string/recevicer"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+        <TextView
+                android:id="@+id/code_warm_context"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingTop="@dimen/dp_3"
+                android:paddingEnd="10dp"
+                android:text="@string/recevicer"
+                android:textColor="@color/black"
+                android:textSize="15sp" />
+
+        <LinearLayout
+                android:id="@+id/code_warm_user_ly"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="@dimen/dp_18"
+                android:paddingEnd="@dimen/dp_18"
+                android:paddingTop="@dimen/dp_10"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+            <CheckBox
+                    android:id="@+id/code_warm_cb"
+                    android:checked="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            <TextView
+                    android:id="@+id/code_warm_user_agreenment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="3"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/user_agreement_context"
+                    android:textColor="@color/blue_text"
+                    android:textSize="15sp" />
+
+        </LinearLayout>
+
+        <TextView
+                android:id="@+id/code_warm_i_see"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_15"
+                android:gravity="center"
+                android:padding="@dimen/dp_10"
+                android:text="@string/i_know"
+                android:textColor="@color/blue_background"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#88888888"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_margin="30dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rect_five_w"
+        android:maxHeight="600dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:text="@string/please_select_area"
+            android:background="@color/blue_background"
+            android:textColor="@color/black_e"
+            android:textSize="13sp" />
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/region_dialog_me_net_num"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:textSize="15sp"
+                    android:background="@color/gray_e"
+                    android:textColor="@color/black_three" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/region_dialog_me_recycleview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                        android:minHeight="@dimen/dp_50"
+                    android:background="@color/white"
+                    android:descendantFocusability="blocksDescendants" />
+                
+                <TextView
+                    android:id="@+id/region_dialog_authorize_net_num"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="@dimen/dp_10"
+                    android:paddingEnd="@dimen/dp_10"
+                    android:background="@color/gray_e"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/black_three"
+                    android:textSize="15sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/region_dialog_authorize_recycleview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                        android:minHeight="@dimen/dp_50"
+                    android:background="@color/white"
+                    android:descendantFocusability="blocksDescendants" />
+            </LinearLayout>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/region_dialog_confirm"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:gravity="center"
+            android:text="@string/confirm"
+            android:background="@color/blue_background"
+            android:textColor="@color/white"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+
+</RelativeLayout>

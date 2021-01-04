@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+        <TextView
+                android:id="@+id/phone_text"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="3dp"
+                android:gravity="center_vertical"
+                android:layout_weight="1"
+                android:textSize="18sp" />
+
+        <ImageView
+                android:id="@+id/delete_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:src="@drawable/baseline_close_black_24" />
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>

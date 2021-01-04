@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/item_more_group_name"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:text="group1"
+        android:textColor="@color/black"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="16sp"
+        />
+
+    <TextView
+        android:id="@+id/group_check_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="选中"
+        android:padding="3dp"
+        android:background="@color/primary"
+        android:textColor="@color/white"
+        android:gravity="center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/item_more_group_name"
+        app:layout_constraintTop_toTopOf="@id/item_more_group_name"
+        />
+</android.support.constraint.ConstraintLayout>

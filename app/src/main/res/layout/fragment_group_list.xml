@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/gpLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background_color">
+
+        <include layout="@layout/toolbar" android:id="@+id/toolbar_top"/>
+
+
+
+       <View
+            android:id="@+id/view5"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="8dp"
+            android:background="#eeeeee"
+            app:layout_constraintBottom_toBottomOf="@+id/toolbar_top"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_top" />
+
+
+        <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+            android:id="@+id/bnve"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/white"
+            app:elevation="0dp"
+            app:itemTextColor="@color/selector_item_color"
+            app:labelVisibilityMode="selected"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar_top"
+            app:menu="@menu/menu_group_fragment_device_type" />
+
+
+
+       <View
+            android:id="@+id/view6"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#eeeeee"
+            app:layout_constraintBottom_toTopOf="@+id/list_groups"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bnve" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/list_groups"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view6"
+            app:layout_constraintVertical_bias="0.0" />
+
+       <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/list_groups"
+            android:background="@color/gray_e"/>
+
+        <include
+            android:id="@+id/dialog_pop"
+            layout="@layout/popwindow_install_deive_list"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_top"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:visibility="gone"
+            />
+
+        <include
+            android:id="@+id/installDialog"
+            layout="@layout/dialog_install_list"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="320dp"
+            android:layout_height="400dp"
+            android:visibility="gone"/>
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="5dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="2dp"
+        android:paddingBottom="2dp"
+        tools:layout_editor_absoluteY="25dp">
+    <!--BatchGroupFourDeviceActivity  SelectSceneListActivity  HumanBodySensorActivity  PirConfigActivity-->
+    <RelativeLayout
+            android:id="@+id/template_device_batch_icon_ly"
+            android:layout_width="@dimen/dp_50"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+                android:id="@+id/template_device_batch_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerInParent="true"
+                android:contentDescription="@null"
+                android:scaleType="fitXY"
+                android:src="@drawable/icon_group" />
+    </RelativeLayout>
+
+    <ImageView
+            android:id="@+id/template_device_batch_selected"
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/icon_checkbox_unselected"
+            app:layout_constraintEnd_toEndOf="@+id/template_device_batch_icon_ly"
+            app:layout_constraintStart_toEndOf="@+id/template_device_batch_icon_ly"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/template_device_batch_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/dp_3"
+            android:gravity="center"
+            android:maxLines="2"
+            android:text="@string/device_name"
+            android:textColor="@color/black_three"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="@+id/template_device_batch_icon_ly"
+            app:layout_constraintStart_toStartOf="@+id/template_device_batch_icon_ly"
+            app:layout_constraintTop_toBottomOf="@+id/template_device_batch_icon_ly" />
+
+
+    <TextView
+            android:id="@+id/template_device_batch_title_blow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:text="1235"
+            android:maxLines="2"
+            android:textColor="@color/black_three"
+            android:layout_marginEnd="@dimen/dp_3"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="@+id/template_device_batch_icon_ly"
+            app:layout_constraintStart_toStartOf="@+id/template_device_batch_icon_ly"
+            app:layout_constraintTop_toBottomOf="@+id/template_device_batch_title" />
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:gravity="center_horizontal"-->
+    <!--android:orientation="vertical">-->
+    <!--<ImageView-->
+    <!--android:id="@+id/img_icon"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:contentDescription="@null"-->
+    <!--android:scaleType="center"-->
+    <!--android:src="@drawable/icon_light_set"-->
+    <!--android:layout_marginTop="15dp"/>-->
+    <!--<TextView-->
+    <!--android:id="@+id/txt_name"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:singleLine="true"-->
+    <!--android:textSize="14sp" />-->
+    <!--<TextView-->
+    <!--android:id="@+id/txt_mac"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:singleLine="false"-->
+    <!--android:textSize="12sp"-->
+    <!--android:visibility="gone" />-->
+    <!--<CheckBox-->
+    <!--android:id="@+id/selected"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:checked="true"-->
+    <!--android:clickable="false"-->
+    <!--android:focusable="false"-->
+    <!--android:focusableInTouchMode="false"-->
+    <!--style="@style/CustomCheckboxTheme"-->
+    <!--/>-->
+    <!--</LinearLayout>-->
+
+</android.support.constraint.ConstraintLayout>

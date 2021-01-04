@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/constraintLayout5"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/device_fragment_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+    <ImageView
+            android:id="@+id/group_ota_icon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:padding="2dp"
+            android:layout_marginStart="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_10"
+            android:src="@drawable/icon_device_open" />
+
+    <LinearLayout
+            android:id="@+id/device_detail_item_name_ly"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+        <TextView
+                android:id="@+id/group_ota_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:text="1234"
+                android:textColor="@color/black_three"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/group_ota_group_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="top"
+                android:paddingStart="2dp"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:visibility="gone"
+                android:text="组1000"
+                android:textColor="@color/black_three"
+                android:textSize="10sp" />
+        <TextView
+                android:id="@+id/group_ota_version"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="top"
+                android:paddingStart="2dp"
+                android:includeFontPadding="false"
+                android:singleLine="true"
+                android:text="LCS-100"
+                android:textColor="@color/black_three"
+                android:textSize="10sp" />
+
+    </LinearLayout>
+    <ImageView
+            android:id="@+id/group_ota_update"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/icon_arrow"/>
+</LinearLayout>

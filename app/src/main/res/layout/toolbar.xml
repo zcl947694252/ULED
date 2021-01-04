@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/toolbar_ly"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+    <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/gray_e"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ToolBarTheme"
+            app:titleTextColor="@color/gray_e"
+            app:titleTextAppearance="@style/Toolbar.TitleText">
+        <EditText
+                android:id="@+id/toolbarTv_left"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|start"
+                android:textColor="@color/gray_3"
+                android:textSize="20sp"
+                android:visibility="gone" />
+
+        <TextView
+                android:id="@+id/toolbarTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="200dp"
+                android:singleLine="true"
+                android:layout_gravity="center"
+                android:textColor="@color/gray_3"
+                android:textSize="20sp"
+                android:visibility="visible" />
+
+
+        <ImageView
+                android:id="@+id/img_function1"
+                android:layout_width="wrap_content"
+                android:maxWidth="@dimen/dp_50"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:padding="5dp"
+                android:paddingEnd="14dp"
+                android:src="@drawable/add"
+                android:visibility="gone" />
+
+        <TextView
+                android:id="@+id/tv_function1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:padding="5dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp"
+                android:text="@string/add_device_new"
+                android:textColor="@color/gray_3"
+                android:visibility="gone" />
+
+        <ImageView
+                android:id="@+id/img_function2"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp"
+                android:src="@drawable/ic_delete_black_24dp"
+                android:visibility="gone" />
+
+        <ImageView
+                android:id="@+id/image_bluetooth"
+                android:layout_width="wrap_content"
+                android:maxWidth="@dimen/dp_50"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:paddingStart="16dp"
+                android:paddingTop="@dimen/dp_10"
+                android:paddingEnd="@dimen/dp_10"
+                android:paddingBottom="@dimen/dp_10"
+                android:src="@drawable/bluetooth_no" />
+
+        <TextView
+                android:id="@+id/btnStopGradient"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="5dp"
+                android:text="@string/stop"
+                android:textColor="@color/gray_3"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+        <TextView
+                android:id="@+id/tvOta"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp"
+                android:text="@string/ota"
+                android:textColor="@color/gray_3"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+        <TextView
+                android:id="@+id/tvRename"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="end"
+                android:foreground="?android:attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="8dp"
+                android:text="@string/please_rename"
+                android:textColor="@color/gray_3"
+                android:textSize="16sp"
+                android:visibility="gone"/>
+
+        <com.dadoutek.uled.widget.AutoTextSizeEditText
+                android:id="@+id/editTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignWithParentIfMissing="false"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:imeOptions="actionDone"
+                android:maxLength="50"
+                android:singleLine="true"
+                android:text=""
+                android:textAlignment="center"
+                android:textColor="@color/gray_3"
+                android:textCursorDrawable="@drawable/edit_cursor"
+                android:textSize="18sp"
+                android:visibility="gone"
+                app:aet_autoSizeMaxTextSize="18sp"
+                app:aet_autoSizeMinTextSize="10sp"
+                app:aet_autoSizeTextType="uniform" />
+
+        <TextView
+                android:id="@+id/titleCenterName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@color/gray_3"
+                android:textSize="16sp"
+                android:visibility="visible" />
+    </android.support.v7.widget.Toolbar>
+
+</android.support.design.widget.AppBarLayout>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+
+    <CheckBox
+        android:id="@+id/diy_selected"
+        style="@style/CustomCheckboxTheme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+            android:padding="@dimen/dp_10"
+        android:layout_marginLeft="15dp"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/modeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:text="modelName"
+        android:textColor="@color/black_three"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/diy_selected"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/diy_mode_on"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/icon_open_blue"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--
+    <TextView
+        android:id="@+id/diy_mode_on_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/group_list_on"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/diy_mode_on"
+        app:layout_constraintEnd_toEndOf="@+id/diy_mode_on"
+        app:layout_constraintStart_toStartOf="@+id/diy_mode_on"
+        app:layout_constraintTop_toTopOf="@+id/diy_mode_on" />
+-->
+
+
+   <View
+        android:id="@+id/view3"
+        android:layout_width="1dp"
+        android:layout_height="18dp"
+        android:layout_marginRight="6dp"
+        android:background="@color/black_nine"
+        app:layout_constraintBottom_toBottomOf="@+id/diy_mode_on"
+        app:layout_constraintEnd_toStartOf="@+id/diy_mode_on"
+        app:layout_constraintTop_toTopOf="@+id/diy_mode_on" />
+
+    <ImageView
+        android:id="@+id/diy_mode_off"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="6dp"
+        android:background="@drawable/icon_stop_blue"
+        app:layout_constraintBottom_toBottomOf="@+id/diy_mode_on"
+        app:layout_constraintEnd_toStartOf="@+id/view3"
+        app:layout_constraintTop_toTopOf="@+id/diy_mode_on" />
+
+<!--
+    <TextView
+        android:id="@+id/diy_mode_off_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/stop_model"
+        android:textColor="@color/black_nine"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="@+id/diy_mode_off"
+        app:layout_constraintEnd_toEndOf="@+id/diy_mode_off"
+        app:layout_constraintStart_toStartOf="@+id/diy_mode_off"
+        app:layout_constraintTop_toTopOf="@+id/diy_mode_off" />
+-->
+
+
+   <View
+        android:id="@+id/view4"
+        android:layout_width="1dp"
+        android:layout_height="18dp"
+        android:layout_marginRight="6dp"
+        android:background="@color/black_nine"
+        app:layout_constraintBottom_toBottomOf="@+id/diy_mode_off"
+        app:layout_constraintEnd_toStartOf="@+id/diy_mode_off"
+        app:layout_constraintTop_toTopOf="@+id/diy_mode_off" />
+
+
+    <ImageView
+        android:id="@+id/diy_mode_set"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="6dp"
+        app:layout_constraintBottom_toBottomOf="@+id/diy_mode_off"
+        app:layout_constraintEnd_toStartOf="@+id/view4"
+        android:src="@drawable/icon_setting_blue"
+        app:layout_constraintTop_toTopOf="@+id/diy_mode_off" />
+</android.support.constraint.ConstraintLayout>

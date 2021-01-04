@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relativeLayout3"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/include5"
+        layout="@layout/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--<Button-->
+    <!--android:text="@string/select_country"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_centerVertical="true"-->
+    <!--android:layout_marginLeft="20dp"-->
+    <!--android:layout_above="@+id/center_layout"-->
+    <!--/>-->
+
+
+    <com.hbb20.CountryCodePicker
+        android:id="@+id/ccp"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="180dp"
+        app:ccp_countryPreference="CN,AU"
+        app:ccp_defaultNameCode="CN"
+        app:layout_constraintEnd_toStartOf="@+id/edit_phone_number"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/edit_phone_number"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/ccp"
+        app:layout_constraintTop_toTopOf="@+id/ccp">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/edit_phone"
+            android:inputType="phone"
+            android:maxLines="1"
+            android:padding="5dp" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_send_verification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="112dp"
+        android:text="@string/send_verification"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ccp" />
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/edit_verification"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="24dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_send_verification"
+        app:layout_constraintTop_toTopOf="@+id/btn_send_verification">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/VerificationCode"
+            android:maxLines="1"
+            android:padding="5dp" />
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:id="@+id/btn_verification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:text="@string/VerificationCode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_verification" />
+</android.support.constraint.ConstraintLayout>

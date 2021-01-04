@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/item_layout"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal">
+
+    <CheckBox
+            android:id="@+id/selected_group"
+            style="@style/CustomCheckboxTheme"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:padding="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/item_more_group_name"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_set"
+            app:layout_constraintStart_toEndOf="@+id/selected_group"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+                android:id="@+id/template_group_name_s"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/allLight"
+                android:textColor="@color/black_three"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+                android:id="@+id/group_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/total"
+                android:textColor="@color/black_nine"
+                android:textSize="12sp"
+                app:layout_constraintStart_toStartOf="@+id/template_group_name_s"
+                app:layout_constraintTop_toBottomOf="@+id/template_group_name_s" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <ImageView
+            android:id="@+id/btn_on"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginRight="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+            android:id="@+id/tv_on"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/group_list_on"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_on"
+            app:layout_constraintEnd_toEndOf="@+id/btn_on"
+            app:layout_constraintStart_toStartOf="@+id/btn_on"
+            app:layout_constraintTop_toTopOf="@+id/btn_on" />
+
+    <TextView
+            android:id="@+id/curtain_setting"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:background="@drawable/btn_rec_blue_r3"
+            android:gravity="center"
+            android:text="@string/setting"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_on"
+            app:layout_constraintEnd_toEndOf="@+id/btn_on"
+            app:layout_constraintStart_toStartOf="@+id/btn_on"
+            app:layout_constraintTop_toTopOf="@+id/btn_on" />
+
+
+    <View
+            android:id="@+id/view3"
+            android:layout_width="1dp"
+            android:layout_height="18dp"
+            android:layout_marginRight="6dp"
+            android:background="@color/black_nine"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_on"
+            app:layout_constraintEnd_toStartOf="@+id/btn_on"
+            app:layout_constraintTop_toTopOf="@+id/btn_on" />
+
+    <ImageView
+            android:id="@+id/btn_off"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginRight="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_on"
+            app:layout_constraintEnd_toStartOf="@+id/view3"
+            app:layout_constraintTop_toTopOf="@+id/btn_on" />
+
+    <TextView
+            android:id="@+id/tv_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/group_list_off"
+            android:textColor="@color/black_nine"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_off"
+            app:layout_constraintEnd_toEndOf="@+id/btn_off"
+            app:layout_constraintStart_toStartOf="@+id/btn_off"
+            app:layout_constraintTop_toTopOf="@+id/btn_off" />
+
+
+    <View
+            android:id="@+id/view4"
+            android:layout_width="1dp"
+            android:layout_height="18dp"
+            android:layout_marginRight="6dp"
+            android:background="@color/black_nine"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_off"
+            app:layout_constraintEnd_toStartOf="@+id/btn_off"
+            app:layout_constraintTop_toTopOf="@+id/btn_off" />
+
+
+    <ImageView
+            android:id="@+id/btn_set"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginRight="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_off"
+            app:layout_constraintEnd_toStartOf="@+id/view4"
+            app:layout_constraintTop_toTopOf="@+id/btn_off" />
+
+    <!--<TextView-->
+    <!--android:id="@+id/btn_on"-->
+    <!--style="@null"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:layout_marginRight="8dp"-->
+    <!--android:background="@drawable/btn_radius_selector"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/group_list_on"-->
+    <!--android:textColor="@android:color/white" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/btn_off"-->
+    <!--style="@null"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:background="@drawable/btn_radius_selector"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/group_list_off"-->
+    <!--android:textColor="@android:color/white" />-->
+
+    <!--<TextView-->
+    <!--android:id="@+id/btn_set"-->
+    <!--style="@null"-->
+    <!--android:layout_width="40dp"-->
+    <!--android:layout_height="40dp"-->
+    <!--android:layout_gravity="center_vertical"-->
+    <!--android:layout_marginLeft="8dp"-->
+    <!--android:background="@drawable/btn_radius_selector"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/setting"-->
+    <!--android:textColor="@android:color/white" />-->
+
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    tools:context=".connector.ScanningConnectorActivity">
+
+    <include
+        android:id="@+id/rvToolbar"
+        layout="@layout/toolbar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <LinearLayout
+        android:id="@+id/groups_bottom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/light_num_layout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rvToolbar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_groups"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/add_group_layout"
+                android:scrollbars="vertical" />
+
+            <LinearLayout
+                android:id="@+id/add_group_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_group_add_black_48dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_str_group" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/primary" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/light_num_layout"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/list_devices"
+        app:layout_constraintTop_toBottomOf="@id/groups_bottom">
+
+        <TextView
+            android:id="@+id/tv_num_lights"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scan_lights_num"
+            android:textColor="@color/blue" />
+    </LinearLayout>
+
+
+    <GridView
+        android:id="@+id/list_devices"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fadingEdge="none"
+        android:gravity="top"
+        android:listSelector="@android:color/transparent"
+        android:numColumns="3"
+        android:scrollbars="none"
+        android:verticalSpacing="10dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_add_groups"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/light_num_layout" />
+
+    <Button
+        android:id="@+id/btn_log"
+        android:layout_width="fill_parent"
+        android:layout_height="46dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/primary"
+        android:text="log"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@android:color/white"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_scan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/primary"
+        android:text="Go Back"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!--<Button-->
+    <!--android:id="@+id/rename_groups"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="46dp"-->
+    <!--android:layout_marginBottom="5dp"-->
+    <!--android:layout_marginLeft="5dp"-->
+    <!--android:layout_marginRight="5dp"-->
+    <!--android:layout_marginTop="10dp"-->
+    <!--android:background="@color/primary"-->
+    <!--android:gravity="center"-->
+    <!--android:text="@string/rename_groups"-->
+    <!--android:textColor="@android:color/white"-->
+    <!--android:visibility="visible"-->
+    <!--app:layout_constraintBottom_toTopOf="@id/btn_add_groups"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent" />-->
+
+    <Button
+        android:id="@+id/btn_add_groups"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/primary"
+        android:gravity="center"
+        android:text="@string/set_group"
+        android:textColor="@android:color/white"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@id/grouping_completed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/grouping_completed"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/primary"
+        android:text="@string/grouping_completed"
+        android:textColor="@android:color/white"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/scanPb"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:indeterminate="true"
+        app:mpb_progressStyle="horizontal"
+        app:mpb_indeterminateTint="@color/accent"
+        app:mpb_useIntrinsicPadding="false"
+        app:mpb_showProgressBackground="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rvToolbar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal.NoPadding" />
+
+</android.support.constraint.ConstraintLayout>

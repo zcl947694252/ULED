@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+            android:id="@+id/toolbar_c_rename"
+            android:orderInCategory="1"
+            android:title="@string/btn_rename_light"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/toolbar_c_change_group"
+            android:icon="@drawable/ic_launcher"
+            android:orderInCategory="2"
+            android:title="@string/update_group"
+            app:showAsAction="never" />
+    <item
+            android:id="@+id/toolbar_c_commutation"
+            android:orderInCategory="2"
+            android:title="@string/commutation"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/toolbar_c_slow_up"
+            android:orderInCategory="2"
+            android:title="@string/slow_up_the_cache"
+            android:visible="false"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/toolbar_c_hand_recovery"
+            android:orderInCategory="2"
+            android:title="@string/hand_recovery"
+            android:visible="false"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/toolbar_c_software_restart"
+            android:orderInCategory="2"
+            android:title="@string/software_restart"
+            android:visible="false"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/toolbar_c_ota"
+            android:orderInCategory="2"
+            android:title="@string/online_upgrade"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/toolbar_c_factory"
+            android:orderInCategory="2"
+            android:title="@string/delete_device"
+            app:showAsAction="never" />
+
+    <item
+            android:id="@+id/toolbar_c_version"
+            android:orderInCategory="2"
+            android:title="@string/factory_reset"
+            app:showAsAction="never" />
+</menu>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_ee">
+
+    <!--<ScrollView-->
+    <!--android:id="@+id/scroll"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0dp"-->
+    <!--app:layout_constraintBottom_toTopOf="@+id/view12"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toTopOf="parent">-->
+
+    <View
+            android:id="@+id/view12"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#00000000"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!--</ScrollView>-->
+
+    <android.support.constraint.ConstraintLayout
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <View
+                android:id="@+id/viewLine"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#eeeeee"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/group_recyclerView" />
+
+
+        <LinearLayout
+                android:id="@+id/no_group"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                    android:id="@+id/image_no_device"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="8dp"
+                    android:src="@drawable/no_device"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.18" />
+            <TextView
+                    android:id="@+id/group_see_helpe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="70dp"
+                    android:padding="@dimen/dp_10"
+                    android:text="@string/see_help"
+                    android:textColor="@color/black_three"
+                    android:textSize="17sp" />
+
+            <Button
+                    android:id="@+id/add_device_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:layout_below="@id/image_no_device"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="60dp"
+                    android:background="@drawable/add_device_bt"
+                    android:stateListAnimator="@null"
+                    android:text="@string/add_groups"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:textColor="@color/blue_background"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/image_no_device" />
+
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+                android:id="@+id/group_recyclerView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+
+</android.support.constraint.ConstraintLayout>
