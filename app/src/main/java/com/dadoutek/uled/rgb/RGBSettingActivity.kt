@@ -975,12 +975,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
-                            if (Constant.IS_ROUTE_MODE)
+                           /* if (Constant.IS_ROUTE_MODE)
                                 when {
                                     currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
                                     else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID
                                             ?: 0).toInt(), tvValue, "rgbwhite")
-                                }
+                                }*/
                             val msg = handler_less.obtainMessage()
                             msg.arg1 = tvValue
                             handler_less.sendMessage(msg)
@@ -996,11 +996,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 onBtnTouch = false
                 if (thisTime - downTime < 500) {
                     tvValue++
-                    if (Constant.IS_ROUTE_MODE)
+                 /*   if (Constant.IS_ROUTE_MODE)
                         when {
                             currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
                             else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), tvValue, "rgbwhite")
-                        }
+                        }*/
                     val msg = handler_less.obtainMessage()
                     msg.arg1 = tvValue
                     handler_less.sendMessage(msg)
@@ -1020,12 +1020,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
-                            if (Constant.IS_ROUTE_MODE)
+                           /* if (Constant.IS_ROUTE_MODE)
                                 when {
                                     currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
                                     else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID
                                             ?: 0).toInt(), tvValue, "rgbwhite")
-                                }
+                                }*/
                             val msg = handler.obtainMessage()
                             msg.arg1 = tvValue
                             handler.sendMessage(msg)
@@ -1039,11 +1039,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 onBtnTouch = false
                 if (thisTime - downTime < 500) {
                     tvValue++
-                    if (Constant.IS_ROUTE_MODE)
+              /*      if (Constant.IS_ROUTE_MODE)
                         when {
                             currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
                             else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), tvValue, "rgbwhite")
-                        }
+                        }*/
                     val msg = handler.obtainMessage()
                     msg.arg1 = tvValue
                     handler.sendMessage(msg)

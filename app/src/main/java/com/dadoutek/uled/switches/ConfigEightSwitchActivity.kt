@@ -660,10 +660,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun deleteDevice() {
-        if (mDeviceInfo != null)
-            deleteSwitch(mDeviceInfo!!.macAddress)
-        else
-            ToastUtils.showShort(getString(R.string.invalid_data))
+        when {
+            mDeviceInfo != null -> deleteSwitch(mDeviceInfo!!.macAddress)
+            else -> ToastUtils.showShort(getString(R.string.invalid_data))
+        }
     }
 
     override fun goOta() {
