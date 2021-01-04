@@ -696,7 +696,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                                         }
                             }
                             NetworkStatusCode.ROUTER_STOP -> {
-                                LogUtils.v("zcl------是否是点击返回-isFinisAc---$isFinisAc--------")
+                                LogUtils.v("zcl------路由是否是点击返回-isFinisAc---$isFinisAc--------")
                                 if (!isFinisAc) //路由停止
                                     skipeType()
                                 else

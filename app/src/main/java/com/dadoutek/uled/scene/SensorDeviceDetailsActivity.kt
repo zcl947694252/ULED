@@ -730,21 +730,22 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
         when (deviceInfo.productUUID) {
             DeviceType.SENSOR -> {//老版本人体感应器
                 currentDevice?.version = s
-                if ("" == s)
-                    startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
-                else
-                    startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+                when (s) {
+                    "" -> startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
+                    else -> startActivity<ConfigSensorAct>("deviceInfo" to deviceInfo, "version" to s)
+                }
                 //doFinish()
             }
             DeviceType.NIGHT_LIGHT -> {//2.0
-                if ("" == s || (s.contains("N") || s.contains("PR") || s.contains("NPR"))) {
-                    if (s.contains("NPR") || "" == s)
-                        startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
-                    else
-                        startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
-                    // doFinish()
-                } else {
-                    ToastUtils.showShort(getString(R.string.connect_fail))
+                when {
+                    "" == s || s.contains("N") || s.contains("PR") || s.contains("NPR") -> {
+                        when {
+                            s.contains("NPR") || "" == s -> startActivity<PirConfigActivity>("deviceInfo" to deviceInfo, "version" to s)
+                            else -> startActivity<HumanBodySensorActivity>("deviceInfo" to deviceInfo, "update" to "0", "version" to s)
+                        }
+                        // doFinish()
+                    }
+                    else -> ToastUtils.showShort(getString(R.string.connect_fail))
                 }
             }
         }

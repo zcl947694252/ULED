@@ -681,9 +681,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val tvContent = v.findViewById<View>(R.id.tvContent) as TextView
         tvContent.text = content
 
-        if (loadDialog == null) {
+        if (loadDialog == null)
             loadDialog = Dialog(this, R.style.FullHeightDialog)
-        }
 
         if (loadDialog!!.isShowing)
             return
@@ -775,12 +774,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     open var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
-        override fun complete() {
-        }
-
+        override fun complete() {}
         @SuppressLint("CheckResult")
-        override fun error(msg: String) {
-        }
+        override fun error(msg: String) {}
     }
 
     /**
