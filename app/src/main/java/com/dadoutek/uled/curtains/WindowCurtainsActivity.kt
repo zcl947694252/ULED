@@ -34,6 +34,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
+import com.dadoutek.uled.model.httpModel.GroupMdodel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -248,8 +249,12 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                 }
                 if (canSave) {
                     curtainGroup?.name = renameEt?.text.toString().trim { it <= ' ' }
-                    DBUtils.updateGroup(curtainGroup!!)
-                    toolbarTv.text = curtainGroup?.name
+                    val subscribe = GroupMdodel.add(curtainGroup!!, curtainGroup!!.id, curtainGroup!!.id)?.subscribe(fun(_: String) {
+                        DBUtils.updateGroup(curtainGroup!!)
+                        toolbarTv.text = curtainGroup?.name
+                    }) {
+                        ToastUtils.showShort(getString(R.string.rename_faile))
+                    }
                     renameDialog.dismiss()
                 }
             }

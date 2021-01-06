@@ -19,7 +19,7 @@ public class Constant implements Serializable {
     public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
-    public static Boolean isDebug = true;
+    public static Boolean isDebug = false;
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -73,13 +73,9 @@ public class Constant implements Serializable {
     public static final String CURTAINS_ARESS_KEY = "CURTAINS_ARESS_KEY";
     public static final String CURTAINS_KEY = "CURTAINS_KEY";
     public static final String LIGHT_KEY = "LIGHT_KEY";
-    public static final String RGB_LIGHT_KEY = "RGB_LIGHT_KEY";
 
     //标志链接是否成功
     public static final String CONNECT_STATE_SUCCESS_KEY = "CONNECT_STATE_SUCCESS_KEY";
-
-    //测试账号设置
-    public static String TESTACCOUNT = "xxxx";
 
     //本地保存是否当前手机登陆过
     public static final String IS_LOGIN = "IS_LOGIN";
@@ -90,13 +86,6 @@ public class Constant implements Serializable {
 
     //用于标记当前数据库名的本地存储
     public static String DB_NAME_KEY = "DB_NAME_KEY";
-
-    //用于标记当前数据库名的本地存储
-    public static String DB_TOken_KEY = "DB_NAME_KEY";
-
-
-    //当前使用的区域默认为0
-    public static long CURRENT_USE_REGION_ID = 0;
 
     //当前使用的区域默认为0
     public static String CURRENT_USE_REGION_KEY = "CURRENT_USE_REGION_KEY";
@@ -122,11 +111,6 @@ public class Constant implements Serializable {
     //用户信息
     public static String USER_INFO = "USER_INFO";
 
-    //用户名
-    public static final String USER_NAME = "NAME";
-
-    //ps
-    public static final String USER_PS = "PS";
     public static final String NOT_SHOW = "NOT_SHOW";
 
     //用户登录此版本
@@ -134,9 +118,6 @@ public class Constant implements Serializable {
 
     //用户在删除模式
     public static String IS_DELETE = "IS_DELETE";
-
-    //开发者模式
-    public static String DEVELOPER_MODEL = "DEVELOPER_MODEL";
 
     //用户信息
     public static String UPDATE_FILE_ADRESS = "UPDATE_FILE_ADRESS";
@@ -156,11 +137,6 @@ public class Constant implements Serializable {
     //用户类型新用户
     public static String USER_TYPE_NEW = "NEW_USER";
     //用户类型新用户
-
-
-    //管理权限本地保存key
-    public static String ME_FUNCTION = "ME_FUNCTION";
-
     public static String DEVICE_TYPE = "DEVICE_TYPE";
     public static String IS_GP = "IS_GP";
     public static final String IS_NEW_START_SCAN = "IS_NEW_START_SCAN";

@@ -149,7 +149,6 @@ public class ActionSheetDialog extends AlertDialog {
                 initAttributes(typedArray);
                 typedArray.recycle();
             }
-
         }
 
         private void initAttributes(TypedArray typedArray) {
@@ -190,6 +189,8 @@ public class ActionSheetDialog extends AlertDialog {
                 mWindowAnimationId = typedArray.getResourceId(R.styleable.ActionSheetDialog_windowAnimations, mWindowAnimationId);
             }
         }
+
+
 
         private void initDefaultAttributes(TypedArray defaultTypedArray) {
             if (null != defaultTypedArray) {

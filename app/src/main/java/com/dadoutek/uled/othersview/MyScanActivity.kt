@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -18,6 +19,7 @@ class MyScanActivity : CaptureActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activtiy_myzxing)
         com.dadoutek.uled.util.StringUtils.initEditTextFilter(scan_device_code)
+        image_bluetooth.visibility = View.GONE
         toolbarTv.text = getString(R.string.scan_code)
         toolbar.setNavigationOnClickListener {
             finish()

@@ -112,8 +112,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         toolbarTv?.text = getString(R.string.curtain_switch)
     }
   private fun makePop() {
-      renameConfirm?.setOnClickListener {
-          // 获取输入框的内容
+      renameConfirm?.setOnClickListener { // 获取输入框的内容
           if (StringUtils.compileExChar(renameEt?.text.toString().trim { it <= ' ' })) {
               ToastUtils.showLong(getString(R.string.rename_tip_check))
           } else {
@@ -217,8 +216,8 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private fun routerConfigSw() {
         RouterModel.configNormalSw(switchDate!!.id, currentGroup!!.meshAddr, "configNormalSw")
                 ?.subscribe({
-                    //    "errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
-                    //    "errorCode": 90007,"该组不存在，刷新组列表"   "errorCode": 90005,"以下路由没有上线，无法配置"
+                    //"errorCode": 90021, "该开关不存在，请重新刷新数据"   "errorCode": 90008,"该开关没有绑定路由，无法配置"
+                    //"errorCode": 90007,"该组不存在，刷新组列表"   "errorCode": 90005,"以下路由没有上线，无法配置"
                     when (it.errorCode) {
                         0 -> {
                             disposableRouteTimer?.dispose()

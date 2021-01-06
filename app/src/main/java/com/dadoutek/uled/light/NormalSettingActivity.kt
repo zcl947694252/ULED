@@ -37,6 +37,7 @@ import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
+import com.dadoutek.uled.model.httpModel.GroupMdodel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.ota.OTAUpdateActivity
@@ -834,6 +835,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         return super.onCreateOptionsMenu(menu)
     }
 
+    @SuppressLint("CheckResult")
     private fun renameGroup() {
         if (!TextUtils.isEmpty(group?.name))
             renameEt?.setText(group?.name)
@@ -861,8 +863,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
                 if (canSave) {
                     group?.name = renameEt?.text.toString().trim { it <= ' ' }
-                    DBUtils.updateGroup(group!!)
-                    toolbarTv.text = group?.name
+                    GroupMdodel.add(group!!, group!!.id, group!!.id)?.subscribe(fun(_: String) {
+                        DBUtils.updateGroup(group!!)
+                        toolbarTv.text = group?.name
+                    }) {
+                        ToastUtils.showShort(getString(R.string.rename_faile))
+                    }
+
                     renameDialog.dismiss()
                 }
             }
@@ -1516,7 +1523,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             else -> {
                 when {
                     Constant.IS_ROUTE_MODE -> {
-                        if (TextUtils.isEmpty(light?.boundMac)){
+                        if (TextUtils.isEmpty(light?.boundMac)) {
                             ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                             return
                         }
@@ -1688,8 +1695,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun routerConfigBrightnesssOrColorTemp(brightness: Boolean) = when {
         brightness -> {//亮度
             when {
-                currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, 1,"gpBri")
-                else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, 1,"lightBri")
+                currentShowPageGroup && group != null -> routeConfigBriGpOrLight(group!!.meshAddr, 97, sendProgress, 1, "gpBri")
+                else -> routeConfigBriGpOrLight(light!!.meshAddr, light!!.productUUID, sendProgress, 1, "lightBri")
             }
         }
         else -> {

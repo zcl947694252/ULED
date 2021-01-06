@@ -37,6 +37,7 @@ import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbLight
+import com.dadoutek.uled.model.httpModel.GroupMdodel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GroupBodyBean
 import com.dadoutek.uled.network.NetworkFactory
@@ -2331,8 +2332,8 @@ else
             }
         }
         RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright, serId)?.subscribe({
-            //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
-            //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
+            //"errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
+            //"errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             when (it.errorCode) {
                 0 -> {
                     //showLoadingDialog(getString(R.string.please_wait))
@@ -2864,6 +2865,7 @@ else
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, lightMeshAddr, params)
     }
 
+    @SuppressLint("CheckResult")
     private fun renameGp() {
         StringUtils.initEditTextFilter(renameEt)
         if (!TextUtils.isEmpty(group?.name))
@@ -2890,10 +2892,16 @@ else
                     }
                 }
 
+
                 if (canSave) {
-                    group?.name = renameEt?.text.toString().trim { it <= ' ' }
-                    DBUtils.updateGroup(group!!)
-                    toolbarTv.text = group?.name
+                group?.name = renameEt?.text.toString().trim { it <= ' ' }
+                    val subscribe = GroupMdodel.add(group!!, group!!.id, group!!.id)?.subscribe(fun(_: String) {
+                        DBUtils.updateGroup(group!!)
+                        toolbarTv.text = group?.name
+                    }) {
+                        ToastUtils.showShort(getString(R.string.rename_faile))
+                    }
+
                     renameDialog.dismiss()
                 }
             }
@@ -2921,15 +2929,16 @@ else
             currentShowGroupSetPage -> group!!.meshAddr
             else -> light!!.meshAddr
         }
-        if (Constant.IS_ROUTE_MODE) {
-            if (currentShowGroupSetPage)
-                routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, white, "rgbwhite")
-            else
-                routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), white, "rgbwhite")
-        } else {
-           var whiteNum = if (cb_white_enable.isChecked)white else 0
-            val params: ByteArray = byteArrayOf(whiteNum.toByte())
-            TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
+        when {
+            Constant.IS_ROUTE_MODE -> when {
+                    currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, white, "rgbwhite")
+                    else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), white, "rgbwhite")
+                }
+            else -> {
+                var whiteNum = if (cb_white_enable.isChecked)white else 0
+                val params: ByteArray = byteArrayOf(whiteNum.toByte())
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
+            }
         }
     }
 
@@ -2942,7 +2951,7 @@ else
 
         hideLoadingDialog()
         if (cmdBean.ser_id == "setRGB") {
-            LogUtils.v("zcl------收到路由调节色盘通知----color---${Color.red(color)}--${Color.green(color)}---${Color.blue(color)}-----$cmdBean")
+            LogUtils.v("zcl--收到路由调节色盘通知--color-${Color.red(color)}-${Color.green(color)}-${Color.blue(color)}--$cmdBean")
             disposableRouteTimer?.dispose()
             if (cmdBean.status == 0) {
                 color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
@@ -3027,6 +3036,7 @@ else
                 hideLoadingDialog()
                 disposableTimer?.dispose()
                 if (cmdBean.status == 0) {
+
                     bleDelGradient(false)
                 } else {
                     ToastUtils.showShort(getString(R.string.del_gradient_fail))

@@ -707,9 +707,9 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             /*   when (clickType) {
                    0 -> {//选择模式 显示配置界面
                        setTextColorsAndText(configSwitchType)
-                       // eight_switch_mode.visibility = View.VISIBLE
+                       //eight_switch_mode.visibility = View.VISIBLE
                        //eight_switch_config.visibility = View.VISIBLE
-                       // eight_switch_banner_ly.visibility = View.GONE
+                       //eight_switch_banner_ly.visibility = View.GONE
                        clickType = 1
                    }
                    1, 2 -> {
@@ -723,7 +723,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         img_function2.setOnClickListener {//清除数据并且清除模式
             setDefaultData()
             //eight_switch_mode.visibility = View.GONE
-            // eight_switch_config.visibility = View.GONE
+            //eight_switch_config.visibility = View.GONE
             //eight_switch_banner_ly.visibility = View.GONE
             //clickType = 0//代表没有选择模式
             configSwitchType++ //默认选中的是群组八键开关
@@ -737,6 +737,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
         eight_switch_b1.setOnClickListener(this)
         eight_switch_b2.setOnClickListener(this)
+
         eight_switch_b3.setOnClickListener(this)
         eight_switch_b4.setOnClickListener(this)
         eight_switch_b5.setOnClickListener(this)
