@@ -1661,7 +1661,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             //    "errorCode": 90007,"该组不存在，请重新刷新数据
             //    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it, 1)
-
         }) {
             ToastUtils.showShort(it.message)
         }

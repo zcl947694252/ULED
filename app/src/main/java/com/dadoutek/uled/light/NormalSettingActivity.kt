@@ -156,7 +156,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
 
 
     override fun deleteGpSuccess() {
-        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
         this.hideLoadingDialog()
         this?.setResult(Constant.RESULT_OK)
         this?.finish()
@@ -552,16 +552,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private fun minusBtnUi() {
         LogUtils.v("zcl--设置---减少-----isProcessChange--------$isProcessChange")
         if (isProcessChange == 0) {
-//            if (light_sbBrightness.progress > 1)
-//                light_sbBrightness.progress--
+            /*    if (!Constant.IS_ROUTE_MODE && light_sbBrightness.progress > 1)
+                    light_sbBrightness.progress--*/
             setAddMinusIcon()
             if (light_sbBrightness.progress < 100)
                 device_light_add.setImageResource(R.drawable.icon_puls)
         } else {
             when {
                 isBrightness -> {//亮度
-//                    if (light_sbBrightness.progress > 1)
-//                        light_sbBrightness.progress--
+                    /*  if (!Constant.IS_ROUTE_MODE)
+                         light_sbBrightness.progress--*/
 
                     when {
                         light_sbBrightness.progress < 1 ->
@@ -614,8 +614,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         device_light_add.setImageResource(R.drawable.icon_puls)
                 }
                 else -> {//色温
-//                    if (light_sbBrightness.progress > 1)
-//                        light_sbBrightness.progress--
+                    /* if (!Constant.IS_ROUTE_MODE)
+                      light_sbBrightness.progress--*/
                     when {
                         light_sbBrightness.progress < 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
 
@@ -697,16 +697,16 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         LogUtils.v("zcl-----设置添加-----isProcessChange--------$isProcessChange")
         when (isProcessChange) {
             0 -> {
-                /*   if (light_sbBrightness.progress < 100)
-                       light_sbBrightness.progress++*/
+                /*  if (!Constant.IS_ROUTE_MODE && light_sbBrightness.progress < 100)
+                      light_sbBrightness.progress++*/
                 setAddMinusIcon()
-                if (light_sbBrightness.progress > 1)
-                    device_light_minus.setImageResource(R.drawable.icon_minus)
+                if (light_sbBrightness.progress > 1) device_light_minus.setImageResource(R.drawable.icon_minus)
             }
             1 -> {
                 when {
                     isBrightness -> {//亮度
-                        //light_sbBrightness.progress++
+                        /*   if (!Constant.IS_ROUTE_MODE)
+                               light_sbBrightness.progress++*/
                         when {
                             light_sbBrightness.progress >= 100 -> {
                                 device_light_add.setImageResource(R.drawable.icon_puls_no)
@@ -735,7 +735,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         }
                     }
                     else -> {//色温
-                        //light_sbBrightness.progress++
+                        /* if (!Constant.IS_ROUTE_MODE)
+                             light_sbBrightness.progress++*/
                         when {
                             currentShowPageGroup -> {
                                 var light = DBUtils.getGroupByID(group!!.id)
@@ -761,7 +762,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             light_sbBrightness.progress > 0 -> device_light_minus.setImageResource(R.drawable.icon_minus)
                             else -> tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                         }
-
                     }
                 }
             }
@@ -769,8 +769,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-
-        DBUtils.lastUser?.let {
+        lastUser?.let {
             if (it.id.toString() == it.last_authorizer_user_id)
                 if (currentShowPageGroup) {
                     // menuInflater.inflate(R.menu.menu_rgb_group_setting, menu)
@@ -784,7 +783,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     findItem?.title = localVersion
                 }
         }
-        LogUtils.v("zclmenu------------------$localVersion-----${DBUtils.lastUser}")
+        LogUtils.v("zclmenu------------------$localVersion-----$lastUser")
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -956,7 +955,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     -1 -> ToastUtils.showShort(getString(R.string.group_failed))
                     0, 1 -> {
                         if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
-                        SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
+                        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, object : SyncCallback {
                             override fun start() {}
                             override fun complete() {}
                             override fun error(msg: String?) {}
@@ -1528,19 +1527,21 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                     while (onBtnTouch) {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
-                            if (Constant.IS_ROUTE_MODE) {
-                                when {
-                                    isAdd -> {
-                                        if (light_sbBrightness.progress < 100)
-                                            light_sbBrightness.progress++
-                                    }
-                                    else -> {
-                                        if (light_sbBrightness.progress > 1)
-                                            light_sbBrightness.progress--
-                                    }
+
+                            when {
+                                isAdd -> {
+                                    if (light_sbBrightness.progress < 100)
+                                        light_sbBrightness.progress++
+                                    LogUtils.v("zcl-----------设置执行添加-------")
                                 }
-                                routerConfigBrightnesssOrColorTemp(isBrightness)
+                                else -> {
+                                    if (light_sbBrightness.progress > 1)
+                                        light_sbBrightness.progress--
+                                    LogUtils.v("zcl-----------设置执行减少-------")
+                                }
                             }
+                            if (Constant.IS_ROUTE_MODE)
+                                routerConfigBrightnesssOrColorTemp(isBrightness)
                             handlerMinusOrAddBtn.sendMessage(Message())
                             delay(100)
                         }
