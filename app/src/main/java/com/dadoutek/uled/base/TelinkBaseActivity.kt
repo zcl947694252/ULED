@@ -1630,8 +1630,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, isEnableBright: Int, serId: String) {
-        LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
-        RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, isEnableBright, serId)?.subscribe({
+        var  bri = when {
+            brightness<1 -> 1
+            brightness>100 -> 100
+            else -> brightness
+        }
+        LogUtils.v("zcl-----------发送路由调光参数-------$bri")
+        RouterModel.routeConfigBrightness(meshAddr, deviceType, bri, isEnableBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"
             //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据
@@ -1644,8 +1649,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     open fun routeConfigTempGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
-        LogUtils.v("zcl----------- zcl-----------发送路由调色参数-------$brightness-------")
-        RouterModel.routeConfigColorTemp(meshAddr, deviceType, brightness, serId)?.subscribe({
+        var  bri = when {
+            brightness<1 -> 1
+            brightness>100 -> 100
+            else -> brightness
+        }
+        LogUtils.v("zcl----------- zcl-----------发送路由调色参数-------$bri-------")
+        RouterModel.routeConfigColorTemp(meshAddr, deviceType, bri, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"
             //    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据

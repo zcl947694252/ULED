@@ -23,16 +23,6 @@ public class SharedPreferencesUtils {
                 Constant.CURRENT_USE_REGION_KEY, -1);
     }
 
-    public static void saveCurrentLightVsersion(String vsersion) {
-        SharedPreferencesHelper.putString(TelinkLightApplication.Companion.getApp(),
-                Constant.CURRENT_LIGHT_VSERSION_KEY, vsersion);
-    }
-
-    public static String getCurrentLightVersion() {
-        return SharedPreferencesHelper.getString(TelinkLightApplication.Companion.getApp(),
-                Constant.CURRENT_LIGHT_VSERSION_KEY, "");
-    }
-
     public static void saveCurrentUserList(String account) {
         List<String> userList = getCurrentUserList();
         if (userList == null) {
@@ -125,15 +115,6 @@ public class SharedPreferencesUtils {
                 Constant.REGION_LIST, list);
     }
 
-    public static List<String> getRegionNameList() {
-        List list = (List<String>)SharedPreferencesHelper.getObject(TelinkLightApplication.Companion.getApp(),
-                Constant.REGION_LIST);
-        if (list == null) {
-            list = new ArrayList<>();
-        }
-        return list;
-    }
-
     public static void setLastOtaTime(long time) {
         SharedPreferencesHelper.putLong(TelinkLightApplication.Companion.getApp(),
                 Constant.OTA_TIME, time);
@@ -160,9 +141,7 @@ public class SharedPreferencesUtils {
                 Constant.IS_NEW_START_SCAN,isNewStartScan);
     }
     public static boolean getScanType() {
-        boolean aBoolean =
-                SharedPreferencesHelper.getBoolean(TelinkLightApplication.Companion.getApp(),
-                Constant.IS_NEW_START_SCAN, true);
-        return aBoolean;
+        return SharedPreferencesHelper.getBoolean(TelinkLightApplication.Companion.getApp(),
+                Constant.IS_NEW_START_SCAN, false);
     }
 }

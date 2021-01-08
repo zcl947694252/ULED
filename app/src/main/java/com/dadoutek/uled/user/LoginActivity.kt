@@ -272,23 +272,25 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             else -> scan_old.isChecked= true
         }
         initToolbar()
-        if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)) {
+        if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false))
             transformView()
-        }
 
         recyclerView = findViewById(R.id.list_phone)
         val info = SharedPreferencesUtils.getLastUser()
         val havePhone = info != null && info.isNotEmpty()
-        if (havePhone) {
-            val messge = info.split("-")
-            if (messge.size > 1)
-                edit_user_phone_or_email!!.setText(messge[0])
-            edit_user_password!!.setText(messge[1])
-            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
-            btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
-        } else {
-            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
-            btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
+        when {
+            havePhone -> {
+                val messge = info.split("-")
+                if (messge.size > 1)
+                    edit_user_phone_or_email!!.setText(messge[0])
+                edit_user_password!!.setText(messge[1])
+                edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
+                btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+            }
+            else -> {
+                edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
+                btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
+            }
         }
     }
 
@@ -441,10 +443,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun isDebugVisible() {
-        if (Constant.isDebug)
-            login_isTeck.visibility = View.VISIBLE
-        else
-            login_isTeck.visibility = View.GONE
+        when {
+            Constant.isDebug -> login_isTeck.visibility = View.VISIBLE
+            else -> login_isTeck.visibility = View.GONE
+        }
     }
 
     private fun newPhoneList() {
@@ -572,15 +574,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     var isSuccess: Boolean = true
     internal var syncCallback: SyncCallback = object : SyncCallback {
-
         override fun start() {}
-
         override fun complete() {
-            if (isSuccess) {
-                syncComplet()
-            }
+            if (isSuccess) syncComplet()
         }
-
         override fun error(msg: String) {
             val ishowRegionDialog = SharedPreferencesHelper.getBoolean(TelinkApplication.getInstance().mContext, Constant.IS_SHOW_REGION_DIALOG, false)
             if (ishowRegionDialog) {
@@ -621,13 +618,11 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 regionBeanAuthorize = authorList[position]
                 when (whoClick) {
                     NONE -> itemAdapterAuthor?.data?.get(position)?.is_selected = true
-                    //上次点击的自己不用便利其他人
-                    AUTHOR ->
+                    AUTHOR ->//上次点击的自己区域不用遍历其他人
                         if (itemAdapterAuthor != null)
                             for (i in itemAdapterAuthor!!.data.indices)
                                 itemAdapterAuthor!!.data[i].is_selected = i == position
-                    //上次点击个人区域 这次自己 个人全是false
-                    ME -> initMe()
+                    ME -> initMe() //上次点击个人区域 这次自己 个人全是false
                 }
                 itemAdapterAuthor?.notifyDataSetChanged()
                 whoClick = AUTHOR
@@ -684,12 +679,15 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     override fun afterTextChanged(p0: Editable?) {
-        if (TextUtils.isEmpty(p0.toString())) {
-            btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
-            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
-        } else {
-            edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
-            btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+        when {
+            TextUtils.isEmpty(p0.toString()) -> {
+                btn_login.background = getDrawable(R.drawable.btn_rec_black_bt)
+                edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)
+            }
+            else -> {
+                edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_blue)
+                btn_login.background = getDrawable(R.drawable.btn_rec_blue_bt)
+            }
         }
     }
 
