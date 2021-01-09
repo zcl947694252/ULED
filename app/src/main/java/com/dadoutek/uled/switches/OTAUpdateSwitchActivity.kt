@@ -458,7 +458,7 @@ class OTAUpdateSwitchActivity : TelinkMeshErrorDealActivity(), EventListener<Str
             this.sendStopMeshOTACommand()
         }
         this.mode = MODE_COMPLETE
-        TelinkLightService.Instance().idleMode(true)
+        TelinkLightService.Instance()?.idleMode(true)
         TelinkLog.i("OTAUpdate#onStop#removeEventListener")
         TelinkLightApplication.getApp().removeEventListener(this)
     }

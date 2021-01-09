@@ -45,6 +45,7 @@ class CloudAssistantActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun updateDataToThird(position: Int) {
+        if (data.size>position)
         RouterModel.updateToThirdParty(data[position].id)?.subscribe({
             ToastUtils.showShort(getString(R.string.upload_data_success))
         },{

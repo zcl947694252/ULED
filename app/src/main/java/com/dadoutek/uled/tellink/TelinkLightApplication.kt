@@ -83,7 +83,7 @@ class TelinkLightApplication : TelinkApplication() {
             refWatcher = LeakCanary.install(this)*/
         Utils.init(this)
         Beta.autoCheckUpgrade = false
-        Bugly.init(applicationContext, "ea665087a5", false)
+        //Bugly.init(applicationContext, "ea665087a5", false)
         Beta.enableHotfix = false
         RxBleManager.init(this)
         DaoSessionUser.checkAndUpdateDatabase()
@@ -132,10 +132,10 @@ class TelinkLightApplication : TelinkApplication() {
     @SuppressLint("CheckResult")
     fun initStompClient() {
         return
-        GlobalScope.launch {
+        /*GlobalScope.launch {
             if (SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)) {
                 mStompManager = StompManager.get()
-                mStompManager?.initStompClient()
+                val initStompClient = mStompManager?.initStompClient()
 
                 if (mStompManager?.mStompClient == null)
                     initStompClient()
@@ -180,9 +180,9 @@ class TelinkLightApplication : TelinkApplication() {
                         sendBroadcast(intent)
                     }, {})
 
-                /**
+                *//**
                  * stomp断联监听
-                 */
+                 *//*
                 stompLifecycleDisposable = mStompManager?.lifeCycle()?.subscribe({ lifecycleEvent ->
                     when (lifecycleEvent.type) {
                         LifecycleEvent.Type.CLOSED -> {
@@ -196,7 +196,7 @@ class TelinkLightApplication : TelinkApplication() {
                     }
                 }, { ToastUtils.showLong(it.localizedMessage) })
             }
-        }
+        }*/
     }
 
     fun setupMesh(mesh: Mesh) {

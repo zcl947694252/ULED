@@ -219,7 +219,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     }
 
     private fun getWeekStr(): String {
-        var tmpWeek = tagBean!!.week
+        var tmpWeek = tagBean?.week?:0
         val sb = StringBuilder()
         when (tmpWeek) {
             0b10000000 -> sb.append(getString(R.string.every_day))

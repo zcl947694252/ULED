@@ -251,11 +251,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun initScene() {
-        val intent = intent
-        isReconfig = intent.extras!!.get(Constant.IS_CHANGE_SCENE) as Boolean
+        isReconfig = intent.extras?.get(Constant.IS_CHANGE_SCENE) as Boolean
         if (isReconfig && !isResult) {
             showGroupList.clear()
-            dbScene = intent.extras!!.get(Constant.CURRENT_SELECT_SCENE) as DbScene
+            dbScene = intent.extras?.get(Constant.CURRENT_SELECT_SCENE) as DbScene
             edit_name.setText(dbScene?.name)
             resId = if (TextUtils.isEmpty(dbScene?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(dbScene?.imgName, this)
             //获取场景具体信息

@@ -221,7 +221,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         temperature_btn.setImageResource(R.drawable.icon_unselected)
         temperature_text.setTextColor(resources.getColor(R.color.black_nine))
         isBrightness = true
-        LogUtils.v("zcl----------收到路由-设置执行----setBrightness---${light.brightness}")
+        LogUtils.v("zcl----------收到路由-设置执行----setBrightness---")
         if (isSwitch)
             when {
                 currentShowPageGroup -> {

@@ -882,7 +882,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     inner class StompReceiver : BroadcastReceiver() {
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onReceive(context: Context?, intent: Intent?) {
-            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
+            val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: "{}"
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
             //var jsonObject = JSONObject(msg)
             LogUtils.v("zcl------------------收到信息长连接---cmdbean$cmdBean")
