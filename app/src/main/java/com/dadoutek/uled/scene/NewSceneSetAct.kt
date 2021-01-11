@@ -302,7 +302,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
             else -> {
                 toolbarTv.setText(R.string.create_scene)
-                when {
+
+                    when {
                     isResult -> showGpDetailList()
                     else -> showEditListVew()
                 }
@@ -449,8 +450,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         val addr = showGroupList[position].groupAddress
         if (Constant.IS_ROUTE_MODE) {
-            var isEnableBright= if (showGroupList[position].isEnableBright) 1 else 0
-            routeConfigBriGpOrLight(addr, 97, brightness, isEnableBright,"configBri")
+            var isEnableBright = if (showGroupList[position].isEnableBright) 1 else 0
+            routeConfigBriGpOrLight(addr, 97, brightness, isEnableBright, "configBri")
         } else {
             val params: ByteArray = byteArrayOf(brightness.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
@@ -471,7 +472,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
         val addr = showGroupList[position].groupAddress
         if (Constant.IS_ROUTE_MODE) {
-            routeConfigWhiteGpOrLight(addr, 97, whiteLight, showGroupList[position].isEnableWhiteBright,"configWhite")
+            routeConfigWhiteGpOrLight(addr, 97, whiteLight, showGroupList[position].isEnableWhiteBright, "configWhite")
         } else {
             val params: ByteArray = byteArrayOf(whiteLight.toByte())//设置白色
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
@@ -510,8 +511,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val green = (gpColor and 0x00ff00) shr 8
         val blue = gpColor and 0x0000ff
         var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
-        var isEnableWhiteBright =  if (isWhiteBright) 1 else 0
-        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright,serId)?.subscribe({
+        var isEnableWhiteBright = if (isWhiteBright) 1 else 0
+        RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
             configBriOrColorTempResult(it, 2)
@@ -769,7 +770,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
         RouterModel.routeUpdateSceneName((dbScene?.id ?: 0).toInt(), editSceneName!!, s)
                 ?.subscribe({
                     when (it.errorCode) {
-                        0 -> {}
+                        0 -> {
+                        }
                         else -> ToastUtils.showShort(getString(R.string.rename_faile))
                     }
                 }, {
@@ -986,10 +988,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 var green = color and 0x00ff00 shr 8
                 var blue = color and 0x0000ff
                 var w = color shr 24
-                if (red==0&&green==0&&blue==0){
+                if (red == 0 && green == 0 && blue == 0) {
                     red = 255
-                    green =255
-                    blue =255
+                    green = 255
+                    blue = 255
                 }
                 var type = list[i].deviceType
                 params = when (type) {
@@ -1049,7 +1051,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         if (!Constant.IS_ROUTE_MODE)
             showLoadingDialog(getString(R.string.saving))
 
-            DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(dbScene?.id!!))
+        DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(dbScene?.id!!))
         val actionsList = mutableListOf<DbSceneActions>()
         for (i in itemGroups.indices) {
             var sceneActions = DbSceneActions()
@@ -1136,10 +1138,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
             var red = color and 0xff0000 shr 16
             var green = color and 0x00ff00 shr 8
             var blue = color and 0x0000ff
-            if (red==0&&green==0&&blue==0){
+            if (red == 0 && green == 0 && blue == 0) {
                 red = 255
-                green =255
-                blue =255
+                green = 255
+                blue = 255
             }
             var w = color shr 24
             val connectDevice = TelinkApplication.getInstance().connectDevice
