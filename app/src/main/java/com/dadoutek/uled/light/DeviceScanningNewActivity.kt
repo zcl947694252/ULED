@@ -217,7 +217,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun stopScanTimer() {
         if (mTimer != null && !mTimer!!.isDisposed) {
             mTimer!!.dispose()
-            isScanning = false
+           setScanningMode(false)
         }
     }
 
@@ -480,7 +480,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * 此处用作设备登录
      */
     private fun autoConnect(elements: MutableList<Int>) {
-        isScanning = false
+       setScanningMode(false)
         when (mAddDeviceType) {
             DeviceType.GATE_WAY -> {
                 LogUtils.v("zcl----连接类型---$mAddDeviceType----网关-----${DeviceType.GATE_WAY}-----mac---${bestRssiDevice?.macAddress}" +
@@ -602,7 +602,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun closeAnimation() {
-        isScanning = false
+       setScanningMode(false)
         lottieAnimationView?.cancelAnimation()
         lottieAnimationView?.visibility = View.GONE
     }
@@ -909,7 +909,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-        isScanning = false
+       setScanningMode(false)
         if (Constant.IS_ROUTE_MODE) {
             skipeType()
         } else {
@@ -940,7 +940,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (Constant.IS_ROUTE_MODE) {//发送命令
             routerStartScan()
         } else {
-            isScanning = true
+           setScanningMode(true)
             if (mRxPermission != null)
                 mRxPermission!!.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)?.subscribeOn(Schedulers.io())
@@ -1074,7 +1074,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun oldStartScan() {
-        isScanning = true
+       setScanningMode(true)
         TelinkLightService.Instance()?.idleMode(true)
         LogUtils.d("####TelinkBluetoothSDK 完整流程开始扫描------------ start scan idleMode true ####")
         startTimer()

@@ -239,18 +239,20 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     val onItemChildClickListener = OnItemChildClickListener { _, view, position ->
         if (position < lightsData.size) {
             currentDevice = lightsData[position]
+            if (currentDevice?.status == ConnectionStatus.OFFLINE.value)
+                return@OnItemChildClickListener
             positionCurrent = position
             itemClikMethod(view)
-        /*    when {
-                Constant.IS_ROUTE_MODE -> itemClikMethod(view)
-                else -> when {
-                    TelinkLightApplication.getApp().connectDevice == null && view.id != R.id.template_device_card_delete -> {
-                        autoConnectAll()
-                        sendToGw()
+            /*    when {
+                    Constant.IS_ROUTE_MODE -> itemClikMethod(view)
+                    else -> when {
+                        TelinkLightApplication.getApp().connectDevice == null && view.id != R.id.template_device_card_delete -> {
+                            autoConnectAll()
+                            sendToGw()
+                        }
+                        else -> itemClikMethod(view)
                     }
-                    else -> itemClikMethod(view)
-                }
-            }*/
+                }*/
         }
     }
 

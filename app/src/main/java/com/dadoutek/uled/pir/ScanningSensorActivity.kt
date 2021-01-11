@@ -137,7 +137,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun startAnimation() {
-        isScanning = true
+        setScanningMode(true)
         device_lottieAnimationView?.playAnimation()
         scanning_device_ly.visibility = View.VISIBLE
         device_lottieAnimationView.visibility = View.VISIBLE
@@ -148,7 +148,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
 
     private fun closeAnimal() {
         runOnUiThread {
-            isScanning = false
+            setScanningMode(false)
             device_lottieAnimationView.cancelAnimation()
             //scanning_device_ly.visibility = View.GONE
             device_lottieAnimationView.visibility = View.GONE
@@ -499,7 +499,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
-        isScanning = true
+       setScanningMode(true)
         isSearchedDevice = false
         //val meshAddress = Constant.SWITCH_PIR_ADDRESS
         val meshAddress = MeshAddressGenerator().meshAddress.get()

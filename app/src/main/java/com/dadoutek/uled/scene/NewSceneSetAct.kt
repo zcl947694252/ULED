@@ -302,7 +302,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
             else -> {
                 toolbarTv.setText(R.string.create_scene)
-
                     when {
                     isResult -> showGpDetailList()
                     else -> showEditListVew()
