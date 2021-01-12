@@ -45,16 +45,9 @@ class TelinkLightApplication : TelinkApplication() {
     open var refWatcher: RefWatcher? = null
     var currentGwTagBean: GwTagBean? = null
     var isConnectGwBle: Boolean = false
-    private var gwCommendDisposable: Disposable? = null
     var offLine: Boolean = false
     var listTask: ArrayList<GwTasksBean> = ArrayList()
-    private var stompLifecycleDisposable: Disposable? = null
     open var mStompManager: StompManager? = null
-    private var singleLoginTopicDisposable: Disposable? = null
-    private var MIN_CLICK_DELAY_TIME = 10000
-    private var lastClickTime: Long = 0
-    private var mCancelAuthorTopicDisposable: Disposable? = null
-    var paserCodedisposable: Disposable? = null
     var lastMeshAddress:Int = 0
 
     val isEmptyMesh: Boolean

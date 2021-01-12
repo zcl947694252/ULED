@@ -181,6 +181,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
             if (granted) {
                 startAnimation()
                 Thread {
+                    TelinkApplication.getInstance().isConnect = false
                     TelinkLightService.Instance()?.idleMode(true)
                     val mesh = mApplication.mesh
                     //扫描参数

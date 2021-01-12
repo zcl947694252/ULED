@@ -40,7 +40,7 @@ public final class NotificationInfo implements Parcelable {
     /**
      * 当前连接的设备
      */
-    public DeviceInfo deviceInfo;
+    public DeviceInfo deviceInfom;
 
     public NotificationInfo() {
     }
@@ -51,7 +51,7 @@ public final class NotificationInfo implements Parcelable {
         in.readByteArray(this.params);
         Object ret = in.readValue(DeviceInfo.class.getClassLoader());
         if (ret != null) {
-            this.deviceInfo = (DeviceInfo) ret;
+            this.deviceInfom = (DeviceInfo) ret;
         }
     }
 
@@ -61,8 +61,8 @@ public final class NotificationInfo implements Parcelable {
         dest.writeInt(this.src);
         dest.writeByteArray(this.params);
 
-        if (this.deviceInfo != null) {
-            dest.writeValue(this.deviceInfo);
+        if (this.deviceInfom != null) {
+            dest.writeValue(this.deviceInfom);
         }
     }
 

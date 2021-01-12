@@ -1204,17 +1204,22 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun getSwitchFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
-
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
-                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.EIGHT_SWITCH.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.DOUBLE_SWITCH.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
         return scanFilters

@@ -13,6 +13,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.telink.TelinkApplication
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.model.Constant
@@ -365,7 +366,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
                     params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
                     params.setTimeoutSeconds(scanTimeoutTime)
                     params.setScanMode(true)
-
+                    TelinkApplication.getInstance().isConnect = false
                     mApplication.removeEventListener(this)
                     mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
                     mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
@@ -416,15 +417,20 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
 
     private fun getSwitchFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
-
         scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
         scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
         scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.EIGHT_SWITCH.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.DOUBLE_SWITCH.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
         scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),

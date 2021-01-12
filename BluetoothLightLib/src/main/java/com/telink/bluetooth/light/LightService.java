@@ -440,7 +440,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         deviceInfo.status = light.getStatus();
         deviceInfo.rssi = light.getRssi();
         deviceInfo.firmwareRevision = light.getVersion();
-        LogUtils.v("zcl----版本赋值--"+deviceInfo.firmwareRevision+"==="+light.getVersion());
+        LogUtils.v("zcl----版本赋值--"+ deviceInfo.firmwareRevision+"==="+light.getVersion());
 
         Intent intent = new Intent();
         intent.setAction(ACTION_LE_SCAN);
@@ -450,7 +450,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         LocalBroadcastManager.getInstance(LightService.this)
                 .sendBroadcast(intent);
 
-        TelinkLog.d("onLeScanResult" + deviceInfo.macAddress + "----------"+deviceInfo.sixByteMacAddress+"------------" + deviceInfo.rssi);
+        TelinkLog.d("onLeScanResult" + deviceInfo.macAddress + "----------"+ deviceInfo.sixByteMacAddress+"------------" + deviceInfo.rssi);
         return true;
     }
 
@@ -509,7 +509,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         deviceInfo.status = newStatus;
         deviceInfo.rssi = light.getRssi();
         deviceInfo.firmwareRevision = light.getVersion();
-        LogUtils.v("zcl----版本赋值--"+deviceInfo.firmwareRevision+"==="+light.getVersion());
+        LogUtils.v("zcl----版本赋值--"+ deviceInfo.firmwareRevision+"==="+light.getVersion());
         return deviceInfo;
     }
 
@@ -534,7 +534,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
             deviceInfo.meshAddress = light.getMeshAddress();
             deviceInfo.meshUUID = light.getMeshUUID();
             deviceInfo.productUUID = light.getProductUUID();
-            notifyInfo.deviceInfo = deviceInfo;
+            notifyInfo.deviceInfom = deviceInfo;
         }
 
 
