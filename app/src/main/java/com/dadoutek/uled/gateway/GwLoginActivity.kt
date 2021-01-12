@@ -358,7 +358,9 @@ class GwLoginActivity : TelinkBaseActivity() {
                             it.version = s
                             bottom_version_number.text = it.version
                             DBUtils.saveGateWay(it, false)
+                            hideLoadingDialog()
                         }, {
+                            hideLoadingDialog()
                             ToastUtils.showLong(getString(R.string.get_version_fail))
                         })
                     }

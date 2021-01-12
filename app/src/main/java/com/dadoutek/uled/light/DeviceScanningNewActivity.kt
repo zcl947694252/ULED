@@ -217,7 +217,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun stopScanTimer() {
         if (mTimer != null && !mTimer!!.isDisposed) {
             mTimer!!.dispose()
-           setScanningMode(false)
+            setScanningMode(false)
         }
     }
 
@@ -480,7 +480,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * 此处用作设备登录
      */
     private fun autoConnect(elements: MutableList<Int>) {
-       setScanningMode(false)
+        setScanningMode(false)
         when (mAddDeviceType) {
             DeviceType.GATE_WAY -> {
                 LogUtils.v("zcl----连接类型---$mAddDeviceType----网关-----${DeviceType.GATE_WAY}-----mac---${bestRssiDevice?.macAddress}" +
@@ -602,7 +602,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun closeAnimation() {
-       setScanningMode(false)
+        setScanningMode(false)
         lottieAnimationView?.cancelAnimation()
         lottieAnimationView?.visibility = View.GONE
     }
@@ -868,7 +868,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun performed(event: Event<String>) {
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
-            LeScanEvent.LE_SCAN_TIMEOUT -> {}
+            LeScanEvent.LE_SCAN_TIMEOUT -> {
+            }
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
             MeshEvent.ERROR -> this.onMeshEvent()
             ErrorReportEvent.ERROR_REPORT -> {
@@ -909,7 +910,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
      * （扫描结束）
      */
     private fun onLeScanTimeout() {
-       setScanningMode(false)
+        setScanningMode(false)
         if (Constant.IS_ROUTE_MODE) {
             skipeType()
         } else {
@@ -940,7 +941,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         if (Constant.IS_ROUTE_MODE) {//发送命令
             routerStartScan()
         } else {
-           setScanningMode(true)
+            setScanningMode(true)
             if (mRxPermission != null)
                 mRxPermission!!.request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
                         Manifest.permission.BLUETOOTH_ADMIN)?.subscribeOn(Schedulers.io())
@@ -1074,7 +1075,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun oldStartScan() {
-       setScanningMode(true)
+        setScanningMode(true)
         TelinkLightService.Instance()?.idleMode(true)
         LogUtils.d("####TelinkBluetoothSDK 完整流程开始扫描------------ start scan idleMode true ####")
         startTimer()
@@ -1334,7 +1335,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun onLogin() {
         //进入分组
-        hideLoadingDialog()
+
         if (meshList.size > mAddedDevices.size) {//如果生成的大于当前保存的找回设备
             meshList.removeAll(mAddedDevices.map { it.meshAddress })
             startToRecoverDevices()
@@ -1346,12 +1347,16 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun skipeType() { //开关传感器不能批量也就不能使用找回
         when (mAddDeviceType) {
-            DeviceType.NORMAL_SWITCH -> when (bestRssiDevice?.productUUID) {//传感器开关单独扫描界面
-                DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "deviceType" to bestRssiDevice?.productUUID)
-                DeviceType.SCENE_SWITCH -> skipSwitch()
-                DeviceType.SMART_CURTAIN_SWITCH -> startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+            DeviceType.NORMAL_SWITCH -> {
+                when (bestRssiDevice?.productUUID) {//传感器开关单独扫描界面
+                    DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "deviceType" to bestRssiDevice?.productUUID)
+                    DeviceType.SCENE_SWITCH -> skipSwitch()
+                    DeviceType.SMART_CURTAIN_SWITCH -> startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+                }
+                hideLoadingDialog()
             }
             DeviceType.GATE_WAY -> {
+
                 if (Constant.IS_ROUTE_MODE) {
                     skipeGw()
                 } else {
@@ -1537,6 +1542,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     @SuppressLint("CheckResult")
     private fun skipeBatchActivity() {
+        hideLoadingDialog()
         if (Constant.IS_ROUTE_MODE) {//获取扫描数据
             getRouterScanResult()
         } else {
@@ -1654,6 +1660,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun skipeGw() {
+        hideLoadingDialog()
         TelinkLightApplication.getApp().isConnectGwBle = true
         val intent = Intent(this@DeviceScanningNewActivity, GwLoginActivity::class.java)
         intent.putExtra("data", dbGw)
