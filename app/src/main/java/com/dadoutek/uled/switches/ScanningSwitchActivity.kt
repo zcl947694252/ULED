@@ -349,60 +349,67 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
     @SuppressLint("CheckResult")
     private fun startScan() {
         btn_stop_scan.text = getString(R.string.stop_scan)
-        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
-            if (granted) {
-                startAnimation()
-                Thread {
-                    TelinkLightService.Instance()?.idleMode(true)
-                    TelinkLightService.Instance()?.disconnect()
-                    val mesh = mApplication?.mesh
-                    //扫描参数
-                    val params = LeScanParameters.create()
-                    if (!AppUtils.isExynosSoc)
-                        params.setScanFilters(getSwitchFilters())
+           RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                   Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
+               if (granted) {
+                   startAnimation()
+                   Thread {
+                       TelinkLightService.Instance()?.idleMode(true)
+                       TelinkLightService.Instance()?.disconnect()
+                       val mesh = mApplication?.mesh
+                       //扫描参数
+                       val params = LeScanParameters.create()
+                       if (!AppUtils.isExynosSoc)
+                           params.setScanFilters(getSwitchFilters())
 
-                    params.setMeshName(mesh?.factoryName)
-                    params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
-                    params.setTimeoutSeconds(scanTimeoutTime)
-                    params.setScanMode(true)
-                    TelinkApplication.getInstance().isConnect = false
-                    mApplication.removeEventListener(this)
-                    mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
-                    mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-                    Thread.sleep(1500)
-                    TelinkLightService.Instance()?.startScan(params)
+                       params.setMeshName(mesh.factoryName)
+                       params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
+                       params.setTimeoutSeconds(scanTimeoutTime)
+                       params.setScanMode(true)
 
-                    scanDisposable?.dispose()
-                    scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                onLeScanTimeout()
-                            }
-                }.start()
-                LogUtils.e("zcl 开关开始扫描")
-            }
-        }, {})
+                       mApplication.removeEventListener(this)
+                       mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
+                       mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+                       TelinkApplication.getInstance().isConnect=false
+                       Thread.sleep(1500)
+                       TelinkLightService.Instance()?.startScan(params)
 
-        /*  disposableTimer?.dispose()
-    disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
-                        DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
-                connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
-                        retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
-                        ?.subscribeOn(Schedulers.io())
-                        ?.observeOn(AndroidSchedulers.mainThread())
-                        ?.subscribe({
-                            mDeviceInfo = it
-                            onLogin()
-                        }, {
-                            scanFail()
-                        })
-            }*/
+
+                       scanDisposable?.dispose()
+                       scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
+                               .subscribeOn(Schedulers.io())
+                               .observeOn(AndroidSchedulers.mainThread())
+                               .subscribe {
+                                   onLeScanTimeout()
+                               }
+
+                   }.start()
+                   LogUtils.e("zcl 开关开始扫描")
+               }
+           }, {})
+
+       /* startAnimation()
+        TelinkLightService.Instance()?.idleMode(true)
+        TelinkLightService.Instance()?.disconnect()
+        disposableTimer?.dispose()
+        disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
+                            DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
+                    connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
+                            retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
+                            ?.subscribeOn(Schedulers.io())
+                            ?.observeOn(AndroidSchedulers.mainThread())
+                            ?.subscribe({
+                                mDeviceInfo = it
+                                onLogin(it)
+                            }, {
+                                scanFail()
+                            })
+                }*/
+
     }
 
 

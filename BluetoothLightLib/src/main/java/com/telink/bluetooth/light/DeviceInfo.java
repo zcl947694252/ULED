@@ -44,7 +44,7 @@ public class DeviceInfo implements Parcelable {
     public int productUUID;
     public int status;
     public int rssi;
-    public int openTag;
+    public int openTag = 1;
 
     /**
      * 是否是重新配置 以及 desenor的id
