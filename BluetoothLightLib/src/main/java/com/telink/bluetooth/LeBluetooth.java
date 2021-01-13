@@ -282,7 +282,6 @@ public final class LeBluetooth extends BluetoothGattCallback {
                 return false;
         } else
             return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mSupportLoScan;
-
     }
 
     public boolean isSupportM() {
