@@ -431,16 +431,17 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun skipDevice(it: String) {
-        when (mDeviceInfo?.productUUID) {
-            DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
-            DeviceType.NIGHT_LIGHT -> {
-                if (it.contains("NPR"))
-                    startActivity<PirConfigActivity>("deviceInfo" to mDeviceInfo, "version" to it)
-                else
-                    startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
+        if (!DBUtils.isFastDoubleClick(1000))
+            when (mDeviceInfo?.productUUID) {
+                DeviceType.SENSOR -> startActivity<ConfigSensorAct>("deviceInfo" to mDeviceInfo!!, "version" to it)
+                DeviceType.NIGHT_LIGHT -> {
+                    if (it.contains("NPR"))
+                        startActivity<PirConfigActivity>("deviceInfo" to mDeviceInfo, "version" to it)
+                    else
+                        startActivity<HumanBodySensorActivity>("deviceInfo" to mDeviceInfo!!, "update" to "0", "version" to it)
+                }
+                else -> ToastUtils.showLong(getString(R.string.scan_end))
             }
-            else -> ToastUtils.showLong(getString(R.string.scan_end))
-        }
     }
 
 
@@ -500,7 +501,7 @@ class ScanningSensorActivity : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onLeScan(leScanEvent: LeScanEvent) {
-       setScanningMode(true)
+        setScanningMode(true)
         isSearchedDevice = false
         //val meshAddress = Constant.SWITCH_PIR_ADDRESS
         val meshAddress = MeshAddressGenerator().meshAddress.get()

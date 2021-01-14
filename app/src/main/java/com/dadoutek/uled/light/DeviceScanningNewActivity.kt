@@ -35,6 +35,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Mesh
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.*
+import com.dadoutek.uled.model.dbModel.DBUtils.isFastDoubleClick
 import com.dadoutek.uled.model.dbModel.DBUtils.lastRegion
 import com.dadoutek.uled.model.dbModel.DBUtils.lastUser
 import com.dadoutek.uled.model.dbModel.DBUtils.saveUser
@@ -1563,7 +1564,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 mAddedDevicesInfos.add(item.deviceInfo)
             }
             lastMyRegion.lastGenMeshAddr = meshAddress
-            skipeActivity(intent)
+            if (!isFastDoubleClick(1000))
+                skipeActivity(intent)
         }
 
         LogUtils.v("zcl------扫描设备类型$mAddDeviceType------------扫描个数${mAddedDevices.size}----${DBUtils.getAllCurtains()}")

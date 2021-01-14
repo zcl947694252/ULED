@@ -637,7 +637,7 @@ object Commander : EventListener<String> {
     fun connect(meshAddr: Int = 0, fastestMode: Boolean = true, macAddress: String? = null, meshName: String? = DBUtils.lastUser?.controlMeshName,
                 meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16),
                 retryTimes: Long = 0, deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 12): Observable<DeviceInfo>? {
-        if (mConnectObservable == null) {
+       // if (mConnectObservable == null) {
             TelinkApplication.getInstance().isConnect=true
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
                 TelinkLightService.Instance().idleMode(false)
@@ -671,16 +671,17 @@ object Commander : EventListener<String> {
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 LogUtils.v("zcl-----------连接失败失败-------connect timeout")
                 it.onError(Throwable("connect timeout"))
+                mConnectObservable = null
             }.doFinally {
                 // LogUtils.d("connect doFinally")
                 mConnectObservable = null
             }.retry(retryTimes)
             return mConnectObservable
-        } else {
+     /*   } else {
             DeviceType.NORMAL_SWITCH
             LogUtils.d("zcl-----------连接失败失败-in connecting device mode")
             return null
-        }
+        }*/
     }
 
     fun getDeviceVersion(dstAddr: Int, retryTimes: Long = 1): Observable<String> {
@@ -724,9 +725,9 @@ object Commander : EventListener<String> {
         if (version != null && version?.isNotEmpty() == true) {
             LogUtils.d("version = $version")
             if (mGetVersionObservable != null) {
-                if (version == null) {
+                if (version == null)
                     mGetVersionObservable?.onError(Throwable("get empty version,please retry"))
-                }
+
                 mGetVersionObservable?.onNext(version!!)
                 mGetVersionObservable?.onComplete()
             } else {

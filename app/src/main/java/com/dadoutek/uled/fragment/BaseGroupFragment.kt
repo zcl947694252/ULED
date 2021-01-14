@@ -472,8 +472,10 @@ abstract class BaseGroupFragment : BaseFragment() {
                         override fun error(msg: String?) {}
                     })
                 }
-                90008 -> {hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
@@ -512,12 +514,13 @@ abstract class BaseGroupFragment : BaseFragment() {
         when (view!!.id) {
             R.id.template_device_icon -> {
                 when {
-                    TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE -> {
+                    TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE && !TelinkLightApplication.getApp().isConnect -> {
                         goConnect()
                         sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
                     }
                     currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
-                            || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO -> {
+                            || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO
+                            ||currentGroup!!.deviceType == Constant.DEVICE_TYPE_CURTAIN-> {
                         when {
                             Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
                                 var status = if (currentGroup!!.connectionStatus == 0) 1 else 0
@@ -527,7 +530,15 @@ abstract class BaseGroupFragment : BaseFragment() {
                             }
                             else -> {
                                 var isopen = currentGroup!!.connectionStatus == 0 //0位关闭 则去打开
-                                Commander.openOrCloseLights(dstAddr, isopen)
+                                when (currentGroup!!.deviceType) {
+                                    Constant.DEVICE_TYPE_CURTAIN -> {
+                                        val elements: Byte = if (isopen) 0x0A else 0x0C
+                                        val opcode = Opcode.CURTAIN_ON_OFF
+                                        val params = byteArrayOf(Opcode.CURTAIN_PACK_START, elements, 0x00, Opcode.CURTAIN_PACK_END)
+                                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, currentGroup!!.meshAddr, params)
+                                    }
+                                    else -> Commander.openOrCloseLights(dstAddr, isopen)
+                                }
                                 LogUtils.v("zcl-----------本地发送开关命令------isopen$isopen-$dstAddr")
                                 groupSwSuccess(position, true)
                             }
@@ -655,8 +666,10 @@ abstract class BaseGroupFragment : BaseFragment() {
                                     override fun error(msg: String?) {}
                                 })
                             }
-                            90008 -> {hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                            90008 -> {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                            }
                             90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                             90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                             else -> ToastUtils.showShort(itr.message)
@@ -742,8 +755,10 @@ abstract class BaseGroupFragment : BaseFragment() {
                         deleteComplete()
                     }
                 }
-                90008 -> {hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90009 -> ToastUtils.showShort(getString(R.string.all_gp_cont_del))
                 else -> ToastUtils.showShort(it.message)
@@ -810,7 +825,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     fun groupSwSuccess(position: Int, isChnage: Boolean) {
         if (isChnage)
-            currentGroup?.connectionStatus = if (currentGroup!!.connectionStatus == 0) ConnectionStatus.ON.value   else ConnectionStatus.OFF.value
+            currentGroup?.connectionStatus = if (currentGroup!!.connectionStatus == 0) ConnectionStatus.ON.value else ConnectionStatus.OFF.value
         groupAdapter?.notifyItemChanged(position)
         GlobalScope.launch {
             currentGroup?.let {
@@ -1083,20 +1098,20 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     override fun receviedGwCmd2500M(gwStompBean: MqttBodyBean) {
-                groupSwSuccess(currentPosition, true)
+        groupSwSuccess(currentPosition, true)
         disposableTimer?.dispose()
         hideLoadingDialog()
-     /*   when (gwStompBean.ser_id.toInt()) {
-            Constant.SER_ID_GROUP_ON -> {
-                LogUtils.v("zcl-----------远程控制群组开启成功-------")
+        /*   when (gwStompBean.ser_id.toInt()) {
+               Constant.SER_ID_GROUP_ON -> {
+                   LogUtils.v("zcl-----------远程控制群组开启成功-------")
 
-            }
-            Constant.SER_ID_GROUP_OFF -> {
-                LogUtils.v("zcl-----------远程控制群组关闭成功-------")
-                disposableTimer?.dispose()
-                hideLoadingDialog()
-                groupCloseSuccess(currentPosition, true)
-            }
-        }*/
+               }
+               Constant.SER_ID_GROUP_OFF -> {
+                   LogUtils.v("zcl-----------远程控制群组关闭成功-------")
+                   disposableTimer?.dispose()
+                   hideLoadingDialog()
+                   groupCloseSuccess(currentPosition, true)
+               }
+           }*/
     }
 }

@@ -36,7 +36,7 @@ class GroupListAdapter(layoutResId: Int, data: List<DbGroup>, internal var isDel
                                 .setImageResource(R.id.template_device_more, R.drawable.icon_more)//进入
                                 .setImageResource(R.id.template_device_icon, R.drawable.icon_group_g_n)
                                 .addOnClickListener(R.id.template_device_setting)
-                        if (group.deviceType != Constant.DEVICE_TYPE_CURTAIN)
+                       // if (group.deviceType != Constant.DEVICE_TYPE_CURTAIN)
                             helper.addOnClickListener(R.id.template_device_icon)
                     }
                     when (group.connectionStatus) {

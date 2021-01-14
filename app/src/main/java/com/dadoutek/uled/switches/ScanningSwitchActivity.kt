@@ -159,7 +159,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
-        val deviceInfo= deviceEvent.args
+        val deviceInfo = deviceEvent.args
         mDeviceMeshName = deviceInfo.meshName
         LogUtils.e("zcl*********扫描连接变化 ******deviceInfo*******$deviceInfo---")
         LogUtils.e("zcl*********扫描连接变化 ********mDeviceInfo*****$mDeviceInfo--")
@@ -349,66 +349,66 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
     @SuppressLint("CheckResult")
     private fun startScan() {
         btn_stop_scan.text = getString(R.string.stop_scan)
-           RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
-                   Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
-               if (granted) {
-                   startAnimation()
-                   Thread {
-                       TelinkLightService.Instance()?.idleMode(true)
-                       TelinkLightService.Instance()?.disconnect()
-                       val mesh = mApplication?.mesh
-                       //扫描参数
-                       val params = LeScanParameters.create()
-                       if (!AppUtils.isExynosSoc)
-                           params.setScanFilters(getSwitchFilters())
+        RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN).subscribe({ granted ->
+            if (granted) {
+                startAnimation()
+                Thread {
+                    TelinkLightService.Instance()?.idleMode(true)
+                    TelinkLightService.Instance()?.disconnect()
+                    val mesh = mApplication?.mesh
+                    //扫描参数
+                    val params = LeScanParameters.create()
+                    if (!AppUtils.isExynosSoc)
+                        params.setScanFilters(getSwitchFilters())
 
-                       params.setMeshName(mesh.factoryName)
-                       params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
-                       params.setTimeoutSeconds(scanTimeoutTime)
-                       params.setScanMode(true)
+                    params.setMeshName(mesh.factoryName)
+                    params.setOutOfMeshName(Constant.OUT_OF_MESH_NAME)
+                    params.setTimeoutSeconds(scanTimeoutTime)
+                    params.setScanMode(true)
 
-                       mApplication.removeEventListener(this)
-                       mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
-                       mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
-                       TelinkApplication.getInstance().isConnect=false
-                       Thread.sleep(1500)
-                       TelinkLightService.Instance()?.startScan(params)
+                    mApplication.removeEventListener(this)
+                    mApplication.addEventListener(LeScanEvent.LE_SCAN, this)
+                    mApplication.addEventListener(LeScanEvent.LE_SCAN_TIMEOUT, this)
+                    TelinkApplication.getInstance().isConnect = false
+                    Thread.sleep(1500)
+                    TelinkLightService.Instance()?.startScan(params)
 
 
-                       scanDisposable?.dispose()
-                       scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
-                               .subscribeOn(Schedulers.io())
-                               .observeOn(AndroidSchedulers.mainThread())
-                               .subscribe {
-                                   onLeScanTimeout()
-                               }
+                    scanDisposable?.dispose()
+                    scanDisposable = Observable.timer(SCAN_TIMEOUT_SECOND.toLong(), TimeUnit.SECONDS)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                onLeScanTimeout()
+                            }
 
-                   }.start()
-                   LogUtils.e("zcl 开关开始扫描")
-               }
-           }, {})
+                }.start()
+                LogUtils.e("zcl 开关开始扫描")
+            }
+        }, {})
 
-       /* startAnimation()
-        TelinkLightService.Instance()?.idleMode(true)
-        TelinkLightService.Instance()?.disconnect()
-        disposableTimer?.dispose()
-        disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
-                            DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
-                    connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
-                            retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
-                            ?.subscribeOn(Schedulers.io())
-                            ?.observeOn(AndroidSchedulers.mainThread())
-                            ?.subscribe({
-                                mDeviceInfo = it
-                                onLogin(it)
-                            }, {
-                                scanFail()
-                            })
-                }*/
+        /* startAnimation()
+         TelinkLightService.Instance()?.idleMode(true)
+         TelinkLightService.Instance()?.disconnect()
+         disposableTimer?.dispose()
+         disposableTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                 .subscribeOn(Schedulers.io())
+                 .observeOn(AndroidSchedulers.mainThread())
+                 .subscribe {
+                     val deviceTypes = mutableListOf(DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2,
+                             DeviceType.SCENE_SWITCH, DeviceType.DOUBLE_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.EIGHT_SWITCH)
+                     connect(meshName = Constant.DEFAULT_MESH_FACTORY_NAME, meshPwd = Constant.DEFAULT_MESH_FACTORY_PASSWORD,
+                             retryTimes = 3, deviceTypes = deviceTypes, fastestMode = true)
+                             ?.subscribeOn(Schedulers.io())
+                             ?.observeOn(AndroidSchedulers.mainThread())
+                             ?.subscribe({
+                                 mDeviceInfo = it
+                                 onLogin(it)
+                             }, {
+                                 scanFail()
+                             })
+                 }*/
 
     }
 
@@ -416,7 +416,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
     private fun onLeScanTimeout() {
         LogUtils.e("zcl onLeScanTimeout")
         GlobalScope.launch(Dispatchers.Main) {
-            ToastUtils.showLong(R.string.not_find_pir)
+            ToastUtils.showLong(R.string.scan_end)
         }
         btn_stop_scan.text = getString(R.string.scan_retry)
         closeAnimation()
@@ -530,27 +530,28 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun skipSwitch(version: String) {
-        when (mDeviceInfo?.productUUID) {
-            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
-                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
-            }
-            DeviceType.DOUBLE_SWITCH -> {
-                startActivity<DoubleTouchSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
-            }
-            DeviceType.SCENE_SWITCH -> {
-                if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
-                    startActivity<ConfigEightSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
-                else
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
-            }
+        if (!DBUtils.isFastDoubleClick(1000))
+            when (mDeviceInfo?.productUUID) {
+                DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
+                    startActivity<ConfigNormalSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                }
+                DeviceType.DOUBLE_SWITCH -> {
+                    startActivity<DoubleTouchSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                }
+                DeviceType.SCENE_SWITCH -> {
+                    if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
+                        startActivity<ConfigEightSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                    else
+                        startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                }
 
-            DeviceType.EIGHT_SWITCH -> {
-                startActivity<ConfigEightSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                DeviceType.EIGHT_SWITCH -> {
+                    startActivity<ConfigEightSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                }
+                DeviceType.SMART_CURTAIN_SWITCH -> {
+                    startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                }
             }
-            DeviceType.SMART_CURTAIN_SWITCH -> {
-                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
-            }
-        }
     }
 
 

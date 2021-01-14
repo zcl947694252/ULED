@@ -87,6 +87,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         super.onCreate(savedInstanceState)
         type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         this.mApplication = this.application as TelinkLightApplication
+        hideLoadingDialog()
     }
 
     override fun onResume() {
@@ -273,21 +274,21 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             TelinkLightService.Instance()?.disconnect()
             showLoadingDialog(getString(R.string.connecting_tip))
             disposableRouteTimer?.dispose()
-            if (IS_ROUTE_MODE) {
-                routerConnectSw(currentDevice!!, 0, "connectSw")
-            } else {
-                Thread.sleep(800)
-                val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
-                        ?.subscribe({
-                            onLogin(it)//判断进入那个开关设置界面
-                            LogUtils.d("login success")
-                        }, {
-                            hideLoadingDialog()
-                            LogUtils.d(it)
-                        })
+            when {
+                IS_ROUTE_MODE -> routerConnectSw(currentDevice!!, 0, "connectSw")
+                else -> {
+                    Thread.sleep(800)
+                    val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
+                            ?.subscribe({
+                                onLogin(it)//判断进入那个开关设置界面
+                                LogUtils.d("login success")
+                            }, {
+                                hideLoadingDialog()
+                                LogUtils.d(it)
+                            })
+                }
             }
-        } else
-            LogUtils.d("currentDevice = $currentDevice")
+        } else LogUtils.d("currentDevice = $currentDevice")
     }
 
     private fun isRightPos(): Boolean {

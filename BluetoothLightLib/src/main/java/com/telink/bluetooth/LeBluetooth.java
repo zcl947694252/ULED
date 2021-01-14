@@ -274,7 +274,8 @@ public final class LeBluetooth extends BluetoothGattCallback {
     }
 
     public boolean isSupportLollipop() {
-        TelinkLog.v("zcl----isSupportLollipop--isNew-----" + TelinkApplication.getInstance().isNew+"---------isConnect---"+ TelinkApplication.getInstance().isConnect);
+        //return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mSupportLoScan;
+             TelinkLog.v("zcl----isSupportLollipop--isNew-----" + TelinkApplication.getInstance().isNew+"---------isConnect---"+ TelinkApplication.getInstance().isConnect);
         if (TelinkApplication.getInstance().isConnect) {
             if (TelinkApplication.getInstance().isNew)
                 return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && mSupportLoScan;
