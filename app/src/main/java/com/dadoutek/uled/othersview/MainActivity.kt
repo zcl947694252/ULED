@@ -14,10 +14,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
-import android.support.v4.app.Fragment
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.view.ViewPager
-import android.support.v7.app.AlertDialog
+import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -143,8 +143,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         mApp = this.application as TelinkLightApplication
         TelinkApplication.getInstance().isNew = SharedPreferencesUtils.getScanType()
 
-        TelinkLightService.Instance()?.disconnect()
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        TelinkLightService.Instance()?.disconnect() //获取单例TelinkLightService
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (LeBluetooth.getInstance().isSupport(applicationContext) && mBluetoothAdapter?.isEnabled == false)
             mBluetoothAdapter?.enable()
         //MqttManger.initMqtt() bindService()
@@ -172,7 +172,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
 
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         //Constant.IS_ROUTE_MODE = false
-        getScanResult()//获取扫描状态
+        getScanResult() //获取扫描状态
         getRouterStatus()
         getRegionList()
         getAllStatus()
@@ -263,7 +263,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 Constant.IS_ROUTE_MODE = it.mode == 1//0蓝牙，1路由
                 if (Constant.IS_ROUTE_MODE)
                     TelinkLightService.Instance().idleMode(true)
-                Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction
+                Constant.IS_OPEN_AUXFUN = it.auxiliaryFunction  //辅助模式是否开启
                 SharedPreferencesHelper.putBoolean(this, Constant.ROUTE_MODE, Constant.IS_ROUTE_MODE)
                 changeDisplayImgOnToolbar(TelinkLightApplication.getApp().connectDevice != null)
             }, {
@@ -335,7 +335,6 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                     .setPositiveButton(R.string.exit) { _, _ ->
                         LogOutAndExitApp()
                     }
-
         }
     }
 
@@ -404,12 +403,12 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     /**
      * 初始化底部的navigation按钮
      */
-    private fun initBottomNavigation() {
+        private fun initBottomNavigation() {
         deviceFragment = DeviceFragment()
         groupFragment = GroupListFragment()
         sceneFragment = SceneFragment()
         meFragment = MeFragment()
-        val fragments: List<Fragment> = listOf(deviceFragment, groupFragment, sceneFragment, meFragment)
+        val fragments: List<androidx.fragment.app.Fragment> = listOf(deviceFragment, groupFragment, sceneFragment, meFragment)
         val vpAdapter = ViewPagerAdapter(supportFragmentManager, fragments)
         viewPager.adapter = vpAdapter
         viewPager.offscreenPageLimit = 3    //屏幕外的page数量限制调整为3
@@ -418,7 +417,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableShiftingMode(false)
         bnve.enableItemShiftingMode(false)
         bnve.setupWithViewPager(viewPager)
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        viewPager.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(p0: Int) {}
 
             override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
@@ -426,7 +425,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             override fun onPageSelected(p0: Int) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")
-                LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(intent)
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this@MainActivity).sendBroadcast(intent)
             }
         })
     }
@@ -844,7 +843,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
             if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")
-                LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
                 return true
             } else {
                 if (secondTime - firstTime > 2000) {

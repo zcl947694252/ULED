@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout15"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -88,7 +88,7 @@
 
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -111,7 +111,7 @@
                 android:background="@color/gray_e"
                 android:textColor="@color/black_three" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/region_me_recycleview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -119,7 +119,7 @@
                 android:descendantFocusability="blocksDescendants" />
 
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/region_me_more"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
@@ -155,7 +155,7 @@
                     app:layout_constraintVertical_bias="0.0"
                     app:srcCompat="@drawable/icon_under" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <TextView
                 android:id="@+id/region_authorize_net_num"
@@ -170,14 +170,14 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/region_authorize_recycleview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white"
                 android:descendantFocusability="blocksDescendants" />
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/region_authorize_more"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"
@@ -213,7 +213,7 @@
                     app:layout_constraintVertical_bias="0.0"
                     app:srcCompat="@drawable/icon_under" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
     </ScrollView>

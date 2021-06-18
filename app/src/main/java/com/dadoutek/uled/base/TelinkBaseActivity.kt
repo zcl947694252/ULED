@@ -15,13 +15,13 @@ import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.support.annotation.RequiresApi
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -95,7 +95,7 @@ import java.util.concurrent.TimeUnit
 
 abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     private var dispos: Disposable? = null
-    private var receiver: BluetoothListenerReceiver? = null
+    private var receiver: BluetoothListenerReceiver? = null //蓝牙接收监听器
     var disposableTimer: Disposable? = null
     open var currentShowGroupSetPage = true
     var isScanningJM: Boolean = false
@@ -118,8 +118,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     var stompLifecycleDisposable: Disposable? = null
     var singleLoginTopicDisposable: Disposable? = null
     var codeStompClient: Disposable? = null
-    private lateinit var stompRecevice: StompReceiver
-    private var locationServiceDialog: android.support.v7.app.AlertDialog? = null
+    private lateinit var stompRecevice: StompReceiver //
+    private var locationServiceDialog: androidx.appcompat.app.AlertDialog? = null
     private lateinit var mStompManager: StompManager
     private var loadDialog: Dialog? = null
     private var mApplication: TelinkLightApplication? = null
@@ -138,6 +138,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open var installDialog: AlertDialog? = null
     var isRgbClick = false
     var clickRgb: Boolean = false
+
     var installId = 0
     var stepOneText: TextView? = null
     var stepTwoText: TextView? = null
@@ -146,6 +147,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     var switchStepTwo: TextView? = null
     var swicthStepThree: TextView? = null
     private var installHelpe: TextView? = null
+
+    //添加8种设备
     val INSTALL_NORMAL_LIGHT = 0
     val INSTALL_RGB_LIGHT = 1
     val INSTALL_SWITCH = 2
@@ -154,7 +157,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     val INSTALL_CONNECTOR = 5
     val INSTALL_GATEWAY = 6
     val INSTALL_ROUTER = 7
+
+    //是否指导
     var isGuide: Boolean = false
+
     lateinit var hinitOne: TextView
     lateinit var popFinish: PopupWindow
     lateinit var cancelf: Button
@@ -163,11 +169,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     var type: Int? = null
     var showDialogHardDelete: AlertDialog? = null
 
+    //重命名相关
     var renameCancel: TextView? = null
     var renameConfirm: TextView? = null
     var renameEt: EditText? = null
     var popReNameView: View? = null
     lateinit var renameDialog: Dialog
+
     var disposableRouteTimer: Disposable? = null
     var mHandlerBase = android.os.Handler()
 
@@ -176,7 +184,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         super.onCreate(savedInstanceState)
         this.mApplication = this.application as TelinkLightApplication
         isScanningJM = false
-        enableConnectionStatusListener()    //尽早注册监听
+        enableConnectionStatusListener()    //尽早注册监听 添加状态变化监听事件
         //注册网络状态监听广播
         netWorkChangReceiver = NetWorkChangReceiver()
         var filter = IntentFilter()
@@ -217,6 +225,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         return ws1
     }
 
+    //获取星期几
     open fun getWeek(str: String): Int {
         var week = 0b00000000
         when (str) {
@@ -246,7 +255,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
-
+    //获取ota版本
     fun getOtaVersion(version: String?): String {
         version?.let {
             val split = version.split("-")
@@ -274,6 +283,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         return getString(R.string.no_get_version)
     }
 
+    //是否支持ota
     fun isSuportOta(version: String?): Boolean {
         version?.let {
             val split = version.split("-")
@@ -287,6 +297,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         return false
     }
 
+    //是否最新版
     fun isMostNew(version: String?): Boolean {
         version?.let {
             val split = version?.split("-")
@@ -300,6 +311,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         return false
     }
 
+    //数字字符
     open fun numberCharat(string: String): String {
         val sBuffer = StringBuffer()
         val replace = string.replace(".", "", true)
@@ -321,7 +333,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     private fun startTimerUpdate() {
-        upDateTimer?.dispose()
+        upDateTimer?.dispose()//interval 每隔一段时间发送一个事件
         upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
             if (netWorkCheck(this) && !Constant.IS_ROUTE_MODE)
                 CoroutineScope(Dispatchers.IO).launch {
@@ -343,7 +355,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
 
     fun stopTimerUpdate() {
-        upDateTimer?.dispose()
+        upDateTimer?.dispose() //取消托管
         upDateTimer = null
     }
 
@@ -351,7 +363,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
      * 自动重连
      */
     fun autoConnectAll() {
-        if (Constant.IS_ROUTE_MODE) return
+        if (Constant.IS_ROUTE_MODE) return //路由模式直接不用重新连接
         val deviceTypes = mutableListOf(DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB)
         val size = DBUtils.getAllCurtains().size + DBUtils.allLight.size + DBUtils.allRely.size
         if (size > 0) {
@@ -371,16 +383,17 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    //弹出其他设备登录弹窗
     private fun makeDialogAndPop() {
         singleLogin = AlertDialog.Builder(this)
                 .setTitle(R.string.other_device_login)
                 .setMessage(getString(R.string.single_login_warm))
                 .setCancelable(false)
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss()
-                    restartApplication()
-                }.create()
-
+                    dialog.dismiss() //消灭弹窗
+                    restartApplication() //重启app杀死原进程
+                }.create()//创建弹窗
+        //没有.show不展示，只是创建了这个其他设备登录之后的弹窗，这还需要一个广播
         popView = LayoutInflater.from(this).inflate(R.layout.code_warm, null)
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         pop?.let {
@@ -390,6 +403,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    //初始化分组提示框
     private fun makeDialog() {
         dialog = Dialog(this@TelinkBaseActivity)
         list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
@@ -398,11 +412,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val popView = View.inflate(this@TelinkBaseActivity, R.layout.dialog_add_group, null)
         popMain = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         popMain.isFocusable = true // 设置PopupWindow可获得焦点
-        popMain.isTouchable = true // 设置PopupWindow可触摸补充：
+        popMain.isTouchable = true // 设置PopupWindow可触摸补充
         popMain.isOutsideTouchable = false
 
-        val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
-        recyclerView.layoutManager = LinearLayoutManager(this@TelinkBaseActivity, LinearLayoutManager.VERTICAL, false)
+        val recyclerView = popView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.pop_recycle)
+        recyclerView.layoutManager = LinearLayoutManager(this@TelinkBaseActivity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapterType
 
         adapterType?.bindToRecyclerView(recyclerView)
@@ -418,14 +432,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 recyclerView.visibility = View.VISIBLE
             else
                 recyclerView.visibility = View.GONE
-
         }
         dialogGroupType?.setOnClickListener {
             if (recyclerView.visibility == View.GONE)
                 recyclerView.visibility = View.VISIBLE
             else
                 recyclerView.visibility = View.GONE
-
         }
         dialogGroupCancel.setOnClickListener { PopUtil.dismiss(popMain) }
         dialogGroupOk.setOnClickListener {
@@ -530,8 +542,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             LightAdapter.STATUS_LOGIN -> {
                 LogUtils.v("zcl---baseactivity收到登入广播")
                 GlobalScope.launch(Dispatchers.Main) {
-                    if (!isScanning)
-                        ToastUtils.showLong(getString(R.string.connect_success))
+//                    if (!isScanning)
+//                        ToastUtils.showLong(getString(R.string.connect_success))
                     changeDisplayImgOnToolbar(true)
                 }
                 afterLogin()
@@ -549,8 +561,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             }
 
             LightAdapter.STATUS_CONNECTING -> {
-                if (!isScanning)
-                    ToastUtils.showLong(R.string.connecting_tip)
+//                if (!isScanning)
+//                    ToastUtils.showLong(R.string.connecting_tip)
             }
         }
     }
@@ -800,7 +812,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     //重启app并杀死原进程
     open fun restartApplication() {
-        TelinkApplication.getInstance().removeEventListeners()
+        TelinkApplication.getInstance().removeEventListeners() //获取TelinkApplication实例，删除事件监听，TelinkApplication是一个单例模式
         SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
         AppUtils.relaunchApp()
     }
@@ -1214,7 +1226,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     fun showOpenLocationServiceDialog() {
-        val builder = android.support.v7.app.AlertDialog.Builder(this)
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
         builder.setTitle(R.string.open_location_service)
         builder.setNegativeButton(getString(android.R.string.ok)) { _, _ ->
             BleUtils.jumpLocationSetting()
@@ -1366,11 +1378,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    //获取已经连接的设备并显示在设备页面上
     fun showInstallDeviceList(isGuide: Boolean, clickRgb: Boolean) {
         this.clickRgb = clickRgb
         val view = View.inflate(this, R.layout.dialog_install_list, null)
         val closeInstallList = view.findViewById<ImageView>(R.id.close_install_list)
-        val installDeviceRecyclerview = view.findViewById<RecyclerView>(R.id.install_device_recyclerView)
+        val installDeviceRecyclerview = view.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.install_device_recyclerView)
         closeInstallList.setOnClickListener { v -> installDialog?.dismiss() }
 
         val installList: ArrayList<InstallDeviceModel> = OtherUtils.getInstallDeviceList(this)
@@ -1380,7 +1393,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         installDeviceRecyclerview?.layoutManager = layoutManager
         installDeviceRecyclerview?.adapter = installDeviceListAdapter
         installDeviceListAdapter.bindToRecyclerView(installDeviceRecyclerview)
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线
         installDeviceRecyclerview?.addItemDecoration(decoration)
@@ -1442,11 +1455,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         installDialog?.show()
     }
 
+    //点击添加新设备跳转界面，点击要添加的设备名称则弹出该弹窗,
     private fun makeInstallView() {
-        viewInstall = View.inflate(this, R.layout.dialog_install_detail, null)
+        viewInstall = View.inflate(this, R.layout.dialog_install_detail, null)//为了找出弹窗里的组件的id需要view.inflate才可以，这种情况最好不用使用插件
         val closeInstallList = viewInstall?.findViewById<ImageView>(R.id.close_install_list)
         val btnBack = viewInstall?.findViewById<ImageView>(R.id.btnBack)
 
+        //初始化控件，如若点击图标，则跳出弹窗
         installTitleTv = viewInstall?.findViewById(R.id.install_title_tv)
         stepOneText = viewInstall?.findViewById(R.id.step_one)
         stepTwoText = viewInstall?.findViewById(R.id.step_two)

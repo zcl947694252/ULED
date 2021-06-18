@@ -9,7 +9,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Handler
 import android.os.Message
-import android.support.annotation.RequiresApi
+import androidx.annotation.RequiresApi
 import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -195,13 +195,29 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     }
                 }
             }
-            else -> {
+            else -> {// 冷暖灯的场景设置就在这里了 
                 helper.setProgress(R.id.normal_sbBrightness, item.brightness)
                         .setProgress(R.id.normal_temperature, item.temperature)
                         .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
                         .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 setAlgClickAble(item, addBrightnessCW!!, lessBrightnessCW!!)
                 setAlgClickAble(item, addTemperatureCW!!, lessTemperatureCW!!)
+                // chown changed it
+                if (item.isOn) {
+                    sbBrightnessCW!!.isEnabled = true
+                    sbtemperature!!.isEnabled = true
+                    addBrightnessCW!!.isEnabled = sbBrightnessCW!!.progress < 100
+                    lessBrightnessCW!!.isEnabled = sbBrightnessCW!!.progress > 1
+                    lessTemperatureCW!!.isEnabled = sbtemperature!!.progress > 1
+                    addTemperatureCW!!.isEnabled = sbtemperature!!.progress < 100
+                }else {
+                    sbBrightnessCW!!.isEnabled = false
+                    sbtemperature!!.isEnabled = false
+                    addBrightnessCW!!.isEnabled = false
+                    lessBrightnessCW!!.isEnabled = false
+                    lessTemperatureCW!!.isEnabled = false
+                    addTemperatureCW!!.isEnabled = false
+                }
             }
         }
 

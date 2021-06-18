@@ -1,17 +1,17 @@
 package com.dadoutek.uled.othersview
 
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentPagerAdapter
 import android.view.View
 import android.view.ViewGroup
 
-class ViewPagerAdapter(private val fm: FragmentManager?, val fragments: List<Fragment>) : FragmentPagerAdapter(fm) {
+class ViewPagerAdapter(private val fm: androidx.fragment.app.FragmentManager?, val fragments: List<androidx.fragment.app.Fragment>) : androidx.fragment.app.FragmentPagerAdapter(fm) {
     override fun getCount(): Int {
         return fragments.size
     }
 
-    override fun getItem(position: Int): Fragment {
+    override fun getItem(position: Int): androidx.fragment.app.Fragment {
         return fragments[position]
     }
 

@@ -557,7 +557,7 @@
         </LinearLayout>
 
         <!--普通灯亮度色温-->
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cw_scene"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -722,9 +722,9 @@
                         android:padding="@dimen/dp_8"
                         android:src="@drawable/add_enabled" />
             </LinearLayout>
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
         <!--开关场景-->
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/switch_scene"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -798,7 +798,7 @@
 
             </RadioGroup>
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 </LinearLayout>

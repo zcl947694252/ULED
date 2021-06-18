@@ -5,7 +5,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="170dp"
             android:background="@drawable/top_back">
@@ -47,7 +47,7 @@
                 android:src="@drawable/bluetooth_no"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ScrollView
             android:layout_width="match_parent"

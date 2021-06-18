@@ -6,8 +6,8 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.PowerManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -65,8 +65,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
     private var poptitle: TextView? = null
     private var poptitleAuthorize: TextView? = null
     private var pop: PopupWindow? = null
-    private var popRecycle: RecyclerView? = null
-    private var popRecycleAuthorize: RecyclerView? = null
+    private var popRecycle: androidx.recyclerview.widget.RecyclerView? = null
+    private var popRecycleAuthorize: androidx.recyclerview.widget.RecyclerView? = null
     private var loadDialog: Dialog? = null
     private var mWakeLock: PowerManager.WakeLock? = null
     private var phone: String? = null
@@ -101,8 +101,8 @@ class EnterPasswordActivity : Activity(), View.OnClickListener, TextWatcher {
 
         popConfirm = popView.findViewById(R.id.region_dialog_confirm)
 
-        popRecycle?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        popRecycleAuthorize?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        popRecycle?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        popRecycleAuthorize?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
 
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 

@@ -2,9 +2,9 @@ package com.dadoutek.uled.router
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
@@ -397,12 +397,12 @@ class BindRouterActivity : TelinkBaseActivity() {
         routerList.clear()
         routerList.addAll(DBUtils.getAllRouter())
         routerList.forEach { it.isSelect = false }
-        bind_router_recycle.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        bind_router_recycle.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
         routerAdapter.bindToRecyclerView(bind_router_recycle)
     }
 
     private fun initView() {
-        bind_router_type.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        bind_router_type.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false)
         bind_router_type.adapter = titleAdapter
         listTitle.clear()
         listTitle.addAll(mutableListOf(TitleBean(getString(R.string.normal_light), true), TitleBean(getString(R.string.rgb_light),

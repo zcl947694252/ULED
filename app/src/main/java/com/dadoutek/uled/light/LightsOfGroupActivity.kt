@@ -4,13 +4,13 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v4.content.ContextCompat
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
+import com.google.android.material.snackbar.Snackbar
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.SearchView
 import android.view.MenuItem
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
@@ -72,7 +72,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
-    private var recyclerView: RecyclerView? = null
+    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
     private var isDelete: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {

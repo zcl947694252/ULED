@@ -152,9 +152,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         super.onCreate(savedInstanceState)
         disableConnectionStatusListener()
         mRxPermission = RxPermissions(this)
-        //设置屏幕常亮
+        //设置屏幕常亮***
         isScanningJM = true
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        //***
         setContentView(R.layout.activity_device_scanning)
         meshList.clear()
         TelinkLightService.Instance()?.idleMode(true)
@@ -541,7 +542,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun autoConnect2() {
         if (TelinkLightService.Instance() != null) {
             if (TelinkLightService.Instance().mode != LightAdapter.MODE_AUTO_CONNECT_MESH) {
-                showLoadingDialog(resources.getString(R.string.connecting_tip))
+                //showLoadingDialog(resources.getString(R.string.connecting_tip))  //chown
                 closeAnimation()
                 startConnect = true
 
@@ -774,13 +775,22 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                    finish()
                }*/
             if (isScanning) {
-                AlertDialog.Builder(this)
-                        .setPositiveButton(android.R.string.ok) { _, _ ->
-                            doFinish()
-                        }
-                        .setNegativeButton(R.string.btn_cancel) { _, _ -> }
-                        .setMessage(R.string.exit_tips_in_scanning)
-                        .show()
+                // chown 改，>0 与 else
+                if (mAddedDevices.size > 0) {
+                    AlertDialog.Builder(this)
+                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                doFinish()
+                            }
+                            .setNegativeButton(R.string.btn_cancel) { _, _ -> }
+                            .setMessage(R.string.exit_tips_in_scanning)
+                            .show()
+                } else {
+                    closeAnimation()
+                    btn_stop_scan.visibility = View.GONE
+                    ToastUtils.showLong(getString(R.string.scan_end))
+                    if (mAddDeviceType == DeviceType.NORMAL_SWITCH || mAddDeviceType == DeviceType.GATE_WAY) TelinkLightService.Instance().disconnect()
+                    finish()
+                }
             } else {
                 doFinish()
             }

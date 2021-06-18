@@ -3,7 +3,7 @@ package com.dadoutek.uled.gateway
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.R
@@ -58,7 +58,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
             }
         }
 
-        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        template_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         adapter = WeeksItemAdapter(R.layout.item_week_day_tick, list!!)
         template_recycleView.adapter = adapter
         adapter?.bindToRecyclerView(template_recycleView)

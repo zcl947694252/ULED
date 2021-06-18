@@ -5,8 +5,8 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AlertDialog
+import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AlertDialog
 import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.MenuItem
@@ -69,7 +69,7 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
     private var mConfigFailSnackbar: Snackbar? = null
     private var isGlassSwitch = false
     private var groupName: String? = null
-    override fun setToolBar(): android.support.v7.widget.Toolbar {
+    override fun setToolBar(): androidx.appcompat.widget.Toolbar {
         return toolbar
     }
 

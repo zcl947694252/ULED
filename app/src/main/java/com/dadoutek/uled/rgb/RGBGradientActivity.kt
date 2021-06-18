@@ -5,10 +5,10 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.*
 import android.widget.ImageView
 import android.widget.TextView
@@ -134,7 +134,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 //        tvSpeed.text = getString(R.string.speed_text, speed.toString())
 //        this.sbSpeed!!.setOnSeekBarChangeListener(this.barChangeListener)
         val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
         builtInModeRecycleView!!.layoutManager = layoutmanager
         this.rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
         builtInModeRecycleView?.itemAnimator = DefaultItemAnimator()
@@ -142,7 +142,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 ////            mDetector?.onTouchEvent(event)
 //            false
 //        }
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         //添加分割线
         builtInModeRecycleView?.addItemDecoration(decoration)
@@ -153,7 +153,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun applyDiyView() {
         val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
         builtDiyModeRecycleView!!.layoutManager = layoutmanager
         this.rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
@@ -161,7 +161,7 @@ class RGBGradientActivity : TelinkBaseActivity(), View.OnClickListener {
 //            mDetector?.onTouchEvent(event)
 //            false
 //        }
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decoration)

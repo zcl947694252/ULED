@@ -6,13 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.Toolbar
 import android.text.InputType
 import android.text.TextUtils
 import android.view.*
@@ -290,7 +290,7 @@ class HumanBodySensorActivity : TelinkBaseActivity(), View.OnClickListener, Even
     }}}
 
     private fun setAdapters() {
-        scene_gp_bottom_list.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        scene_gp_bottom_list.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         scene_gp_bottom_list.adapter = nightLightEditGroupAdapter
         nightLightEditGroupAdapter.bindToRecyclerView(scene_gp_bottom_list)
 

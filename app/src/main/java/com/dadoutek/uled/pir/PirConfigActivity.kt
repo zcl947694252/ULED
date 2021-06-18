@@ -7,13 +7,13 @@ import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.Toolbar
 import android.text.InputType
 import android.text.TextUtils
 import android.view.*
@@ -914,7 +914,7 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun makeGrideView() {
-        pir_config_recyclerGroup.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        pir_config_recyclerGroup.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         pir_config_recyclerGroup.layoutManager = GridLayoutManager(this, 5)
         bottomGvAdapter?.bindToRecyclerView(pir_config_recyclerGroup)
     }
@@ -923,9 +923,9 @@ class PirConfigActivity : TelinkBaseActivity(), View.OnClickListener {
         var views = LayoutInflater.from(this).inflate(R.layout.pop_recycleview, null)
         popupWindow = PopupWindow(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         popupWindow?.contentView = views
-        var recycleView = views.findViewById<RecyclerView>(R.id.pop_recycle)
+        var recycleView = views.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.pop_recycle)
         popAdapter = PopupWindowAdapter(R.layout.pop_item_sigle, popDataList)
-        recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         recycleView.adapter = popAdapter
         popAdapter?.bindToRecyclerView(recycleView)
         popupWindow?.isFocusable = true

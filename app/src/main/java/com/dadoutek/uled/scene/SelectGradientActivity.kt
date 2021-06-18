@@ -2,7 +2,7 @@ package com.dadoutek.uled.scene
 
 import android.app.Activity
 import android.content.Intent
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -66,7 +66,7 @@ class SelectGradientActivity : BaseActivity() {
             finish()
         }
         toolbarTv.text = getString(R.string.model_list)
-        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        template_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = this.rgbSceneModeAdapter
         rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->
             currentRgbGradient = buildInModeList[position]

@@ -16,13 +16,13 @@
             android:layout_height="match_parent">
 
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/sensor_three"
                 android:visibility="visible"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/triggering_model"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -46,7 +46,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/triggering_conditions"
                         android:layout_width="190dp"
                         android:layout_height="30dp"
@@ -77,9 +77,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
            <View
                     android:id="@+id/view15"
@@ -89,7 +89,7 @@
                     android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/triggering_model" />
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/trigger_after_ly"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -113,7 +113,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/trigger_time"
                         android:layout_width="190dp"
                         android:layout_height="30dp"
@@ -145,9 +145,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
            <View
                     android:id="@+id/view16"
@@ -157,7 +157,7 @@
                     android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/trigger_after_ly" />
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/overtime_ly"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -197,7 +197,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/time_type"
                         android:layout_width="70dp"
                         android:layout_height="30dp"
@@ -228,9 +228,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
            <View
                     android:id="@+id/view17"
@@ -240,7 +240,7 @@
                     android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/overtime_ly" />
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/light_brighress_mode"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -264,7 +264,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/brightness_change"
                         android:layout_width="190dp"
                         android:layout_height="30dp"
@@ -295,9 +295,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
            <View
                     android:id="@+id/view18"
@@ -307,7 +307,7 @@
                     android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/light_brighress_mode" />
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout30"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -330,7 +330,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/old_time"
                         android:layout_width="190dp"
                         android:layout_height="30dp"
@@ -361,9 +361,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
            <View
                     android:id="@+id/view30"
@@ -372,7 +372,7 @@
                     android:background="@color/black_ee"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout30" />
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout31"
                     android:layout_width="0dp"
                     android:layout_height="60dp"
@@ -395,7 +395,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/trigger_mode"
                         android:layout_width="190dp"
                         android:layout_height="30dp"
@@ -426,9 +426,9 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
            <View
                     android:id="@+id/view31"
@@ -437,7 +437,7 @@
                     android:background="@color/black_ee"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout31" />
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/choose_group_ly"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
@@ -460,7 +460,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/choose_group"
                         android:layout_width="190dp"
                         android:layout_height="30dp"
@@ -482,10 +482,10 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                </android.support.constraint.ConstraintLayout>
-            </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <android.support.constraint.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/constraintLayout24"
                     android:layout_width="match_parent"
                     android:layout_height="35dp"
@@ -506,9 +506,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-            </android.support.constraint.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerGroup"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -548,10 +548,10 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/scene_gp_bottom_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

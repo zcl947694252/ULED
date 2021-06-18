@@ -15,7 +15,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.os.Parcelable
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.blankj.utilcode.util.LogUtils
@@ -248,7 +248,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     override fun initView() {
         this.mApp = this.application as TelinkLightApplication
         toolbar_t_center.text = getString(R.string.timer_period_set)
-        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        template_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adapter
         // linAdd = View.inflate(this, R.layout.template_bottom_add_no_line, null)
         //     val tv = linAdd?.findViewById<TextView>(R.id.add_group_btn_tv)

@@ -9,7 +9,7 @@
 
     <include layout="@layout/toolbar" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bottomBar"
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -59,7 +59,7 @@
                 app:layout_constraintStart_toEndOf="@id/normal_rgb"
                 app:layout_constraintTop_toTopOf="parent" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
             android:id="@+id/rgb_set"
@@ -74,7 +74,7 @@
                 android:layout_height="1dp"
                 android:background="#eeeeee"/>
 
-         <android.support.constraint.ConstraintLayout
+         <androidx.constraintlayout.widget.ConstraintLayout
                  android:id="@+id/constraintLayout6"
                  android:layout_width="match_parent"
                  android:layout_height="0dp"
@@ -427,7 +427,7 @@
                          android:visibility="gone"
                          android:textSize="15dp" />
 
-                 <android.support.v7.widget.RecyclerView
+                 <androidx.recyclerview.widget.RecyclerView
                          android:id="@+id/diy_color_recycler_list_view"
                          android:layout_width="match_parent"
                          android:layout_height="40dp"
@@ -449,7 +449,7 @@
                      app:layout_constraintEnd_toEndOf="parent"
                      app:layout_constraintStart_toStartOf="parent" />
 
-         </android.support.constraint.ConstraintLayout>
+         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
                 android:id="@+id/rgb_switch"

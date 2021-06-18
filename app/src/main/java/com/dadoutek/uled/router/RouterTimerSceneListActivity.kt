@@ -3,7 +3,7 @@ package com.dadoutek.uled.router
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.ViewGroup
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -137,7 +137,7 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         add_group_btn_tv.text = getString(R.string.add_timer_scene)
 
-        swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        swipe_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         swipe_recycleView.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
         swipe_recycleView.setSwipeMenuCreator(function)   // 设置监听器。
         swipe_recycleView.setOnItemMenuClickListener { menuBridge, adapterPosition ->

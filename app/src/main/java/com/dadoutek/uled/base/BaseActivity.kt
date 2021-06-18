@@ -11,7 +11,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -76,6 +76,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
     protected var foreground = false
     private var mApplication: TelinkLightApplication? = null
     private var netWorkChangReceiver: TelinkBaseActivity.NetWorkChangReceiver? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutID())
@@ -88,9 +89,9 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         registerReceiver(netWorkChangReceiver, filter)
 
         makeDialogAndPop()
-        initView()
-        initData()
-        initListener()
+        initView() // 这是个抽象方法，意味着子类调用的时候必须实现该方法
+        initData() // 这也是抽象方法
+        initListener() // 这也是抽象方法
         initOnLayoutListener()
         initStompReceiver()
         bindService()
@@ -113,6 +114,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         }
     }
 
+    //设备在其他地方登陆，这里只是相当于注册了Dialog，并没有show出来
     private fun makeDialogAndPop() {
         singleLogin = AlertDialog.Builder(this)
                 .setTitle(R.string.other_device_login)
@@ -128,7 +130,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         pop?.let {
             it.isFocusable = true // 设置PopupWindow可获得焦点
             it.isTouchable = true // 设置PopupWindow可触摸补充：
-            it.isOutsideTouchable = false
+            it.isOutsideTouchable = false // 设置PopupWindow外的不可触摸
         }
     }
 

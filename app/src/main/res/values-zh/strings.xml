@@ -27,6 +27,7 @@
     <string name="not_type">未分类</string>
     <!--   设备End -->
 
+    <string name="strUpgradeDialogUpdateTimeLabel">Upgrade time</string>
     <!--   登录Start -->
     <string name="select_country">选择国家和地区</string>
     <string name="register_title_name">注册</string>

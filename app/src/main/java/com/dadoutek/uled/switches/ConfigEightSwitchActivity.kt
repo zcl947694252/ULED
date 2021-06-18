@@ -690,7 +690,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         makePop()
     }
 
-    override fun setToolBar(): android.support.v7.widget.Toolbar {
+    override fun setToolBar(): androidx.appcompat.widget.Toolbar {
         return toolbar
     }
 

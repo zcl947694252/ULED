@@ -1,35 +1,42 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-buildscript { 
+buildscript {
     ext.kotlin_version = '1.3.31'
     ext.anko_version='0.10.8'
 
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
+    repositories {//greendao
+//        jcenter()
+//        mavenCentral()
+//        maven {
+//            url 'https://maven.google.com/'
+//            name 'Google'
+//        }
+//        google()
+        maven { url 'https://maven.aliyun.com/repository/public'}
+        maven { url 'https://maven.aliyun.com/repository/google'}
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.1'
-        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2' // add plugin
+        classpath 'com.android.tools.build:gradle:4.1.3'
+        classpath 'org.greenrobot:greendao-gradle-plugin:3.3.0' // add plugin
         classpath 'com.mob.sdk:MobSDK:+'
-    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" }
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" }
 }
 
 
 allprojects {
     repositories {
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-        maven { url 'https://jitpack.io' }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+//        jcenter()
+//        maven {
+//            url 'https://maven.google.com/'
+//            name 'Google'
+//        }
+//        maven { url 'https://jitpack.io' }
+//        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://jitpack.io'}
+        maven { url 'https://maven.aliyun.com/repository/public'}
+        maven { url 'https://maven.aliyun.com/repository/google'}
+        google()
     }
 }
 

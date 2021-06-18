@@ -5,13 +5,13 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
@@ -72,7 +72,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var phone: String? = null
     private var editPassWord: String? = null
     private var isFirstLauch: Boolean = false
-    private var recyclerView: RecyclerView? = null
+    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
     private var adapter: PhoneListRecycleViewAdapter? = null
     private var phoneList: ArrayList<DbUser>? = null
     private var isPhone = true
@@ -87,8 +87,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var poptitle: TextView? = null
     private var poptitleAuthorize: TextView? = null
     private var popAuthor: PopupWindow? = null
-    private var popRecycle: RecyclerView? = null
-    private var popRecycleAuthorize: RecyclerView? = null
+    private var popRecycle: androidx.recyclerview.widget.RecyclerView? = null
+    private var popRecycleAuthorize: androidx.recyclerview.widget.RecyclerView? = null
     private var whoClick: Int = 0
     private var itemAdapter: RegionDialogAdapter? = null
     private var itemAdapterAuthor: RegionAuthorizeDialogAdapter? = null
@@ -119,8 +119,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
         popConfirm = popView.findViewById(R.id.region_dialog_confirm)
 
-        popRecycle?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        popRecycleAuthorize?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        popRecycle?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        popRecycleAuthorize?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
 
         popAuthor = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
@@ -262,7 +262,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         eye_btn.setOnClickListener(this)
         sms_login_btn.setOnClickListener(this)
         edit_user_phone_or_email.addTextChangedListener(this)
-        com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email)
+        com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_phone_or_email) //添加过滤器
         com.dadoutek.uled.util.StringUtils.initEditTextFilterForRegister(edit_user_password)
     }
 
@@ -370,10 +370,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         if (isPhone) {
             isShowPhoneList(true)
 
-            val layoutmanager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-            recyclerView!!.layoutManager = layoutmanager
+            val layoutmanager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+            recyclerView!!.layoutManager = layoutmanager //一定要设置布局管理器，否则界面出不来
             adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
-            val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+            val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
             decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
             //添加分割线
             recyclerView?.addItemDecoration(decoration)

@@ -1,8 +1,8 @@
 package com.dadoutek.uled.region
 
 import android.annotation.SuppressLint
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -33,7 +33,7 @@ class UnbindMeNetActivity : BaseActivity() {
 
     override fun initData() {
         regionbBean = intent.getSerializableExtra(Constant.SHARE_PERSON) as RegionBean
-        recycleview_title_recycle.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recycleview_title_recycle.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         list = regionbBean?.ref_users
         setData()
     }

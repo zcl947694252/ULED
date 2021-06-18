@@ -9,10 +9,10 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v4.app.FragmentActivity
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.*
+import androidx.fragment.app.FragmentActivity
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.*
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
@@ -20,6 +20,10 @@ import android.view.View.OnClickListener
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -141,7 +145,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
-        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+        AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(this))
                 .setMessage(getString(R.string.delete_group_confirm, group?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     this.showLoadingDialog(getString(R.string.deleting))
@@ -775,9 +779,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private fun setColorMode() {
         setDIyModeData()
-        builtInModeRecycleView!!.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        builtInModeRecycleView!!.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         //渐变标准模式  添加分割线
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
         builtInModeRecycleView?.addItemDecoration(decoration)
         rgbGradientAdapter = RGBGradientAdapter(R.layout.item_gradient_mode, buildInModeList)
@@ -1026,7 +1030,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                                     currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
                                     else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID
                                             ?: 0).toInt(), tvValue, "rgbwhite")
-                                }*/
+                                } */
                             val msg = handler.obtainMessage()
                             msg.arg1 = tvValue
                             handler.sendMessage(msg)
@@ -1075,7 +1079,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     stopTracking = true
                 }
             }
-        }
+            }
     }
 
     @SuppressLint("HandlerLeak")
@@ -1452,10 +1456,10 @@ else
     }
 
     private fun applyDiyView() {
-        builtDiyModeRecycleView!!.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        builtDiyModeRecycleView!!.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
-        val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decoration)

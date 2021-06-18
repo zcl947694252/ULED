@@ -1,8 +1,8 @@
 package com.dadoutek.uled.group
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.chad.library.adapter.base.BaseItemDraggableAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.chad.library.adapter.base.callback.ItemDragAndSwipeCallback
@@ -17,7 +17,7 @@ import com.telink.TelinkApplication
 class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
         BaseItemDraggableAdapter<ItemTypeGroup, BaseViewHolder>(layoutResId, data){
 
-    var recyclerViewChild : RecyclerView ?=null
+    var recyclerViewChild : androidx.recyclerview.widget.RecyclerView?=null
 
     private var adapter: GroupListRecycleViewChildAdapter? = null
 
@@ -67,9 +67,9 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
         if(itemTypeGroup.icon!=0){
             helper.setBackgroundRes(R.id.device_img, itemTypeGroup.icon)
         }
-        recyclerViewChild=helper.getView<RecyclerView>(R.id.device_type_child_group)
+        recyclerViewChild=helper.getView<androidx.recyclerview.widget.RecyclerView>(R.id.device_type_child_group)
         val layoutmanager = LinearLayoutManager(mContext)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
         recyclerViewChild!!.layoutManager = layoutmanager
         this.adapter = GroupListRecycleViewChildAdapter(R.layout.group_item_child, itemTypeGroup!!.list)
 
@@ -91,12 +91,12 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
     }
 
 
-    private fun setMove(recyclerViewChild: RecyclerView) {
+    private fun setMove(recyclerViewChild: androidx.recyclerview.widget.RecyclerView) {
         var startPos=0
         var endPos=0
         val list = adapter!!.data
         val onItemDragListener = object : OnItemDragListener {
-            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            override fun onItemDragStart(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
 
                 startPos=pos
                 endPos=0
@@ -104,11 +104,11 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
               //"indexchange--"+"--start:"+pos)
             }
 
-            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
-                                          target: RecyclerView.ViewHolder, to: Int) {
+            override fun onItemDragMoving(source: androidx.recyclerview.widget.RecyclerView.ViewHolder, from: Int,
+                                          target: androidx.recyclerview.widget.RecyclerView.ViewHolder, to: Int) {
             }
 
-            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
+            override fun onItemDragEnd(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
                 //                viewHolder.getItemId();
                 endPos=pos
               //"indexchange--"+"--end:"+pos)

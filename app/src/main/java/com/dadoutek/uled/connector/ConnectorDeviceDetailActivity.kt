@@ -2,12 +2,14 @@ package com.dadoutek.uled.connector
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.*
+import androidx.recyclerview.widget.DiffUtil
+import androidx.appcompat.widget.*
 import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter

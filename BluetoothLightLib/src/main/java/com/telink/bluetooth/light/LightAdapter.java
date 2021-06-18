@@ -11,7 +11,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -42,17 +42,17 @@ public class LightAdapter {
     public static final int LIGHT_RGB = 0x06;
     public static final int SMART_RELAY = 0x05;       //就是connector
 
-    public static final int STATUS_CONNECTING = 0;
-    public static final int STATUS_CONNECTED = 1;
-    public static final int STATUS_LOGINING = 2;
-    public static final int STATUS_LOGIN = 3;
-    public static final int STATUS_LOGOUT = 4;
+    public static final int STATUS_CONNECTING = 0; //正在连接
+    public static final int STATUS_CONNECTED = 1; //连接成功
+    public static final int STATUS_LOGINING = 2; //正在登陆状态
+    public static final int STATUS_LOGIN = 3; //登陆状态
+    public static final int STATUS_LOGOUT = 4; //登出状态
     public static final int STATUS_ERROR_N = 5; // android N
-    public static final int STATUS_UPDATE_MESH_COMPLETED = 10;
-    public static final int STATUS_UPDATING_MESH = 11;
-    public static final int STATUS_UPDATE_MESH_FAILURE = 12;
-    public static final int STATUS_UPDATE_ALL_MESH_COMPLETED = 13;
-    public static final int STATUS_GET_LTK_COMPLETED = 20;
+    public static final int STATUS_UPDATE_MESH_COMPLETED = 10; //更新完毕
+    public static final int STATUS_UPDATING_MESH = 11; //更新状态
+    public static final int STATUS_UPDATE_MESH_FAILURE = 12; //更新失败
+    public static final int STATUS_UPDATE_ALL_MESH_COMPLETED = 13; //所有更新完毕
+    public static final int STATUS_GET_LTK_COMPLETED = 20; //
     public static final int STATUS_GET_LTK_FAILURE = 21;
     public static final int STATUS_MESH_OFFLINE = 30;
     public static final int STATUS_MESH_SCAN_COMPLETED = 40;
@@ -103,7 +103,7 @@ public class LightAdapter {
 
     private final EventListener<Integer> mErrorReportListener = new ErrorReportListener();
 
-    private final AtomicInteger mode = new AtomicInteger(MODE_IDLE);
+    private final AtomicInteger mode = new AtomicInteger(MODE_IDLE); //原子类型的值，避免出现数值错误，一般用到锁机制
     private final AtomicInteger state = new AtomicInteger(0);
     private final AtomicInteger status = new AtomicInteger(-1);
     private final AtomicBoolean isStarted = new AtomicBoolean(false);

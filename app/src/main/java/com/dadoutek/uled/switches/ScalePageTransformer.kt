@@ -1,7 +1,7 @@
 package com.dadoutek.uled.switches
 
 import android.content.Context
-import android.support.v4.view.ViewPager
+import androidx.viewpager.widget.ViewPager
 import android.view.View
 import com.blankj.utilcode.util.LogUtils
 
@@ -19,7 +19,7 @@ import com.blankj.utilcode.util.LogUtils
  * 更新时间   $
  * 更新描述
  */
-class ScalePageTransformer(private var minScale: Float) : ViewPager.PageTransformer {
+class ScalePageTransformer(private var minScale: Float) : androidx.viewpager.widget.ViewPager.PageTransformer {
     override fun transformPage(page: View, position: Float) {
         LogUtils.v("zcl--滑动$position----------移动x轴${ page.translationX}")
         if (position == 0.8f) {//必須滿足條件才能進入

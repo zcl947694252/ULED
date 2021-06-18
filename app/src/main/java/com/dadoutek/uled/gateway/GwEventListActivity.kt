@@ -8,9 +8,9 @@ import android.content.IntentFilter
 import android.graphics.PorterDuff
 import android.os.Build
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.view.Menu
 import android.view.MenuItem
@@ -83,10 +83,10 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private var fiVersion: MenuItem? = null
     private var fiDelete: MenuItem? = null
     private var isRestSuccess: Boolean = false
-    private var showDialogHardDeleteGw: android.support.v7.app.AlertDialog? = null
+    private var showDialogHardDeleteGw: androidx.appcompat.app.AlertDialog? = null
     private var fiFactoryReset: MenuItem? = null
     private var disposableFactoryTimer: Disposable? = null
-    private var showDialogDelete: android.support.v7.app.AlertDialog? = null
+    private var showDialogDelete: androidx.appcompat.app.AlertDialog? = null
     private var fiChangeGp: MenuItem? = null
     private var receiver: GwBrocasetReceiver? = null
     private lateinit var currentGwTag: GwTagBean
@@ -286,7 +286,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
     private fun deleteDevice() {
         //恢复出厂设置
-        showDialogDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.sure_delete_device2)
+        showDialogDelete = androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.sure_delete_device2)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     hardTimer()
                     showLoadingDialog(getString(R.string.please_wait))
@@ -306,7 +306,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     hideLoadingDialog()
                     CoroutineScope(Dispatchers.Main).launch {
                         showDialogDelete?.dismiss()
-                        showDialogHardDeleteGw = android.support.v7.app.AlertDialog.Builder(this@GwEventListActivity).setMessage(R.string.delete_device_hard_tip)
+                        showDialogHardDeleteGw = androidx.appcompat.app.AlertDialog.Builder(this@GwEventListActivity).setMessage(R.string.delete_device_hard_tip)
                                 .setPositiveButton(android.R.string.ok) { _, _ ->
                                     GlobalScope.launch(Dispatchers.Main) {
                                         showLoadingDialog(getString(R.string.please_wait))
@@ -352,7 +352,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     private fun userReset() {
-        showDialogDelete = android.support.v7.app.AlertDialog.Builder(this).setMessage(R.string.user_reset_tip)
+        showDialogDelete = androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.user_reset_tip)
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     disposableFactoryTimer?.dispose()
                     disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
@@ -537,7 +537,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         }
         bottom_version_number.text = dbGw?.version
 
-        swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        swipe_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         swipe_recycleView.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
         // 设置监听器。
         swipe_recycleView.setSwipeMenuCreator(function)
@@ -549,7 +549,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         swipe_recycleView.adapter = adapter
 
 
-        swipe_recycleView2.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        swipe_recycleView2.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         swipe_recycleView2.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
         // 设置监听器。
         swipe_recycleView2.setSwipeMenuCreator(function)

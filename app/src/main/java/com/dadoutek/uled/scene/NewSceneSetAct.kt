@@ -8,11 +8,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.IBinder
-import android.support.v4.app.FragmentActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.fragment.app.FragmentActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
+import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -70,7 +71,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var resId: Int = R.drawable.icon_out
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
-    private var rgbRecyclerView: RecyclerView? = null
+    private var rgbRecyclerView: androidx.recyclerview.widget.RecyclerView? = null
     private lateinit var diyGradientList: MutableList<DbDiyGradient>
     private var buildInModeList: ArrayList<ItemRgbGradient> = ArrayList()
     private var isOpen: Boolean = true
@@ -105,6 +106,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             startActivityForResult(Intent(this@NewSceneSetAct, SelectSceneIconActivity::class.java), 1100)
         }
 
+        Log.i("chown","newscenesetact")
+
         initChangeState()
         initScene()//获取传递过来的场景数据
         if (!isReconfig) {
@@ -120,7 +123,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         var popView = LayoutInflater.from(this).inflate(R.layout.pop_rgb_mode_list, null)
         rgbRecyclerView = popView.findViewById(R.id.pop_scene_mode_recycle)
-        rgbRecyclerView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        rgbRecyclerView?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         rgbRecyclerView?.adapter = this.rgbSceneModeAdapter
         rgbSceneModeAdapter.notifyDataSetChanged()
         rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->
@@ -404,6 +407,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             cb_white_light.isChecked = false
             cb_white_light.isEnabled = false
             dot_rgb.isEnabled = false
+
             // brightness = 0
             // temperature = 0
         } else {
@@ -608,7 +612,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     @SuppressLint("StringFormatInvalid")
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
         if (position <= showGroupList!!.size - 1)
-            android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+            androidx.appcompat.app.AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(this))
                     .setMessage(getString(R.string.delete_group_confirm, showGroupList!![position]?.gpName))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
@@ -640,7 +644,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         img_function1.setOnClickListener { changeEditView() }
 
         val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
         scene_gp_detail_list.layoutManager = layoutmanager
         scene_gp_detail_list?.addItemDecoration(SpacesItemDecorationScene(40))
         scene_gp_detail_list.itemAnimator!!.changeDuration = 0
@@ -696,7 +700,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         initChangeState()
 
         val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
         // recyclerView_select_group_list_view.layoutManager = layoutmanager
         scene_gp_bottom_list.layoutManager = GridLayoutManager(this, 4)
 

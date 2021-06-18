@@ -6,8 +6,8 @@ import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.Toolbar
 import android.util.Log
 import android.view.*
 import android.widget.AdapterView.OnItemClickListener

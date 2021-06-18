@@ -6,9 +6,9 @@ import android.app.AlertDialog
 import android.bluetooth.le.ScanFilter
 import android.graphics.Color
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
 import android.util.Log
 import android.util.SparseArray
@@ -83,7 +83,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private var tipBottomLy: LinearLayout? = null
     private var popTip: PopupWindow? = null
     private var tipCancel: TextView? = null
-    private var tipRecycleView: RecyclerView? = null
+    private var tipRecycleView: androidx.recyclerview.widget.RecyclerView? = null
     private var gpMeshAddr: Int = 0
     private var isAll: Boolean = false
     private var disposableScan: Disposable? = null
@@ -169,7 +169,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             popTip?.dismiss()
         }
 
-        tipRecycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        tipRecycleView?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         tipRecycleView?.adapter = onlyNameAdapter
 
         popTip = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)

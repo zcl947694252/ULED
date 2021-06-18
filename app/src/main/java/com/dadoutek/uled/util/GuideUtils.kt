@@ -4,8 +4,8 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.graphics.RectF
-import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.TextView
 import com.app.hubert.guide.NewbieGuide
@@ -159,7 +159,7 @@ object GuideUtils {
                 }
     }
 
-    fun guideBuilder(fragment: Fragment, label: String): Builder {
+    fun guideBuilder(fragment: androidx.fragment.app.Fragment, label: String): Builder {
         return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label)
 //        testMode()
 //        return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label).alwaysShow(true)
@@ -176,7 +176,7 @@ object GuideUtils {
         return NewbieGuide.with(activity).setShowCounts(1).setLabel(label).alwaysShow(true).anchor(v)
     }
 
-    fun guideBuilder(fragment: Fragment,label: String,v: View): Builder {
+    fun guideBuilder(fragment: androidx.fragment.app.Fragment, label: String, v: View): Builder {
 //        return NewbieGuide.with(activity).setShowCounts(1).setLabel(label)
         return NewbieGuide.with(fragment).setShowCounts(1).setLabel(label).alwaysShow(true).anchor(v)
     }

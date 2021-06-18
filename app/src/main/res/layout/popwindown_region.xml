@@ -7,7 +7,7 @@
     android:background="#88888888"
     android:gravity="bottom">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/pop_net_ly"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteY="481dp">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout11"
             android:layout_width="match_parent"
             android:layout_height="65dp"
@@ -64,7 +64,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintVertical_bias="0.488" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
        <View
             android:id="@+id/view14"
@@ -272,7 +272,7 @@
             app:layout_constraintStart_toStartOf="@+id/linearLayout4"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/pop_qr_ly"

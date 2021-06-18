@@ -7,14 +7,16 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.*
+import androidx.recyclerview.widget.DiffUtil
+import androidx.appcompat.widget.*
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.*
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter.OnItemChildClickListener
@@ -67,17 +69,17 @@ import kotlin.collections.ArrayList
  */
 
 class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
-    private var allLightData: ArrayList<DbLight> = arrayListOf()
-    private var lightsData: ArrayList<DbLight> = arrayListOf()
-    private var listAdapter: DeviceDetailListAdapter? = null
-    private val SCENE_MAX_COUNT = 100
-    private var currentDevice: DbLight? = null
-    private var positionCurrent: Int = 0
-    private val REQ_LIGHT_SETTING: Int = 0x01
-    private var acitivityIsAlive = true
-    private var installDevice: TextView? = null
-    private var createGroup: TextView? = null
-    private var createScene: TextView? = null
+    private var allLightData: ArrayList<DbLight> = arrayListOf()  //所有灯的数据
+    private var lightsData: ArrayList<DbLight> = arrayListOf() //灯的数据
+    private var listAdapter: DeviceDetailListAdapter? = null //适配器列表
+    private val SCENE_MAX_COUNT = 100 //场景最大技术
+    private var currentDevice: DbLight? = null //当前灯设备
+    private var positionCurrent: Int = 0 // 当前状态或者说局势 可能是当前item
+    private val REQ_LIGHT_SETTING: Int = 0x01 //请求灯配置
+    private var acitivityIsAlive = true //activity是活的
+    private var installDevice: TextView? = null //安装设备或者说添加设备
+    private var createGroup: TextView? = null //添加分组
+    private var createScene: TextView? = null //添加场景
     private var lastOffset: Int = 0//距离
     private var lastPosition: Int = 0//第几个item
     private var sharedPreferences: SharedPreferences? = null
@@ -163,11 +165,11 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         device_detail_direct_item?.visibility = View.GONE
         recycleView!!.layoutManager = GridLayoutManager(this, 2)
         recycleView!!.itemAnimator = DefaultItemAnimator()
-        recycleView!!.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
+        recycleView!!.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)//
                 if (recyclerView.layoutManager != null)
-                    getPositionAndOffset()
+                    getPositionAndOffset() //如果有很多的组件，页面容不下，那么滑动的时候应该保存滑动的位置，跳转其他界面，返回时仍回到当前界面，保持到查看的位置
             }
         })
         //adaper = DeviceDetailListAdapter(R.layout.device_detail_adapter, lightsData)
@@ -617,7 +619,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     private fun getPositionAndOffset() {
-        val layoutManager = recycleView!!.layoutManager as LinearLayoutManager?
+        val layoutManager = recycleView!!.layoutManager as androidx.recyclerview.widget.LinearLayoutManager?
         //获取可视的第一个view
         val topView = layoutManager!!.getChildAt(0)
         if (topView != null) {
@@ -647,7 +649,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         lastOffset = sharedPreferences!!.getInt("lastOffset", 0)
         lastPosition = sharedPreferences!!.getInt("lastPosition", 0)
         if (recycleView!!.layoutManager != null && lastPosition >= 0) {
-            (recycleView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
+            (recycleView.layoutManager as androidx.recyclerview.widget.LinearLayoutManager).scrollToPositionWithOffset(lastPosition, lastOffset)
         }
     }
 

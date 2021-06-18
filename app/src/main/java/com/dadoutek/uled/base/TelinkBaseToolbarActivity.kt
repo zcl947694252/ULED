@@ -4,8 +4,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.PorterDuff
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.appcompat.widget.Toolbar
 import android.view.MenuItem
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -64,11 +64,11 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
                     else ->
                         if (setDeviceDataSize(0) > 0)
                             when (itm.itemId) {
-                                R.id.toolbar_rename -> renameDevice()
-                                R.id.toolbar_batch_gp -> skipBatch()
-                                R.id.toolbar_on_line -> goOta()
-                                R.id.toolbar_delete_device -> editeDevice()
-                                R.id.toolbar_bind_router -> bindDeviceRouter()
+                                R.id.toolbar_rename -> renameDevice() //此处没作用
+                                R.id.toolbar_batch_gp -> skipBatch() //批量分组
+                                R.id.toolbar_on_line -> goOta() //在线升级
+                                R.id.toolbar_delete_device -> editeDevice() //编辑设备
+                                R.id.toolbar_bind_router -> bindDeviceRouter() //绑定路由
                             }
                         else
                             ToastUtils.showShort(getString(R.string.no_device))

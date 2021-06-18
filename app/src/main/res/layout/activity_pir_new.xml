@@ -110,7 +110,7 @@
                         android:layout_weight="1"/>
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/pir_config_trigger_conditions"
                         android:layout_width="200dp"
                         android:layout_height="30dp"
@@ -136,7 +136,7 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -166,7 +166,7 @@
                         android:textSize="15sp" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/pir_config_trigger_after"
                         android:layout_width="200dp"
                         android:layout_height="30dp"
@@ -192,7 +192,7 @@
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -358,7 +358,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/pir_config_choose_scene"
                         android:layout_width="200dp"
                         android:layout_height="30dp"
@@ -376,7 +376,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -399,7 +399,7 @@
                         android:textColor="@color/black_three"
                         android:textSize="15sp"/>
 
-                <android.support.constraint.ConstraintLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                         android:id="@+id/pir_config_choose_group"
                         android:layout_width="200dp"
                         android:layout_height="30dp"
@@ -416,7 +416,7 @@
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
             </LinearLayout>
 
@@ -439,7 +439,7 @@
                     android:textSize="15sp" />
 
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/pir_config_recyclerGroup"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"

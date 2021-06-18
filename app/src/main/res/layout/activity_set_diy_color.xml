@@ -11,7 +11,7 @@
             android:id="@+id/topView"
             layout="@layout/toolbar" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/mode_name_layout"
             android:layout_width="match_parent"
             android:layout_height="70dp"
@@ -46,7 +46,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 
@@ -66,7 +66,7 @@
 
 
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/selectColorRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="180dp"

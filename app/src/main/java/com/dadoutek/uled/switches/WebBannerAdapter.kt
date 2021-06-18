@@ -1,6 +1,6 @@
 package com.dadoutek.uled.switches
 
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +19,7 @@ import com.example.library.banner.BannerLayout
  * 更新描述
  */
 
-class WebBannerAdapter( private val urlList: List<Int>) : RecyclerView.Adapter<WebBannerAdapter.MzViewHolder>() {
+class WebBannerAdapter( private val urlList: List<Int>) : androidx.recyclerview.widget.RecyclerView.Adapter<WebBannerAdapter.MzViewHolder>() {
     private var onBannerItemClickListener: BannerLayout.OnBannerItemClickListener? = null
 
     fun setOnBannerItemClickListener(onBannerItemClickListener: BannerLayout.OnBannerItemClickListener) {
@@ -48,7 +48,7 @@ class WebBannerAdapter( private val urlList: List<Int>) : RecyclerView.Adapter<W
     }
 
 
-    inner class MzViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class MzViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         var imageView: ImageView = itemView.findViewById<View>(R.id.eight_switch_item_image) as ImageView
     }
 

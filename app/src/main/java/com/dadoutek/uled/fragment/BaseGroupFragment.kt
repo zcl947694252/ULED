@@ -11,13 +11,13 @@ import android.content.IntentFilter
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -89,7 +89,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     var currentGroup: DbGroup? = null
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
-    private var recyclerView: RecyclerView? = null
+    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
     private var noGroup: LinearLayout? = null
     private var groupAdapter: GroupListAdapter? = null
     open var groupList: ArrayList<DbGroup> = ArrayList()
@@ -101,7 +101,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private var viewLineRecycler: View? = null
     private var isDelete = false
     private var groupMesher: ArrayList<String>? = null
-    private lateinit var localBroadcastManager: LocalBroadcastManager
+    private lateinit var localBroadcastManager: androidx.localbroadcastmanager.content.LocalBroadcastManager
     private lateinit var br: BroadcastReceiver
     private lateinit var deleteList: ArrayList<DbGroup>
     private var addNewGroup: Button? = null
@@ -119,7 +119,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         this.mContext = this.activity
         setHasOptionsMenu(true)
         makeRenamePopuwindow()
-        localBroadcastManager = LocalBroadcastManager.getInstance(this.mContext!!)
+        localBroadcastManager = androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("back")
         intentFilter.addAction("delete")
@@ -201,7 +201,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         Thread.sleep(delayTime)
         val intent = Intent("delete_true")
         intent.putExtra("delete_true", "true")
-        LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -279,7 +279,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         //发送切换fragment广播
         val intent = Intent("switch_fragment")
         intent.putExtra("switch_fragment", "true")
-        LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
 
         addGroupBtn?.setOnClickListener(onClickAddGroup)
         addNewGroup?.setOnClickListener(onClickAddGroup)
@@ -287,7 +287,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         seeHelp2?.setOnClickListener { seeHelpe() }
         seehelp?.setOnClickListener { seeHelpe() }
 
-        val layoutmanager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
+        val layoutmanager = LinearLayoutManager(activity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         // recyclerView!!.layoutManager = layoutmanager
         recyclerView!!.layoutManager = GridLayoutManager(context, 2)
 
@@ -297,7 +297,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         //this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         this.groupAdapter = GroupListAdapter(R.layout.template_device_type_item, groupList, isDelete)
-        val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
+        val decoration = DividerItemDecoration(activity, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         //添加分割线
         groupAdapter!!.addFooterView(lin)
@@ -334,7 +334,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             val intent = Intent("showPro")
                             intent.putExtra("is_delete", "true")
                             this.activity?.let { it1 ->
-                                LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
+                                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                             }
                         }
                         else -> {//先长按  选中 在长按 就会通知外面关闭了
@@ -342,7 +342,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             val intent = Intent("showPro")
                             intent.putExtra("is_delete", "false")
                             this.activity?.let { it1 ->
-                                LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
+                                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                             }
                         }
                     }

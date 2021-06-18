@@ -37,17 +37,18 @@ class SyncDataPutOrGetUtils {
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
             Thread {
-                val dbDataChangeList = DBUtils.dataChangeAll
-                val dbUser = DBUtils.lastUser
+                val dbDataChangeList = DBUtils.dataChangeAll //获取所有改变的数据
+                val dbUser = DBUtils.lastUser //获取最后一个用户信息
                 if (dbDataChangeList.isEmpty()) {
                     GlobalScope.launch(Dispatchers.Main) {
-                        syncCallback.complete()
+                        syncCallback.complete() //如果是空的，直接同步完成
                     }
                     return@Thread
                 }
 
-                val observableList = ArrayList<Observable<String>>()
+                val observableList = ArrayList<Observable<String>>() //所有的被观察者列表
 
+                //创建主线程的协程 开始同步 看来得看具体的实现，baseActivity中是直接显示一个同步的dialog
                 GlobalScope.launch(Dispatchers.Main) {
                     syncCallback.start()
                 }

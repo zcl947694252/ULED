@@ -8,10 +8,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
-import android.support.v4.app.Fragment
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,7 +50,7 @@ import org.jetbrains.anko.support.v4.runOnUiThread
 import org.json.JSONException
 import java.lang.Exception
 
-open class BaseFragment : Fragment() {
+open class BaseFragment : androidx.fragment.app.Fragment() {
 
     private var stompRecevice: StompReceiver? = null
     private lateinit var changeRecevicer: ChangeRecevicer
@@ -183,8 +183,8 @@ open class BaseFragment : Fragment() {
         popMain.isTouchable = true // 设置PopupWindow可触摸补充：
         popMain.isOutsideTouchable = false
 
-        val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        val recyclerView = popView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.pop_recycle)
+        recyclerView.layoutManager = LinearLayoutManager(context, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapterType
 
         adapterType?.bindToRecyclerView(recyclerView)

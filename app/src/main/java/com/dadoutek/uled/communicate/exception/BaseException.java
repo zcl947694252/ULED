@@ -35,10 +35,10 @@ public class BaseException extends Exception {
     public static final int SOCKET_ERROR = 0x8;
 
 
-    //    api /////////////////////////////////////////
-    // 服务器错误
+    //  api  /////////////////////////////////////////
+    //服务器错误
     public static final int  ERROR_API_SYSTEM=10000;
-    // 登录错误，用户名密码错误
+    //登录错误，用户名密码错误
     public static final int  ERROR_API_LOGIN=10001;
     //调用无权限的API
     public static final int  ERROR_API_NO_PERMISSION=10002;

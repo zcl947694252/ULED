@@ -90,7 +90,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView2"
             app:layout_constraintVertical_bias="0.219" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
@@ -136,14 +136,14 @@
                 app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
                 app:layout_constraintTop_toTopOf="@+id/edit_user_phone" />
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list_phone_code"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="@+id/edit_user_phone"
                 app:layout_constraintTop_toBottomOf="@+id/edit_user_phone" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <EditText
@@ -216,7 +216,7 @@
             app:layout_constraintStart_toStartOf="@+id/sms_login"
             app:layout_constraintTop_toBottomOf="@+id/sms_login" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clThirdPartyLogin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -266,6 +266,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/google_btn"
                 app:layout_constraintTop_toTopOf="parent" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

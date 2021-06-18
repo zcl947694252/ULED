@@ -7,10 +7,10 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
-import android.support.v4.app.FragmentActivity
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.Toolbar
+import androidx.fragment.app.FragmentActivity
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.Menu
@@ -263,7 +263,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
-        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+        AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(this))
                 .setMessage(getString(R.string.delete_group_confirm, curtainGroup?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     if (Constant.IS_ROUTE_MODE)

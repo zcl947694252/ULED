@@ -66,6 +66,7 @@ object RegionModel {
                 .compose(NetworkTransformer())
                 .observeOn(Schedulers.io())
                 .doOnNext {
+                    //subscribe调用前使用的方法
                     for (item in it) {
                         val dbRegion = DbRegion()
                         dbRegion.installMeshPwd = item.installMeshPwd

@@ -5,10 +5,10 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -33,7 +33,7 @@ import kotlinx.android.synthetic.main.template_wheel_container.*
  */
 class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private var standingItemAdapter: StandingItemAdapter? = null
-    private var popRecycle: RecyclerView? = null
+    private var popRecycle: androidx.recyclerview.widget.RecyclerView? = null
     private var newData: GwTasksBean? = null
     private var standingNum: Int = 0 //停留时间
     private var picker: TimePicker? = null
@@ -112,15 +112,15 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun makeStandingTimePop() {
         popView = LayoutInflater.from(this).inflate(R.layout.pop_standing_time_check, null)
         popView?.let {
-            popRecycle = it.findViewById<View>(R.id.template_recycleView) as RecyclerView?
+            popRecycle = it.findViewById<View>(R.id.template_recycleView) as androidx.recyclerview.widget.RecyclerView?
         }
 
         val list = mutableListOf<Int>()
         for (i in 1..59)
             list.add(i)
 
-        popRecycle?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        val decorations = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+        popRecycle?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        val decorations = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
         decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_nine)))
         popRecycle?.addItemDecoration(decorations)
         standingItemAdapter = StandingItemAdapter(R.layout.standing_item, list)

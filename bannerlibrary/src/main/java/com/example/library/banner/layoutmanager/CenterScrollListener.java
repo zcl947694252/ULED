@@ -1,10 +1,10 @@
 package com.example.library.banner.layoutmanager;
 
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 /**
- * A {@link android.support.v7.widget.RecyclerView.OnScrollListener} which helps {@link OverFlyingLayoutManager}
+ * A {@link RecyclerView.OnScrollListener} which helps {@link OverFlyingLayoutManager}
  * to center the current position
  */
 public class CenterScrollListener extends RecyclerView.OnScrollListener {

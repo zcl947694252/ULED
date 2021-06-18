@@ -2,7 +2,7 @@ package com.dadoutek.uled.router
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.view.View
 import android.widget.Button
 import com.blankj.utilcode.util.ToastUtils
@@ -71,7 +71,7 @@ class CloudAssistantActivity : TelinkBaseActivity() {
             finish()
         }
         toolbar.setNavigationIcon(R.drawable.icon_return)
-        template_recycleView.layoutManager = LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false)
+        template_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,false)
         template_recycleView.adapter = adapter
         adapter.bindToRecyclerView(template_recycleView)
         var emptyView = View.inflate(this, R.layout.empty_view, null)

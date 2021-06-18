@@ -7,7 +7,7 @@
 
     <include layout="@layout/toolbar" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/ota_swipe_refresh_ly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -95,5 +95,5 @@
                     android:visibility="visible"/>
 
         </LinearLayout>
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>

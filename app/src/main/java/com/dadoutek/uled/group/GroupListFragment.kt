@@ -9,12 +9,12 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.view.ViewPager
-import android.support.v7.widget.Toolbar
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.widget.Toolbar
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -58,7 +58,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_group_list.*
-import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -83,7 +82,7 @@ class GroupListFragment : BaseFragment() {
     private var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
     private val SCENE_MAX_COUNT = 100
-    private var viewPager: ViewPager? = null
+    private var viewPager: androidx.viewpager.widget.ViewPager? = null
     internal var deviceName: ArrayList<DbDeviceName>? = null
     private lateinit var cwLightFragment: CWLightFragmentList
     private lateinit var rgbLightFragment: RGBLightFragmentList
@@ -108,7 +107,7 @@ class GroupListFragment : BaseFragment() {
     private var allGroup: DbGroup? = null
     private var cwLightGroup: String? = null
     private var switchFragment: String? = null
-    private lateinit var localBroadcastManager: LocalBroadcastManager
+    private lateinit var localBroadcastManager: androidx.localbroadcastmanager.content.LocalBroadcastManager
     private lateinit var br: BroadcastReceiver
     private var isFirst: Boolean = false
     private var allLightText: TextView? = null
@@ -123,7 +122,7 @@ class GroupListFragment : BaseFragment() {
         this.mContext = this.activity
 
         setHasOptionsMenu(true)
-        localBroadcastManager = LocalBroadcastManager.getInstance(mContext!!)
+        localBroadcastManager = androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("showPro")
         intentFilter.addAction("switch_fragment")
@@ -132,9 +131,9 @@ class GroupListFragment : BaseFragment() {
 
         br = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                cwLightGroup = intent.getStringExtra("is_delete")//用户删除模式 长按和长按
+                cwLightGroup = intent.getStringExtra("is_delete") //用户删除模式 长按和长按
                 switchFragment = intent.getStringExtra("switch_fragment")
-                delete = intent.getStringExtra("isDelete")//必定将删除模式恢复掉
+                delete = intent.getStringExtra("isDelete") //必定将删除模式恢复掉
                 deleteComplete = intent.getStringExtra("delete_true")
                 if (cwLightGroup == "true") {
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.GONE
@@ -169,7 +168,7 @@ class GroupListFragment : BaseFragment() {
     private fun sendGroupResterNormal() {
         val intent = Intent("back")
         intent.putExtra("back", "true")
-        LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
     }
 
     private fun changeEnableBackToolbar() {
@@ -334,13 +333,13 @@ class GroupListFragment : BaseFragment() {
         curtianFragment = CurtainFragmentList()
         relayFragment = RelayFragmentList()
 
-        val fragments: List<Fragment> = listOf(cwLightFragment, rgbLightFragment, curtianFragment, relayFragment)
+        val fragments: List<androidx.fragment.app.Fragment> = listOf(cwLightFragment, rgbLightFragment, curtianFragment, relayFragment)
         val vpAdapter = ViewPagerAdapter(childFragmentManager, fragments)
         viewPager?.adapter = vpAdapter
         viewPager?.currentItem = fragmentPosition
 
         viewPager?.offscreenPageLimit = 3
-        viewPager?.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+        viewPager?.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.OnPageChangeListener {
             override fun onPageScrolled(i: Int, v: Float, i1: Int) {}
 
             override fun onPageSelected(i: Int) {
@@ -605,13 +604,13 @@ class GroupListFragment : BaseFragment() {
                 deleteList.addAll(relayFragment.getGroupDeleteList())
 
                 if (deleteList.size > 0) {
-                    android.support.v7.app.AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(mContext as FragmentActivity?))
+                    androidx.appcompat.app.AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(mContext as androidx.fragment.app.FragmentActivity?))
                             .setMessage(getString(R.string.delete_group_confirm, deleteList[0].name))
                             .setPositiveButton(android.R.string.ok) { _, _ ->
                                 //showLoadingDialog(getString(R.string.deleting))
                                 val intent = Intent("delete")
                                 intent.putExtra("delete", "true")
-                                LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
+                                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
                             }
                             .setNegativeButton(R.string.btn_cancel, null)
                             .show()
@@ -631,7 +630,7 @@ class GroupListFragment : BaseFragment() {
         updateLights(true, this.allGroup!!)
         val intent = Intent("switch_here")
         intent.putExtra("switch_here", "on")
-        LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
     }
 
     private fun allGroupOffSuccess() {
@@ -642,7 +641,7 @@ class GroupListFragment : BaseFragment() {
         updateLights(false, this.allGroup!!)
         val intent = Intent("switch_here")
         intent.putExtra("switch_here", "false")
-        LocalBroadcastManager.getInstance(this!!.mContext!!)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this!!.mContext!!)
                 .sendBroadcast(intent)
     }
 

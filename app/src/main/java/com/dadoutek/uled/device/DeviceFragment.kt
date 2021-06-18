@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.GridLayoutManager
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import android.view.*
 import android.widget.ImageView
 import com.blankj.utilcode.util.LogUtils
@@ -62,11 +62,11 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     private val SCENE_MAX_COUNT = 100
 
     val CREATE_SCENE_REQUESTCODE = 2
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? { //初始化显示控件
         return initLayout(inflater)
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) { //onViewCreated是onCreatedView后被触发的事件，前后关系
         super.onViewCreated(view, savedInstanceState)
         initToolBar()
         initData()
@@ -101,7 +101,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).setOnClickListener {
-
             val lastUser = DBUtils.lastUser
             lastUser?.let {
                 when {
@@ -160,27 +159,27 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                 intent = Intent(activity, DeviceDetailAct::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_RGB_LIGHT)
             }
-            Constant.INSTALL_SWITCH -> {//不存在分组
+            Constant.INSTALL_SWITCH -> {//跳转开关
                 intent = Intent(activity, SwitchDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SWITCH)
             }
-            Constant.INSTALL_SENSOR -> {//不存在分组
+            Constant.INSTALL_SENSOR -> {//跳转传感器
                 intent = Intent(activity, SensorDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_SENSOR)
             }
-            Constant.INSTALL_CURTAIN -> {//分组已修改 旧有联动逻辑存在
+            Constant.INSTALL_CURTAIN -> {//跳转窗帘
                 intent = Intent(activity, CurtainsDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CURTAIN)
             }
-            Constant.INSTALL_CONNECTOR -> {//分组已更新  sandian
+            Constant.INSTALL_CONNECTOR -> {//跳转接收器
                 intent = Intent(activity, ConnectorDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_CONNECTOR)
             }
-            Constant.INSTALL_GATEWAY -> {//不存在分组    sandian
+            Constant.INSTALL_GATEWAY -> {//跳转网关
                 intent = Intent(activity, GwDeviceDetailActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_GATEWAY)
             }
-            Constant.INSTALL_ROUTER -> {//不存在分组    sandian
+            Constant.INSTALL_ROUTER -> {//跳转路由器
                 intent = Intent(activity, RouterDeviceDetailsActivity::class.java)
                 intent.putExtra(Constant.DEVICE_TYPE, Constant.INSTALL_ROUTER)
             }
@@ -190,6 +189,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
 
     /**
      * 初始化RecyclerView的Adapter
+     * 即将所有已连接过的冷暖灯、rgb灯、窗帘、开关显示在deviceFragment中
      */
     private fun initAdapterData() {
         deviceTypeList.clear()

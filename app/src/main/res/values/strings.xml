@@ -329,6 +329,7 @@
     <string name="config_fail">Configuration failed</string>
     <string name="tip_switch">Please add Scene first</string>
 
+    <string name="strUpgradeDialogUpdateTimeLabel">更新时间</string>
     <string name="tip_add_gp">Please add a group first!</string>
     <string name="developer_mode">Enter developer mode</string>
     <string name="edit_phone">PhoneNumber</string>

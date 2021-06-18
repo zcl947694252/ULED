@@ -1,6 +1,6 @@
 package com.dadoutek.uled.switches
 
-import android.support.v4.view.PagerAdapter
+import androidx.viewpager.widget.PagerAdapter
 import android.view.View
 import android.view.ViewGroup
 
@@ -14,7 +14,7 @@ import android.view.ViewGroup
  * 更新时间   $
  * 更新描述
  */
-class VpAdapter(var list: MutableList<View>) :PagerAdapter(){
+class VpAdapter(var list: MutableList<View>) : androidx.viewpager.widget.PagerAdapter(){
     override fun isViewFromObject(p0: View, p1: Any): Boolean {
         return p0==p1
     }

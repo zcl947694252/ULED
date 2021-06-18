@@ -10,11 +10,11 @@ import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v4.app.FragmentActivity
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import androidx.fragment.app.FragmentActivity
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.util.Log
 import android.view.*
@@ -90,10 +90,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private var isRenameState = false
     private var group: DbGroup? = null
     private var currentShowPageGroup = true
-    private var isBrightness = true//是否是亮度
-    var downTime: Long = 0//Button被按下时的时间
-    var thisTime: Long = 0//while每次循环时的时间
-    var onBtnTouch = false//Button是否被按下
+    private var isBrightness = true //是否是亮度
+    var downTime: Long = 0 //Button被按下时的时间
+    var thisTime: Long = 0 //while每次循环时的时间
+    var onBtnTouch = false //Button是否被按下
 
     //var = 0//TextView中的值
     private var isProcessChange = 0
@@ -106,7 +106,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
             R.id.tvOta -> if (isRenameState) saveName() else checkPermission()
             R.id.updateGroup -> updateGroup()
             R.id.btnRemove -> remove()
-            R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+            R.id.btn_remove_group -> AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(this))
                     .setMessage(getString(R.string.delete_group_confirm, group?.name))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
@@ -170,12 +170,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         temperature_text.setTextColor(resources.getColor(R.color.blue_background))
         brightness_btn.setImageResource(R.drawable.icon_unselected)
         brightness_text.setTextColor(resources.getColor(R.color.black_nine))
-        if (isSwitch) setTemIcon(currentShowPageGroup)
+        isBrightness = false // chown 改
+        /*if (isSwitch)  chown改*/ setTemIcon(currentShowPageGroup)
     }
 
     private fun setTemIcon(currentShowPageGroup: Boolean) {
         LogUtils.v("zcl-----------收到路由设置执行----setTemIcon---")
-        isBrightness = false
+//        isBrightness = false  //chown改
         when {
             currentShowPageGroup -> {
                 var gp = DBUtils.getGroupByID(group!!.id)
@@ -222,9 +223,9 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         temperature_text.setTextColor(resources.getColor(R.color.black_nine))
         isBrightness = true
         LogUtils.v("zcl----------收到路由-设置执行----setBrightness---")
-        if (isSwitch)
+        /*if (isSwitch) chown改*/
             when {
-                currentShowPageGroup -> {
+                currentShowPageGroup -> { //该变量是用来判断是单个还是组别的，true为组别，false为单个灯调试
                     group?.let {
                         light_sbBrightness?.progress = it.brightness
                         it.isSeek = true
@@ -715,7 +716,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                             light_sbBrightness.progress > 1 -> device_light_minus.setImageResource(R.drawable.icon_minus)
                             else -> tv_Brightness.text = light_sbBrightness.progress.toString() + "%"
                         }
-
                         when {
                             currentShowPageGroup -> {
                                 val light = DBUtils.getGroupByID(group!!.id)
@@ -1282,6 +1282,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                 byteArrayOf(Opcode.CONFIG_EXTEND_ALL_JBZL, 1, 1, 2, 1, 0, 0, 0))//1是开 0是关 第四位
     }
 
+    //设置灯的亮度与色温的大小在图中的显示
     private fun setLightGUIImg(iconLight: Int = R.mipmap.round, progress: Int = 0, temperatureValue: Int = 0, isClose: Boolean = false) {
         var bitmap = BitmapFactory.decodeResource(resources, iconLight)
         light_image.setImage(bitmap)
@@ -1373,15 +1374,11 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
     private val menuItemClickListener = Toolbar.OnMenuItemClickListener { item ->
         when (item?.itemId) {
             R.id.toolbar_f_rename -> renameLight()
-
             R.id.toolbar_fv_change_group -> updateGroup()
-
             R.id.toolbar_f_ota -> updateOTA()
-
             R.id.toolbar_f_delete -> remove()//删除设备
-
             R.id.toolbar_batch_gp -> {//群组模式下
-                AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
+                AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(this))
                         .setMessage(getString(R.string.delete_group_confirm, group?.name))
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             this.showLoadingDialog(getString(R.string.deleting))
@@ -1400,7 +1397,6 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                         .setNegativeButton(R.string.btn_cancel, null)
                         .show()
             }
-
             R.id.toolbar_on_line -> renameGroup()//群组模式下
         }
         true
@@ -1483,7 +1479,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
 
         this.light_sbBrightness?.max = 100
-        if (light!!.connectionStatus == ConnectionStatus.OFF.value) {
+        if (light!!.connectionStatus == ConnectionStatus.OFF.value) { //关闭状态，灯暗，+-不能触发点击事件
             //light_image.setImageResource()
             setLightGUIImg()
             light_switch.setImageResource(R.drawable.icon_light_close)

@@ -10,8 +10,8 @@ import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.Settings
-import android.support.constraint.ConstraintLayout
-import android.support.v7.widget.LinearLayoutManager
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.text.Editable
 import android.util.Log
 import android.view.Gravity
@@ -278,7 +278,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         list = if (!isMeRegionAll) subMeList else listAll
 
-        region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
+        region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         adapter = AreaItemAdapter(R.layout.item_area_net, list!!, lastUser)
 //        LogUtils.e("zcl_NetworkActivity", "zcl***设置adapter***$lastUser")
         adapter!!.setOnItemChildClickListener { _, view, position ->
@@ -328,7 +328,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         Log.e(TAG, "zcl******authorize**${listAuthorize!!.size}")
 
-        region_authorize_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
+        region_authorize_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         adapterAuthorize = AreaAuthorizeItemAdapter(R.layout.item_area_net, listAuthorize!!, lastUser)
         adapterAuthorize!!.setOnItemChildClickListener { _, view, position ->
             isShowType = 2
@@ -1032,7 +1032,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun showUnbindDialog() {
-        val builder = android.support.v7.app.AlertDialog.Builder(this)
+        val builder = androidx.appcompat.app.AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.warm_unbind_authorize_config, regionBeanAuthorize!!.name))
         builder.setNegativeButton(getString(R.string.confirm)) { dialog, _ ->
             //解除授权

@@ -6,7 +6,7 @@ import android.graphics.PorterDuff
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.support.v4.content.ContextCompat
+import androidx.core.content.ContextCompat
 import android.view.*
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText

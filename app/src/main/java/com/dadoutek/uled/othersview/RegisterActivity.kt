@@ -48,7 +48,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN); //设置窗口软键盘的交互模式
         setContentView(R.layout.activity_register)
         initView()
         initListener()
@@ -134,7 +134,7 @@ class RegisterActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher
                     UpdateModel.isRegister(userName!!)?.subscribe({
                         if (!it) {
                             regist_frist_progress.visibility = View.GONE
-                            SMSSDK.getVerificationCode(countryCode, userName)
+                            SMSSDK.getVerificationCode(countryCode, userName) //这条数据是个重点，因为注册了handle，所以有一个callback会执行
 
                         } else {
                             ToastUtils.showLong(getString(R.string.account_exist))

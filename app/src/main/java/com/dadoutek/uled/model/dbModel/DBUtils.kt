@@ -1494,7 +1494,6 @@ object DBUtils {
      * @param changeTable 变化数据所属表
      * @param operating   所执行的操作
      */
-
     fun recordingChange(changeIndex: Long?, changeTable: String, operating: String, type: Int = 3, keys: String = "") {
         val dataChangeList = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
 

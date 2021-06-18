@@ -19,8 +19,9 @@ import com.mob.MobSDK
 import com.squareup.leakcanary.RefWatcher
 import com.telink.TelinkApplication
 import com.telink.bluetooth.TelinkLog
-import com.tencent.bugly.Bugly
-import com.tencent.bugly.beta.Beta
+//import com.tencent.bugly.Bugly
+//import com.tencent.bugly.crashreport.CrashReport
+//import com.tencent.bugly.beta.Beta
 import com.uuzuche.lib_zxing.activity.ZXingLibrary
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.GlobalScope
@@ -75,9 +76,10 @@ class TelinkLightApplication : TelinkApplication() {
         if (!inAnalyzerProcess)
             refWatcher = LeakCanary.install(this)*/
         Utils.init(this)
-        Beta.autoCheckUpgrade = false
-        //Bugly.init(applicationContext, "ea665087a5", false)
-        Beta.enableHotfix = false
+//        Beta.autoCheckUpgrade = false //...
+//        Bugly.init(applicationContext, "ea665087a5", false)
+//        Beta.enableHotfix = false //...
+//        CrashReport.initCrashReport(getApplicationContext(), "ea665087a5", true)
         RxBleManager.init(this)
         DaoSessionUser.checkAndUpdateDatabase()
         DaoSessionInstance.checkAndUpdateDatabase()

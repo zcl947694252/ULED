@@ -1,7 +1,7 @@
 package com.dadoutek.uled.switches
 
 import android.content.Context
-import android.support.v4.view.PagerAdapter
+import androidx.viewpager.widget.PagerAdapter
 import android.view.View
 import android.view.ViewGroup
 
@@ -15,7 +15,7 @@ import android.view.ViewGroup
  * 更新时间   $
  * 更新描述   多图片适配器
  */
-class MoreItemVpAdapter(list: MutableList<View>, context: Context) : PagerAdapter(){
+class MoreItemVpAdapter(list: MutableList<View>, context: Context) : androidx.viewpager.widget.PagerAdapter(){
     var list = list
     var context = context
     override fun isViewFromObject(view: View, `object`: Any): Boolean {

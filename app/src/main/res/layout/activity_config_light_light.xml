@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/configPirRoot"
@@ -11,7 +11,7 @@
         android:id="@+id/include3"
         layout="@layout/toolbar" />
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/data_view_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -19,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/include3">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -73,7 +73,7 @@
                 app:layout_constraintTop_toTopOf="@+id/tvDelayUnits"
                 app:layout_constraintVertical_bias="1.0" />
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/til_Delay"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                 app:layout_constraintStart_toStartOf="@+id/tvDelayUnits"
                 app:layout_constraintTop_toBottomOf="@+id/tvDelayUnits">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/tiet_Delay"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -90,7 +90,7 @@
                     android:inputType="number"
                     android:maxLength="2"
                     android:visibility="gone" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/tvDelay"
@@ -162,7 +162,7 @@
                 app:layout_constraintTop_toTopOf="@+id/tv_SwitchMode"
                 app:layout_constraintVertical_bias="0.0" />
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilMinimum_Brightness"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -171,7 +171,7 @@
                 app:layout_constraintStart_toStartOf="@id/tv_SwitchMode"
                 app:layout_constraintTop_toBottomOf="@id/tv_SwitchMode">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/tietMinimumBrightness"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -180,7 +180,7 @@
                     android:maxLength="2"
                     android:text="0"
                     android:visibility="gone" />
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/tv_TriggerLux"
@@ -241,7 +241,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvSelectGroupScene" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewNightLightGroups"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -272,7 +272,7 @@
             <!--app:layout_constraintHorizontal_bias="1.0"-->
             <!--app:layout_constraintStart_toEndOf="@+id/tvSelectGroup"-->
             <!--app:layout_constraintTop_toTopOf="@+id/tvSelectGroup" />-->
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
             android:id="@+id/versionLayoutPS"
@@ -305,9 +305,9 @@
                 android:textColor="@color/white"
                 android:textSize="12sp" />
         </LinearLayout>
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/edit_data_view_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -332,14 +332,14 @@
                 android:text="@string/please_check_group"
                 android:textSize="16sp" />
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/scene_gp_bottom_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
                 android:background="@drawable/btn_rectangle_all" />
         </LinearLayout>
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!--<android.support.design.widget.FloatingActionButton-->
     <!--android:id="@+id/fabConfirm"-->
@@ -369,4 +369,4 @@
         android:elevation="10dp"
         />
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

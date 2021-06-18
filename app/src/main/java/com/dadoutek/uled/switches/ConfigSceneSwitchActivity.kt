@@ -3,9 +3,9 @@ package com.dadoutek.uled.switches
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.Toolbar
+import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.MenuItem

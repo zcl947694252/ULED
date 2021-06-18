@@ -3,8 +3,8 @@ package com.dadoutek.uled.curtains
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.util.DiffUtil
-import android.support.v7.widget.*
+import androidx.recyclerview.widget.DiffUtil
+import androidx.appcompat.widget.*
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.GridLayoutManager
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R

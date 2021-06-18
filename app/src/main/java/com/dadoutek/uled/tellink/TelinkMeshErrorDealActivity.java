@@ -16,7 +16,7 @@ import com.telink.util.EventListener;
 
 // 添加 扫描过程中出现的因定位未开启而导致的扫描不成功问题
 public abstract class TelinkMeshErrorDealActivity extends TelinkBaseActivity implements EventListener<String> {
-
+//如果这个子类不是一个抽象类,那么你必须实现你所继承的所有抽象方法
     protected final static int ACTIVITY_REQUEST_CODE_LOCATION = 0x11;
     private AlertDialog mErrorDialog;
 
