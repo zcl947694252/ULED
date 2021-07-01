@@ -113,7 +113,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
 
         renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setContentView(popReNameView!!)
         renameDialog!!.setCanceledOnTouchOutside(false)
     }
 

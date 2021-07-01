@@ -5,7 +5,7 @@ import android.os.Parcelable
 
 class ItemCheckBean(var title : String, var checked: Boolean):Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
+            parcel.readString().toString(),
             parcel.readByte() != 0.toByte()) {
     }
 

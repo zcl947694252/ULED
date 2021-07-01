@@ -218,8 +218,8 @@ abstract class BaseGroupFragment : BaseFragment() {
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
         StringUtils.initEditTextFilter(textGp)
 
-        renameDialog = Dialog(mContext)
-        renameDialog?.setContentView(popReNameView)
+        renameDialog = Dialog(mContext!!)
+        renameDialog?.setContentView(popReNameView!!)
         renameDialog?.setCanceledOnTouchOutside(false)
         renameCancel?.setOnClickListener { renameDialog?.dismiss() }
         //确定回调 单独写

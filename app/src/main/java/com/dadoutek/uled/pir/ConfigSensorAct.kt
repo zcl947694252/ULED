@@ -95,7 +95,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
     private val MODE_START_UP_MODE_CLOSE = 1
     private val MODE_DELAY_UNIT_MINUTE = 2
     private val MODE_SWITCH_MODE_GRADIENT = 4
-    private val groupSceneAdapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mGroupScenesName)
+    private val groupSceneAdapter: ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, mGroupScenesName!!)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_config_pir)
@@ -120,7 +120,7 @@ class ConfigSensorAct : TelinkBaseActivity(), View.OnClickListener, AdapterView.
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
 
         renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setContentView(popReNameView!!)
         renameDialog!!.setCanceledOnTouchOutside(false)
     }
 

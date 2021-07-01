@@ -861,7 +861,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         }
 
         renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setContentView(popReNameView!!)
         renameDialog!!.setCanceledOnTouchOutside(false)
 
         renameDialog?.setOnDismissListener {

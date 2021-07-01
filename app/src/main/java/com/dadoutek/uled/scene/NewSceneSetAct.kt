@@ -175,7 +175,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         if (ev.action == MotionEvent.ACTION_DOWN) {
             val v = currentFocus
             if (isShouldHideKeyboard(v, ev)) {
-                val res = hideKeyboard(v.windowToken)
+                val res = hideKeyboard(v?.windowToken)
                 if (res)  //隐藏了输入法，则不再分发事件
                     return super.dispatchTouchEvent(ev)
             }

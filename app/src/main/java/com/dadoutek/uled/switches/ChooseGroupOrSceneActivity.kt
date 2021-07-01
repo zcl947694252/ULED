@@ -49,10 +49,10 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
 
         template_recycleView?.layoutManager = GridLayoutManager(this, 5)
-        val get = intent.extras.get(Constant.EIGHT_SWITCH_TYPE)
+        val get = intent.extras?.get(Constant.EIGHT_SWITCH_TYPE)
         if (get != null) type = get as Int
 
-        val get1 = intent.extras.get(Constant.DEVICE_TYPE)
+        val get1 = intent.extras?.get(Constant.DEVICE_TYPE)
         if (get1 != null) deviceType = get1 as Int
 
         isGroup = type == 0 || type == 2

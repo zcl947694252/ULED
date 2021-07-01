@@ -612,7 +612,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            colorNodeList!![requestCode] = data!!.extras["color"] as DbColorNode
+            colorNodeList!![requestCode] = data!!.extras?.get("color") as DbColorNode
             rgbDiyColorListAdapter?.notifyDataSetChanged()
         }
     }

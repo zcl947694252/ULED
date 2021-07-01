@@ -660,7 +660,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         serviceConnection = MyServiceConnection()
         serviceConnection?.setIGetMessageCallBack(this)
         val intent = Intent(this, MqttService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(intent, serviceConnection!!, Context.BIND_AUTO_CREATE)
     }
 
     open fun unbindSe() { //解绑服务
@@ -757,7 +757,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val am: ActivityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val tasks: List<ActivityManager.RunningTaskInfo> = am.getRunningTasks(1)
         if (tasks.isNotEmpty()) {
-            val topActivity: ComponentName = tasks[0].topActivity
+            val topActivity: ComponentName = tasks[0].topActivity!!
             if (topActivity.packageName == context.packageName) {
                 return true
             }
@@ -1597,7 +1597,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         renameEt?.singleLine = true
 
         renameDialog = Dialog(this)
-        renameDialog?.setContentView(popReNameView)
+        renameDialog?.setContentView(popReNameView!!)
         renameDialog?.setCanceledOnTouchOutside(false)
         renameCancel?.setOnClickListener { renameDialog?.dismiss() }
         //确定回调 单独写

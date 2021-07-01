@@ -173,7 +173,7 @@ open class BaseFragment : androidx.fragment.app.Fragment() {
     }
 
     private fun makeDialog() {
-        dialog = Dialog(context)
+        dialog = Dialog(context!!)
         list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
         adapterType = TypeListAdapter(R.layout.item_group, list!!)
 

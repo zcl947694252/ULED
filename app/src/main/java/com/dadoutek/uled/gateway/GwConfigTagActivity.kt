@@ -610,7 +610,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             gate_way_lable.background = null
             val im = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
             if (currentFocus != null)
-                im.hideSoftInputFromWindow(currentFocus.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                im.hideSoftInputFromWindow(currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         }
     }
 

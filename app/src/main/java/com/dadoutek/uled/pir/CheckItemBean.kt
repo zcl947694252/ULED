@@ -16,7 +16,7 @@ import android.os.Parcelable
 class CheckItemBean(var id: Long, var name: String, var checked: Boolean,var imgName: String?) : Parcelable {
     constructor(parcel: Parcel) : this(
             parcel.readLong(),
-            parcel.readString(),
+            parcel.readString().toString(),
             parcel.readByte() != 0.toByte(),
             parcel.readString()) {
     }

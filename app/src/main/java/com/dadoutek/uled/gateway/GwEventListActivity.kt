@@ -397,7 +397,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
 
         renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView)
+        renameDialog!!.setContentView(popReNameView!!)
         renameDialog!!.setCanceledOnTouchOutside(false)
 
         renameCancel?.setOnClickListener {

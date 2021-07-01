@@ -27,7 +27,7 @@ open class GwTimePeriodsBean() : Parcelable {
         startTime = parcel.readInt()
         endTime = parcel.readInt()
         sceneId = parcel.readLong()
-        sceneName = parcel.readString()
+        sceneName = parcel.readString()!!
         standingTime = parcel.readInt()
     }
 

@@ -15,7 +15,7 @@ import android.os.Parcelable
  */
 class WeekBean(var week: String,var pos: Int,var selected:Boolean = false) :Parcelable{
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
+        parcel.readString().toString(),
             parcel.readInt(),
             parcel.readByte() != 0.toByte())
 

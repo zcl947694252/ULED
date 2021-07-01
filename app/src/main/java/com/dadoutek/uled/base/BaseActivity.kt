@@ -101,7 +101,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         serviceConnection = MyServiceConnection()
         serviceConnection?.setIGetMessageCallBack(this)
         val intent = Intent(this, MqttService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(intent, serviceConnection!!, Context.BIND_AUTO_CREATE)
     }
 
     open fun unbindSe() { //解绑服务
