@@ -10,7 +10,6 @@
         <include layout="@layout/toolbar" android:id="@+id/toolbar_top"/>
 
 
-
        <View
             android:id="@+id/view5"
             android:layout_width="match_parent"

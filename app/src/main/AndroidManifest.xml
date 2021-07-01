@@ -144,7 +144,7 @@
                 android:name=".scene.SelectGradientActivity"
                  android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>
-                <activity
+        <activity
                 android:name=".othersview.ExtendActivity"
                  android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>

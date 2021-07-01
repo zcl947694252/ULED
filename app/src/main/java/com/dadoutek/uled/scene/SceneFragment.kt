@@ -184,11 +184,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         }
                     } else {
                         when (TelinkLightApplication.getApp().connectDevice) {
-                            null -> sendToGw(scenesListData!![position])
+                            null -> sendToGw(scenesListData[position])
                             else -> {
                                 try {
                                     if (position < adapter.data.size) {
-                                        setScene(scenesListData!![position].id!!)
+                                        LogUtils.v("================chown=======${scenesListData[position].id!!}")
+                                        setScene(scenesListData[position].id!!)
                                     }
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -727,7 +728,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     companion object {
-        private const val SCENE_MAX_COUNT = 100
+        private const val SCENE_MAX_COUNT = 255
     }
 
     override fun receviedGwCmd2500(gwStompBean: GwStompBean) {

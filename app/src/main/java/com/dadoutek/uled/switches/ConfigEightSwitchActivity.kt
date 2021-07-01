@@ -120,7 +120,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             val highMes = jOb.getInt("reserveValue_A")
                             val lowMes = jOb.getInt("reserveValue_B")
 
-                            var mesAddress = (highMes shl 8) or lowMes
+                            val mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
                             val groupByMeshAddr = if (featureId == 0xff)
                                 null
@@ -171,6 +171,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                 4 -> eight_switch_b5.text = name
                                 5 -> eight_switch_b6.text = name
                                 6 -> eight_switch_b7.text = name
+                                7 -> eight_switch_b8.text = name
                             }
                         }
                         2 -> {
@@ -583,7 +584,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 eight_switch_b2.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b3.setTextColor(getColor(R.color.click_config_color))
                 eight_switch_b4.setTextColor(getColor(R.color.click_config_color))
-                eight_switch_b8.setTextColor(getColor(R.color.brightness_add_color))
+                eight_switch_b8.setTextColor(getColor(R.color.click_config_color))
                 configSwitchTypeNum = 2
                 eight_switch_b1.text = getString(R.string.click_config)
                 eight_switch_b2.text = getString(R.string.click_config)
@@ -592,7 +593,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 eight_switch_b5.text = getString(R.string.click_config)
                 eight_switch_b6.text = getString(R.string.click_config)
                 eight_switch_b7.text = getString(R.string.click_config)
-                eight_switch_b8.text = getString(R.string.close)
+                eight_switch_b8.text = getString(R.string.click_config)
             }
             2 -> {
                 eight_switch_b1.setTextColor(getColor(R.color.brightness_add_color))
@@ -906,7 +907,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                 configButtonTag = 6
             }
             R.id.eight_switch_b8 -> {
-                isCanClick = configSwitchType == 0 || configSwitchType == 2//是群组开关才可以点击配置 场景开关为关不允许配置
+                isCanClick = true//是群组开关才可以点击配置 场景开关为关不允许配置 chown
                 configButtonTag = 7
             }
         }

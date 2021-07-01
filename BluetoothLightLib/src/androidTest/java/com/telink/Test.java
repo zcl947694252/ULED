@@ -24,7 +24,6 @@ public class Test {
 //        test15();
     }
 
-
     private static void test1() {
         int groupAddr;
         for (int i = 0; i < 10; i++) {
