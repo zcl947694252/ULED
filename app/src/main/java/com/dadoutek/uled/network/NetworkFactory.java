@@ -3,7 +3,11 @@ package com.dadoutek.uled.network;
 import android.text.TextUtils;
 
 import com.dadoutek.uled.model.Constant;
+import com.dadoutek.uled.model.SharedPreferencesHelper;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.util.SharedPreferencesUtils;
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import com.dadoutek.uled.tellink.TelinkLightApplication;
 
 import java.security.KeyManagementException;
 import java.security.MessageDigest;
@@ -102,7 +106,8 @@ public class NetworkFactory {
 
             api = retrofit.create(RequestInterface.class);
         } else*/
-        if (null == api) {
+        if (null == api || SharedPreferencesUtils.getTestType()) {
+            Constant.BASE_URL = Constant.isDebug ? Constant.BASE_DEBUG_URL : Constant.BASE_URL_JAVA;
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
                     .baseUrl(Constant.BASE_URL)
@@ -111,6 +116,7 @@ public class NetworkFactory {
                     .build();
 
             api = retrofit.create(RequestInterface.class);
+            SharedPreferencesUtils.setTestType(false);
         }
         return api;
     }

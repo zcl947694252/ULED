@@ -144,4 +144,13 @@ public class SharedPreferencesUtils {
         return SharedPreferencesHelper.getBoolean(TelinkLightApplication.Companion.getApp(),
                 Constant.IS_NEW_START_SCAN, false);
     }
+
+    public static void setTestType(boolean type) {
+        SharedPreferencesHelper.putBoolean(TelinkLightApplication.Companion.getApp(),"IS_TEST_TYPE",type);
+    }
+
+    public static boolean getTestType() {
+        return SharedPreferencesHelper.getBoolean(TelinkLightApplication.Companion.getApp(),"IS_TEST_TYPE",false);
+    }
+
 }

@@ -267,38 +267,38 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <RadioGroup
-            android:id="@+id/login_isTeck"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/clThirdPartyLogin"
-            app:layout_constraintStart_toStartOf="@+id/btn_login"
-            app:layout_constraintTop_toTopOf="@+id/sms_password_login"
-            app:layout_constraintVertical_bias="0.934">
+<!--    <RadioGroup-->
+<!--            android:id="@+id/login_isTeck"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:visibility="visible"-->
+<!--            app:layout_constraintBottom_toBottomOf="@+id/clThirdPartyLogin"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/btn_login"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/sms_password_login"-->
+<!--            app:layout_constraintVertical_bias="0.934">-->
 
-        <RadioButton
-                android:id="@+id/login_Teck"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="dadoutek" />
+<!--        <RadioButton-->
+<!--                android:id="@+id/login_Teck"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="dadoutek" />-->
 
-        <RadioButton
-                android:id="@+id/login_rd"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="dadourd" />
+<!--        <RadioButton-->
+<!--                android:id="@+id/login_rd"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="dadourd" />-->
 
-        <RadioButton
-                android:id="@+id/login_smart"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="dadousmart" />
-    </RadioGroup>
+<!--        <RadioButton-->
+<!--                android:id="@+id/login_smart"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="dadousmart" />-->
+<!--    </RadioGroup>-->
 
     <RadioGroup
             android:id="@+id/scan_gp"
@@ -312,7 +312,8 @@
             android:orientation="horizontal"
             android:padding="@dimen/dp_5"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="@+id/login_isTeck"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_login"
+            app:layout_goneMarginTop="40dp"
             app:layout_constraintStart_toStartOf="@+id/btn_login"
             app:layout_constraintTop_toTopOf="@+id/sms_password_login"
             app:layout_constraintVertical_bias="0.25">
@@ -342,6 +343,59 @@
                 android:text="@string/compatible_scan"/>
 
     </RadioGroup>
+
+<!--    chown 改 用来切换正式测试版-->
+    <CheckBox
+            android:id="@+id/is_test_version"
+            android:layout_width="41.5dp"
+            android:layout_height="28dp"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/select_check"
+            android:button="@null"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="@+id/scan_gp"
+            app:layout_constraintTop_toBottomOf="@+id/scan_gp"
+             />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tx_test_version"
+            app:layout_constraintLeft_toRightOf="@+id/is_test_version"
+            app:layout_constraintBottom_toBottomOf="@+id/is_test_version"
+            android:visibility="gone"
+            android:text="正式版"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp" />
+
+    <CheckBox
+            android:id="@+id/is_dadousmart"
+            android:layout_width="41.5dp"
+            android:layout_height="28dp"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="center"
+            android:layout_marginEnd="10dp"
+            android:visibility="gone"
+            android:background="@drawable/select_check"
+            android:button="@null"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="@+id/scan_gp"
+            app:layout_constraintTop_toBottomOf="@+id/scan_gp"
+            />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tx_is_dadousmart"
+            android:visibility="gone"
+            app:layout_constraintRight_toLeftOf="@+id/is_dadousmart"
+            app:layout_constraintBottom_toBottomOf="@+id/is_test_version"
+            android:text="dadoutek"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="5dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

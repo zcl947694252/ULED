@@ -234,22 +234,49 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun initListener() {
-        login_isTeck.setOnCheckedChangeListener { _, checkedId ->
-            if (Constant.isDebug) {//如果是debug则可以切换
-                when (checkedId) {
-                    R.id.login_smart -> {
-                        SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 0)
-                    }
-                    R.id.login_Teck -> {
-                        SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 1)
-                    }
-                    R.id.login_rd -> {
-                        SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 2)
-                    }
+        // chown changed it
+        is_test_version.setOnCheckedChangeListener { _, isChecked ->
+            when {
+                isChecked -> {
+                    Constant.isDebug = true
+                    SharedPreferencesUtils.setTestType(true)
+                    tx_test_version.text = "测试版"
                 }
-                //startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                else -> {
+                    Constant.isDebug = false
+                    SharedPreferencesUtils.setTestType(true)
+                    tx_test_version.text = "正式版"
+                }
             }
         }
+        is_dadousmart.setOnCheckedChangeListener { _, isChecked ->
+            when {
+                isChecked -> {
+                    SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 1)
+                    tx_is_dadousmart.text = "dadoutek"
+                }
+                else -> {
+                    SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 0)
+                    tx_is_dadousmart.text = "dadousmart"
+                }
+            }
+        }
+//        login_isTeck.setOnCheckedChangeListener { _, checkedId ->
+//            if (Constant.isDebug) {//如果是debug则可以切换
+//                when (checkedId) {
+//                    R.id.login_smart -> {
+//                        SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 0)
+//                    }
+//                    R.id.login_Teck -> {
+//                        SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 1)
+//                    }
+//                    R.id.login_rd -> {
+//                        SharedPreferencesHelper.putInt(this, Constant.IS_SMART, 2)
+//                    }
+//                }
+//                //startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+//            }
+//        }
         scan_gp.setOnCheckedChangeListener { group, checkedId ->
             TelinkApplication.getInstance().isNew = checkedId == R.id.scan_new
             SharedPreferencesUtils.setScanType(TelinkApplication.getInstance().isNew)
@@ -268,6 +295,21 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun initView() {
         isDebugVisible()
+        if (Constant.isShow) {
+            is_test_version.visibility = View.VISIBLE
+            tx_test_version.visibility = View.VISIBLE
+            is_dadousmart.visibility = View.VISIBLE
+            tx_is_dadousmart.visibility = View.VISIBLE
+        } else {
+            is_test_version.visibility = View.GONE
+            tx_test_version.visibility = View.GONE
+            is_dadousmart.visibility = View.GONE
+            tx_is_dadousmart.visibility = View.GONE
+        }
+        is_test_version.isChecked = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(),"IS_TEST_CHECK",Constant.isDebug)
+        tx_test_version.text = if(is_test_version.isChecked) "测试版"  else "正式版"
+        is_dadousmart.isChecked = SharedPreferencesHelper.getInt(this, Constant.IS_SMART, 1).toInt()==1 //为1 则为dadoutek 为0 则为dadousmart
+        tx_is_dadousmart.text = if(is_dadousmart.isChecked) "dadoutek"  else "dadousmart"
         val scanType = SharedPreferencesUtils.getScanType()
         when {
             scanType -> scan_new.isChecked = true
@@ -396,7 +438,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             btn_login.visibility = View.GONE
             google_btn.visibility = View.GONE
             facebook_btn.visibility = View.GONE
-            login_isTeck.visibility = View.GONE
+//            login_isTeck.visibility = View.GONE
             sms_login_btn.visibility = View.GONE
             third_party_text.visibility = View.GONE
             sms_password_login.visibility = View.GONE
@@ -445,10 +487,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun isDebugVisible() {
-        when {
-            Constant.isDebug -> login_isTeck.visibility = View.VISIBLE
-            else -> login_isTeck.visibility = View.GONE
-        }
+//        when {
+//            Constant.isDebug -> login_isTeck.visibility = View.VISIBLE
+//            else -> login_isTeck.visibility = View.GONE
+//        }
     }
 
     private fun newPhoneList() {

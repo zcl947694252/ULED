@@ -28,11 +28,10 @@ class MqttService : Service() {
     open var imei =DeviceUtils.getIMEI(TelinkLightApplication.getApp().mContext)
     private var clientId: String = NetworkFactory.md5((DBUtils.lastUser?.id ?: 0).toString() + imei).substring(8, 24) //客户端标识MD5加密一定是32位
     private var topics = "app/emit/${DBUtils.lastUser?.id}"
-    private val host = "${Constant.HOST2}:${Constant.PORT}"
+    private var host = "${Constant.HOST2}:${Constant.PORT}"
     private val passWord = EncryptUtils.encryptMD5("123456".toByteArray())
     private val userName = "APP_${DBUtils.lastUser?.id ?: 0}"
     private var IGetMessageCallBack: IGetMessageCallBack? = null
-
 
     // MQTT是否连接成功
     private val iMqttActionListener = object : IMqttActionListener {
@@ -100,7 +99,7 @@ class MqttService : Service() {
     open fun init() {
         if (imei=="未授权")
             imei = TelinkLightApplication.getApp().randomImei
-
+        host = "${Constant.HOST2}:${Constant.PORT}"
         LogUtils.v("zcl----------imei--------$imei")
 
         // 服务器地址（协议+地址+端口号）

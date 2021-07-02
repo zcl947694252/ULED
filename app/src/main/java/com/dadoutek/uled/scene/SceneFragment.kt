@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
 import android.util.Log
 import android.view.*
@@ -107,7 +106,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (position>scenesListData.size)
             return@OnItemChildClickListener
-        currentDbScene = scenesListData!![position]
+        currentDbScene = scenesListData[position]
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
             Log.e("zcl场景", "zcl场景******onItemChildClickListener")
             when (view.id) {
@@ -125,7 +124,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 ToastUtils.showLong(getString(R.string.author_region_warm))
                             else {
                                 Log.e("zcl场景", "zcl场景******scene_edit")
-                                val scene = scenesListData!![position]
+                                val scene = scenesListData[position]
                                 val intent = Intent(activity, NewSceneSetAct::class.java)
                                 intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
                                 intent.putExtra(Constant.IS_CHANGE_SCENE, true)
@@ -281,7 +280,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.gate_way_offline))
                             }
-                    var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
+                    val gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
                             dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
                     val gattBody = GwGattBody()
@@ -314,7 +313,8 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    @SuppressLint("InflateParams")
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         this.inflater = inflater
         viewContent = inflater.inflate(R.layout.fragment_scene, null)
         recyclerView = viewContent.findViewById(R.id.recyclerView)
@@ -365,7 +365,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setView(textGp)
 
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, which ->
+                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     // 获取输入框的内容
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
@@ -376,7 +376,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                         dialog.dismiss()
                     }
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
@@ -460,7 +460,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         LogUtils.v("zcl-----------滑动到-------${scenesListData.size}")
     }
 
-    private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { adapter, view, position ->
+    private var onItemChildLongClickListener = BaseQuickAdapter.OnItemLongClickListener { _, _, _ ->
         val lastUser = DBUtils.lastUser
         lastUser?.let {
             if (it.id.toString() != it.last_authorizer_user_id)
@@ -501,20 +501,20 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun showDeleteDialog() {
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
-        builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { dialog, which ->
+        builder.setPositiveButton(activity!!.getString(android.R.string.ok)) { _, _ ->
             Log.e("TAG_SIZE", scenesListData.size.toString())
             for (i in scenesListData.indices) {
                 if (scenesListData[i].isSelected) {
                     val opcode = Opcode.SCENE_ADD_OR_DEL
                     val params: ByteArray
-                    if (scenesListData!!.size > 0) {
+                    if (scenesListData.size > 0) {
                         Thread.sleep(300)
-                        val id = scenesListData!![i].id!!
+                        val id = scenesListData[i].id!!
                         val list = DBUtils.getActionsBySceneId(id)
                         params = byteArrayOf(0x00, id.toByte())
                         Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
                         DBUtils.deleteSceneActionsList(list)
-                        DBUtils.deleteScene(scenesListData!![i])
+                        DBUtils.deleteScene(scenesListData[i])
                     }
                 }
             }
@@ -585,7 +585,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
             val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
                 override fun getOldListSize(): Int {
-                    return mOldDatas!!.size
+                    return mOldDatas.size
                 }
 
                 override fun getNewListSize(): Int {
@@ -593,11 +593,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
 
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return mOldDatas!![oldItemPosition].id == mNewDatas[newItemPosition].id
+                    return mOldDatas[oldItemPosition].id == mNewDatas[newItemPosition].id
                 }
 
                 override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    val beanOld = mOldDatas!![oldItemPosition]
+                    val beanOld = mOldDatas[oldItemPosition]
                     val beanNew = mNewDatas[newItemPosition]
                     return if (beanOld.name != beanNew.name) false else false
                 }
@@ -610,7 +610,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun loadData(): MutableList<DbScene> {
-        var showList: List<DbScene>
+        val showList: List<DbScene>
         showList = DBUtils.sceneList
         return showList
     }
@@ -620,7 +620,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         when (item.itemId) {
             R.id.menu_install -> if (!instance.isLogin) {
             } else {
-                if (scenesListData!!.size >= SCENE_MAX_COUNT) {
+                if (scenesListData.size >= SCENE_MAX_COUNT) {
                     ToastUtils.showLong(R.string.scene_16_tip)
                 } else {
                     val intent = Intent(activity, NewSceneSetAct::class.java)
@@ -677,7 +677,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     private fun seeHelpe() {
-        var intent = Intent(context, InstructionsForUsActivity::class.java)
+        val intent = Intent(context, InstructionsForUsActivity::class.java)
         intent.putExtra(Constant.WB_TYPE, "#control-scene")
         startActivity(intent)
     }

@@ -8,7 +8,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.IBinder
-import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -71,7 +70,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var resId: Int = R.drawable.icon_out
     private var currentPosition: Int = 1000000
     private lateinit var currentRgbGradient: ItemRgbGradient
-    private var rgbRecyclerView: androidx.recyclerview.widget.RecyclerView? = null
+    private var rgbRecyclerView: RecyclerView? = null
     private lateinit var diyGradientList: MutableList<DbDiyGradient>
     private var buildInModeList: ArrayList<ItemRgbGradient> = ArrayList()
     private var isOpen: Boolean = true
@@ -105,8 +104,6 @@ class NewSceneSetAct : TelinkBaseActivity() {
         select_icon_ly.setOnClickListener {
             startActivityForResult(Intent(this@NewSceneSetAct, SelectSceneIconActivity::class.java), 1100)
         }
-
-        Log.i("chown","newscenesetact")
 
         initChangeState()
         initScene()//获取传递过来的场景数据
@@ -228,15 +225,15 @@ class NewSceneSetAct : TelinkBaseActivity() {
             showCheckListData?.add(gp) //}
         }
         when {
-            showGroupList!!.size != 0 -> {
+            showGroupList.size != 0 -> {
                 for (i in showCheckListData!!.indices) {
-                    loop@ for (j in showGroupList!!.indices) {
+                    loop@ for (j in showGroupList.indices) {
                         when {
-                            showCheckListData!![i].meshAddr == showGroupList!![j].groupAddress -> {
+                            showCheckListData!![i].meshAddr == showGroupList[j].groupAddress -> {
                                 showCheckListData!![i].checked = true
                                 break@loop
                             }
-                            j == showGroupList!!.size - 1 && showCheckListData!![i].meshAddr != showGroupList!![j].groupAddress -> {
+                            j == showGroupList.size - 1 && showCheckListData!![i].meshAddr != showGroupList[j].groupAddress -> {
                                 showCheckListData!![i].checked = false
                             }
                         }
