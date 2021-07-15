@@ -46,6 +46,7 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         public final static Property GradientId = new Property(16, int.class, "gradientId", false, "GRADIENT_ID");
         public final static Property GradientSpeed = new Property(17, int.class, "gradientSpeed", false, "GRADIENT_SPEED");
         public final static Property GradientName = new Property(18, String.class, "gradientName", false, "GRADIENT_NAME");
+        public final static Property CurtainOnOffRange = new Property(19, int.class, "curtainOnOffRange", false, "CURTAIN_ON_OFF_RANGE");
     }
 
     private Query<DbSceneActions> dbScene_ActionsQuery;
@@ -80,7 +81,8 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
                 "\"GRADIENT_TYPE\" INTEGER NOT NULL ," + // 15: gradientType
                 "\"GRADIENT_ID\" INTEGER NOT NULL ," + // 16: gradientId
                 "\"GRADIENT_SPEED\" INTEGER NOT NULL ," + // 17: gradientSpeed
-                "\"GRADIENT_NAME\" TEXT);"); // 18: gradientName
+                "\"GRADIENT_NAME\" TEXT," + // 18: gradientName
+                "\"CURTAIN_ON_OFF_RANGE\" INTEGER NOT NULL );"); // 19: curtainOnOffRange
     }
 
     /** Drops the underlying database table. */
@@ -119,6 +121,7 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         if (gradientName != null) {
             stmt.bindString(19, gradientName);
         }
+        stmt.bindLong(20, entity.getCurtainOnOffRange());
     }
 
     @Override
@@ -151,6 +154,7 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         if (gradientName != null) {
             stmt.bindString(19, gradientName);
         }
+        stmt.bindLong(20, entity.getCurtainOnOffRange());
     }
 
     @Override
@@ -179,7 +183,8 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
             cursor.getInt(offset + 15), // gradientType
             cursor.getInt(offset + 16), // gradientId
             cursor.getInt(offset + 17), // gradientSpeed
-            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18) // gradientName
+            cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18), // gradientName
+            cursor.getInt(offset + 19) // curtainOnOffRange
         );
         return entity;
     }
@@ -205,6 +210,7 @@ public class DbSceneActionsDao extends AbstractDao<DbSceneActions, Long> {
         entity.setGradientId(cursor.getInt(offset + 16));
         entity.setGradientSpeed(cursor.getInt(offset + 17));
         entity.setGradientName(cursor.isNull(offset + 18) ? null : cursor.getString(offset + 18));
+        entity.setCurtainOnOffRange(cursor.getInt(offset + 19));
      }
     
     @Override

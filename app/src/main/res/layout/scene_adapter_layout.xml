@@ -757,6 +757,59 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+<!--            窗帘相关    -->
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/tv_cur_range"
+                    app:layout_constraintTop_toBottomOf="@+id/scene_curtain"
+                    android:textSize="14sp"
+                    android:text="幅度："
+                    android:layout_marginStart="5dp"
+                    />
+            <SeekBar
+                    android:id="@+id/curtain_seekbar"
+                    style="@style/SeekBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:min="0"
+                    android:max="100"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_cur_range"
+                    android:progress="1" />
+            <LinearLayout
+                    android:id="@+id/curtain_add_less_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/curtain_seekbar">
+
+                <ImageView
+                        android:id="@+id/curtain_range_less"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:paddingTop="@dimen/dp_8"
+                        android:paddingBottom="@dimen/dp_8"
+                        android:src="@drawable/less_enabled" />
+
+                <View
+                        android:layout_width="0dp"
+                        android:layout_height="0.1dp"
+                        android:layout_weight="1" />
+
+                <ImageView
+                        android:id="@+id/curtain_range_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="14dp"
+                        android:paddingTop="@dimen/dp_8"
+                        android:paddingBottom="@dimen/dp_8"
+                        android:src="@drawable/add_enabled" />
+            </LinearLayout>
+<!--            -->
+
 
             <ImageView
                     android:id="@+id/scene_relay"

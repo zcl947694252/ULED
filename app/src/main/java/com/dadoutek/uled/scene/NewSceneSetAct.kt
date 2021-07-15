@@ -279,6 +279,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     itemGroup.gradientName = actions[i].gradientName
                     itemGroup.gradientSpeed = actions[i].gradientSpeed
                     itemGroup.deviceType = actions[i].deviceType
+                    itemGroup.curtainOnOffRange = actions[i].curtainOnOffRange
                     showGroupList.add(itemGroup)
                     groupMeshAddrArrayList.add(item.meshAddr)
                 } else {
@@ -943,10 +944,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 sceneActions.gradientName = itemGroup.gradientName
             }
         } else {
-            sceneActions.setIsEnableBright(item.isEnableBright)
-            sceneActions.setIsEnableWhiteBright(item.isEnableWhiteBright)
+            sceneActions.isEnableBright = item.isEnableBright
+            sceneActions.isEnableWhiteBright = item.isEnableWhiteBright
             sceneActions.brightness = item.brightness
             sceneActions.colorTemperature = item.temperature
+            sceneActions.curtainOnOffRange = item.curtainOnOffRange
             sceneActions.setColor(item.color)
             LogUtils.v("zcl--白色-${(item!!.color and 0xff000000.toInt()) shr 24}--亮度${item.brightness}---------色温${item.temperature}----")
         }
@@ -1144,16 +1146,17 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 blue = 255
             }
             var w = color shr 24
+            val range = list[i].curtainOnOffRange.toByte() //chown
             val connectDevice = TelinkApplication.getInstance().connectDevice
             connectDevice?.let {
                 val meshAddress = connectDevice.meshAddress
                 val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
                 val mesL = meshAddress and 0xff
-                var type = list[i].deviceType
+                val type = list[i].deviceType
                 params = when (type) {
                     SMART_CURTAIN, SMART_RELAY -> when {
-                        list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01)  //窗帘开是1
-                        else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02)  //窗帘关是2
+                        list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, range, 0x01)  //窗帘开是1
+                        else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, range, 0x02)  //窗帘关是2
                     }
 //                    LIGHT_RGB -> if (list[i].rgbType == 0)//rgbType 类型 0:颜色模式 1：渐变模式   gradientType 渐变类型 1：自定义渐变  2：内置渐变
 //                        byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), light, temperature)
@@ -1214,6 +1217,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     newItemGroup.enableCheck = true
                     newItemGroup.gpName = showCheckListData!![i].name
                     newItemGroup.groupAddress = showCheckListData!![i].meshAddr
+
                     notCheckedGroupList!!.add(newItemGroup)
                 }
             }

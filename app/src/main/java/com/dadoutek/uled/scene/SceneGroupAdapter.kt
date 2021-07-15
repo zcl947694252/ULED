@@ -84,6 +84,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private lateinit var addWhiteLightRGB: ImageView
     private lateinit var lessWhiteLightRGB: ImageView
 
+//    窗帘相关tv，seekbar，more，less
+    private lateinit var tvCurRange: TextView
+    private lateinit var curtainSeekbar : SeekBar
+    private lateinit var curtainRangeLess : ImageView
+    private lateinit var curtainRangeAdd : ImageView
+
     internal var downTime: Long = 0//Button被按下时的时间
     private var thisTime: Long = 0//while每次循环时的时间
     internal var onBtnTouch = false//Button是否被按下
@@ -118,6 +124,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         topRgLy = helper.getView(R.id.top_rg_ly)
         algLy = helper.getView(R.id.alg_ly)
 
+        //窗帘
+        tvCurRange = helper.getView(R.id.tv_cur_range)
+        curtainSeekbar = helper.getView(R.id.curtain_seekbar)
+        curtainRangeLess = helper.getView(R.id.curtain_range_less)
+        curtainRangeAdd = helper.getView(R.id.curtain_range_add)
+
         val cbTotal = helper.getView<CheckBox>(R.id.cb_total)
         val cbBright = helper.getView<CheckBox>(R.id.cb_bright)
         val cbWhiteLight = helper.getView<CheckBox>(R.id.cb_white_light)
@@ -125,6 +137,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         cbTotal.isChecked = item.isOn
         cbBright.isChecked = item.isEnableBright
         cbWhiteLight.isChecked = item.isEnableWhiteBright
+
+        // 窗帘的初始化
+        curtainSeekbar.progress = item.curtainOnOffRange
+        tvCurRange.text = "幅度：${curtainSeekbar.progress}"
+        LogUtils.v("==============================窗帘幅度: ${item.curtainOnOffRange}=============================================")
+
         var w = (item?.color and 0xff000000.toInt()) shr 24
         var r = Color.red(item?.color!!)
         var g = Color.green(item?.color!!)
@@ -237,6 +255,33 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         sbtemperature!!.setOnSeekBarChangeListener(this)
         sbBrightnessRGB!!.setOnSeekBarChangeListener(this)
         sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
+        curtainSeekbar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener { //seekbar 和两个按钮
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                val value = seekBar?.progress
+                tvCurRange.text = "幅度：$value"
+                data[position].curtainOnOffRange = value!!
+                LogUtils.v("======================data[position].curtainOnOffRange ${data[position].curtainOnOffRange}===================================================")
+                when {
+                    value >= 100 -> {
+                        curtainRangeLess.isEnabled = true
+                        curtainRangeAdd.isEnabled = false
+                    }
+                    value <= 0 -> {
+                        curtainRangeLess.isEnabled = false
+                        curtainRangeAdd.isEnabled = true
+                    }
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+        })
         speedSeekbar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 var value = seekBar?.progress ?: 0
@@ -300,37 +345,37 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 .addOnClickListener(R.id.color_mode_rb)
                 .addOnClickListener(R.id.gradient_mode_rb)
 
-        addTemperatureCW!!.setOnTouchListener { v, event ->
+        addTemperatureCW!!.setOnTouchListener { _, event ->
             currentPostion = position
             clickType = 1//普灯色温
             addTemperature(event, position)
             true
         }
-        lessTemperatureCW!!.setOnTouchListener { v, event ->
+        lessTemperatureCW!!.setOnTouchListener { _, event ->
             currentPostion = position
             clickType = 2//普灯色温
             lessTemperature(event, position)
             true
         }
-        addBrightnessCW!!.setOnTouchListener { v, event ->
+        addBrightnessCW!!.setOnTouchListener { _, event ->
             currentPostion = position
             clickType = 3//普通亮度
             addBrightness(event, position)//亮度
             true
         }
-        lessBrightnessCW!!.setOnTouchListener { v, event ->
+        lessBrightnessCW!!.setOnTouchListener { _, event ->
             currentPostion = position
             clickType = 4//普通亮度
             lessBrightness(event, position)//亮度
             true
         }
-        addBrightnessRGB!!.setOnTouchListener { v, event ->
+        addBrightnessRGB!!.setOnTouchListener { _, event ->
             currentPostion = position
             clickType = 5//彩灯亮度
             addRGBBrightness(event, position)//亮度
             true
         }
-        lessBrightnessRGB!!.setOnTouchListener { v, event ->
+        lessBrightnessRGB!!.setOnTouchListener { _, event ->
             currentPostion = position
             clickType = 6//彩灯亮度
             lessRGBBrightness(event, position)//亮度
@@ -342,7 +387,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             addRGBWhiteLight(event, position)
             true
         }
-        lessWhiteLightRGB!!.setOnTouchListener { v, event ->
+        lessWhiteLightRGB!!.setOnTouchListener { _, event ->
             currentPostion = position
             clickType = 8//普通色温亮度 彩灯亮度白光
             lessRGBWhiteLight(event, position)
@@ -356,6 +401,18 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         lessAlgSpeed?.setOnTouchListener { _, event ->
             currentPostion = position
             lessAlgSpeedNum(event, position)
+            true
+        }
+        curtainRangeAdd.setOnTouchListener { _, _ ->
+            val value = curtainSeekbar.progress++
+            data[position].curtainOnOffRange = curtainSeekbar.progress
+            curtainRangeAdd.isEnabled = value != 100
+            true
+        }
+        curtainRangeLess.setOnTouchListener { _, _ ->
+            val value = curtainSeekbar.progress--
+            data[position].curtainOnOffRange = curtainSeekbar.progress
+            curtainRangeLess.isEnabled = value != 0
             true
         }
     }
@@ -429,9 +486,15 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
+                    curtainSeekbar.isEnabled = true
+                    curtainRangeLess.isEnabled = curtainSeekbar.progress != 0
+                    curtainRangeAdd.isEnabled = curtainSeekbar.progress != 100
                 } else {
                     helper.setChecked(R.id.rg_yy, true)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_no)
+                    curtainSeekbar.isEnabled = true
+                    curtainRangeLess.isEnabled = false
+                    curtainRangeAdd.isEnabled = false
                 }
             }
             else -> {

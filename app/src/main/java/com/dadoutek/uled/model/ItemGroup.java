@@ -27,6 +27,7 @@ public class ItemGroup implements Serializable {
     public int gradientId = 1  ; //渐变id
     public int gradientSpeed = 0 ;//渐变速度
     public String gradientName  ;//变速度
+    public int curtainOnOffRange = 1;//窗帘的幅度
     public int icon = R.drawable.icon_group ;//图标
 
     @Override
@@ -48,6 +49,7 @@ public class ItemGroup implements Serializable {
                 ", gradientId=" + gradientId +
                 ", gradientSpeed=" + gradientSpeed +
                 ", gradientName='" + gradientName + '\'' +
+                ", curtainOnOffRange" + curtainOnOffRange +
                 '}';
     }
 }

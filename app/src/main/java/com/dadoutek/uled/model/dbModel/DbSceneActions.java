@@ -38,15 +38,16 @@ public class DbSceneActions {
     public int gradientId = 0  ; //渐变id
     public int gradientSpeed = 0 ;//渐变速度
     public String gradientName  ;//渐变速度
+    public int curtainOnOffRange; //窗帘幅度，chown
 
 
-    @Generated(hash = 814967990)
+    @Generated(hash = 192241967)
     public DbSceneActions(Long id, long belongSceneId, int groupAddr,
             int colorTemperature, int brightness, int color, boolean isOn,
             boolean isEnableBright, boolean isEnableWhiteBright, int deviceType,
             int circleOne, int circleTwo, int circleThree, int circleFour,
             int rgbType, int gradientType, int gradientId, int gradientSpeed,
-            String gradientName) {
+            String gradientName, int curtainOnOffRange) {
         this.id = id;
         this.belongSceneId = belongSceneId;
         this.groupAddr = groupAddr;
@@ -66,6 +67,7 @@ public class DbSceneActions {
         this.gradientId = gradientId;
         this.gradientSpeed = gradientSpeed;
         this.gradientName = gradientName;
+        this.curtainOnOffRange = curtainOnOffRange;
     }
 
     @Generated(hash = 885919265)
@@ -248,6 +250,14 @@ public class DbSceneActions {
                 ", gradientSpeed=" + gradientSpeed +
                 ", gradientName='" + gradientName + '\'' +
                 '}';
+    }
+
+    public int getCurtainOnOffRange() {
+        return this.curtainOnOffRange;
+    }
+
+    public void setCurtainOnOffRange(int curtainOnOffRange) {
+        this.curtainOnOffRange = curtainOnOffRange;
     }
 
 }

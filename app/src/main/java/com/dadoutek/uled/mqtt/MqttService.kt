@@ -14,6 +14,7 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.util.DeviceUtil
 import com.dadoutek.uled.util.DeviceUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import org.eclipse.paho.android.service.MqttAndroidClient
@@ -25,7 +26,7 @@ class MqttService : Service() {
 
     private var conOpt: MqttConnectOptions? = null
 
-    open var imei =DeviceUtils.getIMEI(TelinkLightApplication.getApp().mContext)
+    /* open */ var imei = DeviceUtil.getIMEI(TelinkLightApplication.getApp().mContext)
     private var clientId: String = NetworkFactory.md5((DBUtils.lastUser?.id ?: 0).toString() + imei).substring(8, 24) //客户端标识MD5加密一定是32位
     private var topics = "app/emit/${DBUtils.lastUser?.id}"
     private var host = "${Constant.HOST2}:${Constant.PORT}"
@@ -96,9 +97,9 @@ class MqttService : Service() {
         init()
     }
 
-    open fun init() {
+    /* open */ fun init() {
         if (imei=="未授权")
-            imei = TelinkLightApplication.getApp().randomImei
+            imei = TelinkLightApplication.getApp().randomImei.toString()
         host = "${Constant.HOST2}:${Constant.PORT}"
         LogUtils.v("zcl----------imei--------$imei")
 
