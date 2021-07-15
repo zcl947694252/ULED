@@ -444,6 +444,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             sms_password_login.visibility = View.GONE
             list_phone.visibility = View.VISIBLE
             date_phone.setImageResource(R.drawable.icon_up)
+            is_test_version.visibility = View.GONE
+            tx_test_version.visibility = View.GONE
+            is_dadousmart.visibility = View.GONE
+            tx_is_dadousmart.visibility = View.GONE
         } else {
             qq_btn.visibility = View.VISIBLE
             scan_gp.visibility = View.VISIBLE
@@ -457,6 +461,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_password.visibility = View.VISIBLE
             forget_password.visibility = View.VISIBLE
             list_phone.visibility = View.GONE
+            is_test_version.visibility = View.VISIBLE
+            tx_test_version.visibility = View.VISIBLE
+            is_dadousmart.visibility = View.VISIBLE
+            tx_is_dadousmart.visibility = View.VISIBLE
             date_phone.setImageResource(R.drawable.icon_down_arr)
         }
     }
