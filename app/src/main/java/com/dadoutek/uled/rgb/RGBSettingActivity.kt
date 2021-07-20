@@ -535,11 +535,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun checkEnable() {
-        var whiteCheck = when {
+        val whiteCheck = when {
             currentShowGroupSetPage -> group?.isEnableWhiteBright == 1
             else -> light?.isEnableWhiteBright == 1
         }
-        var briCheck = when {
+        val briCheck = when {
             currentShowGroupSetPage -> group?.isEnableBright == 1
             else -> light?.isEnableBright == 1
         }
@@ -550,7 +550,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun setSwIcon() {
-        var status = when {
+        val status = when {
             currentShowGroupSetPage -> group?.connectionStatus
             else -> light?.connectionStatus
         }
@@ -561,7 +561,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun swLight(isClick: Boolean) {
-        var connectionStatus = if (currentShowGroupSetPage) group?.connectionStatus else light?.connectionStatus
+        val connectionStatus = if (currentShowGroupSetPage) group?.connectionStatus else light?.connectionStatus
         var status = when {
             isClick -> if (connectionStatus == 1) 0 else 1
             else -> connectionStatus ?: 1
@@ -661,7 +661,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         rgb_sbBrightness!!.max = 100
         rgb_white_seekbar!!.max = 100
 
-        color_picker.reset()
+        color_picker.reset()  //chown
         color_picker.subscribe(colorObserver)
 
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
@@ -718,9 +718,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
 
         var w = ((light?.color ?: 1) and 0xff000000.toInt()) shr 24
-        var r = Color.red(light?.color ?: 0)
-        var g = Color.green(light?.color ?: 0)
-        var b = Color.blue(light?.color ?: 0)
+        val r = Color.red(light?.color ?: 0)
+        val g = Color.green(light?.color ?: 0)
+        val b = Color.blue(light?.color ?: 0)
         if (w == -1 || w < 1) {
             w = 1
         }
@@ -1404,11 +1404,11 @@ else
         diyGradientList.addAll(DBUtils.diyGradientList)
 
         isDelete = false
-        rgbDiyGradientAdapter!!.changeState(isDelete)
+        rgbDiyGradientAdapter.changeState(isDelete)
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
         toolbar!!.title = getString(R.string.dynamic_gradient)
-        rgbDiyGradientAdapter!!.notifyDataSetChanged()
+        rgbDiyGradientAdapter.notifyDataSetChanged()
         setDate()
     }
 
@@ -1417,12 +1417,12 @@ else
         if (bean?.ser_id == "rgbGp") {
             LogUtils.v("zcl-----------收到路由普通灯分组通知-------$bean")
             disposableRouteTimer?.dispose()
-            if (bean?.finish) {
+            if (bean.finish) {
                 hideLoadingDialog()
-                when (bean?.status) {
+                when (bean.status) {
                     -1 -> ToastUtils.showShort(getString(R.string.group_failed))
                     0, 1 -> {
-                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        if (bean.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
                         SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, object : SyncCallback {
                             override fun start() {}
                             override fun complete() {}
@@ -1628,17 +1628,17 @@ else
     }
 
     private fun bleDelGradient(isSendCommend: Boolean) {
-        for (i in diyGradientList!!.indices) {
-            if (diyGradientList!![i].isSelected) {
+        for (i in diyGradientList.indices) {
+            if (diyGradientList[i].isSelected) {
                 if (isSendCommend)
-                    startDeleteGradientCmd(diyGradientList!![i].id)
-                DBUtils.deleteGradient(diyGradientList!![i])
-                LogUtils.v("zcl-----------删除路由相关渐变-------${diyGradientList!![i]}")
-                DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList!![i].id!!))
+                    startDeleteGradientCmd(diyGradientList[i].id)
+                DBUtils.deleteGradient(diyGradientList[i])
+                LogUtils.v("zcl-----------删除路由相关渐变-------${diyGradientList[i]}")
+                DBUtils.deleteColorNodeList(DBUtils.getColorNodeListByDynamicModeId(diyGradientList[i].id!!))
             }
         }
         diyGradientList = DBUtils.diyGradientList
-        rgbDiyGradientAdapter!!.setNewData(diyGradientList)
+        rgbDiyGradientAdapter.setNewData(diyGradientList)
         hideLoadingDialog()
     }
 
@@ -1801,7 +1801,7 @@ else
     }
 
     private suspend fun sendWhiteAndBri(whiteNUm: Int, bri: Int) {
-        var addr: Int = if (currentShowGroupSetPage)
+        val addr: Int = if (currentShowGroupSetPage)
             group?.meshAddr!!
         else
             light?.meshAddr!!
@@ -1809,12 +1809,12 @@ else
 
         GlobalScope.launch {
             val opcodeWhite: Byte = Opcode.SET_W_LUM//设置白色
-            val paramsWhite: ByteArray = byteArrayOf(whiteNUm.toByte())
+            val paramsWhite: ByteArray = byteArrayOf(if (cb_white_enable.isChecked) whiteNUm.toByte() else 0)
             TelinkLightService.Instance()?.sendCommandNoResponse(opcodeWhite, addr, paramsWhite)
             delay(500)
 
             val opcodeBri: Byte = Opcode.SET_LUM//亮度bri
-            val params: ByteArray = byteArrayOf(bri.toByte())
+            val params: ByteArray = byteArrayOf(if (cb_brightness_enable.isChecked) bri.toByte() else 0)
             TelinkLightService.Instance()?.sendCommandNoResponse(opcodeBri, addr, params)
             delay(500)
         }
@@ -1846,8 +1846,8 @@ else
             android.R.id.home ->
                 if (isDelete) {
                     isDelete = false
-                    rgbDiyGradientAdapter!!.changeState(isDelete)
-                    rgbDiyGradientAdapter!!.notifyDataSetChanged()
+                    rgbDiyGradientAdapter.changeState(isDelete)
+                    rgbDiyGradientAdapter.notifyDataSetChanged()
                     setDate()
                     toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
                     toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
@@ -1943,7 +1943,7 @@ else
             presetColors = java.util.ArrayList()
             for (i in 0 until 4) {
                 val itemColorPreset = ItemColorPreset()
-                itemColorPreset.color = OtherUtils.getCreateInitColor(i)
+                itemColorPreset.color = OtherUtils.getCreateInitColor(i) //chown
                 presetColors?.add(itemColorPreset)
             }
         } else {
@@ -1986,9 +1986,9 @@ else
         }
 
         var w = ((group?.color ?: 1) and 0xff000000.toInt()) shr 24
-        var r = Color.red(group?.color ?: 0)
-        var g = Color.green(group?.color ?: 0)
-        var b = Color.blue(group?.color ?: 0)
+        val r = Color.red(group?.color ?: 0)
+        val g = Color.green(group?.color ?: 0)
+        val b = Color.blue(group?.color ?: 0)
 
         w = isZeroOrHundred(w)
         sb_w_bright_num.text = "$w%"
@@ -2036,11 +2036,11 @@ else
     }
 
     @SuppressLint("SetTextI18n")
-    private var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        val color = presetColors?.get(position)?.color
-        var brightness = presetColors?.get(position)?.brightness
+    private var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, _, position ->
+        val color = if (cb_brightness_enable.isChecked) presetColors?.get(position)?.color else 0
+        var brightness = if (cb_white_enable.isChecked) presetColors?.get(position)?.brightness else 0
         var w = (color!! and 0xff000000.toInt()) shr 24
-        val red = (color!! and 0xff0000) shr 16
+        val red = (color and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
 
@@ -2049,7 +2049,7 @@ else
         GlobalScope.launch {
             try {
 
-                var addr: Int = when {
+                val addr: Int = when {
                     currentShowGroupSetPage -> group?.meshAddr!!
                     else -> light?.meshAddr!!
                 }
@@ -2061,12 +2061,13 @@ else
 
                 val paramsW: ByteArray = byteArrayOf(w.toByte())
                 val params: ByteArray = byteArrayOf(brightness!!.toByte())
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr!!, paramsW)
 
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
                 delay(80)
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr!!, params)
 
+                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
                 delay(80)
+
                 changeColor(red, green, blue, true)
                 if (!Constant.IS_ROUTE_MODE)
                     if (currentShowGroupSetPage) {
@@ -2092,13 +2093,13 @@ else
     }
 
     @SuppressLint("SetTextI18n")
-    internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, view, position ->
+    internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, _, position ->
         if (currentShowGroupSetPage) {
             presetColors?.get(position)!!.color = group!!.color
-            presetColors?.get(position)!!.brightness = group!!.brightness
+            presetColors?.get(position)!!.brightness =  group!!.brightness
         } else {
             presetColors?.get(position)!!.color = light!!.color
-            presetColors?.get(position)!!.brightness = light!!.brightness
+            presetColors?.get(position)!!.brightness =  light!!.brightness
         }
         val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as Dot?
         if (currentShowGroupSetPage) {
@@ -2172,8 +2173,8 @@ else
             if (isExitGradient) {
                 isExitGradient = false
                 isDelete = false
-                rgbDiyGradientAdapter!!.changeState(isDelete)
-                rgbDiyGradientAdapter!!.notifyDataSetChanged()
+                rgbDiyGradientAdapter.changeState(isDelete)
+                rgbDiyGradientAdapter.notifyDataSetChanged()
                 setDate()
                 toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
                 toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
@@ -2921,7 +2922,7 @@ else
             sendProgress = brightness
             routerConfigBrightness()
         } else {
-            var brightnessNum = if (cb_brightness_enable.isChecked)brightness else 0
+            var brightnessNum = if (cb_brightness_enable.isChecked) brightness else 0
             LogUtils.v("zcl-----------蓝牙下调节白光-------brightness$brightness")
             val params: ByteArray = byteArrayOf(brightnessNum.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
@@ -2939,7 +2940,7 @@ else
                     else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), white, "rgbwhite")
                 }
             else -> {
-                var whiteNum = if (cb_white_enable.isChecked)white else 0
+                var whiteNum = if (cb_white_enable.isChecked) white else 0
                 val params: ByteArray = byteArrayOf(whiteNum.toByte())
                 TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
             }

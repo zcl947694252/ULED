@@ -765,6 +765,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/scene_curtain"
                     android:textSize="14sp"
                     android:text="幅度："
+                    android:visibility="gone"
                     android:layout_marginStart="5dp"
                     />
             <SeekBar
@@ -773,16 +774,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:visibility="gone"
                     android:min="0"
                     android:max="100"
                     app:layout_constraintTop_toBottomOf="@+id/tv_cur_range"
-                    android:progress="1" />
+                    />
             <LinearLayout
                     android:id="@+id/curtain_add_less_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintStart_toStartOf="parent"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/curtain_seekbar">
 
                 <ImageView

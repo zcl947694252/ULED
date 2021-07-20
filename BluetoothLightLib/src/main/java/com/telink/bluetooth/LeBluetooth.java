@@ -20,6 +20,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.telink.TelinkApplication;
 import com.telink.util.ContextUtil;
 
@@ -125,6 +126,7 @@ public final class LeBluetooth extends BluetoothGattCallback {
                 if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
                     mDelayHandler.removeCallbacks(mLocationCheckTask);
                 }
+                LogUtils.v("onScanResult : " + result.getScanRecord().toString());
             }
 
             @Override

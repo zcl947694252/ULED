@@ -72,7 +72,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var phone: String? = null
     private var editPassWord: String? = null
     private var isFirstLauch: Boolean = false
-    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
+    private var recyclerView: RecyclerView? = null
     private var adapter: PhoneListRecycleViewAdapter? = null
     private var phoneList: ArrayList<DbUser>? = null
     private var isPhone = true
@@ -87,8 +87,8 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     private var poptitle: TextView? = null
     private var poptitleAuthorize: TextView? = null
     private var popAuthor: PopupWindow? = null
-    private var popRecycle: androidx.recyclerview.widget.RecyclerView? = null
-    private var popRecycleAuthorize: androidx.recyclerview.widget.RecyclerView? = null
+    private var popRecycle: RecyclerView? = null
+    private var popRecycleAuthorize: RecyclerView? = null
     private var whoClick: Int = 0
     private var itemAdapter: RegionDialogAdapter? = null
     private var itemAdapterAuthor: RegionAuthorizeDialogAdapter? = null
@@ -461,10 +461,12 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_password.visibility = View.VISIBLE
             forget_password.visibility = View.VISIBLE
             list_phone.visibility = View.GONE
-            is_test_version.visibility = View.VISIBLE
-            tx_test_version.visibility = View.VISIBLE
-            is_dadousmart.visibility = View.VISIBLE
-            tx_is_dadousmart.visibility = View.VISIBLE
+            if(Constant.isShow) {
+                is_test_version.visibility = View.VISIBLE
+                tx_test_version.visibility = View.VISIBLE
+                is_dadousmart.visibility = View.VISIBLE
+                tx_is_dadousmart.visibility = View.VISIBLE
+            }
             date_phone.setImageResource(R.drawable.icon_down_arr)
         }
     }

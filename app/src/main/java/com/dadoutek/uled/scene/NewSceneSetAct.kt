@@ -3,6 +3,7 @@ package com.dadoutek.uled.scene
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -17,6 +18,7 @@ import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -259,6 +261,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             resId = if (TextUtils.isEmpty(dbScene?.imgName)) R.drawable.icon_out else OtherUtils.getResourceId(dbScene?.imgName, this)
             //获取场景具体信息
             val actions = DBUtils.getActionsBySceneId(dbScene!!.id)
+            LogUtils.v("========================================================actions = ${actions}==================================================")
             for (i in actions.indices) {
                 val item = DBUtils.getGroupByMeshAddr(actions[i].groupAddr)
                 if (item.id != 0L && item.meshAddr != 0) {
@@ -280,6 +283,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     itemGroup.gradientSpeed = actions[i].gradientSpeed
                     itemGroup.deviceType = actions[i].deviceType
                     itemGroup.curtainOnOffRange = actions[i].curtainOnOffRange
+                    LogUtils.v("=======================actions[i].curtainOnOffRange = }=${actions[i].curtainOnOffRange}============================================")
                     showGroupList.add(itemGroup)
                     groupMeshAddrArrayList.add(item.meshAddr)
                 } else {
@@ -642,7 +646,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         img_function1.setOnClickListener { changeEditView() }
 
         val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
         scene_gp_detail_list.layoutManager = layoutmanager
         scene_gp_detail_list?.addItemDecoration(SpacesItemDecorationScene(40))
         scene_gp_detail_list.itemAnimator!!.changeDuration = 0
@@ -698,7 +702,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         initChangeState()
 
         val layoutmanager = LinearLayoutManager(this)
-        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
         // recyclerView_select_group_list_view.layoutManager = layoutmanager
         scene_gp_bottom_list.layoutManager = GridLayoutManager(this, 4)
 
@@ -751,7 +755,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         toolbarTv.text = editSceneName
 
         when {
-            showGroupList!!.size <= 0 -> ToastUtils.showLong(R.string.add_scene_gp_tip)
+            showGroupList.size <= 0 -> ToastUtils.showLong(R.string.add_scene_gp_tip)
             else -> {
                 isToolbar = true
                 if (!currentPageIsEdit)
@@ -787,17 +791,17 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         for (i in showCheckListData!!.indices) {
             if (showCheckListData!![i].checked) {
-                if (showGroupList!!.size == 0) {
+                if (showGroupList.size == 0) {
                     val newItemGroup = getNewItemGroup(i)
                     newResultItemList.add(newItemGroup)
                 } else {
-                    loop@ for (j in showGroupList!!.indices) {
+                    loop@ for (j in showGroupList.indices) {
                         when {
-                            showCheckListData!![i].meshAddr == showGroupList!![j].groupAddress -> {
-                                oldResultItemList.add(showGroupList!![j])
+                            showCheckListData!![i].meshAddr == showGroupList[j].groupAddress -> {
+                                oldResultItemList.add(showGroupList[j])
                                 break@loop
                             }
-                            j == showGroupList!!.size - 1 -> {
+                            j == showGroupList.size - 1 -> {
                                 val newItemGroup = getNewItemGroup(i)
                                 newResultItemList.add(newItemGroup)
                             }
@@ -806,9 +810,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 }
             }
         }
-        showGroupList?.clear()
-        showGroupList?.addAll(oldResultItemList)
-        showGroupList?.addAll(newResultItemList)
+        showGroupList.clear()
+        showGroupList.addAll(oldResultItemList)
+        showGroupList.addAll(newResultItemList)
     }
 
     private fun getNewItemGroup(i: Int): ItemGroup {
@@ -934,7 +938,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         sceneActions.belongSceneId = belongSceneId
         sceneActions.groupAddr = item.groupAddress
 
-        if (1 == item.rgbType && deviceType == 0x06) {//是彩灯并且是渐变模式
+        if (1 == item.rgbType && deviceType == 0x06) { //是彩灯并且是渐变模式
             if (position != 1000000) {
                 val itemGroup = showGroupList[position]
                 sceneActions.rgbType = itemGroup.rgbType
@@ -950,7 +954,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             sceneActions.colorTemperature = item.temperature
             sceneActions.curtainOnOffRange = item.curtainOnOffRange
             sceneActions.setColor(item.color)
-            LogUtils.v("zcl--白色-${(item!!.color and 0xff000000.toInt()) shr 24}--亮度${item.brightness}---------色温${item.temperature}----")
+            LogUtils.v("zcl--白色-${(item.color and 0xff000000.toInt()) shr 24}--亮度${item.brightness}---------色温${item.temperature}----")
         }
         return sceneActions
     }
@@ -1047,20 +1051,22 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val itemGroups = showGroupList
         val nameList = java.util.ArrayList<Int>()
         dbScene?.name = name
-        dbScene?.imgName = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
+        dbScene?.imgName = OtherUtils.getResourceName(resId, this@NewSceneSetAct).split("/")[1]
         val belongSceneId = dbScene?.id!!
 
         if (!Constant.IS_ROUTE_MODE)
             showLoadingDialog(getString(R.string.saving))
-
         DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(dbScene?.id!!))
         val actionsList = mutableListOf<DbSceneActions>()
+        actionsList.clear()
         for (i in itemGroups.indices) {
             var sceneActions = DbSceneActions()
             val groupByMeshAddr = DBUtils.getGroupByMeshAddr(itemGroups[i].groupAddress)
+
             sceneActions = when {
                 OtherUtils.isCurtain(groupByMeshAddr) -> {
                     setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x10)
+
                 }
                 OtherUtils.isConnector(groupByMeshAddr) -> {
                     setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x05)
@@ -1068,14 +1074,18 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 OtherUtils.isRGBGroup(groupByMeshAddr) -> setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x06, i)
                 else -> setSceneAc(sceneActions, belongSceneId, itemGroups[i], 0x04)
             }
+//            sceneActions.id =
             actionsList.add(sceneActions)
             DBUtils.saveSceneActions(sceneActions)
             nameList.add(itemGroups[i].groupAddress)
         }
+
         isChange = compareList(nameList, groupMeshAddrArrayList)
 
         when {
-            Constant.IS_ROUTE_MODE -> routerUpdateScene(belongSceneId, actionsList)
+            Constant.IS_ROUTE_MODE -> {
+                routerUpdateScene(belongSceneId, actionsList)
+            }
             else -> {
                 DBUtils.updateScene(dbScene!!)
                 Thread.sleep(100)
@@ -1122,14 +1132,14 @@ class NewSceneSetAct : TelinkBaseActivity() {
             Thread.sleep(100)
             var temperature: Byte
             temperature = when {
-                list[i].getIsEnableWhiteBright() -> list[i].colorTemperature.toByte()
+                list[i].isEnableWhiteBright -> list[i].colorTemperature.toByte()
                 else -> 0
             }
             if (temperature > 99)
                 temperature = 99
 
             var light: Byte = when {
-                list[i].isOn && list[i].getIsEnableBright() -> list[i].brightness.toByte()
+                list[i].isOn && list[i].isEnableBright -> list[i].brightness.toByte()
                 else -> 0
             }
 

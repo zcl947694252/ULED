@@ -1205,32 +1205,34 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun getFilters(): ArrayList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
-        val manuData = byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
+//        val manuData = byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
+        val manuData = null //chown
         val manuDataMask = byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
 
         val scanFilter = ScanFilter.Builder().setManufacturerData(VENDOR_ID, manuData, manuDataMask).build()
+//        val scanFilter = ScanFilter.Builder().build();
         scanFilters.add(scanFilter)
         return scanFilters
     }
 
     private fun getSwitchFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.EIGHT_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.DOUBLE_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
         return scanFilters

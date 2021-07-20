@@ -492,7 +492,10 @@ class DeveloperActivity : BaseActivity() {
                                 }
                     }
                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                    else-> ToastUtils.showShort(it.message)
+                    else-> {
+                        ToastUtils.showShort(it.message)
+                        hideLoadingDialog()
+                    }
                 }
             }, {
                 ToastUtils.showShort(it.message)

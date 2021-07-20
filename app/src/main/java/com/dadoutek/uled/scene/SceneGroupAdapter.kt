@@ -35,15 +35,15 @@ import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.google.gson.Gson
 import com.warkiz.widget.IndicatorSeekBar
-import com.warkiz.widget.OnSeekChangeListener
-import com.warkiz.widget.SeekParams
+//import com.warkiz.widget.OnSeekChangeListener
+//import com.warkiz.widget.SeekParams
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.anko.sdk27.coroutines.onSeekBarChangeListener
+//import org.jetbrains.anko.sdk27.coroutines.onSeekBarChangeListener
 import org.json.JSONException
 import java.lang.Thread.sleep
 import java.util.*
@@ -458,6 +458,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_curtain, false)
                         .setGone(R.id.scene_relay, true)
+                        .setGone(R.id.curtain_add_less_layout,false)
+                        .setGone(R.id.tv_cur_range,false)
+                        .setGone(R.id.curtain_seekbar,false)
                 topRgLy?.visibility = View.GONE
                 when {
                     item.isOn -> {
@@ -482,6 +485,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.switch_scene, true)
                         .setGone(R.id.scene_relay, false)
                         .setGone(R.id.scene_curtain, true)
+                        .setGone(R.id.curtain_add_less_layout,true)
+                        .setGone(R.id.tv_cur_range,true)
+                        .setGone(R.id.curtain_seekbar,true)
                 topRgLy?.visibility = View.GONE
                 if (item.isOn) {
                     helper.setChecked(R.id.rg_xx, true)

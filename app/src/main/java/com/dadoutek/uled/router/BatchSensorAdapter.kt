@@ -43,7 +43,7 @@ class BatchSensorAdapter(layoutResId: Int, data: MutableList<DbSensor>) : BaseQu
         if (item?.productUUID == DeviceType.LIGHT_RGB) {
             icon.setImageResource(R.drawable.icon_rgb_n)
         } else {
-            icon.setImageResource(R.drawable.icon_light_n)
+            icon.setImageResource(R.drawable.icon_sensor)
         }
     }
 }

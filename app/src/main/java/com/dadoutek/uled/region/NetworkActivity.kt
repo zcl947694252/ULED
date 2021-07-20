@@ -113,7 +113,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         return R.layout.activity_network
     }
 
-    override fun initView() {
+    override fun initView() { //重写抽象类，因为activity的调用一定会用到onCreate，该类中没有，那就回调用父类的onCreate
         list = ArrayList()
         listAuthorize = ArrayList()
         mRxPermission = RxPermissions(this)
@@ -278,7 +278,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
         list = if (!isMeRegionAll) subMeList else listAll
 
-        region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        region_me_recycleview.layoutManager = LinearLayoutManager(this@NetworkActivity, LinearLayoutManager.VERTICAL, false)
         adapter = AreaItemAdapter(R.layout.item_area_net, list!!, lastUser)
 //        LogUtils.e("zcl_NetworkActivity", "zcl***设置adapter***$lastUser")
         adapter!!.setOnItemChildClickListener { _, view, position ->
@@ -675,9 +675,10 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
 
+    @SuppressLint("CutPasteId")
     private fun setCancel() {
         view?.let {
-            it?.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility = View.GONE
+            it.findViewById<TextView>(R.id.pop_qr_area_name)?.visibility = View.GONE
             //设置二维码失效状态 倒计时颜色状态
             it.findViewById<TextView>(R.id.pop_qr_timer)?.text = getString(R.string.QR_expired)
             it.findViewById<TextView>(R.id.pop_qr_timer)?.textColor = getColor(R.color.red)
@@ -820,7 +821,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             it.findViewById<ImageView>(R.id.pop_transfer_region).setOnClickListener(this)
         }
         viewAdd?.let {
-            var name = it.findViewById<EditText>(R.id.pop_region_name)
+            val name = it.findViewById<EditText>(R.id.pop_region_name)
             it.findViewById<Button>(R.id.tip_confirm).setOnClickListener {
                 if (com.blankj.utilcode.util.StringUtils.isTrimEmpty(name.text.toString())) {
                     ToastUtils.showLong(getString(R.string.please_input_region_name))
@@ -989,6 +990,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             Log.e(TAG, "zcl******上传数据成功")
             downLoadDataAndChangeDbUser()
             hideLoadingDialog()
+            finish()
         }
 
         override fun error(msg: String) {

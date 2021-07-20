@@ -249,6 +249,7 @@ public class DbSceneActions {
                 ", gradientId=" + gradientId +
                 ", gradientSpeed=" + gradientSpeed +
                 ", gradientName='" + gradientName + '\'' +
+                ", curtainOnOffRange" + curtainOnOffRange +
                 '}';
     }
 

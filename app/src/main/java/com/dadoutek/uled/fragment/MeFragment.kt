@@ -233,13 +233,12 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 .apply(RequestOptions.bitmapTransform(CircleCrop()))
                 .into(userIcon)
 
-
         makePop()
         makePop2()
     }
 
     private fun makePop2() {
-        var popView: View = LayoutInflater.from(activity).inflate(R.layout.pop_time_cancel, null)
+        val popView: View = LayoutInflater.from(activity).inflate(R.layout.pop_time_cancel, null)
         hinitOne = popView.findViewById(R.id.hinit_one)
         hinitTwo = popView.findViewById(R.id.hinit_two)
         hinitThree = popView.findViewById(R.id.hinit_three)
@@ -253,9 +252,9 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         hinitTwo?.text = getString(R.string.user_reset_all2)
         hinitThree?.text = getString(R.string.user_reset_all3)
 
-        var cs: ClickableSpan = object : ClickableSpan() {
+        val cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                val intent = Intent(activity, InstructionsForUsActivity::class.java)
                 intent.putExtra(Constant.WB_TYPE, "#user-reset")
                 startActivity(intent)
             }
@@ -268,7 +267,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         }
 
         val str = getString(R.string.have_question_look_notice)
-        var ss = SpannableString(str)
+        val ss = SpannableString(str)
         val start: Int = if (Locale.getDefault().language.contains("zh")) str.length - 7 else str.length - 26
         val end = str.length
         ss.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

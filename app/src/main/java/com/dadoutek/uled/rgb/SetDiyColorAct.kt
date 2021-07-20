@@ -15,6 +15,7 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.SeekBar
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -36,10 +37,10 @@ import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.util.SharedPreferencesUtils
 import com.dadoutek.uled.util.StringUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import com.warkiz.widget.IndicatorSeekBar
-import com.warkiz.widget.OnSeekChangeListener
-import com.warkiz.widget.SeekParams
-import io.reactivex.disposables.Disposable
+//import com.warkiz.widget.IndicatorSeekBar
+//import com.warkiz.widget.OnSeekChangeListener
+//import com.warkiz.widget.SeekParams
+//import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.activity_ota.*
 import kotlinx.android.synthetic.main.activity_set_diy_color.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -83,7 +84,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
     }
 
-    @SuppressLint("StringFormatMatches", "SetTextI18n")
+    @SuppressLint("StringFormatMatches", "SetTextI18n", "ClickableViewAccessibility")
     private fun initView() {
         saveNode.setOnClickListener(this)
         val layoutmanager = GridLayoutManager(this, 4)
@@ -93,20 +94,20 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         rgbDiyColorListAdapter?.bindToRecyclerView(selectColorRecyclerView)
         rgbDiyColorListAdapter?.onItemClickListener = onItemClickListener
         rgbDiyColorListAdapter?.onItemLongClickListener = onItemLongClickListener
-        sbSpeed.onSeekChangeListener = object : OnSeekChangeListener {
-            override fun onSeeking(seekParams: SeekParams?) {
-                speed = seekParams?.progress ?: 0
+        speed_num.visibility = View.VISIBLE
+        sbSpeed.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                speed = progress
                 if (speed == 0)
                     speed = 1
-
                 if (isChange) {
                     diyGradient?.let {
                         RouterModel.routerUpdateGradientNameSpeed(it.id.toInt(), UpdateGradientNameSpeedBean(name = it.name, speed = speed))
-                                ?.subscribe({ itr ->
-                                    LogUtils.v("zcl-----路由渐变设置速度$speed-------$itr")
-                                }, { itt ->
-                                    ToastUtils.showShort(itt.message)
-                                })
+                            ?.subscribe({ itr ->
+                                LogUtils.v("zcl-----路由渐变设置速度$speed-------$itr")
+                            }, { itt ->
+                                ToastUtils.showShort(itt.message)
+                            })
                     }
                 }
 
@@ -127,13 +128,56 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                 }
             }
 
-            override fun onStartTrackingTouch(seekBar: IndicatorSeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {}
-        }
-        selectColorRecyclerView.addOnScrollListener(object : androidx.recyclerview.widget.RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: androidx.recyclerview.widget.RecyclerView, newState: Int) {
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+
+            }
+
+        })
+//        sbSpeed.onSeekChangeListener = object : OnSeekChangeListener {
+//            override fun onSeeking(seekParams: SeekParams?) {
+//                speed = seekParams?.progress ?: 0
+//                if (speed == 0)
+//                    speed = 1
+//
+//                if (isChange) {
+//                    diyGradient?.let {
+//                        RouterModel.routerUpdateGradientNameSpeed(it.id.toInt(), UpdateGradientNameSpeedBean(name = it.name, speed = speed))
+//                                ?.subscribe({ itr ->
+//                                    LogUtils.v("zcl-----路由渐变设置速度$speed-------$itr")
+//                                }, { itt ->
+//                                    ToastUtils.showShort(itt.message)
+//                                })
+//                    }
+//                }
+//
+//                speed_num.text = "$speed"
+//                when {
+//                    speed >= 100 -> {
+//                        speed_add.isEnabled = false
+//                        speed_less.isEnabled = true
+//                    }
+//                    speed <= 0 -> {
+//                        speed_less.isEnabled = false
+//                        speed_add.isEnabled = true
+//                    }
+//                    else -> {
+//                        speed_less.isEnabled = true
+//                        speed_add.isEnabled = true
+//                    }
+//                }
+//            }
+//
+//            override fun onStartTrackingTouch(seekBar: IndicatorSeekBar?) {}
+//            override fun onStopTrackingTouch(seekBar: IndicatorSeekBar?) {}
+//        }
+        selectColorRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                if (newState == androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING) {
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
                     val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                     val v = window.peekDecorView()
                     if (null != v) {
@@ -167,7 +211,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             toolbarTv.text = getString(R.string.update_gradient)
             editName.setText(diyGradient?.name)
             editName.setSelection(editName.text.toString().length)
-            sbSpeed.setProgress(diyGradient?.speed?.toFloat() ?: 0f)
+            sbSpeed.progress = diyGradient?.speed!!
             speed_num.text = diyGradient?.speed.toString() + "%"
             when {
                 sbSpeed.progress >= 100 -> {
@@ -201,7 +245,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
             toolbarTv.text = getString(R.string.add_gradient)
             editName.setText(DBUtils.getDefaultModeName())
             editName.setSelection(editName.text.toString().length)
-            sbSpeed.setProgress(1f)
+            sbSpeed.progress = 1
 
             speed_num.text = 50.toString() + "%"
         }
@@ -291,9 +335,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
 
     @SuppressLint("HandlerLeak")
     private val addSpeedHandler = object : Handler() {
+        @SuppressLint("SetTextI18n")
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbSpeed.setProgress(sbSpeed.progress + 1f)
+            sbSpeed.progress = sbSpeed.progress + 1
             when {
                 sbSpeed.progress > 100 -> {
                     speed_add.isEnabled = false
@@ -321,14 +366,14 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private val lessSpeedHandler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            sbSpeed.setProgress(sbSpeed.progress - 1f)
+            sbSpeed.progress = sbSpeed.progress - 1
             when {
                 sbSpeed.progress < 0 -> {
                     speed_less.isEnabled = false
                     onBtnTouch = false
                 }
                 sbSpeed.progress == 0 -> {
-                    sbSpeed.setProgress(1f)
+                    sbSpeed.progress = 1
                     speed_num.text = sbSpeed.progress.toString() + "%"
                     speed = sbSpeed.progress
                 }

@@ -106,7 +106,7 @@ public class NetworkFactory {
 
             api = retrofit.create(RequestInterface.class);
         } else*/
-        if (null == api || SharedPreferencesUtils.getTestType()) {
+        if (null == api /*|| SharedPreferencesUtils.getTestType()*/) {
             Constant.BASE_URL = Constant.isDebug ? Constant.BASE_DEBUG_URL : Constant.BASE_URL_JAVA;
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)

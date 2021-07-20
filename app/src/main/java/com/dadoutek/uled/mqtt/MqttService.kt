@@ -100,7 +100,7 @@ class MqttService : Service() {
     /* open */ fun init() {
         if (imei=="未授权")
             imei = TelinkLightApplication.getApp().randomImei.toString()
-        host = "${Constant.HOST2}:${Constant.PORT}"
+//        host = "${Constant.HOST2}:${Constant.PORT}"
         LogUtils.v("zcl----------imei--------$imei")
 
         // 服务器地址（协议+地址+端口号）

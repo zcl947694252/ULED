@@ -15,6 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.app.hubert.guide.core.Builder
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -125,6 +126,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                             else {
                                 Log.e("zcl场景", "zcl场景******scene_edit")
                                 val scene = scenesListData[position]
+                                LogUtils.v("============================点击打印这段话 ${scene.actions}====================================================")
                                 val intent = Intent(activity, NewSceneSetAct::class.java)
                                 intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
                                 intent.putExtra(Constant.IS_CHANGE_SCENE, true)

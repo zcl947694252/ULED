@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
+import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight
 import org.jetbrains.anko.textColor
@@ -32,9 +33,10 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRout
 
         helper.setText(R.id.template_device_batch_title, item?.name)
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
-        when {
-            isRgb -> icon.setImageResource(R.drawable.icon_rgb_n)
-            else -> icon.setImageResource(R.drawable.icon_light_n)
+        if (item?.productUUID == DeviceType.LIGHT_RGB) {
+            icon.setImageResource(R.drawable.icon_rgb_n)
+        } else {
+            icon.setImageResource(R.drawable.icon_sensor)
         }
 
 
