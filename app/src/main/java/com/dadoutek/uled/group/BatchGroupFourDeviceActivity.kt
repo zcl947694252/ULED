@@ -83,7 +83,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private var tipBottomLy: LinearLayout? = null
     private var popTip: PopupWindow? = null
     private var tipCancel: TextView? = null
-    private var tipRecycleView: androidx.recyclerview.widget.RecyclerView? = null
+    private var tipRecycleView: RecyclerView? = null
     private var gpMeshAddr: Int = 0
     private var isAll: Boolean = false
     private var disposableScan: Disposable? = null

@@ -4,7 +4,10 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Binder
+import android.os.Build
+import android.os.Handler
 import android.os.IBinder
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.EncryptUtils
@@ -13,6 +16,7 @@ import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.stomp.MqttManger
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.util.DeviceUtil
 import com.dadoutek.uled.util.DeviceUtils
@@ -61,7 +65,7 @@ class MqttService : Service() {
     private val mqttCallback = object : MqttCallback {
         override fun messageArrived(topic: String, message: MqttMessage) {
             val data = message.payload
-            LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message?.toString()}");
+            LogUtils.v("zcl_mqtt--****mqtt连接回调------------onPublish---${topic}---${message.toString()}");
             val intent = Intent()
             intent.action = Constant.LOGIN_OUT
             intent.putExtra(Constant.LOGIN_OUT, message.toString())
@@ -76,21 +80,46 @@ class MqttService : Service() {
         }
     }
 
-    /** 判断网络是否连接  */
-    private val isConnectIsNormal: Boolean
-        get() {
-            val connectivityManager = this.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val info = connectivityManager.activeNetworkInfo
-            return if (info != null && info.isAvailable) {
-                val name = info.typeName
-                LogUtils.i(TAG, "MQTT当前网络名称：$name")
-                true
-            } else {
-                LogUtils.i(TAG, "MQTT 没有可用网络")
-                false
+    /** 判断网络是否连接  chown */
+//    private val isConnectIsNormal: Boolean
+//        get() {
+//            val connectivityManager = this.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//            val info = connectivityManager.activeNetworkInfo
+//            return if (info != null && info.isAvailable) {
+//                val name = info.typeName
+//                LogUtils.i(TAG, "MQTT当前网络名称：$name")
+//                true
+//            } else {
+//                LogUtils.i(TAG, "MQTT 没有可用网络")
+//                false
+//            }
+//        }
+
+    /** 判断网络是否连接  chown */
+    fun isConnected(context: Context):Boolean {
+        val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (manager!=null){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val networkCapabilities = manager.getNetworkCapabilities(manager.activeNetwork)
+                if (networkCapabilities != null) {
+                    return networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                            || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                }
+            }
+            else {
+                val info = manager.activeNetworkInfo
+                return info != null && info.isConnected
             }
         }
-
+//        else {
+//            LogUtils.v("没有网络")
+//            Handler().postDelayed({
+//                doClientConnection()
+//            },3000)
+//        }
+        return false
+    }
 
     override fun onCreate() {
         super.onCreate()
@@ -100,8 +129,8 @@ class MqttService : Service() {
     /* open */ fun init() {
         if (imei=="未授权")
             imei = TelinkLightApplication.getApp().randomImei.toString()
-//        host = "${Constant.HOST2}:${Constant.PORT}"
-        LogUtils.v("zcl----------imei--------$imei")
+        host = "${Constant.HOST2}:${Constant.PORT}"
+//        LogUtils.v("zcl----------imei--------$imei")
 
         // 服务器地址（协议+地址+端口号）
         val uri = host
@@ -147,17 +176,24 @@ class MqttService : Service() {
 
     override fun onDestroy() {
         if (client != null) {
-            //client!!.disconnect()
-            client?.unregisterResources()
+            try {
+//                client?.disconnect()
+                client?.unregisterResources()
+//                client?.close()
+            } catch (e: MqttException) {
+                e.printStackTrace()
+            }
         }
 
         stopSelf()
         super.onDestroy()
     }
 
+
+
     /** 连接MQTT服务器  */
     private fun doClientConnection() {
-        if (client?.isConnected == false && isConnectIsNormal) {
+        if (client?.isConnected == false && isConnected(this)) { //chown && isConnectIsNormal
             try {
                 client?.connect(conOpt, null, iMqttActionListener)
             } catch (e: MqttException) {
@@ -165,7 +201,6 @@ class MqttService : Service() {
             }
         }
     }
-
 
     override fun onBind(intent: Intent): IBinder? {
         return CustomBinder()

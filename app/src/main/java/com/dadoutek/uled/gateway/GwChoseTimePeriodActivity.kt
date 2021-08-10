@@ -27,22 +27,35 @@ import com.dadoutek.uled.tellink.TelinkLightApplication
 import kotlinx.android.synthetic.main.activity_gate_way_chose_time.*
 import kotlinx.android.synthetic.main.template_top_three.*
 import kotlinx.android.synthetic.main.template_wheel_container.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * 设置网关 时间段时间与场景传递进配config界面
  */
 class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private var standingItemAdapter: StandingItemAdapter? = null
-    private var popRecycle: androidx.recyclerview.widget.RecyclerView? = null
+    private var popRecycle: RecyclerView? = null
     private var newData: GwTasksBean? = null
     private var standingNum: Int = 0 //停留时间
     private var picker: TimePicker? = null
     private val requestStandingCode = 1001
     private val requestTimerPeriodCode = 1002
-    private var startHourTime = 7
-    private var startMinuteTime = 40
-    private var endHourTime = 8
-    private var endMinuteTime = 30
+    private var startHourTime = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    private var startMinuteTime = Calendar.getInstance().get(Calendar.MINUTE)
+    private var endHourTime = if (Calendar.getInstance().get(Calendar.MINUTE)>=50) {
+        if (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)>=23)
+            1
+        else
+            Calendar.getInstance().get(Calendar.HOUR_OF_DAY)+1
+    } else {
+        Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    }
+    private var endMinuteTime = if (Calendar.getInstance().get(Calendar.MINUTE)>=50) {
+        (Calendar.getInstance().get(Calendar.MINUTE)+10)%60
+    } else {
+        Calendar.getInstance().get(Calendar.MINUTE)+10
+    }
     private var startTimeNum: Int = startHourTime * 60 + startMinuteTime
     private var endTimeNum: Int = endHourTime * 60 + endMinuteTime
     private var tasksBean: GwTasksBean? = null
@@ -107,6 +120,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     private fun initView() {
         toolbar_t_center.text = getString(R.string.chose_time)
         makeStandingTimePop()
+        startTime.text = "$startHourTime:$startMinuteTime" //chown
+        endTime.text = "$endHourTime:$endMinuteTime"
     }
 
     private fun makeStandingTimePop() {
@@ -130,10 +145,10 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
         standingItemAdapter?.setOnItemClickListener { _, _, position ->
             standingNum = list[position]
             gw_times_standing_time.text = standingNum.toString()
-            pop?.dismiss()
+            pop.dismiss()
         }
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-        pop?.let {
+        pop.let {
             it.isFocusable = true // 设置PopupWindow可获得焦点
             it.isTouchable = true // 设置PopupWindow可触摸补充：
             //it.isOutsideTouchable = false

@@ -1,5 +1,6 @@
 package com.dadoutek.uled.network
 
+import com.blankj.utilcode.util.LogUtils
 import java.io.Serializable
 
 
@@ -16,6 +17,7 @@ data class RouterTimeoutBean(
     var timeout: Int = 0
 ):Serializable{
     override fun toString(): String {
+        LogUtils.v("=========================chown :timeout= $timeout=====================================")
         return "RouteTimeoutBean(timeout=$timeout)"
     }
 }

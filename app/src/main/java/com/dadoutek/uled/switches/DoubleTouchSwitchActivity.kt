@@ -122,12 +122,12 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         if (TextUtils.isEmpty(localVersion))
             localVersion = getString(R.string.get_version_fail)
         else
-            mDeviceInfo?.firmwareRevision = localVersion
+            mDeviceInfo.firmwareRevision = localVersion
         fiVersion?.title = localVersion
     }
 
     override fun setConnectMeshAddr(): Int {
-        return mDeviceInfo?.meshAddress ?: 0
+        return mDeviceInfo.meshAddress ?: 0
     }
 
     override fun deleteDevice() {
@@ -142,9 +142,10 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         showRenameDialog(switchDate, false)
     }
 
-    override fun setLayoutId(): Int {
-        return R.layout.activity_switch_double_touch
-    }
+    override val setLayoutId: Int
+        get() {
+            return R.layout.activity_switch_double_touch
+        }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -201,7 +202,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         if (isRetryConfig == "false") {
             var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
+                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
                 dbSwitch.controlGroupAddrs = GsonUtils.toJson(mutableListOf(leftGroup?.meshAddr ?: 1000000, rightGroup?.meshAddr
                         ?: 1000000))
                 dbSwitch.meshAddr = /*Constant.SWITCH_PIR_ADDRESS*/mDeviceInfo.meshAddress
@@ -321,7 +322,7 @@ class DoubleTouchSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             rightL = 0
         }
         val bytes = byteArrayOf(leftL, leftH, rightL, rightH, 0, 0, 0, 0)
-        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_DOUBLE_SWITCH, mDeviceInfo?.meshAddress ?: 0, bytes)
+        TelinkLightService.Instance().sendCommandNoResponse(Opcode.CONFIG_DOUBLE_SWITCH, mDeviceInfo.meshAddress ?: 0, bytes)
     }
 
 

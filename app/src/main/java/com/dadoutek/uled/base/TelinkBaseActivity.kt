@@ -62,6 +62,7 @@ import com.dadoutek.uled.router.bean.*
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.switches.ScanningSwitchActivity
+import com.dadoutek.uled.switches.SelectSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -140,6 +141,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     var clickRgb: Boolean = false
 
     var installId = 0
+    var switchId = 0
     var stepOneText: TextView? = null
     var stepTwoText: TextView? = null
     var stepThreeText: TextView? = null
@@ -396,7 +398,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         //没有.show不展示，只是创建了这个其他设备登录之后的弹窗，这还需要一个广播
         popView = LayoutInflater.from(this).inflate(R.layout.code_warm, null)
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        pop?.let {
+        pop.let {
             it.isFocusable = true // 设置PopupWindow可获得焦点
             it.isTouchable = true // 设置PopupWindow可触摸补充：
             it.isOutsideTouchable = false
@@ -1519,8 +1521,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
                         }
                         INSTALL_SWITCH -> {
-                            if (!Constant.IS_ROUTE_MODE) {
-                                startActivity(Intent(this, ScanningSwitchActivity::class.java))
+                            if (!Constant.IS_ROUTE_MODE) { //chown SelectSwitchActivity跳转选择相关开关类型
+                                val intent = Intent(this,ScanningSwitchActivity::class.java )
+                                intent.putExtra("deviceType",switchId)
+//                                startActivity(Intent(this,SelectSwitchActivity::class.java)) //chown
+                                startActivity(intent)
                             } else {
                                 intent = Intent(this, DeviceScanningNewActivity::class.java)
                                 intent.putExtra(Constant.DEVICE_TYPE, 99)       //connector也叫relay

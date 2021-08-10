@@ -81,8 +81,8 @@ public class DbSwitch implements Serializable {
     /**
      * 是否是配置八鍵群組開關
      * 0 八鍵群組開關
-     * 1八鍵場景開關
-     * 2八键单调光
+     * 1 八鍵場景開關
+     * 2 八键单调光
      */
     public int type;
     public int belongRegionId =0;

@@ -136,8 +136,8 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         renameEditText?.setSelection(renameEditText?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -397,14 +397,14 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
 
         renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView!!)
-        renameDialog!!.setCanceledOnTouchOutside(false)
+        renameDialog.setContentView(popReNameView!!)
+        renameDialog.setCanceledOnTouchOutside(false)
 
         renameCancel?.setOnClickListener {
-            renameDialog?.dismiss()
+            renameDialog.dismiss()
         }
         renameConfirm?.setOnClickListener {
-            renameDialog?.dismiss()
+            renameDialog.dismiss()
             dbGw?.name = renameEditText?.text.toString()
             DBUtils.saveGateWay(dbGw!!, false)
         }

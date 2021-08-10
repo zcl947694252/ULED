@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.recyclerview.widget.GridLayoutManager
 import android.view.View
 import android.widget.Toast
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
@@ -16,11 +17,13 @@ import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.othersview.adapter.DeviceTypeAdapter
 import com.dadoutek.uled.router.RoutingNetworkActivity
+import com.dadoutek.uled.switches.SelectSwitchActivity
 import com.dadoutek.uled.util.StringUtils
 import com.tbruyelle.rxpermissions2.RxPermissions
 import com.uuzuche.lib_zxing.activity.CaptureActivity
 import com.uuzuche.lib_zxing.activity.CodeUtils
 import kotlinx.android.synthetic.main.activity_select_device_type.*
+import kotlinx.android.synthetic.main.activity_select_switch.*
 import kotlinx.android.synthetic.main.template_recycleview.*
 import kotlinx.android.synthetic.main.toolbar.*
 
@@ -88,14 +91,16 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
                     showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.curtain))
                 }
                 INSTALL_SWITCH -> {
-                    installId = INSTALL_SWITCH
-                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
-                    stepOneText?.visibility = View.GONE
-                    stepTwoText?.visibility = View.GONE
-                    stepThreeText?.visibility = View.GONE
-                    switchStepOne?.visibility = View.VISIBLE
-                    switchStepTwo?.visibility = View.VISIBLE
-                    swicthStepThree?.visibility = View.VISIBLE
+//                    installId = INSTALL_SWITCH
+//                    showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
+//                    stepOneText?.visibility = View.GONE
+//                    stepTwoText?.visibility = View.GONE
+//                    stepThreeText?.visibility = View.GONE
+//                    switchStepOne?.visibility = View.VISIBLE
+//                    switchStepTwo?.visibility = View.VISIBLE
+//                    swicthStepThree?.visibility = View.VISIBLE
+
+                    startActivity(Intent(this,SelectSwitchActivity::class.java))
                 }
                 INSTALL_SENSOR -> {
                     installId = INSTALL_SENSOR
@@ -116,6 +121,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         RxPermissions(this).request(Manifest.permission.CAMERA).subscribe({
             var intent = Intent(this@SelectDeviceTypeActivity, MyScanActivity::class.java)
             //var intent = Intent(this@SelectDeviceTypeActivity, CaptureActivity::class.java)
+            LogUtils.v("==============================去到MyScanActivity界面=======================================")
             startActivityForResult(intent, REQUEST_CODE)
         },{
             ToastUtils.showShort(it.message)
@@ -131,6 +137,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         when (requestCode) {
             REQUEST_CODE -> {  //处理扫描结果
+                LogUtils.v("==================================处理路由扫描结果========================================")
                 if (null != data) {
                     var bundle: Bundle? = data.extras ?: return
                     when {
@@ -138,6 +145,7 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
                             var result = bundle.getString(CodeUtils.RESULT_STRING)
                             LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
                             if (result != null) {
+                                LogUtils.v("==============================result 不为空 ======================================================")
                                 val intent = Intent(this@SelectDeviceTypeActivity, RoutingNetworkActivity::class.java)
                                 intent.putExtra(Constant.ONE_QR, result)
                                 startActivity(intent)

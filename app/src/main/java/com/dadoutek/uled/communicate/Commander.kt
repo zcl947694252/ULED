@@ -126,17 +126,17 @@ object Commander : EventListener<String> {
                     Thread.sleep(sleepTime)
                     for (k in lightList.indices) {
                         if (DBUtils.getLightByMeshAddr(lightList[k]) != null) {
-                            var ligh = DBUtils.getLightByMeshAddr(lightList[k])
+                            val ligh = DBUtils.getLightByMeshAddr(lightList[k])
                             if (ligh != null) {
                                 DBUtils.deleteLight(ligh)
                             }
                         } else if (DBUtils.getCurtainByMeshAddr(lightList[k]) != null) {
-                            var curtain = DBUtils.getCurtainByMeshAddr(lightList[k])
+                            val curtain = DBUtils.getCurtainByMeshAddr(lightList[k])
                             if (curtain != null) {
                                 DBUtils.deleteCurtain(curtain)
                             }
                         } else if (DBUtils.getRelyByMeshAddr(lightList[k]) != null) {
-                            var rely = DBUtils.getRelyByMeshAddr(lightList[k])
+                            val rely = DBUtils.getRelyByMeshAddr(lightList[k])
                             if (rely != null) {
                                 DBUtils.deleteConnector(rely)
                             }
@@ -206,7 +206,7 @@ object Commander : EventListener<String> {
             var sendCommandNoResponse = TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, deviceMeshAddr, paramsKickOut) //延时后再给直连灯发恢复
             if (sendCommandNoResponse == null)
                 sendCommandNoResponse = false
-            emitter.onNext(sendCommandNoResponse!!)// 出厂设置指令
+            emitter.onNext(sendCommandNoResponse)// 出厂设置指令
         }
 
         val ret = getDeviceVersion(deviceMeshAddr)
@@ -697,6 +697,7 @@ object Commander : EventListener<String> {
                 opcode = Opcode.SEND_MESSAGE_BY_MESH
                 val meshAddr = TelinkApplication.getInstance().connectDevice.meshAddress
                 params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
+//                params = byteArrayOf(0x3c, ((meshAddr shr 8) and 0xFF).toByte(), (meshAddr and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte // chwon 四键版本号
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
         }.retry(retryTimes)

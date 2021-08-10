@@ -1629,7 +1629,7 @@ public interface RequestInterface {
      * {"id": 1, "hour": 8,"min": 0, "week": 0, "sid": 1, "ser_id": "xxxx"}
      */
     @PUT("router/update-timer-scene")
-    Observable<Response<RouterTimeoutBean>> routeUpdateTimerScene(@Body TimerSceneBody body
+    Observable<Response<RouterTimeoutBean>> routeUpdateTimerScene(@Body TimerSceneUpdateBody body
             /*@Field("id") int id,
                                                @Field("hour") int hour,  @Field("min") int min,
                                                @Field("week") int week, @Field("sid") int sid,

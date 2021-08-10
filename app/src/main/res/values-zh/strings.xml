@@ -239,9 +239,14 @@
     <string name="delete_name">删除</string>
     <string name="scene_apply_success">应用成功</string>
     <string name="connecting_tip">正在连接...</string>
-    <string name="normal_swith">普通开关</string>
+    <string name="normal_swith">触摸开关</string>
+    <string name="normal_swith2">光能开关</string>
     <string name="scene_switch">场景开关</string>
     <string name="curtain_switch">窗帘开关</string>
+    <string name="four_switch">四键开关</string>
+    <string name="six_switch">六键开关</string>
+    <string name="double_switch">双组开关</string>
+    <string name="select_switch">选择开关</string>
     <string name="please_near_light">请靠近灯</string>
     <string name="button1">按键1</string>
     <string name="button2">按键2</string>
@@ -447,7 +452,7 @@
     <string name="group_fail_tip">有设备分组失败，请检查要分组的设备是否通电并重试！</string>
     <string name="reset_all_now">正在恢复出厂设置</string>
     <string name="tip_reset_sure">确定恢复所有设备(开关、传感器除外)吗？</string>
-    <string name="scene_16_tip">最多100个场景！</string>
+    <string name="scene_16_tip">最多255个场景！</string>
     <string name="server_exception">服务器异常</string>
     <string name="start_sync">即将开始同步数据..</string>
     <string name="sync_now">同步数据中…</string>
@@ -796,7 +801,6 @@
     <string name="left">左:</string>
     <string name="right">右:</string>
     <string name="single_brighress_group_switch">单调光群组开关</string>
-    <string name="double_switch">双组开关</string>
     <string name="delete_device_tip">是否删除?</string>
     <string name="delete_device_hard_tip">删除失败,是否强制删除?</string>
     <string name="add_cycle_label">添加循环标签</string>
@@ -1214,4 +1218,9 @@
     <string name="please_do_this_over_ble">请在蓝牙下进行此操作</string>
     <string name="compatible_scan">兼容模式</string>
     <string name="normal_scan">常规模式</string>
+    <string name="toolbar_check_data">查看数据</string>
+    <string name="curtain_range">幅度：</string>
+    <string name="sort">排序</string>
+    <string name="switch_normal">灯控开关</string>
+    <string name="smart_curtain_switch">窗帘开关</string>
 </resources>

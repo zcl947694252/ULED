@@ -24,6 +24,8 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
     open var deleteDeviceAll: MenuItem? = null
     open var onlineUpdateAll: MenuItem? = null
     open var batchGpAll: MenuItem? = null
+    open var toolbarAddScene: MenuItem? = null
+    open var checkData: MenuItem? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(setLayoutId())
@@ -46,6 +48,8 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
         onlineUpdateAll = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDeviceAll = toolbar.menu?.findItem(R.id.toolbar_delete_device)
         bindRouter = toolbar.menu?.findItem(R.id.toolbar_bind_router)
+        toolbarAddScene = toolbar.menu?.findItem(R.id.toolbar_add_scene)
+        checkData = toolbar.menu?.findItem(R.id.toolbar_check_data)
 
         batchGpAll?.title = getString(R.string.batch_group)
         onlineUpdateAll?.title = getString(R.string.online_upgrade)
@@ -56,6 +60,8 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
         onlineUpdateAll?.isVisible = onlineUpdateAllVisible()
         bindRouter?.isVisible = bindRouterVisible()
         deleteDeviceAll?.isVisible = deleteDeviceVisible()
+        toolbarAddScene?.isVisible = addSceneVisible()
+        checkData?.isVisible = checkDataVisible()
 
         toolbar.setOnMenuItemClickListener { itm ->
             DBUtils.lastUser?.let {
@@ -69,6 +75,8 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
                                 R.id.toolbar_on_line -> goOta() //在线升级
                                 R.id.toolbar_delete_device -> editeDevice() //编辑设备
                                 R.id.toolbar_bind_router -> bindDeviceRouter() //绑定路由
+                                R.id.toolbar_add_scene -> addSceneRoute() // 单个路由添加场景
+                                R.id.toolbar_check_data -> checkDataRoute() // 单个路由查看数据
                             }
                         else
                             ToastUtils.showShort(getString(R.string.no_device))
@@ -76,6 +84,22 @@ abstract class TelinkBaseToolbarActivity : TelinkBaseActivity() {
             }
             true
         }
+    }
+
+    open fun addSceneRoute() {
+
+    }
+
+    open fun checkDataRoute() {
+
+    }
+
+    open fun addSceneVisible(): Boolean {
+        return false
+    }
+
+    open fun checkDataVisible(): Boolean {
+        return false
     }
 
     open fun deleteDeviceVisible(): Boolean {

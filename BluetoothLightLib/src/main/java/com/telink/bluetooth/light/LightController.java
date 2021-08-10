@@ -714,10 +714,11 @@ public final class LightController extends EventBus<Integer> implements LightPer
         int sn = this.sequenceNumber;
 
         TelinkLog.d("LightController#sendCommand#NoEncrypt: " + Arrays.bytesToHexString(commandData, ":"));
+//        LogUtils.d("LightController#sendCommand#NoEncrypt: " + Arrays.bytesToHexString(commandData, ":"));
         byte[] macAddress = this.light.getMacBytes();
         byte[] nonce = this.getSecIVM(macAddress, sn);
         byte[] data = AES.encrypt(sk, nonce, commandData);
-
+//        LogUtils.v("chown ++++++ commandData " + Arrays.bytesToHexString(commandData,","));
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
         UUID characteristicUUID = manufacture.getUUID(Manufacture.UUIDType.COMMAND);
@@ -727,6 +728,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE :
                     Command.CommandType.WRITE;
             command.data = data;
+//            LogUtils.v(" chown ++ AES command" + Arrays.bytesToHexString(data,","));
             command.serviceUUID = serviceUUID;
             command.characteristicUUID = characteristicUUID;
             command.tag = tag;
@@ -756,9 +758,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             , boolean noResponse, Object tag, int delay) {
 
         int sn = this.generateSequenceNumber();
-
         byte[] command = new byte[20];
-
         int offset = 0;
 
         // SN
@@ -790,6 +790,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
         if (params != null) {
             System.arraycopy(params, 0, command, offset, params.length);
         }
+        LogUtils.v(" chown ++ --- command " +  Arrays.bytesToHexString(command,","));
+//        LogUtils.v(" chown ++ --- params" +  Arrays.bytesToHexString(params,","));
 
         return this.sendCommand(callback, command, noResponse, tag, delay);
     }

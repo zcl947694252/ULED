@@ -3,6 +3,9 @@ package com.telink.bluetooth.light;
 import android.os.Handler;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
+import com.telink.util.Arrays;
+
 /**
  * 命令写入FIFO策略
  * <p>
@@ -141,6 +144,7 @@ public abstract class AdvanceStrategy {
                 this.delay = delay;
                 this.tag = tag;
                 this.noResponse = noResponse;
+                LogUtils.v("chown -- setCommandArgs :" + opcode + address + Arrays.bytesToHexString(params,",") + delay + noResponse);
             }
 
             @Override
@@ -190,7 +194,7 @@ public abstract class AdvanceStrategy {
                     } else {
                         commandSender.removeCallbacks(task);
                         task.setCommandArgs(opcode, address, params, delay, tag,noResponse);
-//                        Log.d(TAG, "postCommand22: "+delay);
+//                      Log.d(TAG, "postCommand22: "+delay);
                         commandSender.postDelayed(task, this.getSampleRate() - interval);
                     }
                 } else {

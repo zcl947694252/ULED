@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit
  * 创建者     ZCL
  * 创建时间   2020/1/10 10:01
  * 描述 八键开关配置
- *乾三连 1开天金
+ * 乾三连 1开天金
  * 坤六断 8大地土
  * 震仰盂 4东方雷木
  * 艮覆碗 7东北齐山土
@@ -76,7 +76,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
 
     override fun initData() {
         val groupKey = mutableListOf(4, 5, 6, 7)
-        val sceneKey = mutableListOf(0, 1, 2, 3, 4, 5, 6)
+        val sceneKey = mutableListOf(0, 1, 2, 3, 4, 5, 6, 7)
         val doubleGroupKey = mutableListOf(2, 3, 4, 5, 6, 7)
         //先进行填充默认数据
         setDefaultData()
@@ -147,7 +147,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                         }
                         1 -> {
                             val sceneId = jOb.getInt("reserveValue_B")
-                            var scene = DBUtils.getSceneByID(sceneId.toLong())
+                            val scene = DBUtils.getSceneByID(sceneId.toLong())
                             eight_switch_title.text = getString(R.string.scene_switch)
                             //赋值旧的设置数据
                             sceneMap[keyId] = if (scene != null) {
@@ -157,7 +157,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                                     scene.name
                                 scene
                             } else {
-                                var dbScene = DbScene()
+                                val dbScene = DbScene()
                                 dbScene.id = 65536L
                                 name = getString(R.string.click_config)
                                 dbScene
@@ -178,7 +178,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                             val highMes = jOb.getInt("reserveValue_A")
                             val lowMes = jOb.getInt("reserveValue_B")
                             eight_switch_title.text = getString(R.string.single_brighress_group_switch)
-                            var mesAddress = (highMes shl 8) or lowMes
+                            val mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
                             val groupByMeshAddr = if (featureId == 0xff)
                                 null
@@ -213,11 +213,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         groupMap.clear()
         sceneMap.clear()
         for (i in 0 until 8) {
-            var dbGroup = DbGroup()
+            val dbGroup = DbGroup()
             dbGroup.id = 65536L
             groupMap[i] = dbGroup
 
-            var dbScene = DbScene()
+            val dbScene = DbScene()
             dbScene.id = 65536L
             sceneMap[i] = dbScene
         }
@@ -287,12 +287,12 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         val first = mutableListOf(0, 1)
         val second = mutableListOf(2, 3)
         val third = mutableListOf(4, 5)
-        //val four = mutableListOf(6, 7)
+        val four = mutableListOf(6, 7)
 
-        val four: MutableList<Int> = if (sceneMap[7]?.id != 65536L)
-            mutableListOf(6, 7)
-        else
-            mutableListOf(6)
+//        val four: MutableList<Int> = if (sceneMap[7]?.id != 65536L)
+//            mutableListOf(6, 7)
+//        else
+//            mutableListOf(6)
         val sceneParmOne = getSceneParm(first)
         val sceneParmTwo = getSceneParm(second)
         val sceneParmThird = getSceneParm(third)
@@ -377,7 +377,11 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     }
 
     private fun updateMeshGroup(isConfigGroup: Int) {
-        newMeshAddr = if (isReConfig) mDeviceInfo?.meshAddress ?: 0 else MeshAddressGenerator().meshAddress.get()
+        newMeshAddr = if (isReConfig) {
+            mDeviceInfo?.meshAddress ?: 0
+        } else {
+            MeshAddressGenerator().meshAddress.get()
+        }
         LogUtils.v("zcl-----------更新开关新mesh-------${newMeshAddr}")
         Commander.updateMeshName(newMeshAddr = newMeshAddr, successCallback = {
             mDeviceInfo?.meshAddress = newMeshAddr
@@ -480,8 +484,19 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt() and 0xff, name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
             dbSceneFirst!!.id
         }
-
-        return if (list.size > 1) {//配置双场景数据
+        val secondNum = list[1]
+        val dbSceneSecond = sceneMap[secondNum]
+        //位置 功能 保留 14场景id
+        val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 65536L) {
+            secondOpcode = Opcode.DEFAULT_SWITCH8K
+            listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            65536L
+        } else {
+            listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt() and 0xff, name = dbSceneSecond.name, hight8Mes = 0, low8Mes = dbSceneSecond.id.toInt()))
+            dbSceneSecond.id
+        }
+        return  byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), secondNum.toByte(), secondOpcode, 0x00, secondDbSceneId.toByte())
+        /*if (list.size > 1) {//配置双场景数据 chown
             val secondNum = list[1]
             val dbSceneSecond = sceneMap[secondNum]
             //位置 功能 保留 14场景id
@@ -497,7 +512,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         } else {//如果第八键没有配置默认为关  0-1-2 3id 4 5 6 7id
             listKeysBean.put(getKeyBean(7, Opcode.CLOSE.toInt() and 0xff, name = getString(R.string.close), hight8Mes = 0, low8Mes = 0xff))
             byteArrayOf(firstNum.toByte(), firstOpcode, 0x00, firsDbSceneId.toByte(), 0x07, Opcode.CLOSE, 0x00, 0x00)
-        }
+        }*/
     }
 
     private fun getGroupParm(list: MutableList<Int>): ByteArray {
@@ -621,14 +636,14 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             var name: String = ""
             when (configSwitchType) {
                 0, 2 -> {
-                    var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+                    val group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
                     groupMap[configButtonTag] = group
                     name = group.name
                 }
                 else -> {
                     val scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
                     //var scene = data?.getParcelableExtra(Constant.EIGHT_SWITCH_TYPE) as DbScene
-                    scene?.let {
+                    scene.let {
                         sceneMap[configButtonTag] = it
                         name = it.name
                     }
@@ -679,9 +694,10 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         showRenameDialog(switchDate, false)
     }
 
-    override fun setLayoutId(): Int {
-        return R.layout.eight_switch
-    }
+    override val setLayoutId: Int
+        get() {
+            return R.layout.eight_switch
+        }
 
     override fun initView() {
         toolbarTv!!.setText(R.string.eight_switch)

@@ -101,7 +101,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     private var create_scene: TextView? = null
     private val SCENE_MAX_COUNT = 100
 
-    override fun onCreate(savedInstanceState: Bundle?) {//其他界面添加扫描网关待做
+    override fun onCreate(savedInstanceState: Bundle?) { //其他界面添加扫描网关待做
         super.onCreate(savedInstanceState)
         type = this.intent.getIntExtra(DEVICE_TYPE, 0)
         inflater = this.layoutInflater
@@ -174,7 +174,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         adaper!!.bindToRecyclerView(recycleView)
         makePopupWindow()
         for (i in gwDatas.indices)
-            gwDatas!![i].updateIcon()
+            gwDatas[i].updateIcon()
 
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
@@ -569,8 +569,8 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
         renameEditText?.setSelection(renameEditText?.text.toString().length)
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
     }
 
@@ -749,7 +749,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             SharedPreferencesHelper.putBoolean(this, IS_GW_CONFIG_WIFI, true)
         }
         if (intent != null) {
-            intent!!.putExtra("data", currentGw)
+            intent.putExtra("data", currentGw)
             startActivity(intent)
         }
     }
@@ -850,21 +850,21 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                 else
                     ToastUtils.showLong(getString(R.string.rename_faile))
 
-                if (this != null && !this.isFinishing)
-                    renameDialog?.dismiss()
+                if (!this.isFinishing)
+                    renameDialog.dismiss()
                 LogUtils.v("zcl改名后-----------${DBUtils.getSwitchByMeshAddr(currentGw?.meshAddr ?: 0)?.name}")
             }
         }
         renameCancel?.setOnClickListener {
-            if (this != null && !this.isFinishing)
-                renameDialog?.dismiss()
+            if (!this.isFinishing)
+                renameDialog.dismiss()
         }
 
         renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView!!)
-        renameDialog!!.setCanceledOnTouchOutside(false)
+        renameDialog.setContentView(popReNameView!!)
+        renameDialog.setCanceledOnTouchOutside(false)
 
-        renameDialog?.setOnDismissListener {
+        renameDialog.setOnDismissListener {
             currentGw?.name = renameEditText?.text.toString().trim { it <= ' ' }
             if (currentGw != null)
                 DBUtils.saveGateWay(currentGw!!, true)

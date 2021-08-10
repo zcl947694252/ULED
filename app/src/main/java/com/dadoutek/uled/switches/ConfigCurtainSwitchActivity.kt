@@ -104,9 +104,10 @@ class ConfigCurtainSwitchActivity : BaseSwitchActivity(), EventListener<String> 
         showRenameDialog(switchDate, false)
     }
 
-    override fun setLayoutId(): Int {
-        return R.layout.activity_switch_group
-    }
+    override val setLayoutId: Int
+        get() {
+            return R.layout.activity_switch_group
+        }
 
     override fun initView() {
         toolbarTv?.text = getString(R.string.curtain_switch)

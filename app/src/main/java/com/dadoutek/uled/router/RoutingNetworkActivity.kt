@@ -63,9 +63,10 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
                 RouterModel.routerAccessInNet(mac!!.toLowerCase(), split[0].toInt(), split[1].toInt(), TAG)
                         ?.subscribe({
                             LogUtils.v("zcl-----------路由请求入网-------$it")
+
                             when (it.errorCode) {
                                 0 -> {
-                                   hideLoadingDialog()
+                                    hideLoadingDialog()
                                     timeOutTimer?.dispose()
                                     timeOutTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                                              .subscribeOn(Schedulers.io())
@@ -133,7 +134,7 @@ class RoutingNetworkActivity : TelinkBaseActivity() {
     }
 
     private fun startToDetail(routerGroup: RouteInAccountBean) {
-        startActivity<RouterDetailActivity>("routerId" to routerGroup?.router.id.toLong())
+        startActivity<RouterDetailActivity>("routerId" to routerGroup.router.id.toLong())
         ToastUtils.showShort(getString(R.string.router_access_in_success))
         finish()
     }

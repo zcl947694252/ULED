@@ -1,5 +1,6 @@
 package com.dadoutek.uled.util
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Build
@@ -29,6 +30,7 @@ class DeviceUtil {
             return DeviceUtils.getIMEI(TelinkLightApplication.getApp().mContext)
         }
 
+        @SuppressLint("HardwareIds")
         private fun getUniqueID(context: Context): String? {
             var id: String? = null
             val androidId = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
@@ -47,7 +49,9 @@ class DeviceUtil {
         }
         private fun getUUID(): String? {
             var serial: String? = null
-            val m_szDevIDShort = "35" + Build.BOARD.length % 10 + Build.BRAND.length % 10 + (if (null != Build.CPU_ABI) Build.CPU_ABI.length else 0) % 10 + Build.DEVICE.length % 10 + Build.DISPLAY.length % 10 + Build.HOST.length % 10 + Build.ID.length % 10 + Build.MANUFACTURER.length % 10 + Build.MODEL.length % 10 + Build.PRODUCT.length % 10 + Build.TAGS.length % 10 + Build.TYPE.length % 10 + Build.USER.length % 10 //13 位
+            val m_szDevIDShort = "35" + Build.BOARD.length % 10 + Build.BRAND.length % 10 + (if (null != Build.CPU_ABI) Build.CPU_ABI.length else 0) % 10
+            + Build.DEVICE.length % 10 + Build.DISPLAY.length % 10 + Build.HOST.length % 10 + Build.ID.length % 10 + Build.MANUFACTURER.length % 10
+            + Build.MODEL.length % 10 + Build.PRODUCT.length % 10 + Build.TAGS.length % 10 + Build.TYPE.length % 10 + Build.USER.length % 10 //13 位
             if (Build.VERSION.SDK_INT <= 29) {
                 try {
                     serial = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f5f5f5"
+        tools:context=".switches.SelectSwitchActivity">
+    <include android:id="@+id/select_switch_include"
+        layout="@layout/toolbar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/select_switch_recyclerView"/>
+
+    <TextView
+            android:id="@+id/see_help_select"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/dp_10"
+            android:gravity="center"
+            android:text="@string/see_help"
+            android:textColor="@color/black_three"
+            android:layout_marginBottom="@dimen/dp_10"
+            android:textSize="17sp" />
+
+</LinearLayout>

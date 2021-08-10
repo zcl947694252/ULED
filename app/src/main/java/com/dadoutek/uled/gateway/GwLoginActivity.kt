@@ -211,7 +211,7 @@ class GwLoginActivity : TelinkBaseActivity() {
     }
 
     private fun sendDeviceMacParmars() {
-        var params = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
+        val params = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_GET_MAC, dbGw?.meshAddr
                 ?: 0, params, "0")
     }
@@ -291,14 +291,14 @@ class GwLoginActivity : TelinkBaseActivity() {
     }
 
     private fun sendParmars(listParmars: MutableList<ByteArray>, byteSize: Byte, isPwd: Boolean) {
-        var num = 500L
+        val num = 500L
         GlobalScope.launch(Dispatchers.Main) {
             for (i in 0 until listParmars.size) {
                 delay(num * i)
                 //11-18 11位labelId
                 val offset = i * 8
                 val bytesArray = listParmars[i]
-                var params = byteArrayOf(byteSize, offset.toByte(), bytesArray[0], bytesArray[1], bytesArray[2], bytesArray[3],
+                val params = byteArrayOf(byteSize, offset.toByte(), bytesArray[0], bytesArray[1], bytesArray[2], bytesArray[3],
                         bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7])
 
                 if (isPwd) {
@@ -383,8 +383,8 @@ class GwLoginActivity : TelinkBaseActivity() {
     private fun setWIFI() {
         GlobalScope.launch {
             if (NetworkUtils.isWifiAvailable() && NetworkUtils.isWifiConnected()) {
-                var wifiManager = application.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                wifiManager?.let { itw ->
+                val wifiManager = application.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                wifiManager.let { itw ->
                     var currentWifiName = itw.connectionInfo.ssid
                     //删除首尾的 \"
                     currentWifiName = currentWifiName.substring(1, currentWifiName.length - 1)

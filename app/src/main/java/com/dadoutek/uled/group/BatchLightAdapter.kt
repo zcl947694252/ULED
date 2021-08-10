@@ -35,6 +35,8 @@ class BatchLightAdapter(layoutResId: Int, data: MutableList<DbLight>, var isRout
         val icon = helper.getView<ImageView>(R.id.template_device_batch_icon)
         if (item?.productUUID == DeviceType.LIGHT_RGB) {
             icon.setImageResource(R.drawable.icon_rgb_n)
+        } else if (item?.productUUID == DeviceType.LIGHT_NORMAL){
+            icon.setImageResource(R.drawable.icon_light_n)
         } else {
             icon.setImageResource(R.drawable.icon_sensor)
         }

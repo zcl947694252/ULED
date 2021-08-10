@@ -764,7 +764,7 @@
                     android:id="@+id/tv_cur_range"
                     app:layout_constraintTop_toBottomOf="@+id/scene_curtain"
                     android:textSize="14sp"
-                    android:text="幅度："
+                    android:text="@string/curtain_range"
                     android:visibility="gone"
                     android:layout_marginStart="5dp"
                     />
@@ -775,7 +775,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:visibility="gone"
-                    android:min="0"
+                    android:progress="100"
+                    android:min="1"
                     android:max="100"
                     app:layout_constraintTop_toBottomOf="@+id/tv_cur_range"
                     />

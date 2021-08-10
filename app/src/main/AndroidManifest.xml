@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
         package="com.dadoutek.uled">
     <!-- 蓝牙权限 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -8,24 +9,31 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION " />
-    <!--    <uses-permission android:name="android.permission.READ_PHONE_STATE" />-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION " /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.READ_LOGS"
+    <uses-permission
+            android:name="android.permission.READ_LOGS"
             tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="com.xiaomi.market.sdk.UPDATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" tools:ignore="ProtectedPermissions" />
-    <!--设备需要蓝牙功能 如果没有蓝牙也允许工作-->
-    <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
-    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
+    <uses-permission
+            android:name="android.permission.WRITE_SETTINGS"
+            tools:ignore="ProtectedPermissions" /> <!-- 设备需要蓝牙功能 如果没有蓝牙也允许工作 -->
+    <uses-feature
+            android:name="android.hardware.bluetooth"
+            android:required="true" />
+    <uses-feature
+            android:name="android.hardware.bluetooth_le"
+            android:required="true" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
-    <uses-permission android:name="android.permission.DEVICE_POWER" tools:ignore="ProtectedPermissions" />
+    <uses-permission
+            android:name="android.permission.DEVICE_POWER"
+            tools:ignore="ProtectedPermissions" />
 
     <application
             android:name=".tellink.TelinkLightApplication"
@@ -37,6 +45,12 @@
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning"
             tools:targetApi="m">
+        <activity android:name=".switches.SelectSwitchActivity"
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
+        <activity android:name=".scene.SceneSortActivity"
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
 
         <meta-data
                 android:name="Mob-AppKey"
@@ -44,7 +58,6 @@
         <meta-data
                 android:name="Mob-AppSecret"
                 android:value="886a329e066cc1fba6db79e0d5a299bf" />
-
         <meta-data
                 android:name="android.max_aspect"
                 android:value="2.1" />
@@ -69,8 +82,11 @@
         <service
                 android:name=".service.SendLightsInfo"
                 android:enabled="true" />
-        <service android:name=".mqtt.MqttService" android:enabled="true" />
-        <service android:name="org.eclipse.paho.android.service.MqttService"/>
+        <service
+                android:name=".mqtt.MqttService"
+                android:enabled="true" />
+        <service android:name="org.eclipse.paho.android.service.MqttService" />
+
         <activity
                 android:name=".router.RouterTimerSceneListActivity"
                 android:screenOrientation="portrait"
@@ -119,7 +135,6 @@
                 android:name=".router.RoutingNetworkActivity"
                 android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity" />
-
         <activity
                 android:name=".router.ChooseModeActivity"
                 android:screenOrientation="portrait"
@@ -131,70 +146,67 @@
         <activity
                 android:name=".fragment.SafeLockActivity"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".scene.SelectSceneIconActivity"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.CountryActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".scene.SelectGradientActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.ExtendActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwLoginActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.DoubleTouchSwitchActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwTimerPeriodListActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwTimerPeriodListActivity2"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwSelectStandingTimeActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwDeviceDetailActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwConfigTagActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwChoseTimeActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwChoseTimePeriodActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwChoseModeActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".gateway.GwEventListActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".pir.HumanBodySensorActivity"
                 android:screenOrientation="portrait"
@@ -204,120 +216,111 @@
                 android:name=".user.EnterConfirmationCodeActivity"
                 android:configChanges="orientation|keyboardHidden|screenSize"
                 android:launchMode="singleTop"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".region.NetworkActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.EnterPasswordActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.AgainEnterPasswordActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.InstructionsForUsActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.VerificationCodeActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.OTASwitchActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".connector.ConnectorBatchGroupActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".curtains.CurtainBatchGroupActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".rgb.RgbBatchGroupActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".ota.OTAConnectorActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".connector.ConnectorGroupingActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.SwitchSettingActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".ota.OTAUpdateCurtuinActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".group.BatchGroupActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".connector.ConnectorOfGroupActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-        <!--  android:theme="@style/FullHeightDialogNew"-->
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" /> <!-- android:theme="@style/FullHeightDialogNew" -->
         <activity
                 android:name=".connector.ConnectorSettingActivity"
                 android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".connector.ConnectorDeviceDetailActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".scene.SensorDeviceDetailsActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".curtains.CurtainsDeviceDetailsActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.SwitchDeviceDetailsActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".group.BatchGroupFourDeviceActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".light.PhysicalRecoveryActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.SplashActivity"
                 android:screenOrientation="nosensor"
-                android:theme="@style/AppTheme"
-                >
+                android:theme="@style/AppTheme.customeTheme">
+<!--            android:theme="@style/AppTheme">-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
                 android:name=".switches.ConfigEightSwitchActivity"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity">
-        </activity>
-
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.MainActivity"
                 android:launchMode="singleTop"
@@ -326,192 +329,185 @@
                 tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".pir.ChooseMoreGroupOrSceneActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".pir.PirConfigActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".light.NormalSettingActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.ChooseGroupOrSceneActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.DeviceBatchScanningActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".ota.OtaActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".ota.OTAUpdateSwitchActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".ota.OTAUpdateActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.FileSelectActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/> <!-- <activity -->
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" /> <!-- <activity -->
         <!-- android:name=".activity.DeviceScanningActivity" -->
         <!-- android:label="@string/activity_device_scanning_label" -->
-        <!--  android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"-->
+        <!--
+  android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"
+        -->
         <!-- /> -->
-
         <activity
                 android:name=".othersview.SelectDeviceTypeActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="DuplicateActivity,LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="DuplicateActivity,LockedOrientationActivity" />
         <activity
                 android:name=".switches.ScanningSwitchActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.ConfigNormalSwitchActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".light.LightsOfGroupActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.ConfigSceneSwitchActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.LoginActivity"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"
-                android:windowSoftInputMode="adjustResize" />
+                android:windowSoftInputMode="adjustResize"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.RegisterActivity"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"
-                android:windowSoftInputMode="adjustResize" />
+                android:windowSoftInputMode="adjustResize"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.PhoneVerificationActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.ForgetPassWordActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".light.DeviceScanningNewActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-   <!-- <activity -->
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" /> <!-- <activity -->
         <!-- android:name=".scene.SetSceneAct" -->
-        <!--  android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/> -->
+        <!--
+  android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"/>
+        -->
         <activity
                 android:name=".pir.ConfigSensorAct"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.AboutSomeQuestionsActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".pir.ScanningSensorActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".rgb.RGBSettingActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".rgb.RGBGradientActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/> <!-- <activity -->
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" /> <!-- <activity -->
         <!-- android:name=".scene.ChangeSceneAct" -->
-        <!--  android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/> -->
+        <!--
+  android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"/>
+        -->
         <activity
                 android:name=".scene.NewSceneSetAct"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"
-                android:windowSoftInputMode="adjustResize|stateHidden" />
+                android:windowSoftInputMode="adjustResize|stateHidden"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".othersview.SelectColorAct"
                 android:theme="@style/MyDialogStyleBottom" />
         <activity
                 android:name=".rgb.SetDiyColorAct"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".light.DeviceDetailAct"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.ConfigCurtainSwitchActivity"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"
-                android:windowSoftInputMode="adjustResize|stateVisible" />
+                android:windowSoftInputMode="adjustResize|stateVisible"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".group.CurtainGroupingActivity"
                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"
-                android:windowSoftInputMode="adjustResize|stateVisible" />
-        <!-- <activity -->
+                android:windowSoftInputMode="adjustResize|stateVisible"
+                tools:ignore="LockedOrientationActivity" /> <!-- <activity -->
         <!-- android:name=".rgb.SelectColorActivity" -->
-        <!--  android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/> -->
+        <!--
+  android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"/>
+        -->
         <activity
                 android:name=".rgb.SelectColorGradientAct"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".base.TelinkBaseActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".curtains.WindowCurtainsActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
-
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".curtain.CurtainOfGroupActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.InputPwdActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".user.DeveloperOtaActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".region.DeveloperActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".region.UnbindMeNetActivity"
-                 android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"/>
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity" />
         <activity
                 android:name=".switches.SelectSceneListActivity"
                 android:screenOrientation="fullSensor" />
-
 
         <meta-data
                 android:name="Mob-AppKey"
@@ -519,8 +515,10 @@
         <meta-data
                 android:name="Mob-AppSecret"
                 android:value="886a329e066cc1fba6db79e0d5a299bf" /> <!-- <activity android:name=".windowCurtains.WindowCurtainsActivity" -->
-        <!--  android:screenOrientation="portrait"
-                tools:ignore="LockedOrientationActivity"-->
+        <!--
+  android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"
+        -->
         <!-- /> -->
         <meta-data
                 android:name="android.max_aspect"
@@ -535,14 +533,17 @@
 
         <uses-library
                 android:name="org.apache.http.legacy"
-                android:required="false" />
-
-        <!--        bugly升级sdk用的-->
+                android:required="false" /> <!-- bugly升级sdk用的 -->
         <activity
                 android:name="com.tencent.bugly.beta.ui.BetaActivity"
                 android:configChanges="keyboardHidden|orientation|screenSize|locale"
                 android:theme="@android:style/Theme.Translucent" />
-
+        <activity android:name=".switches.fourkey.ConfigFourSwitchActivity"
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"/>
+        <activity android:name=".switches.sixkey.ConfigSixSwitchActivity"
+                android:screenOrientation="portrait"
+                tools:ignore="LockedOrientationActivity"/>
     </application>
 
 </manifest>

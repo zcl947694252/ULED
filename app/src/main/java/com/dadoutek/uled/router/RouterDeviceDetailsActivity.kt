@@ -72,8 +72,8 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     }
 
     override fun editeDeviceAdapter() {
-        adapter!!.changeState(isEdite)
-        adapter!!.notifyDataSetChanged()
+        adapter.changeState(isEdite)
+        adapter.notifyDataSetChanged()
     }
 
     override fun deleteDeviceVisible(): Boolean {
@@ -90,7 +90,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
 
     override fun batchGpVisible(): Boolean {
         batchGpAll?.title = getString(R.string.timer_scene)
-        return true
+        return false //chown 把路由下的添加场景false掉 剩下路由里面的添加场景
     }
 
     override fun setDeletePositiveBtn() {
@@ -145,8 +145,8 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                 renameEt?.setSelection(renameEt?.text.toString().length)
 
                 if (this != null && !this.isFinishing) {
-                    renameDialog?.dismiss()
-                    renameDialog?.show()
+                    renameDialog.dismiss()
+                    renameDialog.show()
                 }
 
                 renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -156,7 +156,7 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
                         currentDevice?.name = renameEt?.text.toString().trim { it <= ' ' }
                         DBUtils.updateRouter(currentDevice!!)
                         toolbarTv.text = currentDevice?.name
-                        adapter!!.notifyDataSetChanged()
+                        adapter.notifyDataSetChanged()
                         renameDialog.dismiss()
                     }
                 }
@@ -191,11 +191,14 @@ class RouterDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     }
 
     private fun goConfig() {
+        LogUtils.v("===============================点解没梵音==================================")
         if (isRightPos()) return
+        LogUtils.v("===============================点解没梵音==================================")
         if (!IS_ROUTE_MODE) {
             ToastUtils.showShort(getString(R.string.route_cont_support_ble))
             return
         }
+        LogUtils.v("===============================点解没梵音==================================")
         val intent = Intent(this@RouterDeviceDetailsActivity, RouterDetailActivity::class.java)
         intent.putExtra("routerId", currentDevice?.id)
         startActivity(intent)

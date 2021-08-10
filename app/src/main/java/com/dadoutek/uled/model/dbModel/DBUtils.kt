@@ -323,7 +323,9 @@ object DBUtils {
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SCENE_SWITCH)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.DOUBLE_SWITCH)
                         , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.EIGHT_SWITCH)
-                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)).build()
+                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SMART_CURTAIN_SWITCH)
+                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.FOUR_SWITCH)
+                        , DbSwitchDao.Properties.ProductUUID.eq(DeviceType.SIX_SWITCH)).build()
 
         var arrayList: ArrayList<DbSwitch> = arrayListOf()
         arrayList.addAll(query.list())
@@ -818,6 +820,7 @@ object DBUtils {
     fun saveSwitch(db: DbSwitch, isFromServer: Boolean, type: Int = 3, keys: String = "[]") {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
+            LogUtils.v("你在保存的时候，已经存在在数据了")
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }

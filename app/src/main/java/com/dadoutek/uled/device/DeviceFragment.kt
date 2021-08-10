@@ -72,17 +72,15 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         initData()
         initView()
         initListener()
-     for (i  in 0..10){
-         LogUtils.v("zcl-----------获取正常数据-------${i}")
-     }
-
+        for (i  in 0..10){
+            LogUtils.v("zcl-----------获取正常数据-------${i}")
+        }
     }
 
     private fun initListener() {
         main_go_help.setOnClickListener(this)
         main_add_device.setOnClickListener(this)
     }
-
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
         super.setUserVisibleHint(isVisibleToUser);
@@ -130,7 +128,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         create_scene?.setOnClickListener(onClick)
     }
 
-
     /**
      * 刷新UI
      */
@@ -144,7 +141,6 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
             deviceAdapter.notifyDataSetChanged()
         }
     }
-
 
     var onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         var intent = Intent()

@@ -67,6 +67,7 @@ import kotlin.collections.ArrayList
 class NewSceneSetAct : TelinkBaseActivity() {
     private var brightness: Int = 0
     private var whiteLight: Int = 0
+    private var curtainOnOffRange: Int = 100
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private var rgbGradientId: Int = 1
     private var resId: Int = R.drawable.icon_out
@@ -134,11 +135,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
             // this.showGroupList[position].isOn = false//该group设备是开还是关
             sceneGroupAdapter?.notifyItemChanged(currentPosition)
-            pop?.dismiss()
+            pop.dismiss()
         }
 
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-        pop?.let {
+        pop.let {
             it.isFocusable = true // 设置PopupWindow可获得焦点
             it.isTouchable = true // 设置PopupWindow可触摸补充：
             it.isOutsideTouchable = false
@@ -165,7 +166,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             item.speed = it.speed
             item.gradientType = 1
             item.colorNodes = it.colorNodes
-            buildInModeList?.add(item)
+            buildInModeList.add(item)
         }
 
     }
@@ -398,6 +399,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     }
 
     private fun switchTotal(position: Int) {
+        val param : ByteArray
         if (showGroupList[position].isOn) {
             isOpen = false
             if (!Constant.IS_ROUTE_MODE)
@@ -409,7 +411,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             cb_white_light.isChecked = false
             cb_white_light.isEnabled = false
             dot_rgb.isEnabled = false
-
+            param = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             // brightness = 0
             // temperature = 0
         } else {
@@ -423,18 +425,23 @@ class NewSceneSetAct : TelinkBaseActivity() {
             cb_white_light.isChecked = true
             cb_white_light.isEnabled = true
             dot_rgb.isEnabled = true
+            param = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
         }
         val addr = showGroupList[position].groupAddress
         if (!Constant.IS_ROUTE_MODE)
-            Thread {
-                Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn)
+            Thread { //chown
+                if (OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(showGroupList[position].groupAddress))){
+                    TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.CURTAIN_ON_OFF, showGroupList[position].groupAddress, param)
+                } else {
+                    Commander.openOrCloseLights(showGroupList[position].groupAddress, showGroupList[position].isOn) //chown 在这里将窗帘开关的发进去
+                }
                 /* Thread.sleep(300)
                  TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, byteArrayOf(brightness.toByte()), true)
                  Thread.sleep(300)
                  TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, byteArrayOf(temperature.toByte()), true)*/
             }.start()
         else {
-            var status = if (isOpen) 1 else 0
+            val status = if (isOpen) 1 else 0
             routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, status, "openOrCloseGp")
         }
         sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
@@ -613,12 +620,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     @SuppressLint("StringFormatInvalid")
     private fun delete(adapter: BaseQuickAdapter<*, *>, position: Int) {
-        if (position <= showGroupList!!.size - 1)
+        if (position <= showGroupList.size - 1)
             androidx.appcompat.app.AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(this))
-                    .setMessage(getString(R.string.delete_group_confirm, showGroupList!![position]?.gpName))
+                    .setMessage(getString(R.string.delete_group_confirm, showGroupList[position].gpName))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         this.showLoadingDialog(getString(R.string.deleting))
-                        val itemGroup = showGroupList!![position]
+                        val itemGroup = showGroupList[position]
                         for (index in showCheckListData!!.indices) {
                             if (showCheckListData!![index].meshAddr == itemGroup.groupAddress) {
                                 showGroupList.removeAt(position)
@@ -824,6 +831,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         newItemGroup.enableCheck = false
         newItemGroup.gpName = showCheckListData!![i].name
         newItemGroup.groupAddress = showCheckListData!![i].meshAddr
+        newItemGroup.curtainOnOffRange = 100
 
         return newItemGroup
     }
@@ -847,7 +855,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val name = edit_name.text.toString()
         var sceneIcon: String = "icon_out"
         try {
-            sceneIcon = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
+            sceneIcon = OtherUtils.getResourceName(resId, this@NewSceneSetAct).split("/")[1]
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -860,7 +868,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val belongSceneId = dbScene?.id!!
         DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(belongSceneId))
         val actionsList = mutableListOf<DbSceneActions>()
-        for (i in showGroupList!!.indices) {
+        for (i in showGroupList.indices) {
             var sceneActions = DbSceneActions()
             val item = showGroupList[i]
             sceneActions = when {
@@ -946,6 +954,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 sceneActions.gradientId = itemGroup.gradientId
                 sceneActions.gradientSpeed = itemGroup.gradientSpeed
                 sceneActions.gradientName = itemGroup.gradientName
+                sceneActions.curtainOnOffRange = itemGroup.curtainOnOffRange
             }
         } else {
             sceneActions.isEnableBright = item.isEnableBright
@@ -972,7 +981,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 if (i > 0)
                     Thread.sleep(300)
                 var temperature: Byte = when {
-                    list[i].getIsEnableWhiteBright() -> list[i].colorTemperature.toByte()
+                    list[i].isEnableWhiteBright -> list[i].colorTemperature.toByte()
                     else -> 0
                 }
 
@@ -980,7 +989,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     temperature = 99
 
                 var light: Byte = when {
-                    list[i].isOn && list[i].getIsEnableBright() -> list[i].brightness.toByte()
+                    list[i].isOn && list[i].isEnableBright -> list[i].brightness.toByte()
                     else -> 0
                 }
 
@@ -993,18 +1002,19 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 var red = color and 0xff0000 shr 16
                 var green = color and 0x00ff00 shr 8
                 var blue = color and 0x0000ff
-                var w = color shr 24
+                val w = color shr 24
+                val range = list[i].curtainOnOffRange
                 if (red == 0 && green == 0 && blue == 0) {
                     red = 255
                     green = 255
                     blue = 255
                 }
-                var type = list[i].deviceType
+                val type = list[i].deviceType
                 params = when (type) {
                     SMART_CURTAIN, SMART_RELAY -> {
                         when {
-                            list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x01) //接收器开是1
-                            else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte(), 0x02) //接收器关是2
+                            list[i].isOn -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, range.toByte(), 0x01) //接收器开是1
+                            else -> byteArrayOf(0x01, id.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, range.toByte(), 0x02) //接收器关是2
                         }
                     }
                     LIGHT_RGB -> {

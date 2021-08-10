@@ -224,6 +224,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
         onlineUpdate?.title = getString(R.string.online_upgrade)
         deleteDevice?.title = getString(R.string.edite_device)
         bindRouter?.isVisible = true
+        toolbar.menu?.findItem(R.id.toolbar_add_scene)?.isVisible = false
+        toolbar.menu?.findItem(R.id.toolbar_check_data)?.isVisible = false
 
         deleteDevice?.isVisible = true
         batchGp?.isVisible = true

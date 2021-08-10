@@ -37,13 +37,13 @@ class RouterTimerSceneItemAdapter(resId: Int, data: MutableList<RouterTimerScene
     }
 
     open fun getWeekStr(week: Int?): String {
-        var tmpWeek = week ?: 0
+        val tmpWeek = week ?: 0
         val sb = StringBuilder()
-        var str  =  when (tmpWeek) {
+        val str  =  when (tmpWeek) {
             0b01111111,0b10000000-> sb.append(mContext.getString(R.string.every_day)).toString()
             0b00000000 -> sb.append(mContext.getString(R.string.only_one)).toString()
             else -> {
-                var list = mutableListOf(
+                val list = mutableListOf(
                         WeekBean(mContext.getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
                         WeekBean(mContext.getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
                         WeekBean(mContext.getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),

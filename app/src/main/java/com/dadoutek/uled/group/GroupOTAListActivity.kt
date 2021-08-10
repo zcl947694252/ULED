@@ -640,7 +640,7 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
         setAllAdapter(emptyView)
         setDevice()
-            updataDevice()
+        updataDevice()
     }
 
     private fun setAllAdapter(emptyView: View?) {
@@ -705,7 +705,9 @@ class GroupOTAListActivity : TelinkBaseActivity() {
     private fun getCurtainData() {
         curtainList.clear()
         if (isGroup)
-            curtainList.addAll(DBUtils.getCurtainByGroupID(dbGroup!!.id)) else curtainList.addAll(DBUtils.allCurtain)
+            curtainList.addAll(DBUtils.getCurtainByGroupID(dbGroup!!.id))
+        else
+            curtainList.addAll(DBUtils.allCurtain)
         curtainList.forEach {
             meshAddrList.add(it.meshAddr)
             it.isGetVersion = !Constant.IS_ROUTE_MODE
@@ -1220,37 +1222,64 @@ class GroupOTAListActivity : TelinkBaseActivity() {
         }
     }
 
-    private fun bleOTACurtain(dbCurtain: DbCurtain) {
+    private fun bleOTACurtain(dbCurtain: DbCurtain) { // chown 还需改
         when {
-            dbCurtain.isSupportOta -> when {
-                dbCurtain.isMostNew -> ToastUtils.showShort(getString(R.string.the_last_version))
-                TextUtils.isEmpty(dbCurtain.version) -> {
-                    showLoadingDialog(getString(R.string.please_wait))
-                    when {
-                        TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbCurtain.meshAddr -> {
-                            getDeviceVersionCurtain(dbCurtain)
-                        }
-                        else -> {
-                            showLoadingDialog(getString(R.string.please_wait))
-                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
-                            Thread.sleep(500)
-                            connect(macAddress = dbCurtain.macAddr, meshAddress = dbCurtain.meshAddr, connectTimeOutTime = 15)
-                                    ?.subscribeOn(Schedulers.io())
-                                    ?.observeOn(AndroidSchedulers.mainThread())
-                                    ?.subscribe({
-                                        hideLoadingDialog()
-                                        getDeviceVersionCurtain(dbCurtain)
-                                    }, {
-                                        hideLoadingDialog()
-                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
-                                    })
-                        }
+            dbCurtain.isMostNew -> ToastUtils.showShort(getString(R.string.the_last_version))
+            TextUtils.isEmpty(dbCurtain.version) -> {
+                showLoadingDialog(getString(R.string.please_wait))
+                when {
+                    TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbCurtain.meshAddr -> {
+                        getDeviceVersionCurtain(dbCurtain)
+                    }
+                    else -> {
+                        showLoadingDialog(getString(R.string.please_wait))
+                        val idleMode = TelinkLightService.Instance()?.idleMode(true)
+                        Thread.sleep(500)
+                        connect(macAddress = dbCurtain.macAddr, meshAddress = dbCurtain.meshAddr, connectTimeOutTime = 15)
+                            ?.subscribeOn(Schedulers.io())
+                            ?.observeOn(AndroidSchedulers.mainThread())
+                            ?.subscribe({
+                                hideLoadingDialog()
+                                getDeviceVersionCurtain(dbCurtain)
+                            }, {
+                                hideLoadingDialog()
+                                runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                            })
                     }
                 }
-                else -> getFilePath(dbCurtain.meshAddr, dbCurtain.macAddr, dbCurtain.version, dbCurtain.productUUID)
             }
-            else -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+            else -> getFilePath(dbCurtain.meshAddr, dbCurtain.macAddr, dbCurtain.version, dbCurtain.productUUID)
         }
+//        when {
+//            dbCurtain.isSupportOta -> when {
+//                dbCurtain.isMostNew -> ToastUtils.showShort(getString(R.string.the_last_version))
+//                TextUtils.isEmpty(dbCurtain.version) -> {
+//                    showLoadingDialog(getString(R.string.please_wait))
+//                    when {
+//                        TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == dbCurtain.meshAddr -> {
+//                            getDeviceVersionCurtain(dbCurtain)
+//                        }
+//                        else -> {
+//                            showLoadingDialog(getString(R.string.please_wait))
+//                            val idleMode = TelinkLightService.Instance()?.idleMode(true)
+//                            Thread.sleep(500)
+//                            connect(macAddress = dbCurtain.macAddr, meshAddress = dbCurtain.meshAddr, connectTimeOutTime = 15)
+//                                    ?.subscribeOn(Schedulers.io())
+//                                    ?.observeOn(AndroidSchedulers.mainThread())
+//                                    ?.subscribe({
+//                                        hideLoadingDialog()
+//                                        getDeviceVersionCurtain(dbCurtain)
+//                                    }, {
+//                                        hideLoadingDialog()
+//                                        runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+//                                    })
+//                        }
+//                    }
+//                }
+//                else -> getFilePath(dbCurtain.meshAddr, dbCurtain.macAddr, dbCurtain.version, dbCurtain.productUUID)
+//            }
+//            else -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+//        }
     }
 
     @SuppressLint("CheckResult")

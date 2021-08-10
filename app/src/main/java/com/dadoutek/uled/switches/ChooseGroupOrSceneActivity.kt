@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.recyclerview.widget.GridLayoutManager
 import android.view.View
+import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
@@ -49,10 +50,10 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
 
         template_recycleView?.layoutManager = GridLayoutManager(this, 5)
-        val get = intent.extras?.get(Constant.EIGHT_SWITCH_TYPE)
+        val get = intent.extras?.get(Constant.EIGHT_SWITCH_TYPE) // 获取是群组模式吗 0是群组模式
         if (get != null) type = get as Int
 
-        val get1 = intent.extras?.get(Constant.DEVICE_TYPE)
+        val get1 = intent.extras?.get(Constant.DEVICE_TYPE) // 灯的相关分组 不带所有组DEVICE_TYPE_LIGHT_SW
         if (get1 != null) deviceType = get1 as Int
 
         isGroup = type == 0 || type == 2
@@ -64,7 +65,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
 
                 var filter: List<DbGroup> = mutableListOf()
                 when (deviceType) {
-                    Constant.DEVICE_TYPE_LIGHT.toInt(), Constant.DEVICE_TYPE_LIGHT_SW.toInt() -> {
+                    Constant.DEVICE_TYPE_LIGHT.toInt(), Constant.DEVICE_TYPE_LIGHT_SW.toInt() -> { // 灯的相关分组不带所有组
                         filter = groupList.filter {
                             it.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || it.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL ||
                                     it.deviceType == Constant.DEVICE_TYPE_CONNECTOR
@@ -116,7 +117,10 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
                 return@setOnClickListener
             }
             when {
-                isGroup -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
+                isGroup -> {
+                    LogUtils.v("chown ==- --=====  ${groupList[currentPosition].meshAddr}")
+                    setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
+                }
                 else -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))
             }
             groupList.forEach { it.isChecked = false }

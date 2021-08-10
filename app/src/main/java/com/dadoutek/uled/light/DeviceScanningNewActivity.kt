@@ -6,6 +6,7 @@ import android.app.AlertDialog
 import android.bluetooth.le.ScanFilter
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.SparseArray
@@ -610,9 +611,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun initListener() {
-        cancelf.setOnClickListener { popFinish?.dismiss() }
+        cancelf.setOnClickListener { popFinish.dismiss() }
         confirmf.setOnClickListener {
-            popFinish?.dismiss()
+            popFinish.dismiss()
             stopScanTimer()
             closeAnimation()
             getAndFinish()
@@ -1104,8 +1105,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     //扫描参数
                     val params = LeScanParameters.create()
                     if (!AppUtils.isExynosSoc)
-                        if (mAddDeviceType == DeviceType.NORMAL_SWITCH)
+                        if (mAddDeviceType == DeviceType.NORMAL_SWITCH){
                             params.setScanFilters(getSwitchFilters())
+                        }
                         else
                             params.setScanFilters(getFilters())
 
@@ -1203,20 +1205,46 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         return java.lang.Long.valueOf(id.toLong())
     }
 
+//    private fun getFilters(): ArrayList<ScanFilter> {
+//        val scanFilters = ArrayList<ScanFilter>()
+//        val manuData = byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
+////        val manuData = null //chown
+//        val manuDataMask = byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
+//
+//        val scanFilter = ScanFilter.Builder().setManufacturerData(VENDOR_ID, manuData, manuDataMask).build()
+////        val scanFilter = ScanFilter.Builder().build();
+//        scanFilters.add(scanFilter)
+//        return scanFilters
+//    }
     private fun getFilters(): ArrayList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
-//        val manuData = byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
-        val manuData = null //chown
-        val manuDataMask = byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
-
+        /*val manuData =      byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte())//转换16进制
+        val manuDataMask =  byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
         val scanFilter = ScanFilter.Builder().setManufacturerData(VENDOR_ID, manuData, manuDataMask).build()
-//        val scanFilter = ScanFilter.Builder().build();
-        scanFilters.add(scanFilter)
+        scanFilters.add(scanFilter)*/
+
+        Log.d("Mack", "MobilePhoneBrand:"+ Build.BRAND)
+        if (Build.BRAND.contains("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0x11.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        }
+        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+            byteArrayOf(0, 0, 0, 0, 0, 0, mAddDeviceType.toByte()),
+            byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+
         return scanFilters
     }
 
     private fun getSwitchFilters(): MutableList<ScanFilter> {
         val scanFilters = ArrayList<ScanFilter>()
+        Log.d("Mack", "MobilePhoneBrand:"+ Build.BRAND)
+        LogUtils.v("=================================================================")
+        if (Build.BRAND.contains("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0x11.toByte()),
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        }
         scanFilters.add(ScanFilter.Builder().setManufacturerData(VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
@@ -1353,7 +1381,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     private fun onLogin() {
         //进入分组
-
         if (meshList.size > mAddedDevices.size) {//如果生成的大于当前保存的找回设备
             meshList.removeAll(mAddedDevices.map { it.meshAddress })
             startToRecoverDevices()

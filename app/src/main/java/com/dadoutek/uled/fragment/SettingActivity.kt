@@ -266,7 +266,7 @@ class SettingActivity : TelinkBaseActivity() {
         toolbarTv.text = getString(R.string.setting)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
-        recycleView_setting.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        recycleView_setting.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycleView_setting.adapter = settingAdapter
         settingAdapter.bindToRecyclerView(recycleView_setting)
         makePop2()

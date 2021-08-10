@@ -25,7 +25,7 @@ class MyScanActivity : CaptureActivity() {
             finish()
         }
         toolbar.setNavigationIcon(R.drawable.icon_return)
-
+        LogUtils.v("==============================进入MyScanActivity界面=======================================")
         scan_confim.setOnClickListener {
             val toString = scan_device_code.editableText.toString()
 
@@ -34,6 +34,7 @@ class MyScanActivity : CaptureActivity() {
                 else -> {
                     val intent = Intent()
                     intent.putExtra(CodeUtils.RESULT_TYPE, CodeUtils.RESULT_SUCCESS)
+                    LogUtils.v("==================================传递的toString：$toString======================================================")
                     intent.putExtra(CodeUtils.RESULT_STRING, toString)
                     setResult(Activity.RESULT_OK, intent)
                     finish()

@@ -622,6 +622,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 }, {
                     LogUtils.d("logging: " + "登录错误" + it.message)
                     ToastUtils.showShort(it.message)
+//                    Toast.makeText(this,"账号密码错误",Toast.LENGTH_SHORT).show()
                     hideLoadingDialog()
                 })
     }

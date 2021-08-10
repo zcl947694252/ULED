@@ -64,9 +64,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     private lateinit var mGroupArrayList: ArrayList<DbGroup>
     private var localVersion: String = ""
     private var isGlassSwitch = false
-    override fun setLayoutId(): Int {
-        return R.layout.activity_switch_group
-    }
+    override val setLayoutId: Int
+        get() {
+            return R.layout.activity_switch_group
+        }
 
     override fun setToolBar(): Toolbar {
         return toolbar
@@ -296,8 +297,10 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
                                         finish()
                                     }
                                     900018 -> ToastUtils.showShort(getString(R.string.device_not_exit))
-                                      90008 -> {hideLoadingDialog()
-                ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                                    90008 -> {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                    }
                                     90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                                     else -> ToastUtils.showShort(it.message)
@@ -515,17 +518,17 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
 
     private fun updateSwitch() {
         if (groupName == "false") {
-            var dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
+            val dbSwitch = DBUtils.getSwitchByMacAddr(mDeviceInfo.macAddress)
             if (dbSwitch != null) {
                 dbSwitch.belongGroupId = currentGroup!!.id
-                dbSwitch?.meshAddr = mDeviceInfo?.meshAddress
+                dbSwitch.meshAddr = mDeviceInfo.meshAddress
                 dbSwitch.controlGroupAddr = currentGroup!!.meshAddr
-                dbSwitch!!.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
+                dbSwitch.name = StringUtils.getSwitchPirDefaultName(mDeviceInfo.productUUID, this) + dbSwitch.meshAddr
                 dbSwitch.version = mDeviceInfo.firmwareRevision
                 DBUtils.updateSwicth(dbSwitch)
                 switchDate = dbSwitch
             } else {
-                var dbSwitch = DbSwitch()
+                val dbSwitch = DbSwitch()
                 DBUtils.saveSwitch(dbSwitch, false)
                 dbSwitch.belongGroupId = currentGroup!!.id
                 dbSwitch.macAddr = mDeviceInfo.macAddress
@@ -545,7 +548,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
             }
             switchDate = dbSwitch
         } else {
-            switchDate?.meshAddr = mDeviceInfo?.meshAddress
+            switchDate?.meshAddr = mDeviceInfo.meshAddress
             switchDate!!.belongGroupId = currentGroup!!.id
             switchDate!!.controlGroupAddr = currentGroup!!.meshAddr
             DBUtils.updateSwicth(switchDate!!)

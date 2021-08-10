@@ -356,7 +356,7 @@
     <string name="one_click_reset">Выйти с устройства</string>
     <string name="reset_all_now">В ходе восстановления заводских настроек</string>
     <string name="tip_reset_sure">Вы уверены что хотите сбросить настройки устройства? </string>
-    <string name="scene_16_tip">Имеются 100 режимов!</string>
+    <string name="scene_16_tip">Имеются 255 режимов!</string>
     <string name="server_exception">Возникла проблема с сервером</string>
     <string name="start_sync">Скоро начнется синхронизация данных…</string>
     <string name="sync_now">Идет синхронизация данных…</string>
@@ -783,9 +783,13 @@
     <string name="old_light_rest">Устаревшая версия прошивки, попробуйте выполнить следующие шаги для сброса устройства:</string>
     <string name="warm_notice">Советы: Если у вас есть другие вопросы, ознакомьтесь с инструкцией.</string>
     <string name="config_success">Конфигурация выполнена успешно</string>
-    <string name="normal_swith">обычный</string>
+<!--    <string name="normal_swith">обычный</string>-->
+    <string name="normal_swith">контактный выключатель</string>
+    <string name="normal_swith2">обычный</string>
     <string name="scene_switch">Сцены</string>
     <string name="curtain_switch">гардины</string>
+    <string name="four_switch">четырехклавишный выключатель</string>
+    <string name="six_switch">шестикнопочный выключатель</string>
     <string name="night_light">Ночной свет</string>
     <string name="click_config">Нажмите Настройку</string>
     <string name="choose_scene">Выбор сцены</string>
@@ -882,6 +886,7 @@
     <string name="right">n.:</string>
     <string name="single_brighress_group_switch">Коммутатор регуляторов яркости</string>
     <string name="eight_switch">восьмёрка</string>
+    <string name="select_switch">селекторный переключатель</string>
     <string name="double_switch">две группы </string>
     <string name="delete_device">Удалить устройство</string>
     <string name="delete_device_tip">Нужно ли удалить?</string>
@@ -1102,5 +1107,6 @@
     <string name="please_do_this_over_ble">Пожалуйста, пройдите под bluetooth</string>
     <string name="compatible_scan">Режим совместимости</string>
     <string name="normal_scan">Обычный режим.</string>
-
+    <string name="toolbar_check_data">просмотреть данные</string>
+    <string name="sort">сортировка</string>
 </resources>

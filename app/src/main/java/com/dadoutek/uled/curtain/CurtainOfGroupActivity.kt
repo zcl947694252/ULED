@@ -363,6 +363,9 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
         deleteDevice?.isVisible = true
         batchGp?.isVisible = true
+        toolbar.menu?.findItem(R.id.toolbar_add_scene)?.isVisible = false
+        toolbar.menu?.findItem(R.id.toolbar_check_data)?.isVisible = false
+
         toolbar.setOnMenuItemClickListener { itm ->
             DBUtils.lastUser?.let {
                 if (it.id.toString() != it.last_authorizer_user_id)

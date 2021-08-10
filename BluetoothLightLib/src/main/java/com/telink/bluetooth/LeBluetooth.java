@@ -17,11 +17,13 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.telink.TelinkApplication;
+import com.telink.util.Arrays;
 import com.telink.util.ContextUtil;
 
 import java.util.List;
@@ -120,8 +122,11 @@ public final class LeBluetooth extends BluetoothGattCallback {
                     byte[] scanRecord = null;
                     if (result.getScanRecord() != null)
                         scanRecord = result.getScanRecord().getBytes();
-                    if (mCallback != null)
+                    if (mCallback != null){
                         mCallback.onLeScan(result.getDevice(), result.getRssi(), scanRecord);
+                        Log.e("Chown", "onScanResult :" + result.getScanRecord());
+                        Log.d("Chown","scanRecord-->" + Arrays.bytesToHexString(scanRecord, ":"));  //Mack
+                    }
                 }
                 if (isSupportM() && !ContextUtil.isLocationEnable(mContext)) {
                     mDelayHandler.removeCallbacks(mLocationCheckTask);

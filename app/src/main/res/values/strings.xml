@@ -264,7 +264,6 @@
 
     <!-- MeshSchema Add -->
 
-
     <string name="select_file">Select file(%s)</string>
     <string name="ota_prepare_title">OTA Prepare</string>
     <string name="ota_update_title">OTA Processing</string>
@@ -385,7 +384,7 @@
     <string name="one_click_reset">Reset all lights</string>
     <string name="reset_all_now">Restoring factory settings</string>
     <string name="tip_reset_sure">Are you sure to restore all devices (except switches and sensors)?</string>
-    <string name="scene_16_tip">Up to 100 Scenes!</string>
+    <string name="scene_16_tip">Up to 255 Scenes!</string>
     <string name="server_exception">Server exception</string>
     <string name="start_sync">Start to download data…</string>
     <string name="sync_now">Download data…</string>
@@ -892,9 +891,12 @@
     <string name="old_light_rest">The current firmware version is lower, please try the following steps to reset the device:</string>
     <string name="warm_notice">Tips: if you have any other questions, please refer to the APP instructions.</string>
     <string name="config_success">Configuration is successful</string>
-    <string name="normal_swith">Ordinary switch</string>
+    <string name="normal_swith">Touch switch</string>
+    <string name="normal_swith2">Light switch</string>
     <string name="scene_switch">Scene switch</string>
     <string name="curtain_switch">Curtain switch</string>
+    <string name="four_switch">Four switch</string>
+    <string name="six_switch">Six switch</string>
     <string name="night_light">Night light</string>
     <string name="click_config">Config</string>
     <string name="choose_scene">Select the scene</string>
@@ -992,6 +994,7 @@
     <string name="single_brighress_group_switch">Dimmer double switch</string>
     <string name="eight_switch">Multifunction switch</string>
     <string name="double_switch">DoubleGroup Switch</string>
+    <string name="select_switch">Selector Switch</string>
     <string name="delete_device">Delete Device</string>
     <string name="delete_device_tip">Whether or not to delete?</string>
     <string name="delete_device_hard_tip">Delete failed, whether to force delete?</string>
@@ -1215,4 +1218,7 @@
     <string name="please_do_this_over_ble">Please do this over Bluetooth</string>
     <string name="compatible_scan">Compatibility mode</string>
     <string name="normal_scan">Conventional mode</string>
+    <string name="toolbar_check_data">View Data</string>
+    <string name="curtain_range">range of  curtain: </string>
+    <string name="sort">Sort</string>
 </resources>

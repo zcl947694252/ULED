@@ -15,7 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.app.hubert.guide.core.Builder
-import com.app.hubert.guide.util.LogUtil
+//import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -126,7 +126,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                             else {
                                 Log.e("zcl场景", "zcl场景******scene_edit")
                                 val scene = scenesListData[position]
-                                LogUtils.v("============================点击打印这段话 ${scene.actions}====================================================")
                                 val intent = Intent(activity, NewSceneSetAct::class.java)
                                 intent.putExtra(Constant.CURRENT_SELECT_SCENE, scene)
                                 intent.putExtra(Constant.IS_CHANGE_SCENE, true)
@@ -189,7 +188,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                             else -> {
                                 try {
                                     if (position < adapter.data.size) {
-                                        LogUtils.v("================chown=======${scenesListData[position].id!!}")
+//                                        LogUtils.v("================chown=======${scenesListData[position].id!!}")
                                         setScene(scenesListData[position].id!!)
                                     }
                                 } catch (e: Exception) {
@@ -233,7 +232,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 Thread { TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params) }.start()
                 deleteSceneSuccess(list, dbScene)
             }
-
         }
         builder.setNegativeButton(activity!!.getString(R.string.cancel)) { _, _ -> }
         val dialog = builder.show()
@@ -396,11 +394,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
         val btnAdd = toolbar?.findViewById<ImageView>(R.id.img_function1)
         val btnDelete = toolbar?.findViewById<ImageView>(R.id.img_function2)
-
+        val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
+        orderScene?.visibility=View.VISIBLE // chown
         btnAdd?.visibility = View.GONE
 
         btnAdd?.setOnClickListener(this)
         btnDelete?.setOnClickListener(this)
+        orderScene?.setOnClickListener(this)
     }
 
 
@@ -418,6 +418,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     private fun initData() {
         telinkLightApplication = this.activity!!.application as TelinkLightApplication
+        scenesListData.clear()
         scenesListData = DBUtils.sceneList
 
         img_function2?.visibility = View.GONE
@@ -653,6 +654,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                     }
                                 }
                             }
+                        }
+                        R.id.order_scene -> { //chown
+                            val intent = Intent(activity,SceneSortActivity::class.java)
+
+                            startActivityForResult(intent,4)
                         }
                         R.id.add_device_btn , R.id.main_add_device -> addNewScenes()
                         R.id.main_go_help -> seeHelpe()

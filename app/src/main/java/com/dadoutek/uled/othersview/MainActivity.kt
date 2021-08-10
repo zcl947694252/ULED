@@ -9,14 +9,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager.NameNotFoundException
+//import android.content.pm.PackageManager.NameNotFoundException
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.PersistableBundle
-import androidx.fragment.app.Fragment
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.viewpager.widget.ViewPager
+//import androidx.fragment.app.Fragment
+//import androidx.localbroadcastmanager.content.LocalBroadcastManager
+//import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.KeyEvent
@@ -187,7 +187,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                 .subscribeOn(Schedulers.io())
                 .compose(NetworkTransformer())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe({ it ->
-                    LogUtils.v("zcl获取服务器bin-----------$it-------")
+                    LogUtils.v("chown 获取服务器bin 支持ota的各个版本-----------$it-------")
                     hideLoadingDialog()
                     TelinkLightApplication.mapBin = it
                     /*  it.forEach {

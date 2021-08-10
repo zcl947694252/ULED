@@ -38,7 +38,7 @@ public class DbSceneActions {
     public int gradientId = 0  ; //渐变id
     public int gradientSpeed = 0 ;//渐变速度
     public String gradientName  ;//渐变速度
-    public int curtainOnOffRange; //窗帘幅度，chown
+    public int curtainOnOffRange = 100; //窗帘幅度，chown
 
 
     @Generated(hash = 192241967)

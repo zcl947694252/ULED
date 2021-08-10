@@ -68,8 +68,8 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
         renameEt?.setSelection(renameEt?.text.toString().length)
         StringUtils.initEditTextFilter(renameEt)
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -82,6 +82,31 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
         }
     }
 
+    override fun addSceneVisible(): Boolean { //chown 添加场景
+        return true
+    }
+
+    override fun checkDataVisible(): Boolean { //chown 查看数据
+        return false
+    }
+
+    // 单个路由添加场景
+    override fun addSceneRoute() {
+        when {
+            Constant.IS_ROUTE_MODE -> {
+                val intent = Intent(this, RouterTimerSceneListActivity::class.java)
+                intent.putExtra("routerMacAddr",router?.macAddr)
+                startActivity(intent)
+            }
+            else -> ToastUtils.showShort(getString(R.string.route_cont_support_ble))
+        }
+    }
+
+    //单个路由查看数据
+    override fun checkDataRoute() {
+
+    }
+
     @SuppressLint("CheckResult")
     private fun routerRenameDevice(toString: String) {
         RouterModel.routeUpdateRouterName(router?.id ?: 0, toString)?.subscribe({
@@ -89,9 +114,9 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
             router?.name = toString
             DBUtils.saveRouter(router!!,true)
             toolbarTv.text = router?.name
-            renameDialog?.dismiss()
+            renameDialog.dismiss()
         }, {
-            renameDialog?.dismiss()
+            renameDialog.dismiss()
             ToastUtils.showShort(it.message)
         })
     }

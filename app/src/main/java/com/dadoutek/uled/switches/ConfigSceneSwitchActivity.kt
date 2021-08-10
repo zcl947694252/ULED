@@ -65,9 +65,10 @@ class ConfigSceneSwitchActivity : BaseSwitchActivity(), EventListener<String>, V
     private var configTag: Int = 0
     private var mIsDisconnecting: Boolean = false
     private var mIsConfiguring: Boolean = false
-    override fun setLayoutId(): Int {
-        return R.layout.activity_scene_switch_group
-    }
+    override val setLayoutId: Int
+        get() {
+            return R.layout.activity_scene_switch_group
+        }
 
     override fun initData() {
         mDeviceInfo = intent.getParcelableExtra("deviceInfo")

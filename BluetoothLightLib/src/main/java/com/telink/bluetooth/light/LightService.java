@@ -7,6 +7,8 @@ package com.telink.bluetooth.light;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
+
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -509,7 +511,8 @@ public abstract class LightService extends Service implements LightAdapter.Callb
         deviceInfo.status = newStatus;
         deviceInfo.rssi = light.getRssi();
         deviceInfo.firmwareRevision = light.getVersion();
-        LogUtils.v("zcl----版本赋值--"+ deviceInfo.firmwareRevision+"==="+light.getVersion());
+//        LogUtils.v("chown----版本赋值--"+ deviceInfo.firmwareRevision+"==="+light.getVersion());
+        Log.d("chown","device version");
         return deviceInfo;
     }
 

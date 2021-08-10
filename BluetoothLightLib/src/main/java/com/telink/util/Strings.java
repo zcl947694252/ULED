@@ -9,6 +9,7 @@ import java.nio.charset.Charset;
 public final class Strings {
 
     private Strings() {
+
     }
 
     public static byte[] stringToBytes(String str, int length) {

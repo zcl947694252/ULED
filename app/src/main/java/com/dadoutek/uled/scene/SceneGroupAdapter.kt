@@ -107,9 +107,9 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         speedSeekbar = helper.getView(R.id.speed_seekbar)
         algText = helper.getView(R.id.alg_text)
 
-        var docOneLy = helper.getView<RelativeLayout>(R.id.dot_one_ly)
-        var docOne = helper.getView<Dot>(R.id.dot_one)
-        var dotRgb = helper.getView<ImageView>(R.id.dot_rgb)
+        val docOneLy = helper.getView<RelativeLayout>(R.id.dot_one_ly)
+        val docOne = helper.getView<Dot>(R.id.dot_one)
+        val dotRgb = helper.getView<ImageView>(R.id.dot_rgb)
 
         sbBrightnessRGB = helper.getView(R.id.rgb_sbBrightness)
         addBrightnessRGB = helper.getView(R.id.sbBrightness_add)
@@ -143,10 +143,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         tvCurRange.text = "幅度：${curtainSeekbar.progress}"
         LogUtils.v("==============================窗帘幅度: ${item.curtainOnOffRange}=============================================")
 
-        var w = (item?.color and 0xff000000.toInt()) shr 24
-        var r = Color.red(item?.color!!)
-        var g = Color.green(item?.color!!)
-        var b = Color.blue(item?.color!!)
+        val w = (item.color and 0xff000000.toInt()) shr 24
+        val r = Color.red(item.color)
+        val g = Color.green(item.color)
+        val b = Color.blue(item.color)
         //0x4FFFE0  不在使用  使用0来判断
         docOne.setChecked(true, if (r == 0 && g == 0 && b == 0) {
             docOneLy.visibility = View.GONE
@@ -247,14 +247,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         sbBrightnessCW!!.tag = position
         sbtemperature!!.tag = position
-        sbBrightnessRGB!!.tag = position
-        sbWhiteLightRGB!!.tag = position
+        sbBrightnessRGB.tag = position
+        sbWhiteLightRGB.tag = position
         speedSeekbar!!.tag = position
 
         sbBrightnessCW!!.setOnSeekBarChangeListener(this)
         sbtemperature!!.setOnSeekBarChangeListener(this)
-        sbBrightnessRGB!!.setOnSeekBarChangeListener(this)
-        sbWhiteLightRGB!!.setOnSeekBarChangeListener(this)
+        sbBrightnessRGB.setOnSeekBarChangeListener(this)
+        sbWhiteLightRGB.setOnSeekBarChangeListener(this)
         curtainSeekbar.setOnSeekBarChangeListener(object :SeekBar.OnSeekBarChangeListener { //seekbar 和两个按钮
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 val value = seekBar?.progress
@@ -266,8 +266,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         curtainRangeLess.isEnabled = true
                         curtainRangeAdd.isEnabled = false
                     }
-                    value <= 0 -> {
+                    value <= 1 -> {
                         curtainRangeLess.isEnabled = false
+                        curtainRangeAdd.isEnabled = true
+                    }
+                    else -> {
+                        curtainRangeLess.isEnabled = true
                         curtainRangeAdd.isEnabled = true
                     }
                 }
@@ -412,7 +416,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         curtainRangeLess.setOnTouchListener { _, _ ->
             val value = curtainSeekbar.progress--
             data[position].curtainOnOffRange = curtainSeekbar.progress
-            curtainRangeLess.isEnabled = value != 0
+            curtainRangeLess.isEnabled = value != 1
             true
         }
     }
@@ -493,7 +497,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     helper.setChecked(R.id.rg_xx, true)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
                     curtainSeekbar.isEnabled = true
-                    curtainRangeLess.isEnabled = curtainSeekbar.progress != 0
+                    curtainRangeLess.isEnabled = curtainSeekbar.progress != 1
                     curtainRangeAdd.isEnabled = curtainSeekbar.progress != 100
                 } else {
                     helper.setChecked(R.id.rg_yy, true)
@@ -1485,7 +1489,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
         }
 
-        if (seekBar!!.progress < 5)
+        if (seekBar.progress < 5)
             lessImage!!.isEnabled = true
     }
 
@@ -1493,18 +1497,18 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private val algHandlerLess = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            var pos = msg.arg2
-            var seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
-            var brightnText = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
-            var lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
-            var addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
+            val pos = msg.arg2
+            val seekBar = getViewByPosition(pos, R.id.speed_seekbar) as IndicatorSeekBar?
+            val brightnText = getViewByPosition(pos, R.id.speed_seekbar_alg_tv) as TextView?
+            val lessImage = getViewByPosition(pos, R.id.speed_seekbar_alg_less) as ImageView?
+            val addImage = getViewByPosition(pos, R.id.speed_seekbar_alg_add) as ImageView?
             //seekBar!!.progress--
 //            seekBar?.progress?.toFloat()?.minus(1f)?.let { speedSeekbar?.setProgress(it) }
 
             val address = data[pos].groupAddress
             val opcode: Byte
             val itemGroup = data[pos]
-            var params: ByteArray
+            val params: ByteArray
 
             when {
                 seekBar?.progress!! < 1f -> {
@@ -1544,11 +1548,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     }
 
     private fun hLesswihte(msg: Int, data: List<ItemGroup>) {
-        var pos = msg
-        var seekBar = getViewByPosition(pos, R.id.rgb_white_seekbar) as SeekBar?
-        var brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
-        var lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
-        var addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
+        val pos = msg
+        val seekBar = getViewByPosition(pos, R.id.rgb_white_seekbar) as SeekBar?
+        val brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
+        val lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
+        val addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
         seekBar!!.progress--
 
         val address = data[pos].groupAddress
@@ -1557,24 +1561,24 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         var params: ByteArray
 
         when {
-            seekBar!!.progress < 1 -> {
+            seekBar.progress < 1 -> {
                 lessImage!!.isEnabled = false
                 onBtnTouch = false
             }
-            seekBar!!.progress == 1 -> {
+            seekBar.progress == 1 -> {
                 lessImage!!.isEnabled = false
-                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                brightnText!!.text = seekBar.progress.toString() + "%"
                 onBtnTouch = false
                 if (!Constant.IS_ROUTE_MODE) {
-                    itemGroup.temperature = seekBar!!.progress
+                    itemGroup.temperature = seekBar.progress
                     opcode = Opcode.SET_W_LUM
-                    params = byteArrayOf(seekBar!!.progress.toByte())
+                    params = byteArrayOf(seekBar.progress.toByte())
                     TelinkLightService.Instance()?.sendCommandNoResponse(opcode, address, params)
                 }
             }
             else -> {
                 lessImage!!.isEnabled = true
-                brightnText!!.text = seekBar!!.progress.toString() + "%"
+                brightnText!!.text = seekBar.progress.toString() + "%"
                 if (!Constant.IS_ROUTE_MODE) {
                     itemGroup.temperature = seekBar!!.progress
                     opcode = Opcode.SET_W_LUM
@@ -1598,11 +1602,11 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     }
 
     private fun hAddWhite(msg: Int, data: List<ItemGroup>) {
-        var pos = msg
-        var seekBar = getViewByPosition(pos, R.id.rgb_white_seekbar) as SeekBar?
-        var brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
-        var lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
-        var addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
+        val pos = msg
+        val seekBar = getViewByPosition(pos, R.id.rgb_white_seekbar) as SeekBar?
+        val brightnText = getViewByPosition(pos, R.id.sb_w_bright_num) as TextView?
+        val lessImage = getViewByPosition(pos, R.id.sb_w_bright_less) as ImageView?
+        val addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
         seekBar!!.progress++
 
         val address = data[pos].groupAddress
@@ -1708,16 +1712,16 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 clickType = 5
                 when {
                     seekBar.progress <= 0 -> {
-                        addBrightnessRGB!!.isEnabled = true
-                        lessBrightnessRGB!!.isEnabled = false
+                        addBrightnessRGB.isEnabled = true
+                        lessBrightnessRGB.isEnabled = false
                     }
                     seekBar.progress >= 100 -> {
-                        addBrightnessRGB!!.isEnabled = false
-                        lessBrightnessRGB!!.isEnabled = true
+                        addBrightnessRGB.isEnabled = false
+                        lessBrightnessRGB.isEnabled = true
                     }
                     else -> {
-                        addBrightnessRGB!!.isEnabled = true
-                        lessBrightnessRGB!!.isEnabled = true
+                        addBrightnessRGB.isEnabled = true
+                        lessBrightnessRGB.isEnabled = true
                     }
                 }
 

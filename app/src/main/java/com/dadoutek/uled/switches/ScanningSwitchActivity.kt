@@ -2,7 +2,9 @@ package com.dadoutek.uled.switches
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothClass
 import android.bluetooth.le.ScanFilter
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.Gravity
@@ -21,6 +23,8 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.othersview.MainActivity
+import com.dadoutek.uled.switches.fourkey.ConfigFourSwitchActivity
+import com.dadoutek.uled.switches.sixkey.ConfigSixSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
@@ -47,6 +51,7 @@ import kotlinx.android.synthetic.main.template_lottie_animation.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.*
 import org.jetbrains.anko.startActivity
+import java.lang.Exception
 import java.util.ArrayList
 import java.util.concurrent.TimeUnit
 
@@ -141,7 +146,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
 
     override fun performed(event: Event<String>?) {
         event ?: return
-        LogUtils.e("zcl***************扫描*******Event${event.type}")
+        LogUtils.v("chown***************扫描*******Event${event.type}")
         when (event.type) {
             LeScanEvent.LE_SCAN -> this.onLeScan(event as LeScanEvent)
             DeviceEvent.STATUS_CHANGED -> this.onDeviceStatusChanged(event as DeviceEvent)
@@ -161,15 +166,15 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
     private fun onDeviceStatusChanged(deviceEvent: DeviceEvent) {
         val deviceInfo = deviceEvent.args
         mDeviceMeshName = deviceInfo.meshName
-        LogUtils.e("zcl*********扫描连接变化 ******deviceInfo*******$deviceInfo---")
-        LogUtils.e("zcl*********扫描连接变化 ********mDeviceInfo*****$mDeviceInfo--")
+        LogUtils.v("zcl*********扫描连接变化 ******deviceInfo*******$deviceInfo---")
+        LogUtils.v("zcl*********扫描连接变化 ********mDeviceInfo*****$mDeviceInfo--")
 
         when (deviceInfo.status) {
             LightAdapter.STATUS_CONNECTING -> {//0
                 LogUtils.e("zcl 链接中")
             }
 
-            LightAdapter.STATUS_LOGIN -> {//3
+            LightAdapter.STATUS_LOGIN -> {//3 登录的时候出问题嘞，原因是获取版本号出错
                 connectDisposable?.dispose()
                 onLogin(deviceInfo)
             }
@@ -203,7 +208,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
         setScanningMode(true)
         //val meshAddress = Constant.SWITCH_PIR_ADDRESS
         val meshAddress = MeshAddressGenerator().meshAddress.get()
-        LogUtils.v("zcl-----------传感器扫描-------${leScanEvent.args.macAddress}")
+        LogUtils.v("zcl-----------开关扫描-------${leScanEvent.args.macAddress}")
         if (meshAddress == -1) {
             this.doFinish()
             return
@@ -212,7 +217,8 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
         val MAX_RSSI = 81
         when (leScanEvent.args.productUUID) {
             DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.DOUBLE_SWITCH,
-            DeviceType.SCENE_SWITCH, DeviceType.EIGHT_SWITCH, DeviceType.SMART_CURTAIN_SWITCH -> {
+            DeviceType.SCENE_SWITCH, DeviceType.EIGHT_SWITCH, DeviceType.SMART_CURTAIN_SWITCH,
+            DeviceType.FOUR_SWITCH, DeviceType.SIX_SWITCH-> {
                 if (leScanEvent.args.rssi < MAX_RSSI) {
                     scanDisposable?.dispose()
                     LeBluetooth.getInstance().stopScan()
@@ -236,6 +242,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
         launch?.cancel()
         launch = GlobalScope.launch {
             delay(200)
+            LogUtils.d("chown开始连接mDeviceInfo?.macAddress- ${mDeviceInfo?.macAddress}-------------------DBUtils.lastUser?.controlMeshName-${DBUtils.lastUser?.controlMeshName}")
             TelinkLightService.Instance()?.connect(mDeviceInfo?.macAddress, CONNECT_TIMEOUT_SECONDS)
         }
         LogUtils.d("zcl开始连接${mDeviceInfo?.macAddress}--------------------${DBUtils.lastUser?.controlMeshName}")
@@ -423,25 +430,61 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
     }
 
     private fun getSwitchFilters(): MutableList<ScanFilter> {
+        val devicetype = intent.getIntExtra("deviceType",0)
+        LogUtils.v("================chown devicetype:$devicetype==================")
         val scanFilters = ArrayList<ScanFilter>()
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
+//        Log.d("Chown", "MobilePhoneBrand:"+ Build.BRAND)
+        if (Build.BRAND.contains("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                byteArrayOf(0, 0, 0, 0, 0, 0, 0x11.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
-                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.EIGHT_SWITCH.toByte()),
-                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.DOUBLE_SWITCH.toByte()),
-                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
-                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
-        scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
-                byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
-                byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+        }
+        when (devicetype) {
+            DeviceType.NORMAL_SWITCH -> {
+                scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                    byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH.toByte()),
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+            }
+            DeviceType.NORMAL_SWITCH2 -> {
+                scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                    byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.NORMAL_SWITCH2.toByte()),
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+            }
+            DeviceType.EIGHT_SWITCH -> {
+                scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                    byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.EIGHT_SWITCH.toByte()),
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+            }
+            DeviceType.DOUBLE_SWITCH -> {
+                scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                    byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.DOUBLE_SWITCH.toByte()),
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+            }
+            DeviceType.SCENE_SWITCH -> {
+                scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                    byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SCENE_SWITCH.toByte()),
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+            }
+            DeviceType.FOUR_SWITCH -> {
+                scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                    byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.FOUR_SWITCH.toByte()),
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+            }
+            DeviceType.SIX_SWITCH -> {
+                scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
+                    byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SIX_SWITCH.toByte()),
+                    byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
+            }
+            else -> {
+                scanFilters.add(
+                    ScanFilter.Builder().setManufacturerData(
+                        Constant.VENDOR_ID,
+                        byteArrayOf(0, 0, 0, 0, 0, 0, DeviceType.SMART_CURTAIN_SWITCH.toByte()),
+                        byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())
+                    ).build()
+                )
+            }
+        }
         return scanFilters
     }
 
@@ -478,7 +521,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
         if (mDeviceInfo != null) {
             mApplication.removeEventListener(this)
             scanDisposable?.dispose()
-/*
+        /*
             val meshAddress = mDeviceInfo!!.meshAddress
             val mac = mDeviceInfo!!.sixByteMacAddress.split(":")
             if (mac != null && mac.size >= 6) {
@@ -499,7 +542,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
             LogUtils.v("zcl-----------扫描等候获取版本-------${mDeviceInfo!!.meshAddress}")
             val disposable = Commander.getDeviceVersion(mDeviceInfo!!.meshAddress, retryTimes = 2)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({ version ->
+                    .subscribe( { version ->
                         LogUtils.v("zcl-----------扫描等候获取版本------version-$version")
                         if (version != null && version != "") {
                             skipSwitch(version)
@@ -521,15 +564,16 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
                         if (TextUtils.isEmpty(version1))
                         //ToastUtils.showLong(getString(R.string.get_version_fail))
                             skipSwitch(version1)
-                        else
+                        else{
                             skipSwitch(version1)
+                        }
                         finish()
                     })
 
         }
     }
 
-    private fun skipSwitch(version: String) {
+        private fun skipSwitch(version: String) { //chown
         if (!DBUtils.isFastDoubleClick(1000))
             when (mDeviceInfo?.productUUID) {
                 DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
@@ -544,12 +588,17 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
                     else
                         startActivity<ConfigSceneSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
                 }
-
                 DeviceType.EIGHT_SWITCH -> {
                     startActivity<ConfigEightSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
                 }
                 DeviceType.SMART_CURTAIN_SWITCH -> {
                     startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                }
+                DeviceType.FOUR_SWITCH -> {
+                    startActivity<ConfigFourSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
+                }
+                DeviceType.SIX_SWITCH -> {
+                    startActivity<ConfigSixSwitchActivity>("deviceInfo" to mDeviceInfo!!, "group" to "false", "version" to version)
                 }
             }
     }

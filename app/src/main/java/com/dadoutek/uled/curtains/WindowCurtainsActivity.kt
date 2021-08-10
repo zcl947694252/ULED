@@ -710,15 +710,21 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun updateOTA() {
         when {
-            curtain?.boundMac == "" || curtain?.boundMac == null -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-
             versionText.text != null && versionText.text != "" -> {
                 when {
-                    !isSuportOta(curtain?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+//                    !isSuportOta(curtain?.version) -> {
+//                        LogUtils.v("==============================${curtain?.version}==========================================")
+//                        LogUtils.v("==============================${curtain?.version}==========================================")
+//                        ToastUtils.showShort(getString(R.string.dissupport_ota))
+//                    }
                     isMostNew(curtain?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
                     else -> {
                         when {
                             Constant.IS_ROUTE_MODE -> {
+//                                if ( curtain?.boundMac == "" || curtain?.boundMac == null){
+//                                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+//                                    return
+//                                }
                                 if (TextUtils.isEmpty(curtain?.boundMac)) {
                                     ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                                     return
@@ -738,7 +744,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
 
     private fun checkPermission() {
         mDisposable.add(
-                RxPermissions(this)!!.request(Manifest.permission.READ_EXTERNAL_STORAGE,
+                RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -754,7 +760,6 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
                                                         else -> {
                                                             curtain!!.version = s
                                                             isDirectConnectDevice()
-
                                                         }
                                                     }
                                                 }, { hideLoadingDialog() }
@@ -766,7 +771,7 @@ class WindowCurtainsActivity : TelinkBaseActivity(), View.OnClickListener {
     }
 
     private fun isDirectConnectDevice() {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        val isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.meshAddress == curtain?.meshAddr) {
             when {
                 isBoolean -> transformView()

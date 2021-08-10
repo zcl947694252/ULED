@@ -79,7 +79,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(setLayoutId())
+        setContentView(setLayoutId)
         mApp = application as TelinkLightApplication
         TelinkLightApplication.isLoginAccount = false
         makePopuwindow()
@@ -222,7 +222,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                                                           deleteData()
                                                       }
                                                       .setNegativeButton(R.string.btn_cancel, null)
-                                                      .show()*/
+                                                      .show()   */
                                         }
                                     })
                             deleteData()
@@ -265,12 +265,18 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         deviceType = type
         otaDeviceInfo = mDeviceInfo
         when {
-            !isSuportOta(mDeviceInfo?.firmwareRevision) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
-            isMostNew(mDeviceInfo?.firmwareRevision) -> ToastUtils.showShort(getString(R.string.the_last_version))
+            !isSuportOta(mDeviceInfo.firmwareRevision) -> {
+                ToastUtils.showShort(getString(R.string.dissupport_ota))
+                LogUtils.v("chown --- switch ${getString(R.string.dissupport_ota)}")
+            }
+            isMostNew(mDeviceInfo.firmwareRevision) -> {
+                ToastUtils.showShort(getString(R.string.the_last_version))
+                LogUtils.v("chown --- switch ${getString(R.string.the_last_version)}")
+            }
             else -> {
                 when {
                     Constant.IS_ROUTE_MODE -> {
-                        if (TextUtils.isEmpty(mDeviceInfo?.boundMac)){
+                        if (TextUtils.isEmpty(mDeviceInfo.boundMac)){
                             ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                             return
                         }
@@ -344,7 +350,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     abstract fun reName()
 
-    abstract fun setLayoutId(): Int
+    abstract val setLayoutId: Int
     abstract fun initListener()
     abstract fun initData()
     abstract fun initView()

@@ -29,7 +29,8 @@ class DeviceTypeRecycleViewAdapter(layoutResId: Int, data: List<DeviceItem>?) : 
             DeviceType.LIGHT_RGB -> {
                 helper.setImageResource(R.id.template_device_icon, R.drawable.icon_rgb_no_circle)
             }
-            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH -> {
+            DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SIX_SWITCH,
+            DeviceType.FOUR_SWITCH, DeviceType.SCENE_SWITCH, DeviceType.EIGHT_SWITCH, DeviceType.DOUBLE_SWITCH -> {
                 helper.setImageResource(R.id.template_device_icon, R.drawable.icon_switch_device)
             }
             DeviceType.SENSOR -> {

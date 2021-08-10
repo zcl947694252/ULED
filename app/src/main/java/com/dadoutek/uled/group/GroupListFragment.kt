@@ -10,10 +10,10 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import androidx.viewpager.widget.ViewPager
+//import androidx.fragment.app.Fragment
+//import androidx.fragment.app.FragmentActivity
+//import androidx.localbroadcastmanager.content.LocalBroadcastManager
+//import androidx.viewpager.widget.ViewPager
 import androidx.appcompat.widget.Toolbar
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -278,7 +278,6 @@ class GroupListFragment : BaseFragment() {
     private fun initData() {
         this.mApplication = activity!!.application as TelinkLightApplication
         gpList = DBUtils.getgroupListWithType(activity!!)
-
 
         val cwNum = DBUtils.getAllNormalLight().size
         val rgbNum = DBUtils.getAllRGBLight().size

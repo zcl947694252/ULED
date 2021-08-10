@@ -264,6 +264,11 @@
         <item name="android:backgroundDimEnabled">true</item>
     </style>
 
+    <!--parent设置为启动页的theme-->
+    <style name="AppTheme.customeTheme" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/splash</item>
+    </style>
+
 
     <declare-styleable name="VerCodeInputView">
         <attr name="box" format="integer" />

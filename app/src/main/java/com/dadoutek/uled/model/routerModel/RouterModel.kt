@@ -561,14 +561,14 @@ object RouterModel {
                 .observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun routeAddTimerScene( name:String , hour:Int, min :Int, week:Int, sid :Int,status :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeAddTimerScene(TimerSceneBody(0,name, hour, min , week, sid , status,ser_id))
+    fun routeAddTimerScene( name:String , hour:Int, min :Int, week:Int, sid :Int,status :Int, ser_id:String, routerMacAddr:String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeAddTimerScene(TimerSceneBody(name, hour, min , week, sid ,ser_id, status,routerMacAddr))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun routeUpdateTimerScene( id:Int , hour:Int, min :Int, week:Int, sid :Int, ser_id:String): Observable<Response<RouterTimeoutBean>>? {
-        return NetworkFactory.getApi().routeUpdateTimerScene(TimerSceneBody(id,"", hour, min , week, sid ,0, ser_id))
+    fun routeUpdateTimerScene( id:Int , hour:Int, min :Int, week:Int, sid :Int, ser_id:String, routerMacAddr:String): Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().routeUpdateTimerScene(TimerSceneUpdateBody(id, hour, min , week, sid ,ser_id, routerMacAddr))
                 // .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

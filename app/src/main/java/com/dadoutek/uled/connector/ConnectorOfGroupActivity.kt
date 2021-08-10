@@ -191,6 +191,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         deleteDevice?.isVisible = true
         batchGp?.isVisible = true
         bindRouter?.isVisible = true
+        toolbar.menu?.findItem(R.id.toolbar_add_scene)?.isVisible = false
+        toolbar.menu?.findItem(R.id.toolbar_check_data)?.isVisible = false
 
         toolbar.setOnMenuItemClickListener { itm ->
             DBUtils.lastUser?.let {

@@ -103,6 +103,15 @@ object Opcode {
     const val GROUP_BRIGHTNESS_MINUS: Byte = 0x2C.toByte()//降低组亮度
     const val GROUP_CCT_ADD: Byte = 0x3C.toByte()//增加组色温
     const val GROUP_CCT_MINUS: Byte = 0x4C.toByte()//减少组色温
+
+    /**
+     * 四键开关
+     */
+    const val FOUR_GROUP_BRIGHTNESS_ADD: Byte = 0x06.toByte() //亮度调节
+    const val FOUR_GROUP_BRIGHTNESS_MINUS: Byte = 0x07.toByte()
+    const val FOUR_GROUP_CCT_ADD: Byte = 0x04.toByte() // 色温调节
+    const val FOUR_GROUP_CTT_MINUS: Byte = 0x05.toByte()
+
     /**
      * 單组开关
      */

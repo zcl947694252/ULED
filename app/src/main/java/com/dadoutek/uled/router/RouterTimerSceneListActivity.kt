@@ -59,8 +59,11 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
     }
 
     private fun initListener() {
+        val routerMacAddr = intent.getStringExtra("routerMacAddr")
         add_group_btn.setOnClickListener {
-            startActivity(Intent(this@RouterTimerSceneListActivity, AddTimerSceneActivity::class.java))
+            val intent = Intent(this, AddTimerSceneActivity::class.java)
+            intent.putExtra("routerMacAddr",routerMacAddr)
+            startActivity(intent)
         }
         adapter.setOnItemChildClickListener { _, view, position ->
             if (view.id == R.id.item_event_switch) {
@@ -69,6 +72,7 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
             } else {
                 val intent = Intent(this@RouterTimerSceneListActivity, AddTimerSceneActivity::class.java)
                 intent.putExtra("timerScene", list[position])
+                intent.putExtra("routerMacAddr",routerMacAddr)
                 startActivity(intent)
             }
         }
@@ -137,7 +141,7 @@ class RouterTimerSceneListActivity : TelinkBaseActivity() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         add_group_btn_tv.text = getString(R.string.add_timer_scene)
 
-        swipe_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         swipe_recycleView.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
         swipe_recycleView.setSwipeMenuCreator(function)   // 设置监听器。
         swipe_recycleView.setOnItemMenuClickListener { menuBridge, adapterPosition ->

@@ -38,6 +38,8 @@ import com.dadoutek.uled.ota.OTAUpdateActivity
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
+import com.dadoutek.uled.switches.fourkey.ConfigFourSwitchActivity
+import com.dadoutek.uled.switches.sixkey.ConfigSixSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.OtaPrepareUtils
@@ -345,28 +347,36 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
     }
 
     private fun skipeSw(bestRSSIDevice: DeviceInfo, version: String) {
-        when (bestRSSIDevice?.productUUID) {
+        when (bestRSSIDevice.productUUID) {
             DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
-                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
                 finish()
             }
             DeviceType.DOUBLE_SWITCH -> {
-                startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                startActivity<DoubleTouchSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
                 finish()
             }
             DeviceType.SCENE_SWITCH -> {
                 if (version.contains(DeviceType.EIGHT_SWITCH_VERSION))
-                    startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                    startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
                 else
-                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                    startActivity<ConfigSceneSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
                 finish()
             }
             DeviceType.EIGHT_SWITCH -> {
-                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                startActivity<ConfigEightSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
                 finish()
             }
             DeviceType.SMART_CURTAIN_SWITCH -> {
-                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice!!, "group" to "true", "switch" to currentDevice, "version" to version)
+                startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
+                finish()
+            }
+            DeviceType.FOUR_SWITCH -> {
+                startActivity<ConfigFourSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
+                finish()
+            }
+            DeviceType.SIX_SWITCH -> {
+                startActivity<ConfigSixSwitchActivity>("deviceInfo" to bestRSSIDevice, "group" to "true", "switch" to currentDevice, "version" to version)
                 finish()
             }
         }

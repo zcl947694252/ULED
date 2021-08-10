@@ -55,6 +55,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
     private var hourTime = 3
     private var minuteTime = 15
     private var scene: DbScene? = null
+    private var routerMacAddr: String? = null
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,6 +88,8 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
     }
 
     private fun initData() {
+        routerMacAddr = intent.getStringExtra("routerMacAddr")
+
         item_gw_timer_title!!.text = getString(R.string.scene_name) //底部item 的title
         //打开时设置为当前时间
         hourTime = Calendar.getInstance()[Calendar.HOUR_OF_DAY]
@@ -94,6 +97,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
 
         val serializable = intent.getSerializableExtra("timerScene")
         isReConfig = serializable != null && serializable != ""
+        LogUtils.v("===========================$isReConfig=================================================")
         if (isReConfig) {
             timerSceneBean = serializable as RouterTimerSceneBean
             hourTime = timerSceneBean?.hour ?: hourTime
@@ -171,7 +175,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun routerAddSceneTimer() {
-        RouterModel.routeAddTimerScene("$hourTime:$minuteTime", hourTime, minuteTime,getWeek(mode!!.replace("6","")), scene!!.id.toInt(), 1,"addTimerScene")?.subscribe({
+        RouterModel.routeAddTimerScene("$hourTime:$minuteTime", hourTime, minuteTime,getWeek(mode!!.replace("6","")), scene!!.id.toInt(), 1,"addTimerScene",routerMacAddr!!)?.subscribe({
             when (it.errorCode) {
                 0 -> {
                     showLoadingDialog(getString(R.string.please_wait))
@@ -212,7 +216,7 @@ class AddTimerSceneActivity : TelinkBaseActivity() {
     private fun routerUpdateSceneTimer() {
         timerSceneBean?.let {
             RouterModel.routeUpdateTimerScene(timerSceneBean?.id
-                    ?: 0, hourTime, minuteTime, getWeek(mode!!.replace("6","")), scene!!.id.toInt(), "updateTimerScene")
+                    ?: 0, hourTime, minuteTime, getWeek(mode!!.replace("6","")), scene!!.id.toInt(), "updateTimerScene",routerMacAddr!!)
                     ?.subscribe({
                         LogUtils.v("zcl-----------路由请求刷新定时场景$-------$it")
                         when (it.errorCode) {
