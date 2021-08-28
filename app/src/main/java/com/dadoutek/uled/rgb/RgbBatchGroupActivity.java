@@ -1085,6 +1085,7 @@ public class RgbBatchGroupActivity extends TelinkMeshErrorDealActivity
     // 如果没有网络，则弹出网络设置对话框
     public void checkNetworkAndSync() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
+            LogUtils.v("chown -- 同步数据");
             SyncDataPutOrGetUtils.Companion.syncPutDataStart(this, syncCallback);
         }
     }

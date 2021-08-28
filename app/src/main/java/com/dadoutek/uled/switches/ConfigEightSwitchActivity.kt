@@ -239,7 +239,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         listKeysBean = JSONArray()
 
         //11-12-13-14 11-12-13-14
-        var firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x01, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00)
+        val firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x01, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00)
         listKeysBean.put(getKeyBean(0x00, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
         listKeysBean.put(getKeyBean(0x01, Opcode.GROUP_BRIGHTNESS_ADD.toInt()))
 
@@ -322,8 +322,8 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
         listKeysBean = JSONArray()
 
         //11-12-13-14 11-12-13-14
-        var firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00, 0x01, Opcode.GROUP_CCT_ADD, 0x00, 0x00)
-        var secondParm = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
+        val firstParm = byteArrayOf(0x00, Opcode.GROUP_BRIGHTNESS_ADD, 0x00, 0x00, 0x01, Opcode.GROUP_CCT_ADD, 0x00, 0x00)
+        val secondParm = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
         listKeysBean.put(getKeyBean(0x00, Opcode.GROUP_BRIGHTNESS_ADD.toInt()))
         listKeysBean.put(getKeyBean(0x01, Opcode.GROUP_CCT_ADD.toInt()))
         listKeysBean.put(getKeyBean(0x02, Opcode.GROUP_BRIGHTNESS_MINUS.toInt()))
@@ -366,7 +366,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private fun getKeyBean(keyId: Int, featureId: Int, name: String = "", hight8Mes: Int = 0, low8Mes: Int = 0): JSONObject {
         //return JSONObject(["keyId" = keyId, "featureId" = featureId, "reserveValue_A" = hight8Mes, "reserveValue_B" = low8Mes, "name" = name])
         //["keyId" = 11, "featureId" =11, "reserveValue_A" = 0x11, "reserveValue_B" = 0x11, "name" = name])
-        var job = JSONObject()
+        val job = JSONObject()
         job.put("keyId", keyId)
         job.put("featureId", featureId)
         job.put("reserveValue_A", hight8Mes)
@@ -482,7 +482,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             65536L
         } else {
             listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt() and 0xff, name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst!!.id.toInt()))
-            dbSceneFirst!!.id
+            dbSceneFirst.id
         }
         val secondNum = list[1]
         val dbSceneSecond = sceneMap[secondNum]
@@ -518,7 +518,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
     private fun getGroupParm(list: MutableList<Int>): ByteArray {
         val firstNum = list[0]
         val dbGroup1 = groupMap[firstNum]!!
-        var opcodeOne: Byte
+        val opcodeOne: Byte
         var fristL: Byte = 0
         var fristH: Byte = 0
 
@@ -539,7 +539,7 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
             val secondNum = list[1]
             val dbGroup2 = groupMap[secondNum]
 
-            var opcodeTwo: Byte
+            val opcodeTwo: Byte
             var secondL: Byte = 0
             var secondH: Byte = 0
 
@@ -798,15 +798,15 @@ class ConfigEightSwitchActivity : BaseSwitchActivity(), View.OnClickListener {
                     routerRenameSw(switchDate!!, trim)
 
                 if (this != null && !this.isFinishing)
-                    renameDialog?.dismiss()
+                    renameDialog.dismiss()
                 LogUtils.v("zcl改名后-----------${DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)?.name}")
             }
         }
         renameCancel?.setOnClickListener {
             if (this != null && !this.isFinishing)
-                renameDialog?.dismiss()
+                renameDialog.dismiss()
         }
-        renameDialog?.setOnDismissListener {
+        renameDialog.setOnDismissListener {
             if (!isReConfig)
                 finishAc()
         }

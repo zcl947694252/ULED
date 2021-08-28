@@ -173,6 +173,19 @@ class MqttService : Service() {
         }
     }
 
+    fun delete() {
+        if (client != null) {
+            try {
+//                client?.disconnect()
+                client?.unregisterResources()
+//                client?.close()
+            } catch (e: MqttException) {
+                e.printStackTrace()
+            }
+        }
+
+        stopSelf()
+    }
 
     override fun onDestroy() {
         if (client != null) {

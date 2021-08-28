@@ -3,6 +3,7 @@ package com.dadoutek.uled.network;
 import com.dadoutek.uled.gateway.bean.ClearGwBean;
 import com.dadoutek.uled.gateway.bean.DbGateway;
 import com.dadoutek.uled.gateway.bean.DbRouter;
+import com.dadoutek.uled.model.BodyBias;
 import com.dadoutek.uled.model.Response;
 import com.dadoutek.uled.model.ResponseVersionAvailable;
 import com.dadoutek.uled.model.dbModel.DbConnector;
@@ -25,7 +26,17 @@ import com.dadoutek.uled.model.routerModel.MeshAddressTypeTimeBody;
 import com.dadoutek.uled.model.routerModel.MeshListTypeMacBody;
 import com.dadoutek.uled.model.routerModel.RouteStasusBean;
 import com.dadoutek.uled.model.routerModel.UpdateGradientBean;
+import com.dadoutek.uled.network.bean.ConnectorBodyBean;
+import com.dadoutek.uled.network.bean.CurtainListBodyBean;
+import com.dadoutek.uled.network.bean.GradientListBodyBean;
+import com.dadoutek.uled.network.bean.GradientListBodyList;
+import com.dadoutek.uled.network.bean.GroupListBodyBean;
+import com.dadoutek.uled.network.bean.LightListBodyBean;
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean;
+import com.dadoutek.uled.network.bean.SceneListBodyBean;
+import com.dadoutek.uled.network.bean.SceneListBodyBean2;
+import com.dadoutek.uled.network.bean.SensorListBodyBean;
+import com.dadoutek.uled.network.bean.SwitchListBodyBean;
 import com.dadoutek.uled.network.bean.TransferRegionBean;
 import com.dadoutek.uled.region.RegionBcBean;
 import com.dadoutek.uled.region.bean.ParseCodeBean;
@@ -235,6 +246,10 @@ public interface RequestInterface {
     //@FormUrlEncoded
     @POST("group/add-batch")
     Observable<Response> batchUpGroupList(@Body GroupListBodyBean bean/*@Field("groups")
+    List<DbGroup> listGp*/);
+
+    @POST("group/add-batch")
+    Observable<Response<String>> batchUpGroupList2(@Body GroupListBodyBean bean/*@Field("groups")
     List<DbGroup> listGp*/);
 
     //获取组列表
@@ -1336,6 +1351,14 @@ public interface RequestInterface {
    int id, @Field("keys") List<KeyBean> keys,  @Field("ser_id") String ser_id*/);
 
     /**
+     * 配置四六键开关
+     * @param body
+     * @return
+     */
+    @POST("router/fourAndSix-key-switch/configure")
+    Observable<Response<RouterTimeoutBean>> configFourAndSixSw(@Body SwFourAndSixSwBody body);
+
+    /**
      * 传感器配置 https://dev.dadoutek.com/xxxx/router/sensor/configure POST
      * ser_id	是	string	app会话id，推送时回传
      * id	是	int	传感器id
@@ -1548,6 +1571,95 @@ public interface RequestInterface {
      */
     @PUT("light/update/{id}")
     Observable<Response> routeUpdateLight(@Path("id") long id, @Body NameBody body);
+
+    /**
+     * 批量灯更新 请求URL https://dev.dadoutek.com/xxxx/light/add-batch  POST
+     * @param lights
+     * @return
+     */
+    @POST("light/add-batch")
+    Observable<Response<String>> updateLights(@Body LightListBodyBean lights);
+
+    @HTTP(method = "DELETE", path = "light/remove", hasBody = true)
+    Observable<Response<String>> deleteLights(@Body BodyBias lightId);
+
+    /**
+     * 批量组更新
+     * @param groups
+     * @return
+     */
+    @POST("group/add-batch")
+    Observable<Response<String>> updateGroups(@Field("groups") List<DbGroup> groups);
+
+    @HTTP(method = "DELETE", path = "group/remove", hasBody = true)
+    Observable<Response<String>> deleteGroups(@Body BodyBias groupId);
+
+    /**
+     * 批量场景更新
+     * @param scenes
+     * @return
+     */
+    @POST("scene/add-batch")
+    Observable<Response<String>> updateScenes(@Body SceneListBodyBean2 scenes);
+
+    @HTTP(method = "DELETE", path = "scene/remove", hasBody = true)
+    Observable<Response<String>> deleteScenes(@Body BodyBias sceneId);
+
+    /**
+     * 批量窗帘更新
+     * @param curtains
+     * @return
+     */
+    @POST("curtain/add-batch")
+    Observable<Response<String>> updateCurtain(@Body CurtainListBodyBean curtains);
+
+    @HTTP(method = "DELETE", path = "curtain/remove", hasBody = true)
+    Observable<Response<String>> deleteCurtains(@Body BodyBias curtainId);
+
+    /**
+     * 批量添加更新连接器
+     * @param connectors
+     * @return
+     */
+    @POST("relay/add-batch")
+    Observable<Response<String>> updateRelay(@Body ConnectorBodyBean connectors);
+
+    @HTTP(method = "DELETE", path = "relay/remove", hasBody = true)
+    Observable<Response<String>> deleteRelay(@Body BodyBias relayId);
+
+    /**
+     * 批量添加更新传感器
+     * @param sensors
+     * @return
+     */
+    @POST("sensor/add-batch")
+    Observable<Response<String>> updateSensors(@Body SensorListBodyBean sensors);
+
+    @HTTP(method = "DELETE", path = "sensor/remove", hasBody = true)
+    Observable<Response<String>> deleteSensor(@Body BodyBias sensorId);
+
+    /**
+     * 批量添加更新开关
+     * @param switches
+     * @return
+     */
+    @POST("switch/add-batch")
+    Observable<Response<String>> updateSwitch(@Body SwitchListBodyBean switches);
+
+    @HTTP(method = "DELETE", path = "switch/remove", hasBody = true)
+    Observable<Response<String>> deleteSwitch(@Body BodyBias switchId);
+
+    /**
+     * 批量处理动态变换更新与添加
+     * @param dynamics
+     * @return
+     */
+    @POST("dynamic-change/add-batch")
+    Observable<Response<String>> updateDynamic(@Body GradientListBodyBean dynamics);
+
+    @HTTP(method = "DELETE", path = "dynamic-change/remove", hasBody = true)
+    Observable<Response<String>> deleteDynamic(@Body BodyBias dynamicId);
+
 
     /**
      * 窗帘更新  https://dev.dadoutek.com/xxxx/curtain/update/{id}* PUT

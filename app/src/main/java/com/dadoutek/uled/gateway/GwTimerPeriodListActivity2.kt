@@ -68,7 +68,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
 
     private var isAddNew: Boolean = false
     private var launch: Job? = null
-    private var indexAll: Int = 0
+//    private var indexAll: Int = 0
     private var receviedCount: Int = 0
     private var timeListTp: MutableList<GwTimePeriodsBean>? = null
     private var gwTagBean: GwTagBean? = null
@@ -76,7 +76,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     private var connectCount: Int = 0
     private var disposableTimer: Disposable? = null
     private var tasksBean: GwTasksBean? = null
-    private var isHaveLastOne = false
+//    private var isHaveLastOne = false
 
     override fun setLayoutID(): Int {
         return R.layout.activity_timer_period_list
@@ -91,6 +91,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun performed(event: Event<String>?) {
+        LogUtils.v("事件启动了吗")
         if (event is DeviceEvent) {
             this.onDeviceEvent(event)
         }
@@ -227,7 +228,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 it1.standingTime = tasksBean?.stayTime ?: 0
             }
             timesNowList.addAll(it)
-            var num = 0 until timesNowList.size
+            val num = 0 until timesNowList.size
             val reversed = num.reversed()
             for (i in reversed)//倒序输出
                 if (i < timesList.size)
@@ -248,7 +249,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
     override fun initView() {
         this.mApp = this.application as TelinkLightApplication
         toolbar_t_center.text = getString(R.string.timer_period_set)
-        template_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = adapter
         // linAdd = View.inflate(this, R.layout.template_bottom_add_no_line, null)
         //     val tv = linAdd?.findViewById<TextView>(R.id.add_group_btn_tv)
@@ -286,7 +287,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
             if (t.sceneId != 0L)
                 timeListTp?.add(t)
 
-        var os = ByteArrayOutputStream()
+        val os = ByteArrayOutputStream()
 
         timeListTp?.let {
             var sendK = 0
@@ -294,7 +295,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 val tp = it[i]
                 if (tasksBean != null) {
                     if (!TelinkLightApplication.getApp().isConnectGwBle) {
-                        var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
+                        val labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
                                 Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02,
                                 tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
                                 tasksBean!!.stayTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
@@ -321,7 +322,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                         sendK++
                         LogUtils.v("zcl-----------发送次数-------$sendK")
 
-                        var params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
+                        val params = byteArrayOf(tasksBean!!.labelId.toByte(), tasksBean!!.index.toByte(),
                                 tasksBean!!.stayTime.toByte(), (tasksBean?.startHour ?: 0).toByte(),
                                 (tasksBean?.startMins ?: 0).toByte(), (tasksBean?.endHour
                                 ?: 0).toByte(), (tasksBean?.endMins ?: 0).toByte(), tp.index.toByte(), tp.sceneId.toByte())
@@ -355,7 +356,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
         TelinkApplication.getInstance().removeEventListeners()
         this.mApp.addEventListener(DeviceEvent.STATUS_CHANGED, this)
 
-        var meshAddress = gwTagBean?.meshAddr ?: 0
+        val meshAddress = gwTagBean?.meshAddr ?: 0
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH) + 1
@@ -368,7 +369,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
             if (!TelinkLightApplication.getApp().isConnectGwBle) {
                 //如果是网络离线通过服务器
                 setHeadTimerDelay(6500L)
-                var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
+                val gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
                         it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
                         month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
@@ -384,7 +385,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
             } else {
                 setHeadTimerDelay(1500L)
 
-                var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
+                val labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
                         it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
                 TelinkLightService.Instance()?.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
                 LogUtils.v("zcl-----------发送0xf6-----时间段选择时间--列表")
@@ -452,12 +453,12 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 index += 1
                 LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
                 if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
-                    var bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.choose_scene))
+                    val bean = GwTimePeriodsBean(index, time, endTime, getString(R.string.choose_scene))
                     bean.standingTime = tasksBean?.stayTime ?: 0
                     timesList.add(bean)
                     break
                 } else if (endTime - time >= standingNum) {
-                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.choose_scene))
+                    val bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.choose_scene))
                     bean.sceneName = getString(R.string.choose_scene)
                     timesList.add(bean)
                 }

@@ -156,12 +156,12 @@ class DeveloperActivity : BaseActivity() {
 
         LogUtils.v("zcl------找回controlMeshName:${DBUtils.lastUser?.controlMeshName}")
         disposableTimer = Observable.timer(13, TimeUnit.SECONDS)
-                 .subscribeOn(Schedulers.io())
-                                 .observeOn(AndroidSchedulers.mainThread()).subscribe {
-            hideLoadingDialog()
-            disposableFind?.dispose()
-            ToastUtils.showShort(getString(R.string.find_device_num) + 0)
-        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                hideLoadingDialog()
+                disposableFind?.dispose()
+                ToastUtils.showShort(getString(R.string.find_device_num) + 0)
+            }
         TelinkLightService.Instance()?.idleMode(true)
         showLoadingDialog(getString(R.string.please_wait))
         val scanFilter = com.polidea.rxandroidble2.scan.ScanFilter.Builder().setDeviceName(DBUtils.lastUser?.controlMeshName).build()
@@ -533,6 +533,8 @@ class DeveloperActivity : BaseActivity() {
     }
 
     private fun syncData() {
+        LogUtils.v("chown -- 同步数据")
+
         SyncDataPutOrGetUtils.syncPutDataStart(this@DeveloperActivity!!, object : SyncCallback {
             override fun complete() {
                 hideLoadingDialog()

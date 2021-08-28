@@ -1,9 +1,11 @@
 package com.dadoutek.uled.model.httpModel
 
+import com.dadoutek.uled.model.BodyBias
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
-import com.dadoutek.uled.network.GroupListBodyBean
+import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.bean.GroupListBodyBean
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
@@ -24,9 +26,27 @@ object GroupMdodel {
     }
     fun batchAddOrUpdateGp(list: List<DbGroup>): Observable<Response<Any>>? {
         return NetworkFactory.getApi()
-                .batchUpGroupList(GroupListBodyBean(list))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+            .batchUpGroupList(GroupListBodyBean(list))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun batchAddOrUpdateGp2(list: List<DbGroup>): Observable<String>? {
+        return NetworkFactory.getApi()
+            .batchUpGroupList2(GroupListBodyBean(list))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {  }
+    }
+
+    fun remove(list: List<Int>): Observable<String>? {
+        return NetworkFactory.getApi()
+            .deleteGroups(BodyBias(list))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {  }
     }
 
     fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int,color: Int,id: Long): Observable<String>? {
@@ -55,6 +75,8 @@ object GroupMdodel {
                 }
                 .observeOn(AndroidSchedulers.mainThread())
     }
+
+
 
     fun get(token: String): Observable<MutableList<DbGroup>>? {
         return NetworkFactory.getApi()

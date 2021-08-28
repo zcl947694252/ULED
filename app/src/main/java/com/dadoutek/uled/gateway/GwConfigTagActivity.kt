@@ -46,7 +46,7 @@ import com.yanzhenjie.recyclerview.SwipeMenu
 import com.yanzhenjie.recyclerview.SwipeMenuItem
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
+//import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_gate_way.*
 import kotlinx.android.synthetic.main.template_bottom_add_no_line.*
@@ -70,6 +70,7 @@ import kotlin.collections.ArrayList
  * 更新时间   $
  * 更新描述
  */
+
 class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
     private lateinit var filter: IntentFilter
@@ -111,8 +112,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             renameEt?.setSelection(renameEt?.text.toString().length)
 
             if (this != null && !this.isFinishing) {
-                renameDialog?.dismiss()
-                renameDialog?.show()
+                renameDialog.dismiss()
+                renameDialog.show()
             }
 
             renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -140,9 +141,9 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         isCanEdite = false
         isCanEdite()
 
-        swipe_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        swipe_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         swipe_recycleView.isItemViewSwipeEnabled = false //侧滑删除，默认关闭。
-        swipe_recycleView.addItemDecoration(DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.HORIZONTAL))
+        swipe_recycleView.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.HORIZONTAL))
         swipe_recycleView.setSwipeMenuCreator(function) // 设置监听器。
         swipe_recycleView.setOnItemMenuClickListener { menuBridge, adapterPosition ->
             menuBridge.closeMenu()//删除标签的回调
@@ -150,7 +151,6 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             sendDeleteTask(listTask[deletePosition ?: 0])
         }
         swipe_recycleView.adapter = adapter
-
 
         this.mApp = this.application as TelinkLightApplication
     }
@@ -219,13 +219,13 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     }
 
     private fun getWeekStr(): String {
-        var tmpWeek = tagBean?.week?:0
+        val tmpWeek = tagBean?.week?:0
         val sb = StringBuilder()
         when (tmpWeek) {
             0b10000000 -> sb.append(getString(R.string.every_day))
             0b00000000 -> sb.append(getString(R.string.only_one))
             else -> {
-                var list = mutableListOf(
+                val list = mutableListOf(
                         WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
                         WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
                         WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
@@ -326,8 +326,8 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
     private fun sendDeleteTask(gwTaskBean: GwTasksBean) {
         deleteBean = gwTaskBean
         connectCount++
-        val id = gwTaskBean?.labelId
-        var opcodeDelete = if (tagBean?.isTimer() == true)
+        val id = gwTaskBean.labelId
+        val opcodeDelete = if (tagBean?.isTimer() == true)
             Opcode.CONFIG_GW_TIMER_DELETE_TASK
         else
             Opcode.CONFIG_GW_TIMER_PERIOD_DELETE_TASK
@@ -335,11 +335,11 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         if (TelinkLightApplication.getApp().isConnectGwBle) {
             setTimerDelay(1500L, gwTaskBean)
             //11-18 11位标签id 12 时间条index
-            var paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
+            val paramer = byteArrayOf(id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0)
             TelinkLightService.Instance().sendCommandResponse(opcodeDelete, dbGw?.meshAddr ?: 0, paramer, "1")
         } else {
             setTimerDelay(6500L, gwTaskBean)
-            var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
+            val gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeDelete, 0x11, 0x02,
                     id.toByte(), gwTaskBean.index.toByte(), 0, 0, 0, 0, 0, 0, 0, 0)
             LogUtils.v("zcl-----------发送到服务器删除标签-------$gattPar")
 
@@ -380,14 +380,14 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                         ToastUtils.showShort(getString(R.string.send_gate_way_label_head_fail))
                     }
                 }
-        var meshAddress = dbGw?.meshAddr ?: 0
+        val meshAddress = dbGw?.meshAddr ?: 0
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         val calendar = Calendar.getInstance()
         val month = calendar.get(Calendar.MONTH) + 1
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        LogUtils.v("zcl-----------当前日期:--------$month-$day")
+//        LogUtils.v("zcl-----------当前日期:--------$month-$day")
 
         val opcodeHead = if (tagBean?.isTimer() == true)
             Opcode.CONFIG_GW_TIMER_LABLE_HEAD
@@ -402,7 +402,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         if (!TelinkLightApplication.getApp().isConnectGwBle) {
             tagBean?.let {
                 it.status = 0//修改数据后状态设置成关闭
-                var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
+                val labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodeHead, 0x11, 0x02,
                         it.tagId.toByte(), it.status.toByte(), it.week.toByte(), 0,
                         month.toByte(), day.toByte(), 0, 0, 0, 0)// status 开1 关0 tag的外部现实
 
@@ -418,7 +418,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             }
         } else {
             tagBean?.let {
-                var labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
+                val labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
                         it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
                 TelinkLightService.Instance()?.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
                 LogUtils.v("zcl-----------发送命令0xf6-------配置界面")
@@ -530,7 +530,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == requestModeCode) {//选择重复日期
-                var mode = data?.getStringExtra("data")
+                val mode = data?.getStringExtra("data")
                 if (mode!!.contains("6")) {
                     gate_way_repete_mode.textSize = 13F
                     gate_way_repete_mode.text = mode.replace("6", "")
@@ -550,7 +550,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                         listTask.add(b)
                     } else {
                         bean.isCreateNew = false
-                        var targetPosition: Int
+                        val targetPosition: Int
                         for (i in 0 until listTask.size) {
                             val timeBean = listTask[i]
                             if (timeBean.index == bean.index) {//存在
@@ -575,7 +575,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
 
     private fun isOnlyOne(mode: String): String {
         val split = mode.split(",").toMutableList()
-        var weekDay = when {
+        val weekDay = when {
             Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 0 -> getString(R.string.sunday)
             Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 1 -> getString(R.string.monday)
             Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1 == 2 -> getString(R.string.tuesday)
@@ -619,7 +619,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gate_way)
         receiver = GwBrocasetReceiver()
-         filter = IntentFilter()
+        filter = IntentFilter()
         filter.addAction(LightService.ACTION_STATUS_CHANGED)
         receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
             override fun loginSuccess() {

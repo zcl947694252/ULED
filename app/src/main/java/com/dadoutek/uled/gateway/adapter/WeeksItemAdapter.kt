@@ -26,7 +26,7 @@ class WeeksItemAdapter(resId: Int, data: MutableList<WeekBean>) : BaseQuickAdapt
         val textView = helper?.getView<TextView>(R.id.item_week_title)
         val cb = helper?.getView<ImageView>(R.id.item_week_checked)
         cb?.isSelected = item!!.selected
-        if (item!!.selected) {
+        if (item.selected) {
             cb?.setImageResource(R.drawable.icon_checkbox_selected)
             textView?.setTextColor(mContext.getColor(R.color.blue_text))
         } else {

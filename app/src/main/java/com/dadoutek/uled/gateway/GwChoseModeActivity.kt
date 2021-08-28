@@ -58,7 +58,7 @@ class GwChoseModeActivity : TelinkBaseActivity() {
             }
         }
 
-        template_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         adapter = WeeksItemAdapter(R.layout.item_week_day_tick, list!!)
         template_recycleView.adapter = adapter
         adapter?.bindToRecyclerView(template_recycleView)
@@ -88,8 +88,8 @@ class GwChoseModeActivity : TelinkBaseActivity() {
     }
 
     private fun setWeekResult() {
-        var intent = Intent()
-        var sb = StringBuilder()
+        val intent = Intent()
+        val sb = StringBuilder()
         when (checkedList.size) {
             0 -> sb.append(getString(R.string.only_one))
             7 -> sb.append(getString(R.string.every_day))

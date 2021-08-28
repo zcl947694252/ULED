@@ -15,6 +15,7 @@ import com.dadoutek.uled.switches.RouterListBody
 import com.dadoutek.uled.switches.bean.KeyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.internal.operators.observable.ObservableAll
 import io.reactivex.schedulers.Schedulers
 
 
@@ -344,6 +345,15 @@ object RouterModel {
         return NetworkFactory.getApi().configEightSw(SwEightBody(id.toInt(), keys, ser_id,configSwitchType))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    /**
+     * 配置四六键开关
+     */
+    fun configFourAndSixSw(ser_id: String,id: Long,configSwitchType:Int,keys: List<KeyBean>) : Observable<Response<RouterTimeoutBean>>? {
+        return NetworkFactory.getApi().configFourAndSixSw(SwFourAndSixSwBody(ser_id,id.toInt(),configSwitchType,keys))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
     }
 
     /**

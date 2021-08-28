@@ -219,17 +219,17 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                     when (data.op) {//路由升级 0设备类型  1单灯  2群组  3 ota Router本身
                                         0 -> startActivity<GroupOTAListActivity>("DeviceType" to productUUID, "isOTAing" to 1)
                                         1 -> {
-                                            var meshAddr = when (productUUID) {
+                                            val meshAddr = when (productUUID) {
                                                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMac(otaDataOne.macAddr)?.meshAddr
                                                 DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByMac(otaDataOne.macAddr)?.meshAddr
                                                 DeviceType.SMART_RELAY -> DBUtils.getConnectorByMac(otaDataOne.macAddr)?.meshAddr
                                                 else -> DBUtils.getLightByMac(otaDataOne.macAddr)?.meshAddr
                                             }
                                             startActivity<RouterOtaActivity>("deviceMeshAddress" to meshAddr, "deviceType" to productUUID,
-                                                    "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
+                                                    "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne.fromVersion)
                                         }
                                         2 -> {
-                                            var gpId = when (productUUID) {
+                                            val gpId = when (productUUID) {
                                                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMac(otaDataOne.macAddr)?.belongGroupId
                                                 DeviceType.SMART_CURTAIN -> DBUtils.getCurtainByMac(otaDataOne.macAddr)?.belongGroupId
                                                 DeviceType.SMART_RELAY -> DBUtils.getConnectorByMac(otaDataOne.macAddr)?.belongGroupId
@@ -241,7 +241,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                             startActivity<GroupOTAListActivity>("group" to groupByID!!, "DeviceType" to productUUID, "isOTAing" to 1)
                                         }
                                         3 -> startActivity<RouterOtaActivity>("deviceMeshAddress" to 100000, "deviceType" to
-                                                productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne!!.fromVersion)
+                                                productUUID, "deviceMac" to otaDataOne.macAddr, "isOTAing" to 1, "version" to otaDataOne.fromVersion)
                                     }
                                 }
                             }
@@ -376,6 +376,8 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         if (!NetWorkUtils.isNetworkAvalible(this)) {
             LogUtils.d(getString(R.string.net_disconnect_tip_message))
         } else {
+            LogUtils.v("chown -- 同步数据")
+
             SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallback)
         }
     }
@@ -418,9 +420,13 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
         bnve.enableItemShiftingMode(false)
         bnve.setupWithViewPager(viewPager)
         viewPager.addOnPageChangeListener(object : androidx.viewpager.widget.ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(p0: Int) {}
+            override fun onPageScrollStateChanged(p0: Int) {
 
-            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {}
+            }
+
+            override fun onPageScrolled(p0: Int, p1: Float, p2: Int) {
+
+            }
 
             override fun onPageSelected(p0: Int) {
                 val intent = Intent("isDelete")
@@ -726,9 +732,9 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
                                                         ?.subscribe({//找回有效设备
                                                             //RecoverMeshDeviceUtil.addDevicesToDb(it)
                                                             onLogin()
-                                                            LogUtils.v("zcl-----------连接成功失败-------")
+//                                                            LogUtils.v("zcl-----------连接成功失败-------")
                                                         }, {
-                                                            LogUtils.v("zcl-----------连接失败失败-------")
+//                                                            LogUtils.v("zcl-----------连接失败失败-------")
                                                             LogUtils.d("TelinkBluetoothSDK connect failed, reason = ${it.message}---${it.localizedMessage}")
                                                             //   autoConnect()
                                                         })
@@ -839,7 +845,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
             val secondTime = System.currentTimeMillis()
-            var isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, false)
+            val isDelete = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DELETE, false)
             if (isDelete) {
                 val intent = Intent("isDelete")
                 intent.putExtra("isDelete", "true")
@@ -866,6 +872,7 @@ class MainActivity : TelinkBaseActivity(), EventListener<String>, CallbackLinkMa
     }
 
     override fun setMessage(cmd: Int, extCmd: Int, message: String) {
+
     }
 }
 

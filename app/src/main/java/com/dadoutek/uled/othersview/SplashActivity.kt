@@ -1,5 +1,6 @@
 package com.dadoutek.uled.othersview
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -36,8 +37,8 @@ import java.util.*
  */
 class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
     private var mApplication: TelinkLightApplication? = null
-    var mIsFirstData = true
-    var mIsLogging = false
+    private var mIsFirstData = true
+    private var mIsLogging = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
@@ -94,9 +95,9 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         }*/
     }
 
-    private fun gotoLoginSetting(isFrist: Boolean) {
+    private fun gotoLoginSetting(isFirst: Boolean) {
         val intent = Intent(this@SplashActivity, LoginActivity::class.java)
-        intent.putExtra(IS_FIRST_LAUNCH, isFrist)
+        intent.putExtra(IS_FIRST_LAUNCH, isFirst)
         startActivityForResult(intent, 0)
     }
 
@@ -113,6 +114,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         const val IS_FIRST_LAUNCH = "IS_FIRST_LAUNCH"
     }
 
+    @SuppressLint("CutPasteId")
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.splash_to_login -> gotoLoginSetting(false)
@@ -121,9 +123,9 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                 popView?.let {
                     val userAgreenment = it.findViewById<TextView>(R.id.code_warm_user_agreenment)
                     val ss = SpannableString(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
-                    var cs: ClickableSpan = object : ClickableSpan() {
+                    val cs: ClickableSpan = object : ClickableSpan() {
                         override fun onClick(widget: View) {
-                            var intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
+                            val intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
                             startActivity(intent)
                         }
 
@@ -133,8 +135,8 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                             ds.isUnderlineText = false
                         }
                     }
-                    var start = if (isZh(this)) 3 else 0
-                    var end = if (isZh(this)) ss.length else ss.length - 17
+                    val start = if (isZh(this)) 3 else 0
+                    val end = if (isZh(this)) ss.length else ss.length - 17
                     ss.setSpan(cs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                     userAgreenment.text = ss
                     userAgreenment?.movementMethod = LinkMovementMethod.getInstance()//必须要加否则不能点击
@@ -162,8 +164,8 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                     }
 
                     try {
-                        if (!this@SplashActivity.isFinishing && !pop!!.isShowing)
-                            pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 50)
+                        if (!this@SplashActivity.isFinishing && !pop.isShowing)
+                            pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 50)
                     } catch (e: Exception) {
                         LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
                     }

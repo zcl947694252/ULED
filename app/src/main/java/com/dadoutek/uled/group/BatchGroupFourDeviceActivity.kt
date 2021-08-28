@@ -63,7 +63,7 @@ import kotlinx.android.synthetic.main.activity_batch_group_four.image_bluetooth
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbar
 import kotlinx.android.synthetic.main.activity_batch_group_four.toolbarTv
 import kotlinx.coroutines.*
-import org.greenrobot.greendao.DbUtils
+//import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
 import java.lang.StringBuilder
 import java.util.*
@@ -145,7 +145,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private var isAddGroupEmptyView: Boolean = false
     private var isComplete: Boolean = false
     private var isChange: Boolean = false
-    private var isFirst: Boolean = true
+    private var timerStop = 0
+
+//    private var isFirst: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,7 +160,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun makePop() {
-        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_tip_recycle, null)
+        val popView: View = LayoutInflater.from(this).inflate(R.layout.pop_tip_recycle, null)
         tipRecycleView = popView.findViewById(R.id.tip_recycle)
         tipReadTimer = popView.findViewById(R.id.read_timer)
         tipBottomLy = popView.findViewById(R.id.cancel_confirm_ly)
@@ -169,7 +171,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             popTip?.dismiss()
         }
 
-        tipRecycleView?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        tipRecycleView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         tipRecycleView?.adapter = onlyNameAdapter
 
         popTip = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -211,9 +213,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         // batch_four_device_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
 
         batch_four_device_recycle_grouped.layoutManager = GridLayoutManager(this, 4)
-        //batch_four_device_recycle_grouped.addItemDecoration(RecyclerGridDecoration(this, 2))
+        // batch_four_device_recycle_grouped.addItemDecoration(RecyclerGridDecoration(this, 2))
 
-        batch_four_group_recycle.layoutManager = LinearLayoutManager(this, LinearLayout.HORIZONTAL, false)
+//         batch_four_group_recycle.layoutManager = LinearLayoutManager(this, LinearLayout.HORIZONTAL, false) // chown 2021.08.19
+        batch_four_group_recycle.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         // batch_four_group_recycle.addItemDecoration(RecyclerGridDecoration(this, 2))
 
         lplong = batch_four_no_group.layoutParams as LinearLayout.LayoutParams
@@ -408,7 +411,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         val textGp = EditText(this)
         textGp.singleLine = true
         StringUtils.initEditTextFilter(textGp)
-        textGp.setText(groupsByDeviceType?.get(position)?.name)
+        textGp.setText(groupsByDeviceType[position].name)
         //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(this)
@@ -419,8 +422,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
                         ToastUtils.showLong(getString(R.string.rename_tip_check))
                     } else {
-                        groupsByDeviceType?.get(position)?.name = textGp.text.toString().trim { it <= ' ' }
-                        val group = groupsByDeviceType?.get(position)
+                        groupsByDeviceType[position].name = textGp.text.toString().trim { it <= ' ' }
+                        val group = groupsByDeviceType[position]
                         if (Constant.IS_ROUTE_MODE) {
                             GroupMdodel.batchAddOrUpdateGp(mutableListOf(group))?.subscribe({
                                 if (it.errorCode == 0)
@@ -441,7 +444,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     private fun renameGpSuccess(group: DbGroup, position: Int) {
         if (group != null)
             DBUtils.updateGroup(group)
-        groupAdapter?.notifyItemRangeChanged(position, 1)
+        groupAdapter.notifyItemRangeChanged(position, 1)
         when (deviceType) {
             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
                 for (device in listGroup) {
@@ -541,9 +544,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 deviceDataCurtainAll.clear()
                 when (scanningList) {
                     null -> {
-                        when {
-                            gpMeshAddr == 0 -> deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
-                            else -> DBUtils.getCurtainByGroupMesh(gpMeshAddr)?.let {
+                        when (gpMeshAddr) {
+                            0 -> deviceDataCurtainAll.addAll(DBUtils.getAllCurtains())
+                            else -> DBUtils.getCurtainByGroupMesh(gpMeshAddr).let {
                                 deviceDataCurtainAll.addAll(it)
                             }
                         }
@@ -604,8 +607,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -617,7 +620,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 if (curtain != null) {
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            val subscribe = RouterModel.routeUpdateCurtainName(curtain!!.id, curtain?.name)?.subscribe({
+                            val subscribe = RouterModel.routeUpdateCurtainName(curtain.id, curtain.name)?.subscribe({
                                 renameCurtainSuccess(curtain)
                             }, {
                                 ToastUtils.showShort(it.message)
@@ -638,13 +641,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
     private fun renameConnector(connector: DbConnector?) {
         if (connector != null) {
-            if (!TextUtils.isEmpty(connector?.name))
-                renameEt?.setText(connector?.name)
+            if (!TextUtils.isEmpty(connector.name))
+                renameEt?.setText(connector.name)
             renameEt?.setSelection(renameEt?.text.toString().length)
 
             if (this != null && !this.isFinishing) {
-                renameDialog?.dismiss()
-                renameDialog?.show()
+                renameDialog.dismiss()
+                renameDialog.show()
             }
 
             renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -655,7 +658,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            val subscribe = RouterModel.routeUpdateCurtainName(connector!!.id, connector?.name)?.subscribe({
+                            val subscribe = RouterModel.routeUpdateCurtainName(connector.id, connector.name)?.subscribe({
                                 renameRelaySuccess(connector)
                             }, {
                                 ToastUtils.showShort(it.message)
@@ -683,8 +686,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -695,13 +698,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 if (light != null) {
                     when {
                         Constant.IS_ROUTE_MODE -> {
-                            val subscribe = RouterModel.routeUpdateLightName(light!!.id, light?.name)?.subscribe({
+                            val subscribe = RouterModel.routeUpdateLightName(light.id, light.name)?.subscribe({
                                 renameLightSuccess(light)
                             }, {
                                 ToastUtils.showShort(it.message)
                             })
                         }
-                        else -> renameLightSuccess(light!!)
+                        else -> renameLightSuccess(light)
                     }
                 }
                 // changeDeviceData()
@@ -919,6 +922,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                             }
                         }
                     }
+//                    runBlocking {
+//                        delay(10)
+//                    }
                     routerGroupDevice(batchList, it)
                 }
             } else {//如果什么操作都没有点击后退出 此相关逻辑已经废弃
@@ -930,6 +936,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
             changeGroupSelectView(position)
         }
         groupAdapter.setOnItemLongClickListener { _, _, position ->
+            // 长按修改组名
             showGroupForUpdateNameDialog(position)
             false
         }
@@ -993,10 +1000,10 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     }
 
     private fun showNoBound(itR: Response<RouterBatchGpBean>) {
-        var str = StringBuilder()
+        val str = StringBuilder()
         str.append(getString(R.string.device_name))
         itR.t.noBoundMeshAddrs.forEach { itDevice ->
-            var name = when (deviceType) {
+            val name = when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> DBUtils.getLightByMeshAddr(itDevice)?.name
                 DeviceType.SMART_CURTAIN -> DBUtils.getLightByMeshAddr(itDevice)?.name
                 DeviceType.SMART_RELAY -> DBUtils.getLightByMeshAddr(itDevice)?.name
@@ -1013,13 +1020,13 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
     override fun tzRouterGroupResult(bean: RouteGroupingOrDelBean?) {
         if (bean?.ser_id == "batchGp") {
             disposableTimer?.dispose()
-            if (bean?.finish) {
+            if (bean.finish) {
                 hideLoadingDialog()
                 changeDeviceAll()
-                when (bean?.status) {
+                when (bean.status) {
                     -1 -> ToastUtils.showShort(getString(R.string.group_failed))
                     0, 1 -> {
-                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        if (bean.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
                         hideLoadingDialog()
                         currentGroup!!.meshAddr
                         //batchList.forEach { it1 ->
@@ -1320,6 +1327,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         setGroupData()
         changeSourceData()
         updateGroupResult()
+        LogUtils.v("chown -- 同步数据")
+
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {}
 
@@ -1464,7 +1473,12 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 currentGroup?.deviceType = dbRelay.productUUID.toLong()
             }
         }
-
+        if (timerStop == 20) { // chown 2021.8.19 添加一个协程阻塞 因为说有配置失败出现在组中找不到 所有组可控，添加个延时，让其处理
+            runBlocking {
+                delay(1200)
+            }
+            timerStop = 0
+        }
         val successCallback: () -> Unit = {
             when (deviceType) {
                 DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_RGB -> {
@@ -1554,7 +1568,9 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
 
         }
         isChange = true
+
         Commander.addGroup(deviceMeshAddr, dbGroup.meshAddr, successCallback, failedCallback)
+        timerStop++
     }
 
     private fun stopBlink(meshAddr: Int, belongGroupId: Long) {
@@ -1568,7 +1584,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         Log.d("zcl", "startBlink groupAddresss = $groupAddress")
         newStartBlinkOpcode(groupAddress, meshAddr, false)
 
-        val disposable = mBlinkDisposables?.get(meshAddr)
+        val disposable = mBlinkDisposables.get(meshAddr)
         disposable?.dispose()
     }
 
@@ -1707,8 +1723,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容

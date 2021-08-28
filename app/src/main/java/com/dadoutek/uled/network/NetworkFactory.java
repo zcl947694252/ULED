@@ -106,7 +106,7 @@ public class NetworkFactory {
 
             api = retrofit.create(RequestInterface.class);
         } else*/
-        if (null == api || SharedPreferencesUtils.getTestType()) { //chown
+        if (null == api /*|| SharedPreferencesUtils.getTestType()*/) { //chown
             Constant.BASE_URL = Constant.isDebug ? Constant.BASE_DEBUG_URL : Constant.BASE_URL_JAVA;
             Retrofit retrofit = new Retrofit.Builder()
                     .client(okHttpClient)
@@ -118,6 +118,23 @@ public class NetworkFactory {
             api = retrofit.create(RequestInterface.class);
             SharedPreferencesUtils.setTestType(false); //chown
         }
+        return api;
+    }
+
+    public static RequestInterface getOtherApi() {
+        okHttpClient = null;
+        okHttpClient = initHttpClient();
+        api = null;
+        Constant.BASE_URL = Constant.isDebug ? Constant.BASE_DEBUG_URL : Constant.BASE_URL_JAVA;
+        Retrofit retrofit = new Retrofit.Builder()
+                .client(okHttpClient)
+                .baseUrl(Constant.BASE_URL)
+                .addConverterFactory(gsonConverterFactory)
+                .addCallAdapterFactory(rxJavaCallAdapterFactory)
+                .build();
+
+        api = retrofit.create(RequestInterface.class);
+        SharedPreferencesUtils.setTestType(false); //chown
         return api;
     }
 

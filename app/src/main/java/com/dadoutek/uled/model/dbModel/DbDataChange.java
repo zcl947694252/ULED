@@ -13,16 +13,16 @@ import org.greenrobot.greendao.annotation.Generated;
 @Entity
 public class DbDataChange {
     @Id(autoincrement = true)
-    private Long id;//自增
+    private Long id;    //自增
 
-    private Long changeId;//变化行id
+    private Long changeId;  //变化行id
 
-    private String tableName;//改变的表名
+    private String tableName;   //改变的表名
 
     private String changeType;  //数据改变操作类型  增删改查
 
     public int type = 3 ;  // 群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
-@Nullable
+    @Nullable
     public String keys ="";
 
     @Generated(hash = 1326895366)

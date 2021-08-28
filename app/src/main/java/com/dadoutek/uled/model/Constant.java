@@ -29,7 +29,7 @@ public class Constant implements Serializable {
      * 测试mqtt服务器地址  tcp://47.107.227.130:1885
      * 正式mqtt服务器地址 tcp://smart.dadoutek.com:1883
      */
-    public static String HOST =isDebug ? "47.107.227.130":"smart.dadoutek.com";
+    public static String HOST =isDebug ? "47.107.227.130":"smart.dadoutek.com"; //no use
     public static String HOST2 =isDebug ? "tcp://47.107.227.130":"tcp://smart.dadoutek.com";
     public static int PORT = isDebug ?1885:1883;
 
@@ -93,7 +93,7 @@ public class Constant implements Serializable {
     public static String CURRENT_USE_REGION_KEY = "CURRENT_USE_REGION_KEY";
 
     //当前使用的区域默认为0
-    public static String CURRENT_LIGHT_VSERSION_KEY = "CURRENT_LIGHT_VSERSION_KEY";
+    public static String CURRENT_LIGHT_VSERSION_KEY = "CURRENT_LIGHT_VSERSION_KEY"; // no use
 
     //当前使用过此手机登录的用户列表
     public static String CURRENT_USE_LIST_KEY = "CURRENT_USE_LIST_KEY";
@@ -105,7 +105,7 @@ public class Constant implements Serializable {
     public static String IS_ALL_LIGHT_MODE = "IS_ALL_LIGHT_MODE";
 
     //是否重置引导显示
-    public static String IS_SHOWGUIDE_AGAIN = "IS_DEVELOPER_MODE";
+    public static String IS_SHOWGUIDE_AGAIN = "IS_DEVELOPER_MODE"; // no use
 
     //是否连接成功
     public static String IS_BLUETOOTH_STATE = "IS_BLUETOOTH_STATE";
@@ -179,10 +179,10 @@ public class Constant implements Serializable {
     public static final int INSTALL_GATEWAY = 6;
     public static final int INSTALL_ROUTER = 7;
 
-    public static final int INSTALL_LIGHT_OF_CW = 10;
-    public static final int INSTALL_LIGHT_OF_RGB = 11;
+    public static final int INSTALL_LIGHT_OF_CW = 10;// no use
+    public static final int INSTALL_LIGHT_OF_RGB = 11;// no use
     public static final int INSTALL_CURTAIN_OF = 12;
-    public static final int INSTALL_RELAY_OF = 13;
+    public static final int INSTALL_RELAY_OF = 13;// no use
     //分组标识
 
     //默认分组
@@ -197,6 +197,9 @@ public class Constant implements Serializable {
     //灯的相关分组 不带所有组
     public static final Long DEVICE_TYPE_LIGHT_SW = 3L;
 
+    // 选择了灯的亮度还是色温
+    public static final String IS_BRI="ISBRI"; // no use
+
     //普通灯分组
     public static final Long DEVICE_TYPE_LIGHT_NORMAL = Long.valueOf(0x04);
     //RGB分组
@@ -206,10 +209,10 @@ public class Constant implements Serializable {
     //连接器
     public static final Long DEVICE_TYPE_CONNECTOR = Long.valueOf(0x05);
     //网关
-    public static final Long DEVICE_TYPE_GATE_WAY = Long.valueOf(0x07);
+    public static final Long DEVICE_TYPE_GATE_WAY = Long.valueOf(0x07); // no use
 
     //升级标记t
-    public static final String UP_VERSION = "UP_VERSION";
+    public static final String UP_VERSION = "UP_VERSION"; // no use
 
     //网络授权分享人数
     public static final String SHARE_PERSON = "SHARE_PERSON";
@@ -223,38 +226,38 @@ public class Constant implements Serializable {
     //区域列表key
     public static final String REGION_LIST = "REGION_LIST";
     //区域授权列表key
-    public static final String REGION_AUTHORIZE_LIST = "REGION_AUTHORIZE_LIST";
+    public static final String REGION_AUTHORIZE_LIST = "REGION_AUTHORIZE_LIST"; // no use
 
     //区域列别
-    public static final int REGION_TYPE = 1;
+    public static final int REGION_TYPE = 1; // no use
     //授权区域列别
-    public static final int REGION_AUTHORIZE_TYPE = 2;
+    public static final int REGION_AUTHORIZE_TYPE = 2; // no use
     //进行OTA的设备类型
     public static final String OTA_TYPE = "OTA_TYPE";
 
     //进行OTA的设备类型为开关
-    public static final int SWITCH_TYPE = 3;
+    public static final int SWITCH_TYPE = 3; // no use
 
     //Stomp传递标识
-    public static final String STOMP = "LOGIN_OUT";
+    public static final String STOMP = "LOGIN_OUT"; // no use
     //rxbus 登出传递标识
     public static final String LOGIN_OUT = "LOGIN_OUT";
     //rxbus 解析码传递标识
-    public static final String PARSE_CODE = "PARSE_CODE";
+    public static final String PARSE_CODE = "PARSE_CODE"; // no use
     //rxbus 取消码传递标识
-    public static final String CANCEL_CODE = "CANCEL_CODE";
+    public static final String CANCEL_CODE = "CANCEL_CODE"; // no use
 
     //OTA 升级版本
     public static final String OTA_VERSION = "OTA_VERSION";
     //是否是重新配置
-    public static final String ISCONFIRM = "isConfirm";
-    public static boolean isCreat = false;
+    public static final String ISCONFIRM = "isConfirm"; // no use
+    public static boolean isCreat = false; // no use
     public static final String DEVICE_NUM = "DEVICE_NUM";
     public static final String IS_SMART = "IS_TECK";
-    public static final String IS_ONLINE = "IS_ONLINE";
+    public static final String IS_ONLINE = "IS_ONLINE"; // no use
     public static final String EIGHT_SWITCH_TYPE = "EIGHT_SWITCH_TYPE";
 
-    public static final String GW_COMMEND_CODE = "GW_COMMEND_CODE";
+    public static final String GW_COMMEND_CODE = "GW_COMMEND_CODE"; // no use
     /**
      * 网关设置wifi连接标识
      */
@@ -262,7 +265,7 @@ public class Constant implements Serializable {
     /**
      * 网关开关业务标识
      */
-    public static final int GW_SWITCH_VOIP = 0X11;
+    public static final int GW_SWITCH_VOIP = 0X11; // no use
     /**
      * 网关用户恢复业务标识 文档上写的是恢复出厂
      */
@@ -378,19 +381,19 @@ public class Constant implements Serializable {
 
     public static final int SER_ID_LIGHT_ON = 0x55;
     public static final int SER_ID_LIGHT_OFF = 0x56;
-    public static final int SER_ID_RGBLIGHT_ON = 0x57;
-    public static final int SER_ID_RGBLIGHT_OFF = 0x58;
+    public static final int SER_ID_RGBLIGHT_ON = 0x57; // no use
+    public static final int SER_ID_RGBLIGHT_OFF = 0x58; // no use
     public static final int SER_ID_SCENE_ON = 0x59;
-    public static final int SER_ID_CURTAIN_ON = 0x60;
-    public static final int SER_ID_CURTAIN_OFF = 0x61;
-    public static final int SER_ID_RELAY_ON = 0x62;
-    public static final int SER_ID_RELAY_OFF = 0x63;
-    public static final int SER_ID_GATEWAY_ON = 0x64;
-    public static final int SER_ID_GATEWAY_OFF = 0x65;
+    public static final int SER_ID_CURTAIN_ON = 0x60; // chown
+    public static final int SER_ID_CURTAIN_OFF = 0x61; // chown
+    public static final int SER_ID_RELAY_ON = 0x62; // chown
+    public static final int SER_ID_RELAY_OFF = 0x63; // chown
+    public static final int SER_ID_GATEWAY_ON = 0x64; // chown
+    public static final int SER_ID_GATEWAY_OFF = 0x65; // chown
     public static final int SER_ID_SENSOR_ON = 0x66;
     public static final int SER_ID_SENSOR_OFF = 0x67;
 
-    public static final String LAST_MESS_ADDR="LAST_MESS_ADDR";
+    public static final String LAST_MESS_ADDR="LAST_MESS_ADDR"; //chown
     /**
      * 网页锚点
      */
@@ -404,13 +407,13 @@ public class Constant implements Serializable {
     @Nullable
     public static final String ONE_QR="one_qr";
     @Nullable//-1：全部失败；0：全部成功；1：部分成功
-    public static final int ALL_SUCCESS =0;
-    public static final int ALL_FAILE =-1;
-    public static final int SOME_SUCCESS =1;
+    public static final int ALL_SUCCESS = 0;
+    public static final int ALL_FAILE = -1; // chown
+    public static final int SOME_SUCCESS = 1; //chown
     /**
      * 路由器闲置状态
      */
-    public static final int ROUTER_IDLE =0;
+    public static final int ROUTER_IDLE = 0;
     /**
      * 路由器正在扫描 有未确认扫描数据
      */

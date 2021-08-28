@@ -7,22 +7,21 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.util.GsonUtil
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DaoSessionInstance
-import com.dadoutek.uled.model.Group
-import com.dadoutek.uled.model.Opcode
+import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.routerModel.RouterModel
-import com.dadoutek.uled.router.bean.Scene
+import com.dadoutek.uled.router.bean.CmdBodyBean
+//import com.dadoutek.uled.router.bean.Scene
 import com.dadoutek.uled.switches.BaseSwitchActivity
 import com.dadoutek.uled.switches.ChooseGroupOrSceneActivity
 import com.dadoutek.uled.switches.bean.KeyBean
@@ -55,8 +54,8 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
     private var groupName:String? = null
     private var version:String? = null
     private var mDeviceInfo:DeviceInfo? = null
-    private var configSwitchType = 0
-    private var configSwitchTypeNum = 1
+    private var configSwitchType = 1 // 起始界面 0是群组界面 1是场景界面
+    private var configSwitchTypeNum = 0
     private var configButtonTag = 1
     private var requestCodeNum = 100
     private var clickType =  0
@@ -64,8 +63,7 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
     private val groupParamList = mutableListOf<ByteArray>()
     private val sceneMap = mutableMapOf<Int,DbScene>()
     private val sceneParamList = mutableListOf<ByteArray>()
-    private var count = 0
-
+    private var isOK = false
 
     override fun setToolBar(): Toolbar {
         return toolbar
@@ -81,9 +79,8 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun setVersion() {
-        if (TextUtils.isEmpty(version))
-            version = getString(R.string.get_version_fail)
-        else
+        if (!TextUtils.isEmpty(version))
+//            version = getString(R.string.get_version_fail)
             mDeviceInfo?.firmwareRevision = version
         fiVersion?.title = version
     }
@@ -93,13 +90,21 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
     }
 
     override fun deleteDevice() {
-
+        when{
+            mDeviceInfo != null -> deleteSwitch(mDeviceInfo!!.macAddress)
+            else -> ToastUtils.showShort(getString(R.string.invalid_data))
+        }
     }
 
     override fun goOta() {
+        if (mDeviceInfo != null)
+            deviceOta(mDeviceInfo!!, DeviceType.FOUR_SWITCH)
+        else
+            ToastUtils.showShort(getString(R.string.invalid_data))
     }
 
     override fun reName() {
+        showRenameDialog(switchDate, false)
     }
 
     override fun initListener() {
@@ -134,18 +139,23 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
         listKeysBean = JSONArray()
 
         //11-12-13-14 11-12-13-14
-        val first = mutableListOf(0)
-        val second = mutableListOf(1)
-        val third = mutableListOf(2)
+        val first = mutableListOf(0x61, 0x62)
+        val second = mutableListOf(0x63, 0x64)
+        val third = mutableListOf(0x65, 0x66)
 
-        val firstParam = getGroupParm(first, 0x61)
-        val secondParam = getGroupParm(second, 0x62)
-        val thirdParam = getGroupParm(third, 0x63)
+        val firstParam = getGroupParm(first)
+        val secondParam = getGroupParm(second)
+        val thirdParam = getGroupParm(third)
 
         LogUtils.v("chown获得的keys是$listKeysBean")
-        groupParamList.add(0, firstParam)
+        groupParamList.add(0, firstParam)  // 如果没有配置功能应该给于0
         groupParamList.add(1, secondParam)
         groupParamList.add(2, thirdParam)
+
+        if (!isOK) {
+            Toast.makeText(this,"至少选择一个组",Toast.LENGTH_SHORT).show()
+            return
+        }
 
         if (!Constant.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.setting_switch))
@@ -162,26 +172,30 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                 updateMeshGroup(0)
             }
         } else {
-            routerConfigEightSw(mDeviceInfo?.id?.toLong() ?: 0L)
+            routerConfigSixSw(mDeviceInfo?.id?.toLong() ?: 0L)
         }
     }
 
     private fun sendSceneParms() {
-        showLoadingDialog(getString(R.string.setting_switch))
         sceneParamList.clear()
         listKeysBean = JSONArray()
 
-        val first = mutableListOf(0, 1)
-        val second = mutableListOf(2, 3)
-        val third = mutableListOf(4, 5)
+        val first = mutableListOf(0x61, 0x62)
+        val second = mutableListOf(0x63, 0x64)
+        val third = mutableListOf(0x65, 0x66)
 
-        val sceneParamOne = getSceneParm(first, 0x61)
-        val sceneParamTwo = getSceneParm(second, 0x63)
-        val sceneParamThree = getSceneParm(third, 0x65)
+        val sceneParamOne = getSceneParm(first)
+        val sceneParamTwo = getSceneParm(second)
+        val sceneParamThree = getSceneParm(third)
         sceneParamList.add(sceneParamOne)
         sceneParamList.add(sceneParamTwo)
         sceneParamList.add(sceneParamThree)
 
+        if (!isOK) {
+            Toast.makeText(this,"至少选择一个场景",Toast.LENGTH_SHORT).show()
+            return
+        }
+        showLoadingDialog(getString(R.string.setting_switch))
         if (!Constant.IS_ROUTE_MODE) {
             var delay = 1000.toLong()
             GlobalScope.launch {
@@ -194,43 +208,45 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                 updateMeshGroup(1)
             }
         } else {
-            routerConfigEightSw(mDeviceInfo?.id?.toLong() ?: 0L)
+            routerConfigSixSw(mDeviceInfo?.id?.toLong() ?: 0L)
         }
 
     }
 
-    private fun getSceneParm(list: MutableList<Int>, num : Int): ByteArray {
-        var firstOpcode = Opcode.SCENE_SWITCH8K
-        var secondOpcode = Opcode.SCENE_SWITCH8K
-
+    private fun getSceneParm(list: MutableList<Int>): ByteArray {
         val firstNum = list[0]
-        val dbSceneFirst = sceneMap[firstNum]
+        val dbSceneFirst = sceneMap[firstNum-0x61]
+        var opcodeOne :Byte = 0x80.toByte()
+        var opcodeTwo : Byte = 0x80.toByte()
         val firsDbSceneId = if (dbSceneFirst == null || dbSceneFirst.id == 65536L) {
-            firstOpcode = Opcode.DEFAULT_SWITCH8K
-            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            opcodeOne = 0x00
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
             65536L
         } else {
-            listKeysBean.put(getKeyBean(firstNum, firstOpcode.toInt() and 0xff, name = sceneMap[firstNum]!!.name, hight8Mes = 0, low8Mes = dbSceneFirst.id.toInt()))
+            isOK = true
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = dbSceneFirst.name, hight8Mes = 0, low8Mes = dbSceneFirst.id.toInt()))
             dbSceneFirst.id
         }
         val secondNum = list[1]
-        val dbSceneSecond = sceneMap[secondNum]
+        val dbSceneSecond = sceneMap[secondNum-0x61]
         //位置 功能 保留 14场景id
         val secondDbSceneId = if (dbSceneSecond == null || dbSceneSecond.id == 65536L) {
-            secondOpcode = Opcode.DEFAULT_SWITCH8K
-            listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            opcodeTwo = 0x00
+            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
             65536L
         } else {
-            listKeysBean.put(getKeyBean(secondNum, secondOpcode.toInt() and 0xff, name = dbSceneSecond.name, hight8Mes = 0, low8Mes = dbSceneSecond.id.toInt()))
+            isOK = true
+            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = dbSceneSecond.name, hight8Mes = 0, low8Mes = dbSceneSecond.id.toInt()))
             dbSceneSecond.id
         }
-        return  byteArrayOf(num.toByte(), 0x80.toByte(), 0x00, firsDbSceneId.toByte(), 0x00, (num+1).toByte(), 0x80.toByte(), 0x00, secondDbSceneId.toByte(), 0x00)
+        return  byteArrayOf(firstNum.toByte(), opcodeOne, 0x00, firsDbSceneId.toByte(), 0x00, secondNum.toByte(), opcodeTwo, 0x00, secondDbSceneId.toByte(), 0x00)
     }
 
     @SuppressLint("CheckResult")
-    private fun routerConfigEightSw(id: Long) {
+    private fun routerConfigSixSw(id: Long) {
         val keys = GsonUtil.stringToList(listKeysBean.toString(), KeyBean::class.java)
-        RouterModel.configEightSw(id, keys, "configEightSw",configSwitchType)?.subscribe({
+//        RouterModel.configEightSw(id, keys, "configEightSw",configSwitchType)?.subscribe({
+            RouterModel.configFourAndSixSw("3028",id,configSwitchType, keys)?.subscribe({
             LogUtils.v("zcl-----------收到路由配置六键请求-------$it")
             when (it.errorCode) {
                 0 -> {
@@ -261,28 +277,44 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
         })
     }
 
-    private fun getGroupParm(list: MutableList<Int>, num: Int): ByteArray { // 0   1   2
+    private fun getGroupParm(list: MutableList<Int>): ByteArray { // 0   1   2
         val firstNum = list[0]
-        val dbGroup1 = groupMap[firstNum]!!
+        val secondNum = list[1]
+        val dbGroup1 = groupMap[(firstNum-0x61)%3]!!
         var firstL: Byte = 0
         var firstH: Byte = 0
-        val opcodeOne: Byte = 0x08.toByte()
-        val opcodeTwo: Byte = 0x09.toByte()
-        LogUtils.v("chown ++ -- group1 : $dbGroup1")
-        if (dbGroup1 == null || dbGroup1.id == 65536L) {
+        var secondL: Byte = 0
+        var secondH: Byte = 0
+        var opcodeOne: Byte = if (firstNum%0x61<3) 0x08.toByte() else 0x09.toByte()
+        var opcodeTwo: Byte = if (secondNum%0x61<3) 0x08.toByte() else 0x09.toByte()
+//        LogUtils.v("chown ++ -- group1 : $dbGroup1")
+        if (dbGroup1.id == 65536L) {
+            opcodeOne = 0x00
             listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
-            listKeysBean.put(getKeyBean(firstNum, opcodeTwo.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
         } else {
+            isOK = true
             val firstMesAddr = dbGroup1.meshAddr
             val mesL = firstMesAddr and 0xff
             val mesH = (firstMesAddr shr 8) and 0xff // 右移8位
             firstL = mesL.toByte()
             firstH = mesH.toByte()
-            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt() and 0xff, name = groupMap[firstNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
-            listKeysBean.put(getKeyBean(firstNum, opcodeTwo.toInt() and 0xff, name = groupMap[firstNum]!!.name, hight8Mes = mesH, low8Mes = mesL))
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt() and 0xff, name = dbGroup1.name, hight8Mes = mesH, low8Mes = mesL))
+        }
+        val dbGroup2 = groupMap[(secondNum-0x61)%3]!!
+        if (dbGroup2.id == 65536L) {
+            opcodeTwo = 0x00
+            listKeysBean.put(getKeyBean(secondNum, 0x00, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+        } else {
+            isOK = true
+            val firstMesAddr = dbGroup2.meshAddr
+            val mesL = firstMesAddr and 0xff
+            val mesH = (firstMesAddr shr 8) and 0xff // 右移8位
+            secondL = mesL.toByte()
+            secondH = mesH.toByte()
+            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt() and 0xff, name = dbGroup2.name, hight8Mes = mesH, low8Mes = mesL))
         }
 
-        return byteArrayOf(num.toByte(), opcodeOne, firstH, firstL, 0x00, (num+3).toByte(), opcodeTwo, firstH, firstL, 0x00)
+        return byteArrayOf(firstNum.toByte(), opcodeOne, firstH, firstL, 0x00, secondNum.toByte(), opcodeTwo, secondH, secondL, 0x00)
     }
 
     private fun updateMeshGroup(isConfigGroup: Int) { // 1
@@ -326,28 +358,28 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                 DBUtils.updateSwicth(dbSixSwitch)
                 switchDate = dbSixSwitch
             } else {
-                var SixSwitch = DbSwitch()
-                DBUtils.saveSwitch(SixSwitch, isFromServer = false, type = SixSwitch.type, keys = SixSwitch.keys)
-                SixSwitch = setGroupIdsOrSceneIds(configGroup == 0, SixSwitch)
-                SixSwitch.type = configGroup
-                SixSwitch.macAddr = mDeviceInfo?.macAddress
-                SixSwitch.meshAddr = mDeviceInfo?.meshAddress ?: 0
-                SixSwitch.productUUID = mDeviceInfo?.productUUID ?: 0
-                SixSwitch.index = SixSwitch.id.toInt()
+                var sixSwitch = DbSwitch()
+                DBUtils.saveSwitch(sixSwitch, isFromServer = false, type = sixSwitch.type, keys = sixSwitch.keys)
+                sixSwitch = setGroupIdsOrSceneIds(configGroup == 0, sixSwitch)
+                sixSwitch.type = configGroup
+                sixSwitch.macAddr = mDeviceInfo?.macAddress
+                sixSwitch.meshAddr = mDeviceInfo?.meshAddress ?: 0
+                sixSwitch.productUUID = mDeviceInfo?.productUUID ?: 0
+                sixSwitch.index = sixSwitch.id.toInt()
                 if (TextUtils.isEmpty(version))
                     version = mDeviceInfo!!.firmwareRevision
-                SixSwitch.version = version
+                sixSwitch.version = version
 
-                SixSwitch.keys = listKeysBean.toString()
+                sixSwitch.keys = listKeysBean.toString()
 
-                Log.e("chown", "chown*****设置新的开关使用插入替换$SixSwitch")
-                DBUtils.saveSwitch(SixSwitch, isFromServer = false, type = SixSwitch.type, keys = SixSwitch.keys)
+                Log.e("chown", "chown*****设置新的开关使用插入替换$sixSwitch")
+                DBUtils.saveSwitch(sixSwitch, isFromServer = false, type = sixSwitch.type, keys = sixSwitch.keys)
 
                 LogUtils.v("chown", "chown*****设置新的开关使用插入替换" + DBUtils.getAllSwitch())
                 val gotSwitchByMac = DBUtils.getSwitchByMacAddr(mDeviceInfo?.macAddress ?: "")
                 DBUtils.recordingChange(gotSwitchByMac?.id, DaoSessionInstance.getInstance().dbSwitchDao.tablename,
-                    Constant.DB_ADD, SixSwitch.type, SixSwitch.keys)
-                switchDate = SixSwitch
+                    Constant.DB_ADD, sixSwitch.type, sixSwitch.keys)
+                switchDate = sixSwitch
             }
         } else {
 //            LogUtils.v("=================你在保存的时候走的是else==========")
@@ -391,19 +423,18 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
 
     fun changeMode() {
         setDefaultData()
+        isOK = false
         configSwitchTypeNum++
         when (configSwitchTypeNum % 2) { // 群组
             0 -> {
                 setTextColorsAndText(0)
                 configSwitchType = 0
-                six_switch_title.text = getString(R.string.group_switch)
-                count = 0
+                six_switch_title.text = getString(R.string.group_three_switch)
             }
             1 -> { // 场景
                 configSwitchType = 1
                 setTextColorsAndText(1)
                 six_switch_title.text = getString(R.string.scene_switch)
-                count = 0
             }
         }
     }
@@ -423,7 +454,7 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
 
         if (isReConfig) {
             switchDate = this.intent.extras!!.get("switch") as DbSwitch
-            LogUtils.v("chown=========================$switchDate")
+//            LogUtils.v("chown=========================$switchDate")
             toolbarTv.text = switchDate?.name
             switchDate?.keys?.let {
                 listKeysBean = JSONArray(it)
@@ -434,7 +465,6 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                 clickType = 1//代表跳过选择模式
 
                 setTextColorsAndText(type)
-
                 for (i in 0 until listKeysBean.length()) {
                     //int keyId;  int featureId;   int reserveValue_A;  int reserveValue_B;  String name;
                     val jOb = listKeysBean.getJSONObject(i)
@@ -454,7 +484,7 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                                 DBUtils.getGroupByMeshAddr(mesAddress)
 
                             if (groupByMeshAddr != null) {
-                                groupMap[keyId] = groupByMeshAddr
+                                groupMap[keyId-0x61] = groupByMeshAddr
                                 name = if (groupByMeshAddr.name == "")
                                     getString(R.string.click_config)
                                 else
@@ -464,18 +494,18 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                                 name = getString(R.string.click_config)
                             }
                             when (keyId) {
-                                0 -> six_switch_b7.text = name
-                                1 -> six_switch_b8.text = name
-                                2 -> six_switch_b9.text = name
+                                0x61 -> six_switch_b7.text = name
+                                0x62 -> six_switch_b8.text = name
+                                0x63 -> six_switch_b9.text = name
                             }
-                            six_switch_title.text = getString(R.string.group_switch)
+                            six_switch_title.text = getString(R.string.group_three_switch)
                         }
                         1 -> {
                             val sceneId = jOb.getInt("reserveValue_B")
                             val scene = DBUtils.getSceneByID(sceneId.toLong())
                             six_switch_title.text = getString(R.string.scene_switch)
                             //赋值旧的设置数据
-                            sceneMap[keyId] = if (scene != null) {
+                            sceneMap[keyId-0x61] = if (scene != null) {
                                 name = if (scene.name == "")
                                     getString(R.string.click_config)
                                 else
@@ -489,19 +519,19 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                             }
                             sceneKey.remove(keyId)
                             when (keyId) {
-                                0 -> six_switch_b1.text = name
-                                1 -> six_switch_b2.text = name
-                                2 -> six_switch_b3.text = name
-                                3 -> six_switch_b4.text = name
-                                4 -> six_switch_b5.text = name
-                                5 -> six_switch_b6.text = name
+                                0x61 -> six_switch_b1.text = name
+                                0x62 -> six_switch_b2.text = name
+                                0x63 -> six_switch_b3.text = name
+                                0x64 -> six_switch_b4.text = name
+                                0x65 -> six_switch_b5.text = name
+                                0x66 -> six_switch_b6.text = name
                             }
                         }
                     }
                 }
             }
         } else {
-            setTextColorsAndText(0)
+            setTextColorsAndText(1)
         }
 
     }
@@ -509,7 +539,7 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
     private fun setDefaultData() {
         groupMap.clear()
         sceneMap.clear()
-        for (i in 0 until 4) {
+        for (i in 0 until 6) {
             val dbGroup = DbGroup()
             dbGroup.id = 65536L
             groupMap[i] = dbGroup
@@ -519,6 +549,28 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
             sceneMap[i] = dbScene
         }
     }
+
+    override fun tzRouterConfigSixSwRecevice(cmdBean: CmdBodyBean) {
+        LogUtils.v("zcl-----------收到路由配置八键通知-------$cmdBean")
+        if (cmdBean.ser_id == "3028") {
+            disposableRouteTimer?.dispose()
+            hideLoadingDialog()
+            if (cmdBean.status == 0) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    ToastUtils.showShort(getString(R.string.config_success))
+                    if (Constant.IS_ROUTE_MODE)
+                        updateAllSwitch()
+                    if (!isReConfig)
+                        showRenameDialog(switchDate!!,true)
+                    else
+                        finish()
+                }
+            } else {
+                ToastUtils.showShort(getString(R.string.config_fail))
+            }
+        }
+    }
+
 
     @SuppressLint("SetTextI18n")
     private fun setTextColorsAndText(type: Int) {
@@ -695,11 +747,11 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
-            var name: String = ""
+            var name:String = ""
             when (configSwitchType) {
                 0 -> {
                     val group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
-                    groupMap[count++] = group
+                    groupMap[configButtonTag-6] = group
                     name = group.name
                 }
                 else -> {

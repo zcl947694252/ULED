@@ -249,6 +249,8 @@
 
     <!-- Activity Labels -->
     <string name="app_name">ULed</string>
+    <string name="app_another_name">ULedTest</string>
+
     <string name="activity_device_grouping">Device Grouping</string>
     <string name="filter_vcode">0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
     <!-- DeviceSchema Setting -->
@@ -604,6 +606,8 @@
     <string name="delete_switch_confirm"> After deletion, the factory Settings of the switch need to be manually restored. Confirm the delete switch?</string>
 
     <string name="delete_switch_success">Delete successfully, please power on again after power off</string>
+    <string name="delete_switch_fail">Delete fail</string>
+
 
     <string name="have_curtain_no_group_tip">There are no curtain grouping, please complete the grouping operation</string>
 
@@ -903,6 +907,7 @@
     <string name="no_found_recovery_device">No device with factory Settings found. Please check and retry...</string>
     <string name="select_type">Please select type</string>
     <string name="group_switch">Group switch</string>
+    <string name="group_three_switch">Three groups of dimmer and toner switches</string>
     <string name="close">close</string>
     <string name="brightness_add">brightness+</string>
     <string name="color_temperature_add">cct+</string>

@@ -462,6 +462,8 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                                 0)
                     }.create().show()
         } else {
+            LogUtils.v("chown -- 同步数据")
+
             SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
         }
     }
@@ -474,7 +476,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        var num = 5 - it as Long
+                        val num = 5 - it as Long
                         if (num == 0L) {
                             confirm?.isClickable = true
                             confirm?.text = getString(R.string.confirm)
@@ -526,6 +528,8 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
     }
 
     private fun syncData() {
+        LogUtils.v("chown -- 同步数据")
+
         SyncDataPutOrGetUtils.syncPutDataStart(activity!!, object : SyncCallback {
             override fun complete() {
                 hideLoadingDialog()

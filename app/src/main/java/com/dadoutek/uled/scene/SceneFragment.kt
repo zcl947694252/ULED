@@ -20,6 +20,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
+import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.intf.CallbackLinkMainActAndFragment
@@ -56,6 +57,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -273,7 +275,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
 
                 if (!TelinkLightApplication.getApp().offLine) {
-                    disposableTimer?.dispose()
+                    disposableTimer?.dispose() // rxjava 解除订阅
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread()).subscribe {
@@ -395,7 +397,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btnAdd = toolbar?.findViewById<ImageView>(R.id.img_function1)
         val btnDelete = toolbar?.findViewById<ImageView>(R.id.img_function2)
         val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
-        orderScene?.visibility=View.VISIBLE // chown
+//        orderScene?.visibility=View.VISIBLE // chown
         btnAdd?.visibility = View.GONE
 
         btnAdd?.setOnClickListener(this)
@@ -436,7 +438,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         adaper?.onItemLongClickListener = onItemChildLongClickListener
         adaper?.bindToRecyclerView(recyclerView)
 
-        var footer = View.inflate(context, R.layout.template_add_help, null)
+        val footer = View.inflate(context, R.layout.template_add_help, null)
         addNewScene = footer.findViewById(R.id.main_add_device)
         addNewScene?.text = getString(R.string.create_scene)
         goHelp = footer.findViewById(R.id.main_go_help)
@@ -444,7 +446,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         goHelp?.setOnClickListener(this)
 
 
-        var emptyView = View.inflate(context, R.layout.empty_view, null)
+        val emptyView = View.inflate(context, R.layout.empty_view, null)
          emptyAdd = emptyView.findViewById(R.id.add_device_btn)
         emptyAdd?.text = getString(R.string.create_scene)
         emptyAdd?.setOnClickListener(this)
@@ -537,6 +539,16 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     private fun setScene(id: Long) {
         val opcode = Opcode.SCENE_LOAD
+
+        DBUtils.getSceneByID(id)?.actions?.forEach {
+            if (it.groupAddr == 0xffff) {
+                GlobalScope.launch {
+                    Commander.openOrCloseLights(it.groupAddr, it.isOn)
+                    ToastUtils.showShort(getString(R.string.scene_apply_success))
+                }
+                return
+            }
+        }
         GlobalScope.launch {
             val params: ByteArray = byteArrayOf(id.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)

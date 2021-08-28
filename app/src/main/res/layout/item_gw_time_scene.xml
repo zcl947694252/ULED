@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/timer_scene_ly"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/dp_50"
+        android:layout_height="60dp"
         android:gravity="center"
         android:orientation="horizontal">
     <!--時間定時title的顔色是黑3 時間段時黑9-->
@@ -43,7 +43,7 @@
             android:id="@+id/item_gw_timer_scene"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/dp_10"
+            android:layout_marginEnd="@dimen/dp_18"
             android:layout_above="@id/item_gw_timer_line"
             android:layout_below="@+id/item_gw_timer_line_top"
             android:layout_toStartOf="@id/item_gw_timer_arr"

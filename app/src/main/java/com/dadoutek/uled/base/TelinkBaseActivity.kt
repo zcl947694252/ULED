@@ -21,7 +21,7 @@ import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+//import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -37,7 +37,7 @@ import com.dadoutek.uled.R
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.WeekBean
-import com.dadoutek.uled.group.GroupOTAListActivity
+//import com.dadoutek.uled.group.GroupOTAListActivity
 import com.dadoutek.uled.group.InstallDeviceListAdapter
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.intf.SyncCallback
@@ -62,7 +62,7 @@ import com.dadoutek.uled.router.bean.*
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.switches.ScanningSwitchActivity
-import com.dadoutek.uled.switches.SelectSwitchActivity
+//import com.dadoutek.uled.switches.SelectSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.*
@@ -87,9 +87,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
+//import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
-import org.jetbrains.anko.startActivity
+//import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
 
 ///TelinkLog 打印
@@ -189,7 +189,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         enableConnectionStatusListener()    //尽早注册监听 添加状态变化监听事件
         //注册网络状态监听广播
         netWorkChangReceiver = NetWorkChangReceiver()
-        var filter = IntentFilter()
+        val filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
         initOnLayoutListener()//加载view监听
@@ -336,9 +336,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     private fun startTimerUpdate() {
         upDateTimer?.dispose()//interval 每隔一段时间发送一个事件
-        upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
+        upDateTimer = Observable.interval(0, 10, TimeUnit.SECONDS).subscribe {
             if (netWorkCheck(this) && !Constant.IS_ROUTE_MODE)
                 CoroutineScope(Dispatchers.IO).launch {
+                    LogUtils.v("chown -- 同步数据")
                     SyncDataPutOrGetUtils.syncPutDataStart(this@TelinkBaseActivity, object : SyncCallback {
                         override fun start() {}
                         override fun complete() {}
@@ -614,7 +615,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     private fun checkVersionAvailable() {
-        var version = packageName(this)
+        val version = packageName(this)
         if (netWorkCheck(this))
             UpdateModel.run {
                 isVersionAvailable(0, version)
@@ -676,8 +677,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     open fun initOnLayoutListener() {
-        var view = window.decorView
-        var viewTreeObserver = view.viewTreeObserver
+        val view = window.decorView
+        val viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
             view.viewTreeObserver.removeOnGlobalLayoutListener {}
         }
@@ -782,6 +783,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
                     }.create().show()
         } else {
+            LogUtils.v("chown -- 同步数据")
+
             SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallbackUp)
         }
     }
@@ -865,10 +868,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
 
                 initOnLayoutListener()
-                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop!!.isShowing} ---&&-- ${true}")
+                LogUtils.v("zcl---------判断tel---${!this@TelinkBaseActivity.isFinishing}----- && --${!pop.isShowing} ---&&-- ${true}")
                 try {
-                    if (!this@TelinkBaseActivity.isFinishing && !pop!!.isShowing && isShow)
-                        pop!!.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
+                    if (!this@TelinkBaseActivity.isFinishing && !pop.isShowing && isShow)
+                        pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
                 } catch (e: Exception) {
                     LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
                 }
@@ -900,6 +903,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
             //var jsonObject = JSONObject(msg)
             LogUtils.v("zcl------------------收到信息长连接---cmdbean$cmdBean")
+            if(cmdBean.cmd == Cmd.routeOTAFinish && cmdBean.ser_id == "3027") {
+                tzRouterConfigFourSwRecevice(cmdBean)
+                return
+            } else if (cmdBean.cmd == Cmd.routeOTAFinish && cmdBean.ser_id == "3028") {
+                tzRouterConfigSixSwRecevice(cmdBean)
+                return
+            }
             when (cmdBean.cmd) {
                 Cmd.singleLogin, Cmd.parseQR, Cmd.unbindRegion, Cmd.gwStatus, Cmd.gwCreateCallback, Cmd.gwControlCallback -> {
                     val codeBean = Gson().fromJson(msg, MqttBodyBean::class.java)
@@ -957,6 +967,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 }
                 Cmd.tzRouteConfigEightSw -> {//配置普通开关
                     tzRouterConfigEightSwRecevice(cmdBean)
+                }
+                Cmd.tzRouteConfigFourSw -> { // 配置时间开关
+                    tzRouterConfigFourSwRecevice(cmdBean)
                 }
                 Cmd.tzRouteConfigEightSesonr -> {//配置普通开关
                     tzRouterConfigSensorRecevice(cmdBean)
@@ -1062,6 +1075,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open fun tzRouteContorlCurtaine(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigSensorRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigEightSwRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigFourSwRecevice(cmdBean: CmdBodyBean) {}
+    open fun tzRouterConfigSixSwRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigSceneSwRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigNormalSwRecevice(cmdBean: CmdBodyBean) {}
     open fun tzRouterConfigDoubleSwRecevice(cmdBean: CmdBodyBean) {}
@@ -1142,6 +1157,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     this.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
                 }.create().show()
     } else {
+        LogUtils.v("chown -- 同步数据")
+
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {
                 showLoadingDialog(getString(R.string.tip_start_sync))
@@ -1153,7 +1170,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 val showing = singleLogin?.isShowing
                 SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), Constant.IS_LOGIN, false)
                 TelinkLightService.Instance()?.idleMode(true)
-                var isShowSingleForeground = if (!isForeground(this@TelinkBaseActivity))//不是前台
+                val isShowSingleForeground = if (!isForeground(this@TelinkBaseActivity))//不是前台
                     !b && showing != null && !showing
                 else
                     !b && showing != null && !showing && isShow //是前台
@@ -1358,8 +1375,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
         override fun onReceive(context: Context?, intent: Intent?) {
             try {
-                var connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                var networkInfo = connectivityManager.activeNetworkInfo
+                val connectivityManager = context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val networkInfo = connectivityManager.activeNetworkInfo
                 if (networkInfo != null && networkInfo.isAvailable) {
                     if (!isHaveNetwork) {
 
@@ -1482,10 +1499,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     private val dialogOnclick = View.OnClickListener {
         var medressData = 0
-        var allData = DBUtils.allLight
-        var sizeData = DBUtils.allLight.size
+        val allData = DBUtils.allLight
+        val sizeData = DBUtils.allLight.size
         if (sizeData != 0) {
-            var lightData = allData[sizeData - 1]
+            val lightData = allData[sizeData - 1]
             medressData = lightData.meshAddr
         }
 
@@ -1573,14 +1590,14 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     fun seeHelpe(webIndex: String) {
-        var intent = Intent(this, InstructionsForUsActivity::class.java)
+        val intent = Intent(this, InstructionsForUsActivity::class.java)
         intent.putExtra(Constant.WB_TYPE, webIndex)
 
         startActivity(intent)
     }
 
     private fun makeStopScanPop() {
-        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_warm, null)
+        val popView: View = LayoutInflater.from(this).inflate(R.layout.pop_warm, null)
 
         hinitOne = popView.findViewById(R.id.pop_warm_tv)
         cancelf = popView.findViewById(R.id.tip_cancel)
@@ -1602,9 +1619,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         renameEt?.singleLine = true
 
         renameDialog = Dialog(this)
-        renameDialog?.setContentView(popReNameView!!)
-        renameDialog?.setCanceledOnTouchOutside(false)
-        renameCancel?.setOnClickListener { renameDialog?.dismiss() }
+        renameDialog.setContentView(popReNameView!!)
+        renameDialog.setCanceledOnTouchOutside(false)
+        renameCancel?.setOnClickListener { renameDialog.dismiss() }
         //确定回调 单独写
     }
 
@@ -1650,7 +1667,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, isEnableBright: Int, serId: String) {
-        var  bri = when {
+        val bri = when {
             brightness<1 -> 1
             brightness>100 -> 100
             else -> brightness
@@ -1669,7 +1686,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     open fun routeConfigTempGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
-        var  bri = when {
+        val  bri = when {
             brightness<1 -> 1
             brightness>100 -> 100
             else -> brightness
@@ -2054,13 +2071,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     open fun getWeekStr(week: Int?): String {
-        var tmpWeek = week ?: 0
+        val tmpWeek = week ?: 0
         val sb = StringBuilder()
-        var str = when (tmpWeek) {
+        val str = when (tmpWeek) {
             0b01111111, 0b10000000 -> sb.append(getString(R.string.every_day)).toString()
             0b00000000 -> sb.append(getString(R.string.only_one)).toString()
             else -> {
-                var list = mutableListOf(
+                val list = mutableListOf(
                         WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
                         WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
                         WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),

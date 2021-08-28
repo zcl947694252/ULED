@@ -38,6 +38,7 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
+import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BleUtils
@@ -83,6 +84,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
     private var deleteDevice: MenuItem? = null
     private var onlineUpdate: MenuItem? = null
     private var batchGp: MenuItem? = null
+    private var bindRoute: MenuItem? = null
     private var isDelete: Boolean = false
 
     //    private lateinit var mMeshAddressGenerator: MeshAddressGenerator
@@ -269,7 +271,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
             else -> curtainList = DBUtils.getCurtainByGroupID(group.id)
         }
 
-        toolbar.title = group?.name + "(${group?.deviceCount})"
+        toolbar.title = group.name + "(${group.deviceCount})"
 
         if (curtainList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
@@ -356,13 +358,16 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         batchGp = toolbar.menu?.findItem(R.id.toolbar_batch_gp)
         onlineUpdate = toolbar.menu?.findItem(R.id.toolbar_on_line)
         deleteDevice = toolbar.menu?.findItem(R.id.toolbar_delete_device)
+        bindRoute = toolbar.menu?.findItem(R.id.toolbar_bind_router)
 
         batchGp?.title = getString(R.string.batch_group)
         onlineUpdate?.title = getString(R.string.online_upgrade)
         deleteDevice?.title = getString(R.string.edite_device)
+        bindRoute?.title = getString(R.string.bind_reouter)
 
         deleteDevice?.isVisible = true
         batchGp?.isVisible = true
+        bindRoute?.isVisible = true
         toolbar.menu?.findItem(R.id.toolbar_add_scene)?.isVisible = false
         toolbar.menu?.findItem(R.id.toolbar_check_data)?.isVisible = false
 
@@ -375,10 +380,17 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
                         R.id.toolbar_batch_gp -> skipeBatch()
                         R.id.toolbar_on_line -> goOta()
                         R.id.toolbar_delete_device -> editeDevice()
+                        R.id.toolbar_bind_router ->bindRouterDevice()
                     }
             }
             true
         }
+    }
+
+    private fun bindRouterDevice() {
+        val intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", group)
+        startActivity(intent)
     }
 
     private fun skipeBatch() {
@@ -469,8 +481,8 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
 
 
     private fun deletePreGroup(dbLight: DbCurtain) {
-        if (DBUtils.getGroupByID(dbLight!!.belongGroupId!!) != null) {
-            val groupAddress = DBUtils.getGroupByID(dbLight!!.belongGroupId!!)?.meshAddr
+        if (DBUtils.getGroupByID(dbLight.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(dbLight.belongGroupId!!)?.meshAddr
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())//0x00表示删除组
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dbLight.meshAddr, params)

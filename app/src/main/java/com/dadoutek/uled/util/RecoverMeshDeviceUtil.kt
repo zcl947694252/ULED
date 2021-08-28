@@ -28,7 +28,7 @@ object RecoverMeshDeviceUtil {
     val rxBleClient: RxBleClient = RxBleClient.create(TelinkLightApplication.getApp())
 
     private val createdDeviceList = hashMapOf<Int, DeviceInfo>()  //需要重新配置的设备的mac地址
-    private var macBytes: ByteArray? = null
+//    private var macBytes: ByteArray? = null //no use
     val SCAN_TIMEOUT_SECONDS: Long = 20
 
     data class ResultOfAddDevice(val deviceInfo: DeviceInfo, val hasConflict: Boolean)
@@ -38,7 +38,6 @@ object RecoverMeshDeviceUtil {
 
     private fun getAllDeviceAddressList(): List<Int> {
         val lights = DBUtils.allLight.map { it.meshAddr }
-
 
         val curtain = DBUtils.allCurtain.map { it.meshAddr }
         val relay = DBUtils.allRely.map { it.meshAddr }
@@ -55,7 +54,6 @@ object RecoverMeshDeviceUtil {
 
         val scanFilter = ScanFilter.Builder().setDeviceName(deviceName).build()
         val scanSettings = ScanSettings.Builder()
-
                 // .setScanMode(SCAN_MODE_LOW_LATENCY)
                 .build()
         LogUtils.d("findMeshDevice name = $deviceName")
@@ -136,7 +134,7 @@ object RecoverMeshDeviceUtil {
      * 是否有地址冲突
      */
     private fun hasMeshAddrConflict(deviceInfo: DeviceInfo): Boolean {
-        var isConflict: Boolean = false
+        var isConflict = false
         val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
         if (isExist) {
             when (deviceInfo.productUUID) {
@@ -169,7 +167,7 @@ object RecoverMeshDeviceUtil {
      * 如果该deviceInfo不存在于数据库，则创建
      * @return true 保存成功    false，无需保存
      */
-    fun addDevicesToDb(deviceInfo: DeviceInfo): Boolean {
+    private fun addDevicesToDb(deviceInfo: DeviceInfo): Boolean {
         val productUUID = deviceInfo.productUUID
 
         val isExist = DBUtils.isDeviceExist(deviceInfo.meshAddress)
@@ -235,7 +233,7 @@ object RecoverMeshDeviceUtil {
                     LogUtils.v("zcl找回--------------$count------sensor---")
                 }
                 DeviceType.DOUBLE_SWITCH, DeviceType.NORMAL_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH, DeviceType.EIGHT_SWITCH
-                    , DeviceType.NORMAL_SWITCH2 -> {
+                    , DeviceType.NORMAL_SWITCH2, DeviceType.FOUR_SWITCH, DeviceType.SIX_SWITCH -> {
                     val switch = DbSwitch()
                     switch.productUUID = productUUID
                     switch.belongGroupId = DBUtils.groupNull?.id
@@ -352,7 +350,7 @@ object RecoverMeshDeviceUtil {
                     val meshUUID = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position++].toInt() and 0xFF shl 8)
                     position += 4
                     val productUUID = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position++].toInt() and 0xFF shl 8)
-                    val status = scanRecord[position++].toInt() and 0xFF
+                    val status = scanRecord[position++].toInt() and 0xFF //no use
                     val meshAddress = (scanRecord[position++].toInt() and 0xFF) + (scanRecord[position++].toInt() and 0xFF shl 8)//可能因为后面没有其他操作所以saw没有++
                     //                    String version = valueOf((char) scanRecord[39])+ (char) scanRecord[40] + (char) scanRecord[41]
 //                            + (char) scanRecord[42] + (char) scanRecord[43] + (char) scanRecord[44];

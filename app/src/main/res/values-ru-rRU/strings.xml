@@ -236,6 +236,7 @@
 
 
     <string name="app_name">ULED</string>
+    <string name="app_another_name">ULEDTest</string>
     <string name="activity_device_grouping">Перегруппировывать</string>
     <string name="device_setting_temperature">Температура:%1$s</string>
     <string name="device_scan_scan">Поиск устройства</string>

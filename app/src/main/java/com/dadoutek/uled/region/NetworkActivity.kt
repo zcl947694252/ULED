@@ -23,6 +23,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -35,6 +36,7 @@ import com.dadoutek.uled.model.httpModel.RegionModel.lookAuthorizeCode
 import com.dadoutek.uled.model.httpModel.RegionModel.lookTransferCode
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.bean.RegionAuthorizeBean
+import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.region.adapter.AreaAuthorizeItemAdapter
 import com.dadoutek.uled.region.adapter.AreaItemAdapter
 import com.dadoutek.uled.region.bean.ParseCodeBean
@@ -120,7 +122,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         initToolBar()
         makePop()
         initListener()
-        getQrInfo()//查看提交吗信息如果存在授权码就直接提示它去取消授权码
+        getQrInfo() //查看提交吗信息如果存在授权码就直接提示它去取消授权码
 
         mBuild = AlertDialog.Builder(this@NetworkActivity)
     }
@@ -173,6 +175,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 }, { t -> ToastUtils.showLong(t.localizedMessage) })
 
         transfer_account.setOnClickListener {
+            LogUtils.v("chown -- 同步数据")
+
             SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
                 override fun start() {
                 }
@@ -520,6 +524,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 })
             }
             R.id.pop_share_net -> {
+                LogUtils.v("chown -- 同步数据")
+
                 SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
                     override fun start() {}
 
@@ -968,6 +974,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
             lastUser?.let {
                 //如果是自己的区域切换到其他区域 那么就要上传自己数据 否则不上传
                 if (it.id.toString() == it.last_authorizer_user_id) {
+                    LogUtils.v("chown -- 同步数据")
+
                     SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
                 } else {
                     downLoadDataAndChangeDbUser()

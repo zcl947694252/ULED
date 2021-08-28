@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.R;
 import com.dadoutek.uled.intf.SyncCallback;
 import com.dadoutek.uled.model.Constant;
@@ -109,6 +110,7 @@ public class BluetoothConnectionFailedDialog extends AlertDialog implements View
             // 跳转到设置界面
 
         } else {
+            LogUtils.v("chown -- 同步数据");
             SyncDataPutOrGetUtils.Companion.syncPutDataStart(mContenxt, syncCallback);
         }
     }

@@ -111,6 +111,7 @@
     <string name="btn_rename_light">重命名</string>
     <string name="delete_device">删除设备</string>
     <string name="group_switch">群组开关</string>
+    <string name="group_three_switch">调光调色三组开关</string>
     <string name="eight_switch">多功能开关</string>
     <string name="choose_scene">选择场景</string>
     <!--   //开关，传感器 End -->
@@ -366,6 +367,7 @@
 
     <!-- Activity Labels -->
     <string name="app_name">优乐迪</string>
+    <string name="app_another_name">优乐迪测试版</string>
 
     <string name="device_setting_temperature">色温:%1$s</string>
     <!-- GroupSchema Setting -->
@@ -573,6 +575,7 @@
     <string name="title_curtain_lights_num">已扫到 %1$d 个窗帘</string>
     <string name="delete_switch_confirm">删除后需要手动恢复该开关的出厂设置,确定删除此开关？</string>
     <string name="delete_switch_success">删除成功,请断电后重新上电</string>
+    <string name="delete_switch_fail">删除失败</string>
     <string name="have_curtain_no_group_tip">还有窗帘没有分组，请完成分组操作</string>
     <string name="grouping_curtain_wait_tip">当前有%1$s个窗帘正在分组，请稍候！</string>
     <string name="selected_curtain_tip">至少选择一个窗帘进行分组</string>

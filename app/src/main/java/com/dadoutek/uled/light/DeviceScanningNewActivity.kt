@@ -52,6 +52,8 @@ import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.Data
 import com.dadoutek.uled.scene.SensorDeviceDetailsActivity
 import com.dadoutek.uled.switches.*
+import com.dadoutek.uled.switches.fourkey.ConfigFourSwitchActivity
+import com.dadoutek.uled.switches.sixkey.ConfigSixSwitchActivity
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.tellink.TelinkMeshErrorDealActivity
@@ -465,13 +467,13 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
 
     private fun refreshView() {
-        currentGroupIndex = groups!!.size - 1
-        for (i in groups!!.indices.reversed()) {
-            groups!![i].checked = i == groups!!.size - 1
+        currentGroupIndex = groups.size - 1
+        for (i in groups.indices.reversed()) {
+            groups[i].checked = i == groups.size - 1
         }
         add_group_relativeLayout?.visibility = View.GONE
         add_group?.visibility = View.VISIBLE
-        recycler_view_groups?.smoothScrollToPosition(groups!!.size - 1)
+        recycler_view_groups?.smoothScrollToPosition(groups.size - 1)
         groupsRecyclerViewAdapter.notifyDataSetChanged()
         SharedPreferencesHelper.putInt(TelinkLightApplication.getApp(),
                 Constant.DEFAULT_GROUP_ID, currentGroupIndex)
@@ -821,11 +823,15 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.NORMAL_SWITCH2))
                 groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SCENE_SWITCH))
                 groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN_SWITCH))
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.FOUR_SWITCH))
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.EIGHT_SWITCH))
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SIX_SWITCH))
+                groups.addAll(DBUtils.getGroupsByDeviceType(DeviceType.DOUBLE_SWITCH))
             }
             else -> groups.addAll(DBUtils.getGroupsByDeviceType(mAddDeviceType))
         }
 
-        var title = when (mAddDeviceType) {
+        val title = when (mAddDeviceType) {
             DeviceType.LIGHT_NORMAL -> getString(R.string.normal_light)
             DeviceType.LIGHT_RGB -> getString(R.string.rgb_light)
             98 -> getString(R.string.sensor)
@@ -866,8 +872,11 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
 
     // 如果没有网络，则弹出网络设置对话框
     private fun checkNetworkAndSync() {
-        if (NetWorkUtils.isNetworkAvalible(this))
+        if (NetWorkUtils.isNetworkAvalible(this)){
+            LogUtils.v("chown -- 同步数据")
+
             SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallback)
+        }
     }
 
     override fun onLocationEnable() {}
@@ -1049,9 +1058,9 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     override fun tzRouteDeviceNum(cmdBodyBean: CmdBodyBean) {//收到扫描的设备数
         if (cmdBodyBean.finish) {
             skipeType()
-            LogUtils.v("zcl-----------收到路由设备结束-------$cmdBodyBean")
+//            LogUtils.v("zcl-----------收到路由设备结束-------$cmdBodyBean")
         } else {
-            LogUtils.v("zcl-----------收到路由设备数-------$cmdBodyBean")
+//            LogUtils.v("zcl-----------收到路由设备数-------$cmdBodyBean")
             routerScanCount = cmdBodyBean.count
             if (mAddDeviceType == DeviceType.LIGHT_NORMAL || mAddDeviceType == DeviceType.LIGHT_RGB || mAddDeviceType == DeviceType.SMART_RELAY ||
                     mAddDeviceType == DeviceType.SMART_CURTAIN || mAddDeviceType == 98 || mAddDeviceType == 99)
@@ -1224,7 +1233,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         scanFilters.add(scanFilter)*/
 
         Log.d("Mack", "MobilePhoneBrand:"+ Build.BRAND)
-        if (Build.BRAND.contains("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (/*Build.BRAND.contains("samsung") && */  Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0x11.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
@@ -1240,7 +1249,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         val scanFilters = ArrayList<ScanFilter>()
         Log.d("Mack", "MobilePhoneBrand:"+ Build.BRAND)
         LogUtils.v("=================================================================")
-        if (Build.BRAND.contains("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (/*Build.BRAND.contains("samsung") &&*/ Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0x11.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())
@@ -1397,6 +1406,8 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                     DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "deviceType" to bestRssiDevice?.productUUID)
                     DeviceType.SCENE_SWITCH -> skipSwitch()
                     DeviceType.SMART_CURTAIN_SWITCH -> startActivity<ConfigCurtainSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+                    DeviceType.FOUR_SWITCH -> startActivity<ConfigFourSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
+                    DeviceType.SIX_SWITCH -> startActivity<ConfigSixSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false")
                 }
                 hideLoadingDialog()
             }
@@ -1405,7 +1416,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 if (Constant.IS_ROUTE_MODE) {
                     skipeGw()
                 } else {
-                    if (TelinkLightApplication.getApp().isConnectGwBle) {//直连时候获取版本号
+                    if (TelinkLightApplication.getApp().isConnectGwBle) { //直连时候获取版本号
                         val disposable = Commander.getDeviceVersion(dbGw.meshAddr).subscribe({ s: String ->
                             dbGw.version = s
                             DBUtils.saveGateWay(dbGw, false)
@@ -1421,7 +1432,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     }
 
     private fun skipSwitch() {
-        var version = bestRssiDevice?.firmwareRevision ?: ""
+        val version = bestRssiDevice?.firmwareRevision ?: ""
         when (bestRssiDevice?.productUUID) {
             DeviceType.NORMAL_SWITCH, DeviceType.NORMAL_SWITCH2 -> {
                 startActivity<ConfigNormalSwitchActivity>("deviceInfo" to bestRssiDevice!!, "group" to "false", "version" to version)

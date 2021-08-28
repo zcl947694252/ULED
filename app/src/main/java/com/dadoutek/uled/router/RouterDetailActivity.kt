@@ -218,6 +218,7 @@ class RouterDetailActivity : TelinkBaseToolbarActivity() {
         hideLoadingDialog()
         ToastUtils.showShort(getString(R.string.successful_resumption))
         DBUtils.deleteRouter(router!!)
+        LogUtils.v("chown -- 同步数据")
 
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {}

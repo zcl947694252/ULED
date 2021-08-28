@@ -39,14 +39,12 @@ import com.telink.bluetooth.light.LightService
 import com.telink.util.Arrays
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.Disposable
+//import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_gw_login.*
 import kotlinx.android.synthetic.main.bottom_version_ly.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.launch
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -231,16 +229,21 @@ class GwLoginActivity : TelinkBaseActivity() {
         showLoadingDialog(getString(R.string.please_wait))
         val byteAccount = account.toByteArray()
         val bytePwd = pwd.toByteArray()
-        val listAccount = getParmarsList(byteAccount)
+        val listAccount = getParmarsList(byteAccount) // 将字符转化为字节
         val listPwd = getParmarsList(bytePwd)
         val accountByteSize = byteAccount.size.toByte()
         val pwdByteSize = bytePwd.size.toByte()
 
-        LogUtils.v("zcl----蓝牙数据账号list-------${Arrays.bytesToHexString(byteAccount, ",")}----------${listAccount.size}-----$accountByteSize")
-        LogUtils.v("zcl----蓝牙数据密码list-------${Arrays.bytesToHexString(bytePwd, ",")}----------${listPwd.size}----$pwdByteSize")
+        LogUtils.v("chown----蓝牙数据 wifi账号list-------${Arrays.bytesToHexString(byteAccount, ",")}----------${listAccount.size}-----$accountByteSize")
+        LogUtils.v("chown----蓝牙数据 wifi密码list-------${Arrays.bytesToHexString(bytePwd, ",")}----------${listPwd.size}----$pwdByteSize")
 
-        sendParmars(listAccount, accountByteSize, false)
-        sendParmars(listPwd, pwdByteSize, true)
+
+        GlobalScope.launch {
+            sendParmars(listAccount, accountByteSize, false)
+            delay(20)
+            sendParmars(listPwd, pwdByteSize, true)
+        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -285,16 +288,18 @@ class GwLoginActivity : TelinkBaseActivity() {
                 Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02, tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
 
-        var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+        val params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
     }
 
     private fun sendParmars(listParmars: MutableList<ByteArray>, byteSize: Byte, isPwd: Boolean) {
-        val num = 500L
+        val num = 500L // why you so long
+//        val num = 50L // why you so long
         GlobalScope.launch(Dispatchers.Main) {
             for (i in 0 until listParmars.size) {
-                delay(num * i)
+//                delay(num * i) // chown i can't understand , why you multi i
+                delay(num)
                 //11-18 11位labelId
                 val offset = i * 8
                 val bytesArray = listParmars[i]
@@ -302,10 +307,10 @@ class GwLoginActivity : TelinkBaseActivity() {
                         bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7])
 
                 if (isPwd) {
-                    LogUtils.v("zcl----------蓝牙数据密码参数-------${Arrays.bytesToHexString(params, ",")}")
+                    LogUtils.v("chown----------蓝牙数据密码参数-------${Arrays.bytesToHexString(params, ",")}")
                     TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_WIFI_PASSWORD, dbGw?.meshAddr ?: 0, params, "1")
                 } else {
-                    LogUtils.v("zcl----------蓝牙数据账号参数-------${Arrays.bytesToHexString(params, ",")}")
+                    LogUtils.v("chown----------蓝牙数据账号参数-------${Arrays.bytesToHexString(params, ",")}")
                     TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_WIFI_SDID, dbGw?.meshAddr ?: 0, params, "1")
                 }
             }

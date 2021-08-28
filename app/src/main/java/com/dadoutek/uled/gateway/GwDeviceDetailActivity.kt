@@ -283,8 +283,9 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
             }
             R.id.template_device_icon -> {
                 //开关网关通过普通灯的连接状态发送
-                if (IS_ROUTE_MODE) {
+                if (IS_ROUTE_MODE) { // 这里修改一下处理方式 发送给网关
                     ToastUtils.showShort(getString(R.string.please_do_this_over_ble))
+//                    sendOpenOrCloseGw(false)
                     return@OnItemChildClickListener
                 }
                 when {
@@ -309,7 +310,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
         //第是一位0x01代表开 默认开 0x00代表关
         currentGw?.let { it ->
             if (isBleConnect) {
-                var labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
+                val labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
                     byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
                 else
                     byteArrayOf(0x01, 0, 0, 0, 0, 0, 0, 0)
@@ -328,7 +329,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
                 adaper!!.notifyDataSetChanged()
             } else {
-                var labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
+                val labHeadPar: ByteArray = if (it.openTag == 1)//如果是开就执行关闭
                     byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
                 else
                     byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, Opcode.CONFIG_GW_SWITCH, 0x11, 0x02, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -346,7 +347,11 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
 
     @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody) {
-        GwModel.sendToGatt(gattBody)?.subscribe({}, {})
+        GwModel.sendToGatt(gattBody)?.subscribe({
+              LogUtils.v("chown -- 发送成功")
+        }, {
+            LogUtils.v("chown -- 发送失败")
+        })
     }
 
     @SuppressLint("CheckResult")
@@ -354,6 +359,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     private fun getGw() {
         TelinkLightApplication.getApp().offLine = false
         GwModel.getGwList()?.subscribe({
+            LogUtils.v("chown -- 走对地方了")
             hideLoadingDialog()
             it.forEach { db ->
                 if (db.meshAddr == currentGw!!.meshAddr) {//网关在线状态，1表示在线，0表示离线
@@ -366,6 +372,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                 }
             }
         }, {
+            LogUtils.v("chown -- 网关走错误地方")
             hideLoadingDialog()
             ToastUtils.showShort(getString(R.string.gw_not_online))
         })
@@ -493,7 +500,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
                             { s: String ->
                                 currentGw!!.version = s
                                 DBUtils.saveGateWay(currentGw!!, false)
-                                var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
+                                val isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
                                 if (isBoolean) {
                                     transformView()
                                 } else {
@@ -642,7 +649,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     }
 
     private fun sendGwResetFactory(frist: Int) {
-        var labHeadPar = byteArrayOf(frist.toByte(), 0, 0, 0, 0, 0, 0, 0)
+        val labHeadPar = byteArrayOf(frist.toByte(), 0, 0, 0, 0, 0, 0, 0)
         TelinkLightService.Instance().sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, currentGw?.meshAddr ?: 0, labHeadPar, "1")
     }
 
@@ -823,7 +830,7 @@ class GwDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener
     }
 
     override fun receviedGwCmd2000(ser_id: String) {
-        if (GW_GATT_SWITCH == ser_id?.toInt()) {
+        if (GW_GATT_SWITCH == ser_id.toInt()) {
             currentGw?.openTag = if (currentGw?.openTag == 0) 1 else 0
             currentGw?.icon = if (currentGw?.openTag == 0) R.drawable.icon_gateway_off else R.drawable.icon_gateway
             DBUtils.saveGateWay(currentGw!!, false)

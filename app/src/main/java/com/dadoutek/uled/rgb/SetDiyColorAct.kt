@@ -49,6 +49,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
+/**
+ * 选择自定义模式界面
+ */
 class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private var deviceType: Int = 0
     var colorNodeList: ArrayList<DbColorNode>? = null
@@ -111,13 +114,15 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     }
                 }
 
-                speed_num.text = "$speed"
+                speed_num.text = "$speed%"
                 when {
                     speed >= 100 -> {
+                        sbSpeed.progress = 100
                         speed_add.isEnabled = false
                         speed_less.isEnabled = true
                     }
-                    speed <= 0 -> {
+                    speed <= 1 -> {
+                        sbSpeed.progress = 1
                         speed_less.isEnabled = false
                         speed_add.isEnabled = true
                     }
@@ -208,17 +213,19 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         }
 
         if (isChange) {
-            toolbarTv.text = getString(R.string.update_gradient)
+            toolbarTv.text = getString(R.string.mode_diy)
             editName.setText(diyGradient?.name)
             editName.setSelection(editName.text.toString().length)
             sbSpeed.progress = diyGradient?.speed!!
             speed_num.text = diyGradient?.speed.toString() + "%"
             when {
                 sbSpeed.progress >= 100 -> {
+                    sbSpeed.progress = 100
                     speed_add.isEnabled = false
                     speed_less.isEnabled = true
                 }
-                sbSpeed.progress <= 0 -> {
+                sbSpeed.progress <= 1 -> {
+                    sbSpeed.progress = 1
                     speed_less.isEnabled = false
                     speed_add.isEnabled = true
                 }
@@ -230,10 +237,12 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         } else {
             when {
                 sbSpeed.progress >= 100 -> {
+                    sbSpeed.progress = 100
                     speed_add.isEnabled = false
                     speed_less.isEnabled = true
                 }
-                sbSpeed.progress <= 0 -> {
+                sbSpeed.progress <= 1 -> {
+                    sbSpeed.progress = 1
                     speed_less.isEnabled = false
                     speed_add.isEnabled = true
                 }
@@ -242,10 +251,10 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
                     speed_add.isEnabled = true
                 }
             }
-            toolbarTv.text = getString(R.string.add_gradient)
+            toolbarTv.text = getString(R.string.mode_diy)
             editName.setText(DBUtils.getDefaultModeName())
             editName.setSelection(editName.text.toString().length)
-            sbSpeed.progress = 1
+            sbSpeed.progress = 50
 
             speed_num.text = 50.toString() + "%"
         }
@@ -646,7 +655,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
         return true
     }
 
-    val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, view, position ->
+    val onItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         val intent = Intent(this, SelectColorGradientAct::class.java)
         colorNodeList!![position].dstAddress = dstAddress
         intent.putExtra(Constant.COLOR_NODE_KEY, colorNodeList!![position])
@@ -671,7 +680,7 @@ class SetDiyColorAct : TelinkBaseActivity(), View.OnClickListener {
     private fun creatNewData() {
         colorNodeList = ArrayList()
         for (i in 0..7) {
-            var colorNode = DbColorNode()
+            val colorNode = DbColorNode()
             when (i) {
                 0 -> {
                     colorNode.index = 0

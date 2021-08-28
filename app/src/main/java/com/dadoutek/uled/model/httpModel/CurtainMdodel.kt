@@ -1,9 +1,13 @@
 package com.dadoutek.uled.model.httpModel
 
+import com.dadoutek.uled.model.BodyBias
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbCurtain
+import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.network.bean.CurtainListBodyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -53,5 +57,23 @@ object CurtainMdodel {
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun batchAddOrUpdateCurtain(list: List<DbCurtain>) : Observable<String>? {
+        return NetworkFactory.getApi()
+            .updateCurtain(CurtainListBodyBean(list))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {  }
+    }
+
+    fun remove(list: List<Int>) : Observable<String>? {
+        return NetworkFactory.getApi()
+            .deleteCurtains(BodyBias(list))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {  }
     }
 }

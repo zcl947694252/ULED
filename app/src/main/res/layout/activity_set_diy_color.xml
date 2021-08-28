@@ -121,7 +121,7 @@
                 android:layout_height="40dp"
                 android:id="@+id/sbSpeed"
                 style="@style/SeekBarStyle"
-                android:max="100"
+                android:max="101"
                 android:min="1"
                 android:progress="1" />
 

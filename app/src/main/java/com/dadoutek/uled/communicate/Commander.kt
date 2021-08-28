@@ -60,12 +60,13 @@ object Commander : EventListener<String> {
         val params: ByteArray = if (isOpen) {
             //0x64代表延时100ms，从而保证多个灯同步开关
             if (groupAddr == 0xffff)//是否是所有组
-                byteArrayOf(0x01, 0x64, 0x00, 0x00, 0x01)
+                byteArrayOf(0x01, 0x64, 0x00) //chown
+//            byteArrayOf(0x01, 0x64, 0x00, 0x00, 0x00) //chown
             else
                 byteArrayOf(0x01, 0x64, 0x00)
         } else {
-            if (groupAddr == 0xffff)
-                byteArrayOf(0x00, 0x64, 0x00, 0x00, 0x01)
+            if (groupAddr == 0xffff)                //byteArrayOf(0x00, 0x64, 0x00, 0x00, 0x00)
+               byteArrayOf(0x00, 0x64, 0x00)
             else
                 byteArrayOf(0x00, 0x64, 0x00)
         }
@@ -202,7 +203,6 @@ object Commander : EventListener<String> {
     fun resetDevice(deviceMeshAddr: Int, isSensor: Boolean = false): Observable<Boolean> {
         val deviceMeshAddr = deviceMeshAddr
         val observable = Observable.create<Boolean> { emitter ->
-
             var sendCommandNoResponse = TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, deviceMeshAddr, paramsKickOut) //延时后再给直连灯发恢复
             if (sendCommandNoResponse == null)
                 sendCommandNoResponse = false
@@ -211,8 +211,9 @@ object Commander : EventListener<String> {
 
         val ret = getDeviceVersion(deviceMeshAddr)
                 .flatMap {
+                    LogUtils.v("chonw -- 获取成功")
                     observable
-                }//如果获取没成功就走到外部的error
+                } // 如果获取没成功就走到外部的error
 
         return ret
     }
@@ -291,7 +292,7 @@ object Commander : EventListener<String> {
      * 修改设备分组
      */
     fun addGroup(dstAddr: Int, groupAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
-        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
+        TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_GROUP, this)
         mDstAddr = dstAddr
 
         mTargetGroupAddr = groupAddr
@@ -305,6 +306,7 @@ object Commander : EventListener<String> {
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
         }
 
+
         Observable.interval(0, 300, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -312,7 +314,7 @@ object Commander : EventListener<String> {
                     var mDisposable: Disposable? = null
                     override fun onComplete() {
                         mDisposable?.dispose()
-                        TelinkLightApplication.getApp()?.removeEventListener(Commander)
+                        TelinkLightApplication.getApp().removeEventListener(Commander)
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -414,9 +416,8 @@ object Commander : EventListener<String> {
                         }
                     }
 
-
                     override fun onError(e: Throwable) {
-                        LogUtils.e("zcl", "zcl**********updateMeshName*******onError***${e.message}")
+                        LogUtils.e("chown", "chown **********updateMeshName*******onError***${e.message}")
                     }
                 })
     }
@@ -588,11 +589,10 @@ object Commander : EventListener<String> {
 
     //加载自定义渐变
     fun applyDiyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int) {
-        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val opcode = Opcode.APPLY_RGB_GRADIENT
         //开始自定义渐变
         val gradientActionType = 0x04
-        val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
+        val params: ByteArray = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         for (i in 0..2) {
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
             Thread.sleep(50)
@@ -669,7 +669,7 @@ object Commander : EventListener<String> {
                 TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
 
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
-                LogUtils.v("zcl-----------连接失败失败-------connect timeout")
+                LogUtils.v("chown -----------连接失败失败-------connect timeout")
                 it.onError(Throwable("connect timeout"))
                 mConnectObservable = null
             }.doFinally {
@@ -692,19 +692,18 @@ object Commander : EventListener<String> {
             var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
             val params: ByteArray
             if (TelinkApplication.getInstance().connectDevice.meshAddress == dstAddr) {
-                params = byteArrayOf(0x00, 0x00)
+                params = byteArrayOf(0x00, 0x00) // 很明显 如果是switch的话，走的都是这个函数，所以指令就发不出去
             } else {
                 opcode = Opcode.SEND_MESSAGE_BY_MESH
                 val meshAddr = TelinkApplication.getInstance().connectDevice.meshAddress
                 params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
-//                params = byteArrayOf(0x3c, ((meshAddr shr 8) and 0xFF).toByte(), (meshAddr and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte // chwon 四键版本号
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
         }.retry(retryTimes)
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .timeout(10, TimeUnit.SECONDS) {
-                    it.onError(Throwable("get version failed"))
+                    it.onError(Throwable("chown get version failed"))
                 }
                 .doOnSubscribe {
 //                    TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
@@ -726,16 +725,16 @@ object Commander : EventListener<String> {
         if (version != null && version?.isNotEmpty() == true) {
             LogUtils.d("version = $version")
             if (mGetVersionObservable != null) {
-                if (version == null)
+                if (version == null) {
                     mGetVersionObservable?.onError(Throwable("get empty version,please retry"))
-
+                }
                 mGetVersionObservable?.onNext(version!!)
                 mGetVersionObservable?.onComplete()
-            } else {
             }
         } else {
-            if (mGetVersionObservable?.isDisposed == false)
+            if (mGetVersionObservable?.isDisposed == false) {
                 mGetVersionObservable?.onError(Throwable("get empty version"))
+            }
             LogUtils.d("get empty version")
         }
 

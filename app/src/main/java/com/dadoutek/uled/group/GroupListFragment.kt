@@ -9,7 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
-import androidx.constraintlayout.widget.ConstraintLayout
+//import androidx.constraintlayout.widget.ConstraintLayout
 //import androidx.fragment.app.Fragment
 //import androidx.fragment.app.FragmentActivity
 //import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -67,7 +67,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
-    private var groupAllLy: ConstraintLayout? = null
+//    private var groupAllLy: ConstraintLayout? = null
     private var disposableTimer: Disposable? = null
     private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
@@ -81,7 +81,7 @@ class GroupListFragment : BaseFragment() {
     private var toolbarTv: TextView? = null
     private var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
-    private val SCENE_MAX_COUNT = 100
+    private val SCENE_MAX_COUNT = 255
     private var viewPager: androidx.viewpager.widget.ViewPager? = null
     internal var deviceName: ArrayList<DbDeviceName>? = null
     private lateinit var cwLightFragment: CWLightFragmentList
@@ -90,9 +90,9 @@ class GroupListFragment : BaseFragment() {
     private lateinit var relayFragment: RelayFragmentList
 
     //19-2-20 界面调整
-    private var install_device: TextView? = null
-    private var create_group: TextView? = null
-    private var create_scene: TextView? = null
+//    private var install_device: TextView? = null
+//    private var create_group: TextView? = null
+//    private var create_scene: TextView? = null
 
     //新用户选择的初始安装选项是否是RGB灯
     private var isRgbClick = false
@@ -103,14 +103,14 @@ class GroupListFragment : BaseFragment() {
     private var totalNum: TextView? = null
     private var btnOn: ImageView? = null
     private var btnOff: ImageView? = null
-    private var btnSet: ImageView? = null
+//    private var btnSet: ImageView? = null
     private var allGroup: DbGroup? = null
     private var cwLightGroup: String? = null
     private var switchFragment: String? = null
     private lateinit var localBroadcastManager: androidx.localbroadcastmanager.content.LocalBroadcastManager
     private lateinit var br: BroadcastReceiver
     private var isFirst: Boolean = false
-    private var allLightText: TextView? = null
+//    private var allLightText: TextView? = null
     private var onText: TextView? = null
     private var offText: TextView? = null
     private var fragmentPosition = 0
@@ -180,7 +180,7 @@ class GroupListFragment : BaseFragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = getView(inflater)
         this.initData()
         return view
@@ -404,7 +404,7 @@ class GroupListFragment : BaseFragment() {
             relayFragment.refreshData()
             rgbLightFragment.refreshData()
             gpList = DBUtils.getgroupListWithType(activity!!)
-
+            showList = null
             showList = ArrayList()
             showList = gpList
 
@@ -596,7 +596,7 @@ class GroupListFragment : BaseFragment() {
             }
 
             R.id.img_function2 -> {
-                var deleteList: ArrayList<DbGroup> = ArrayList()
+                val deleteList: ArrayList<DbGroup> = ArrayList()
                 deleteList.addAll(cwLightFragment.getGroupDeleteList())
                 deleteList.addAll(rgbLightFragment.getGroupDeleteList())
                 deleteList.addAll(curtianFragment.getGroupDeleteList())
@@ -629,7 +629,7 @@ class GroupListFragment : BaseFragment() {
         updateLights(true, this.allGroup!!)
         val intent = Intent("switch_here")
         intent.putExtra("switch_here", "on")
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this!!.mContext!!).sendBroadcast(intent)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
     }
 
     private fun allGroupOffSuccess() {
@@ -640,7 +640,7 @@ class GroupListFragment : BaseFragment() {
         updateLights(false, this.allGroup!!)
         val intent = Intent("switch_here")
         intent.putExtra("switch_here", "false")
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this!!.mContext!!)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!)
                 .sendBroadcast(intent)
     }
 

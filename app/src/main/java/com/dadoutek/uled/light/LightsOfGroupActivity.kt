@@ -72,7 +72,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
-    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
+    private var recyclerView: RecyclerView? = null
     private var isDelete: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -203,7 +203,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     }
 
     private fun setEmptyAndToolbarTV() {
-        toolbarTv.text = group?.name + "(${lightList?.size})"
+        toolbarTv.text = group?.name + "(${lightList.size})"
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light_ly.visibility = View.GONE
@@ -246,7 +246,7 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     }
 
     private fun bindRouterDevice() {
-        var intent = Intent(this, BindRouterActivity::class.java)
+        val intent = Intent(this, BindRouterActivity::class.java)
         intent.putExtra("group", group)
         startActivity(intent)
     }
@@ -293,33 +293,33 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
 
     fun notifyData() {
-        val mOldDatas: MutableList<DbLight>? = lightList
-        val mNewDatas: MutableList<DbLight>? = getNewData()
+        val mOldDatas: MutableList<DbLight> = lightList
+        val mNewDatas: MutableList<DbLight> = getNewData()
         val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
             override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-                (newItemPosition)?.id) ?: false;
+                return mOldDatas[oldItemPosition].id?.equals(mNewDatas.get
+                (newItemPosition).id) ?: false;
             }
 
             override fun getOldListSize(): Int {
-                return mOldDatas?.size ?: 0
+                return mOldDatas.size ?: 0
             }
 
             override fun getNewListSize(): Int {
-                return mNewDatas?.size ?: 0
+                return mNewDatas.size ?: 0
             }
 
             override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                val beanOld = mOldDatas?.get(oldItemPosition)
-                val beanNew = mNewDatas?.get(newItemPosition)
-                return if (!beanOld?.name.equals(beanNew?.name)) {
+                val beanOld = mOldDatas[oldItemPosition]
+                val beanNew = mNewDatas[newItemPosition]
+                return if (!beanOld.name.equals(beanNew.name)) {
                     return false//如果有内容不同，就返回false
                 } else true
 
             }
         }, true)
         deviceAdapter?.let { diffResult.dispatchUpdatesTo(it) }
-        lightList = mNewDatas!!
+        lightList = mNewDatas
         deviceAdapter?.setNewData(lightList)
     }
 
@@ -383,8 +383,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                         if (Constant.IS_ROUTE_MODE)
                             routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 1, "lightSw")
                         else {
-                            Commander.openOrCloseLights(lightList[position]!!.meshAddr, true)
-                            lightList[position]!!.connectionStatus = ConnectionStatus.ON.value
+                            Commander.openOrCloseLights(lightList[position].meshAddr, true)
+                            lightList[position].connectionStatus = ConnectionStatus.ON.value
                             afterLightIcon(position)
                         }
                     }
@@ -393,8 +393,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
                         if (Constant.IS_ROUTE_MODE)
                             routeOpenOrCloseBase(currentLight!!.meshAddr, currentLight!!.productUUID, 0, "lightSw")
                         else {
-                            Commander.openOrCloseLights(lightList[position]!!.meshAddr, false)
-                            lightList[position]!!.connectionStatus = ConnectionStatus.OFF.value
+                            Commander.openOrCloseLights(lightList[position].meshAddr, false)
+                            lightList[position].connectionStatus = ConnectionStatus.OFF.value
                             afterLightIcon(position)
                         }
                     }
@@ -440,18 +440,18 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
 
     private fun afterLightIcon(position: Int) {
         when (deviceType) {
-            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> lightList[position]!!.updateIcon()
-            DeviceType.LIGHT_RGB -> lightList[position]!!.updateRgbIcon()
+            DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD -> lightList[position].updateIcon()
+            DeviceType.LIGHT_RGB -> lightList[position].updateRgbIcon()
         }
 
-        DBUtils.updateLight(lightList[position]!!)
+        DBUtils.updateLight(lightList[position])
         deviceAdapter?.notifyDataSetChanged()
     }
 
     private fun showDeleteSingleDialog(dbLight: DbLight) {
         val builder = AlertDialog.Builder(this)
         builder.setMessage(getString(R.string.sure_delete_device, dbLight.name))
-        TelinkLightService.Instance()?.idleMode(true)
+//        TelinkLightService.Instance()?.idleMode(true) //chown
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             /*   deletePreGroup(dbLight)
                DBUtils.updateGroup(group!!)
@@ -469,8 +469,8 @@ class LightsOfGroupActivity : TelinkBaseActivity(), SearchView.OnQueryTextListen
     }
 
     private fun deletePreGroup(dbLight: DbLight) {
-        if (DBUtils.getGroupByID(dbLight!!.belongGroupId!!) != null) {
-            val groupAddress = DBUtils.getGroupByID(dbLight!!.belongGroupId!!)?.meshAddr
+        if (DBUtils.getGroupByID(dbLight.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(dbLight.belongGroupId!!)?.meshAddr
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())//0x00表示删除组
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dbLight.meshAddr, params)

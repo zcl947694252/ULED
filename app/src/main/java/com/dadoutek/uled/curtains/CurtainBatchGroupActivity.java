@@ -35,6 +35,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -1128,6 +1129,7 @@ public class CurtainBatchGroupActivity extends TelinkMeshErrorDealActivity
     // 如果没有网络，则弹出网络设置对话框
     public void checkNetworkAndSync() {
         if (NetWorkUtils.isNetworkAvalible(this)) {
+            LogUtils.v("chown -- 同步数据");
             SyncDataPutOrGetUtils.Companion.syncPutDataStart(this, syncCallback);
         }
     }

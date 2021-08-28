@@ -16,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+//import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -89,7 +89,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     var currentGroup: DbGroup? = null
     private var lin: View? = null
     private var inflater: LayoutInflater? = null
-    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
+    private var recyclerView: RecyclerView? = null
     private var noGroup: LinearLayout? = null
     private var groupAdapter: GroupListAdapter? = null
     open var groupList: ArrayList<DbGroup> = ArrayList()
@@ -101,7 +101,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private var viewLineRecycler: View? = null
     private var isDelete = false
     private var groupMesher: ArrayList<String>? = null
-    private lateinit var localBroadcastManager: androidx.localbroadcastmanager.content.LocalBroadcastManager
+    private lateinit var localBroadcastManager: LocalBroadcastManager
     private lateinit var br: BroadcastReceiver
     private lateinit var deleteList: ArrayList<DbGroup>
     private var addNewGroup: Button? = null
@@ -119,7 +119,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         this.mContext = this.activity
         setHasOptionsMenu(true)
         makeRenamePopuwindow()
-        localBroadcastManager = androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!)
+        localBroadcastManager = LocalBroadcastManager.getInstance(this.mContext!!)
         val intentFilter = IntentFilter()
         intentFilter.addAction("back")
         intentFilter.addAction("delete")
@@ -163,7 +163,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                                     if (j == deleteList.size - 1 && isDeleteSucess) {
                                         hideLoadingDialog()
                                         isDelete = false
-                                        sendDeleteBrocastRecevicer(300)
+                                        sendDeleteBrocastRecevicer()
                                         refreshData()
                                     }
                                 },
@@ -197,11 +197,11 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
 
-    private fun sendDeleteBrocastRecevicer(delayTime: Long) {
-        Thread.sleep(delayTime)
+    private fun sendDeleteBrocastRecevicer() {
+        Thread.sleep(300L)
         val intent = Intent("delete_true")
         intent.putExtra("delete_true", "true")
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -219,9 +219,9 @@ abstract class BaseGroupFragment : BaseFragment() {
         StringUtils.initEditTextFilter(textGp)
 
         renameDialog = Dialog(mContext!!)
-        renameDialog?.setContentView(popReNameView!!)
-        renameDialog?.setCanceledOnTouchOutside(false)
-        renameCancel?.setOnClickListener { renameDialog?.dismiss() }
+        renameDialog.setContentView(popReNameView!!)
+        renameDialog.setCanceledOnTouchOutside(false)
+        renameCancel?.setOnClickListener { renameDialog.dismiss() }
         //确定回调 单独写
     }
 
@@ -279,7 +279,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         //发送切换fragment广播
         val intent = Intent("switch_fragment")
         intent.putExtra("switch_fragment", "true")
-        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
+        LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
 
         addGroupBtn?.setOnClickListener(onClickAddGroup)
         addNewGroup?.setOnClickListener(onClickAddGroup)
@@ -287,7 +287,7 @@ abstract class BaseGroupFragment : BaseFragment() {
         seeHelp2?.setOnClickListener { seeHelpe() }
         seehelp?.setOnClickListener { seeHelpe() }
 
-        val layoutmanager = LinearLayoutManager(activity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+//        val layoutmanager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
         // recyclerView!!.layoutManager = layoutmanager
         recyclerView!!.layoutManager = GridLayoutManager(context, 2)
 
@@ -297,7 +297,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
         //this.groupAdapter = GroupListAdapter(R.layout.group_item_child, groupList, isDelete)
         this.groupAdapter = GroupListAdapter(R.layout.template_device_type_item, groupList, isDelete)
-        val decoration = DividerItemDecoration(activity, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
+        val decoration = DividerItemDecoration(activity, DividerItemDecoration.VERTICAL)
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(activity!!, R.color.divider)))
         //添加分割线
         groupAdapter!!.addFooterView(lin)
@@ -308,14 +308,14 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     open fun seeHelpe() {
-        var wbType = when (setGroupType()) {
+        val wbType = when (setGroupType()) {
             Constant.DEVICE_TYPE_LIGHT_NORMAL -> "#control-normal-group"
             Constant.DEVICE_TYPE_LIGHT_RGB -> "#control-color-light-group"
             Constant.DEVICE_TYPE_CURTAIN -> "#control-curtain-group"
             Constant.DEVICE_TYPE_CONNECTOR -> "#control-relay-group"
             else -> "#control-normal-group"
         }
-        var intent = Intent(mContext, InstructionsForUsActivity::class.java)
+        val intent = Intent(mContext, InstructionsForUsActivity::class.java)
         intent.putExtra(Constant.WB_TYPE, wbType)
         startActivity(intent)
     }
@@ -334,7 +334,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             val intent = Intent("showPro")
                             intent.putExtra("is_delete", "true")
                             this.activity?.let { it1 ->
-                                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
+                                LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                             }
                         }
                         else -> {//先长按  选中 在长按 就会通知外面关闭了
@@ -342,7 +342,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                             val intent = Intent("showPro")
                             intent.putExtra("is_delete", "false")
                             this.activity?.let { it1 ->
-                                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
+                                LocalBroadcastManager.getInstance(it1).sendBroadcast(intent)
                             }
                         }
                     }
@@ -404,7 +404,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     val low = currentGroup!!.meshAddr and 0xff
                     val hight = (currentGroup!!.meshAddr shr 8) and 0xff
                     val gattBody = GwGattBody()
-                    var gattPar: ByteArray
+                    val gattPar: ByteArray
                     if (isOpen) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -497,12 +497,13 @@ abstract class BaseGroupFragment : BaseFragment() {
                     DBUtils.saveGroup(currentGroup!!, true)
                 }
                 else -> {
-                    if (currentGroup?.connectionStatus == 0) 1 else 0
                     ToastUtils.showShort(getString(R.string.open_light_faile))
+                    if (currentGroup?.connectionStatus == 0) 1 else 0
                 }
             }
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
@@ -523,13 +524,14 @@ abstract class BaseGroupFragment : BaseFragment() {
                             ||currentGroup!!.deviceType == Constant.DEVICE_TYPE_CURTAIN-> {
                         when {
                             Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-                                var status = if (currentGroup!!.connectionStatus == 0) 1 else 0
+
+                                val status = if (currentGroup!!.connectionStatus == 0) 1 else 0
                                 LogUtils.v("zcl---请求路由开关组之前--connectionStatus-----${currentGroup!!.connectionStatus}--status--$status")
                                 routeOpenOrClose(currentGroup!!.meshAddr, 97, status, "zu")
                                 currentGroup?.connectionStatus = status
                             }
                             else -> {
-                                var isopen = currentGroup!!.connectionStatus == 0 //0位关闭 则去打开
+                                val isopen = currentGroup!!.connectionStatus == 0 //0位关闭 则去打开
                                 when (currentGroup!!.deviceType) {
                                     Constant.DEVICE_TYPE_CURTAIN -> {
                                         val elements: Byte = if (isopen) 0x0A else 0x0C
@@ -637,7 +639,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     @SuppressLint("CheckResult")
     private fun routeSwitchCurtain() {//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea 换向 = 0x11
         currentGroup?.let {
-            var opcode = if (it.status == 1) 0x0c else 0x0a
+            val opcode = if (it.status == 1) 0x0c else 0x0a
 
             RouterModel.routeControlCurtain(it.meshAddr, 97, opcode, 1, "groupSwCurtain")//换向 = 0x11
                     ?.subscribe({ itr ->
@@ -683,7 +685,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     @SuppressLint("StringFormatInvalid")
     private fun deleteSingleGroup(dbGroup: DbGroup) {
         AlertDialog.Builder(mContext)
-                .setMessage(getString(R.string.delete_group_confirm, dbGroup?.name))
+                .setMessage(getString(R.string.delete_group_confirm, dbGroup.name))
                 .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
                     if (Constant.IS_ROUTE_MODE) {
                         routeDeleteGroup(dbGroup)
@@ -727,7 +729,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
                     dialog.dismiss()
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
     }
 
     @SuppressLint("CheckResult")
@@ -777,12 +779,12 @@ abstract class BaseGroupFragment : BaseFragment() {
         disposableRouteTimer?.dispose()
         if (routerGroup.ser_id == "delGp") {
             hideLoadingDialog()
-            if (routerGroup?.finish) {
+            if (routerGroup.finish) {
                 val gp = DBUtils.getGroupByID(routerGroup.targetGroupId.toLong())
-                when (routerGroup?.status) {
+                when (routerGroup.status) {
                     0 -> {
                         if (gp != null)
-                            DBUtils.deleteGroupOnly(gp!!)
+                            DBUtils.deleteGroupOnly(gp)
                         deleteComplete()
                         SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                             override fun start() {}
@@ -795,7 +797,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                     -1 -> ToastUtils.showShort(getString(R.string.delete_gp_fail))
                 }
             } else {
-                ToastUtils.showShort(getString(R.string.router_del_gp, routerGroup?.succeedNow?.size))
+                ToastUtils.showShort(getString(R.string.router_del_gp, routerGroup.succeedNow.size))
             }
         }
     }
@@ -808,7 +810,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun deleteComplete() {
         isDeleteSucess = true
         hideLoadingDialog()
-        sendDeleteBrocastRecevicer(300)
+        sendDeleteBrocastRecevicer()
         refreshData()
     }
 
@@ -888,8 +890,8 @@ abstract class BaseGroupFragment : BaseFragment() {
     private fun addNewGroup() {
         StringUtils.initEditTextFilter(textGp)
         if (this != null && mContext?.isFinishing == false) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -899,7 +901,7 @@ abstract class BaseGroupFragment : BaseFragment() {
                 val dbGroup = DBUtils.addNewGroupWithType(textGp?.text.toString().trim { it <= ' ' }, setGroupType())
                 dbGroup?.let {
                     if (Constant.IS_ROUTE_MODE) {
-                        GroupMdodel.batchAddOrUpdateGp(mutableListOf(dbGroup!!))?.subscribe({
+                        GroupMdodel.batchAddOrUpdateGp(mutableListOf(dbGroup))?.subscribe({
                             if (it.errorCode == 0)
                                 addGroupSuccess(dbGroup)
                             else
@@ -917,7 +919,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     private fun addGroupSuccess(dbGroup: DbGroup?) {
-        groupList?.add(dbGroup!!)
+        groupList.add(dbGroup!!)
         refreshData()
     }
 

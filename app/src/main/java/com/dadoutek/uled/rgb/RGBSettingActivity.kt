@@ -145,7 +145,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
-        AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(this))
+        AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
                 .setMessage(getString(R.string.delete_group_confirm, group?.name))
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     this.showLoadingDialog(getString(R.string.deleting))
@@ -176,7 +176,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun routerConfigBrightness() {
-        var isEnabledBri = if (cb_brightness_enable.isChecked) 1 else 0
+        val isEnabledBri = if (cb_brightness_enable.isChecked) 1 else 0
 
         when {
             currentShowGroupSetPage && group != null -> {
@@ -263,6 +263,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             if (light!!.meshAddr == mConnectDevice!!.meshAddress)
                 this.setResult(Activity.RESULT_OK, Intent().putExtra("data", true))
         }
+        LogUtils.v("chown -- 同步数据")
         SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
             override fun start() {}
 
@@ -555,14 +556,18 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             else -> light?.connectionStatus
         }
         when (status) {
-            1 -> rgb_switch.setImageResource(R.drawable.icon_light_open)
-            else -> rgb_switch.setImageResource(R.drawable.icon_light_close)
+            1 -> {
+                rgb_switch.setImageResource(R.drawable.icon_light_open)
+            }
+            else -> {
+                rgb_switch.setImageResource(R.drawable.icon_light_close)
+            }
         }
     }
 
     private fun swLight(isClick: Boolean) {
         val connectionStatus = if (currentShowGroupSetPage) group?.connectionStatus else light?.connectionStatus
-        var status = when {
+        val status = when {
             isClick -> if (connectionStatus == 1) 0 else 1
             else -> connectionStatus ?: 1
         }
@@ -658,8 +663,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
         }
 
 
-        rgb_sbBrightness!!.max = 100
-        rgb_white_seekbar!!.max = 100
 
         color_picker.reset()  //chown
         color_picker.subscribe(colorObserver)
@@ -704,6 +707,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
         when {
             rgb_sbBrightness!!.progress >= 100 -> {
+                rgb_sbBrightness!!.progress=100
                 sbBrightness_add.isEnabled = false
                 sbBrightness_less.isEnabled = true
             }
@@ -737,9 +741,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
         sb_w_bright_num.text = "$w%"
         rgb_white_seekbar.progress = w
-
         when {
             rgb_white_seekbar.progress >= 100 -> {
+                rgb_white_seekbar.progress = 100
                 sb_w_bright_add.isEnabled = false
                 sb_w_bright_less.isEnabled = true
             }
@@ -752,7 +756,6 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 sb_w_bright_add.isEnabled = true
             }
         }
-
         color_picker.setInitialColor((light?.color ?: 1 and 0xffffff) or 0xff000000.toInt())
         rgb_sbBrightness!!.setOnSeekBarChangeListener(barChangeListener)
         rgb_white_seekbar.setOnSeekBarChangeListener(barChangeListener)
@@ -1212,7 +1215,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             R.id.normal_rgb -> toNormalView()
             R.id.tvRename -> renameLight()
             R.id.ll_r -> {
-                var dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                val dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
                     redColor = red.toInt()
                     greenColor = green.toInt()
                     blueColor = blue.toInt()
@@ -1304,8 +1307,8 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             }
 
             R.id.gradient_mode_set -> {
-                speed = postionAndNum?.speed ?: 1
-                var dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
+                speed = postionAndNum?.speed ?: 50
+                val dialog = SpeedDialog(this, speed, R.style.Dialog, SpeedDialog.OnSpeedListener {
                     //if (!Constants.IS_ROUTE_MODE)
                     GlobalScope.launch {//速度是全局的 不发送命令保存速度
                         speed = it
@@ -1355,21 +1358,21 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     }
 
     private fun systemGradientStop() {
-        for (i in buildInModeList!!.indices)
-            buildInModeList!![i].select = false
+        for (i in buildInModeList.indices)
+            buildInModeList[i].select = false
 
-        rgbGradientAdapter!!.notifyDataSetChanged()
+        rgbGradientAdapter.notifyDataSetChanged()
 
-        for (i in diyGradientList!!.indices) {
-            diyGradientList!![i].select = false
-            DBUtils.updateGradient(diyGradientList!![i])
+        for (i in diyGradientList.indices) {
+            diyGradientList[i].select = false
+            DBUtils.updateGradient(diyGradientList[i])
         }
-        rgbDiyGradientAdapter!!.notifyDataSetChanged()
+        rgbDiyGradientAdapter.notifyDataSetChanged()
     }
 
     private fun systemGradientApply(position: Int) {
-        for (i in buildInModeList!!.indices) {
-            buildInModeList!![i].select = i == position
+        for (i in buildInModeList.indices) {
+            buildInModeList[i].select = i == position
         }
 
         rgbGradientAdapter!!.notifyDataSetChanged()
@@ -1463,9 +1466,9 @@ else
         decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_ee)))
         //添加分割线
         builtDiyModeRecycleView?.addItemDecoration(decoration)
-        rgbDiyGradientAdapter!!.onItemChildClickListener = onItemChildClickListenerDiy
-        rgbDiyGradientAdapter!!.onItemLongClickListener = this.onItemChildLongClickListenerDiy
-        rgbDiyGradientAdapter!!.bindToRecyclerView(builtDiyModeRecycleView)
+        rgbDiyGradientAdapter.onItemChildClickListener = onItemChildClickListenerDiy
+        rgbDiyGradientAdapter.onItemLongClickListener = this.onItemChildLongClickListenerDiy
+        rgbDiyGradientAdapter.bindToRecyclerView(builtDiyModeRecycleView)
     }
 
     private var onItemChildClickListenerDiy = BaseQuickAdapter.OnItemChildClickListener { _, view, position ->
@@ -1479,7 +1482,7 @@ else
 
             R.id.diy_mode_off -> {
                 if (!Constant.IS_ROUTE_MODE) {
-                    Commander.closeGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(), diyGradientList!![clickPostion].speed)
+                    Commander.closeGradient(dstAddress, diyGradientList[clickPostion].id.toInt(), diyGradientList[clickPostion].speed)
                     diyGradientCloseResult(clickPostion)
                 } else
                     routerGradientStop("stopGradient")
@@ -1511,8 +1514,8 @@ else
                 GlobalScope.launch {
                     stopGradient()
                     delay(200)
-                    Commander.applyDiyGradient(dstAddress, diyGradientList!![clickPostion].id.toInt(),
-                            diyGradientList!![position].speed, firstLightAddress)
+                    Commander.applyDiyGradient(dstAddress, diyGradientList[clickPostion].id.toInt(),
+                            diyGradientList[position].speed, firstLightAddress)
                 }
                 diyOpenGradientResult(clickPostion)
             } else {
@@ -1523,36 +1526,36 @@ else
     private fun diyOpenGradientResult(position: Int) {
         postionAndNum?.position = 100
         diyPosition = position
-        diyGradientList!![position].select = true
-        for (i in diyGradientList!!.indices) {
-            if (i != position && diyGradientList!![i].select) {
-                diyGradientList!![i].select = false
-                DBUtils.updateGradient(diyGradientList!![i])
+        diyGradientList[position].select = true
+        for (i in diyGradientList.indices) {
+            if (i != position && diyGradientList[i].select) {
+                diyGradientList[i].select = false
+                DBUtils.updateGradient(diyGradientList[i])
             }
         }
-        rgbDiyGradientAdapter!!.notifyDataSetChanged()
+        rgbDiyGradientAdapter.notifyDataSetChanged()
 
-        for (i in buildInModeList!!.indices)
-            buildInModeList!![i].select = false
-        rgbGradientAdapter!!.notifyDataSetChanged()
+        for (i in buildInModeList.indices)
+            buildInModeList[i].select = false
+        rgbGradientAdapter.notifyDataSetChanged()
     }
 
     private fun diyGradientCloseResult(position: Int) {
         diyPosition = 100
-        diyGradientList!![position].select = false
-        rgbDiyGradientAdapter!!.notifyItemChanged(position)
-        DBUtils.updateGradient(diyGradientList!![position])
+        diyGradientList[position].select = false
+        rgbDiyGradientAdapter.notifyItemChanged(position)
+        DBUtils.updateGradient(diyGradientList[position])
 
-        for (i in buildInModeList!!.indices)
-            buildInModeList!![i].select = false
+        for (i in buildInModeList.indices)
+            buildInModeList[i].select = false
 
-        rgbGradientAdapter!!.notifyDataSetChanged()
+        rgbGradientAdapter.notifyDataSetChanged()
     }
 
     private var onItemChildLongClickListenerDiy = BaseQuickAdapter.OnItemLongClickListener { _, _, _ ->
         isDelete = true
         isExitGradient = true
-        rgbDiyGradientAdapter!!.changeState(isDelete)
+        rgbDiyGradientAdapter.changeState(isDelete)
         refreshData()
         return@OnItemLongClickListener true
     }
@@ -1696,8 +1699,8 @@ else
 
             if (isDelete) {
                 isDelete = false
-                rgbDiyGradientAdapter!!.changeState(isDelete)
-                rgbDiyGradientAdapter!!.notifyDataSetChanged()
+                rgbDiyGradientAdapter.changeState(isDelete)
+                rgbDiyGradientAdapter.notifyDataSetChanged()
                 setDate()
             }
             toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE
@@ -1736,8 +1739,7 @@ else
         color_g?.text = g.toString()
         color_b?.text = b.toString()
         //两个0 是一个字节 也就是8bit 右移8
-        var w: Int
-        w = when {
+        var w: Int = when {
             currentShowGroupSetPage -> if (group == null)
                 50
             else
@@ -1748,11 +1750,8 @@ else
                 (light!!.color and 0xff000000.toInt()) shr 24
         }
 
-
-        var color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
-
+        val color: Int = (w shl 24) or (r shl 16) or (g shl 8) or b
         var ws = (color and 0xff000000.toInt()) shr 24//白色
-
         val red = (color and 0xff0000) shr 16
         val green = (color and 0x00ff00) shr 8
         val blue = color and 0x0000ff
@@ -1766,12 +1765,11 @@ else
         ws = isZeroOrHundred(ws)
         w = isZeroOrHundred(w)
 
-
         GlobalScope.launch {
             // 使用协程替代thread看是否能解决溢出问题 delay想到与thread  所有内容要放入协程
             try {
                 //sendWhiteAndBri(ws, w)
-                changeColor(red, green, blue, true)
+                changeColor(red, green, blue, true) // 发送指令
                 if (!Constant.IS_ROUTE_MODE)
                     if (currentShowGroupSetPage) {
                         group?.brightness = showBrightness
@@ -2026,11 +2024,11 @@ else
         buildInModeList.clear()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
         presetGradientList.indices.forEach { i ->
-            var item = ItemRgbGradient()
+            val item = ItemRgbGradient()
             item.name = presetGradientList[i]
             item.id = i
             item.select = false /*i == postionAndNum?.position*///如果等于该postion则表示选中
-            buildInModeList?.add(item)
+            buildInModeList.add(item)
         }
         LogUtils.v("zcl-----------添加完毕-------${buildInModeList.size}")
     }
@@ -2714,8 +2712,7 @@ else
         color_b?.text = b.toString()
         Log.d("", "onColorSelected: " + Integer.toHexString(color))
         if (fromUser) {
-            if (r == 0 && g == 0 && b == 0) {
-            } else {
+            if (r != 0 || g != 0 || b != 0) { // 只要不是黑色就可以调
                 if (!Constant.IS_ROUTE_MODE)
                     when {
                         currentShowGroupSetPage -> group?.color = color
@@ -2727,21 +2724,21 @@ else
     }
 
     private fun changeColor(r: Int, G: Int, B: Int, isOnceSet: Boolean) {
-        var red = r.toByte()
-        var green = G.toByte()
-        var blue = B.toByte()
+        val red = r.toByte()
+        val green = G.toByte()
+        val blue = B.toByte()
 
-        var white = when {
+        val white = when {
             currentShowGroupSetPage -> if (group == null) 50 else (group!!.color and 0xff000000.toInt()) shr 24
             else -> if (light == null) 50 else light!!.color and 0xff000000.toInt() shr 24
         }
 
-        var meshAddr: Int = if (!currentShowGroupSetPage) light?.meshAddr!! else group?.meshAddr!!
-        var deviceType: Int = if (!currentShowGroupSetPage) light?.productUUID!! else 97
+        val meshAddr: Int = if (!currentShowGroupSetPage) light?.meshAddr!! else group?.meshAddr!!
+        val deviceType: Int = if (!currentShowGroupSetPage) light?.productUUID!! else 97
         color = (white shl 24) or (r shl 16) or (G shl 8) or B
 
         if (System.currentTimeMillis() - lastTime > 100)
-            if (Constant.IS_ROUTE_MODE)//路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
+            if (Constant.IS_ROUTE_MODE) //路由发送色盘之不用发送白光 亮度 色温等 白光在color内已经存在
                 routerConfigRGBNum(meshAddr, deviceType, color)
             else
                 CoroutineScope(Dispatchers.IO).launch {
@@ -2753,9 +2750,9 @@ else
                     Log.d("RGBCOLOR", logStr)
                     if (isOnceSet) {
                         delay(50)
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr!!, params)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
                     } else {
-                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr!!, params)
+                        TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
                     }
                     if (Constant.IS_ROUTE_MODE)
                         routerConfigBrightness()

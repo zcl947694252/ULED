@@ -9,9 +9,9 @@ import java.io.Serializable;
  */
 
 public class ItemGroup implements Serializable {
-    public int groupAddress = 0;
-    public int brightness = 50;
-    public int temperature = 50;
+    public int groupAddress = 0; //组地址
+    public int brightness = 50; //亮度
+    public int temperature = 50; // 色温
     public int color = 855638015;
     public String gpName = "";
     public boolean enableCheck=false;

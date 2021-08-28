@@ -17,61 +17,66 @@ import com.telink.TelinkApplication
 class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
         BaseItemDraggableAdapter<ItemTypeGroup, BaseViewHolder>(layoutResId, data){
 
-    var recyclerViewChild : androidx.recyclerview.widget.RecyclerView?=null
+    var recyclerViewChild : RecyclerView?=null
 
     private var adapter: GroupListRecycleViewChildAdapter? = null
 
     override fun convert(helper: BaseViewHolder, itemTypeGroup : ItemTypeGroup?) {
         helper.setText(R.id.device_type_name,itemTypeGroup!!.name)
-        if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.normal_light)){
-            var num:Int?=null
-            var lightNum:Int=0
-            for(i in itemTypeGroup.list!!.indices){
-                if(OtherUtils.isNormalGroup(itemTypeGroup.list[i])){
-                    num=DBUtils.getLightByGroupID(itemTypeGroup.list[i].id).size
-                    lightNum += num
+        when (itemTypeGroup.name) {
+            TelinkApplication.getInstance().getString(R.string.normal_light) -> {
+                var num:Int?=null
+                var lightNum:Int=0
+                for(i in itemTypeGroup.list!!.indices){
+                    if(OtherUtils.isNormalGroup(itemTypeGroup.list[i])){
+                        num=DBUtils.getLightByGroupID(itemTypeGroup.list[i].id).size
+                        lightNum += num
+                    }
                 }
+                helper.setText(R.id.device_type_name,itemTypeGroup.name+"("+lightNum+")")
             }
-            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+lightNum+")")
-        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.rgb_light)){
-            var num:Int?=null
-            var RGBNum:Int=0
-            for(i in itemTypeGroup.list!!.indices){
-                if(OtherUtils.isRGBGroup(itemTypeGroup.list[i])){
-                    num=DBUtils.getLightByGroupID(itemTypeGroup.list[i].id).size
-                    RGBNum += num
+            TelinkApplication.getInstance().getString(R.string.rgb_light) -> {
+                var num:Int?=null
+                var RGBNum:Int=0
+                for(i in itemTypeGroup.list!!.indices){
+                    if(OtherUtils.isRGBGroup(itemTypeGroup.list[i])){
+                        num=DBUtils.getLightByGroupID(itemTypeGroup.list[i].id).size
+                        RGBNum += num
+                    }
                 }
+                helper.setText(R.id.device_type_name,itemTypeGroup.name+"("+RGBNum+")")
             }
-            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+RGBNum+")")
-        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.curtain)){
-            var num:Int?=null
-            var curtainNum:Int=0
-            for(i in itemTypeGroup.list!!.indices){
-                 if(OtherUtils.isCurtain(itemTypeGroup.list[i])){
-                     num=DBUtils.getCurtainByGroupID(itemTypeGroup.list[i].id).size
-                     curtainNum+=num
-                 }
-            }
-            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+curtainNum+")")
-        }else if(itemTypeGroup!!.name==TelinkApplication.getInstance().getString(R.string.relay)){
-            var num:Int?=null
-            var curtainNum:Int=0
-            for(i in itemTypeGroup.list!!.indices){
-                if(OtherUtils.isConnector(itemTypeGroup.list[i])){
-                    num=DBUtils.getRelayByGroupID(itemTypeGroup.list[i].id).size
-                    curtainNum+=num
+            TelinkApplication.getInstance().getString(R.string.curtain) -> {
+                var num:Int?=null
+                var curtainNum:Int=0
+                for(i in itemTypeGroup.list!!.indices){
+                    if(OtherUtils.isCurtain(itemTypeGroup.list[i])){
+                        num=DBUtils.getCurtainByGroupID(itemTypeGroup.list[i].id).size
+                        curtainNum+=num
+                    }
                 }
+                helper.setText(R.id.device_type_name,itemTypeGroup.name+"("+curtainNum+")")
             }
-            helper.setText(R.id.device_type_name,itemTypeGroup!!.name+"("+curtainNum+")")
+            TelinkApplication.getInstance().getString(R.string.relay) -> {
+                var num:Int?=null
+                var curtainNum:Int=0
+                for(i in itemTypeGroup.list!!.indices){
+                    if(OtherUtils.isConnector(itemTypeGroup.list[i])){
+                        num=DBUtils.getRelayByGroupID(itemTypeGroup.list[i].id).size
+                        curtainNum+=num
+                    }
+                }
+                helper.setText(R.id.device_type_name,itemTypeGroup.name+"("+curtainNum+")")
+            }
         }
         if(itemTypeGroup.icon!=0){
             helper.setBackgroundRes(R.id.device_img, itemTypeGroup.icon)
         }
-        recyclerViewChild=helper.getView<androidx.recyclerview.widget.RecyclerView>(R.id.device_type_child_group)
+        recyclerViewChild=helper.getView(R.id.device_type_child_group)
         val layoutmanager = LinearLayoutManager(mContext)
-        layoutmanager.orientation = androidx.recyclerview.widget.LinearLayoutManager.VERTICAL
+        layoutmanager.orientation = LinearLayoutManager.VERTICAL
         recyclerViewChild!!.layoutManager = layoutmanager
-        this.adapter = GroupListRecycleViewChildAdapter(R.layout.group_item_child, itemTypeGroup!!.list)
+        this.adapter = GroupListRecycleViewChildAdapter(R.layout.group_item_child, itemTypeGroup.list)
 
 //        val decoration = DividerItemDecoration(mContext,
 //                DividerItemDecoration
@@ -91,12 +96,12 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
     }
 
 
-    private fun setMove(recyclerViewChild: androidx.recyclerview.widget.RecyclerView) {
+    private fun setMove(recyclerViewChild: RecyclerView) {
         var startPos=0
         var endPos=0
         val list = adapter!!.data
         val onItemDragListener = object : OnItemDragListener {
-            override fun onItemDragStart(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
+            override fun onItemDragStart(viewHolder: RecyclerView.ViewHolder, pos: Int) {
 
                 startPos=pos
                 endPos=0
@@ -104,11 +109,11 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
               //"indexchange--"+"--start:"+pos)
             }
 
-            override fun onItemDragMoving(source: androidx.recyclerview.widget.RecyclerView.ViewHolder, from: Int,
-                                          target: androidx.recyclerview.widget.RecyclerView.ViewHolder, to: Int) {
+            override fun onItemDragMoving(source: RecyclerView.ViewHolder, from: Int,
+                                          target: RecyclerView.ViewHolder, to: Int) {
             }
 
-            override fun onItemDragEnd(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, pos: Int) {
+            override fun onItemDragEnd(viewHolder: RecyclerView.ViewHolder, pos: Int) {
                 //                viewHolder.getItemId();
                 endPos=pos
               //"indexchange--"+"--end:"+pos)
@@ -128,7 +133,7 @@ class GroupListRecycleViewAdapter(layoutResId: Int, data: List<ItemTypeGroup>) :
 
     private fun updateGroupList(list: MutableList<DbGroup>, startPos: Int, endPos: Int) {
 
-        var tempIndex = list[endPos].index
+        val tempIndex = list[endPos].index
 
         if(endPos<startPos){
             for(i in endPos..startPos){

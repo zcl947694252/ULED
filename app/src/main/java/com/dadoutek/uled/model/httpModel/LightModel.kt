@@ -1,9 +1,14 @@
 package com.dadoutek.uled.model.httpModel
 
+import com.blankj.utilcode.util.LogUtils
+import com.dadoutek.uled.model.BodyBias
+import com.dadoutek.uled.model.Light
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.network.bean.LightListBodyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -54,5 +59,22 @@ object LightModel {
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun batchAddorUpdateLight(dbLights: List<DbLight>): Observable<String>? {
+        LogUtils.v("chown ------batchAddorUpdateLight ${LightListBodyBean(dbLights).toString()}")
+        return NetworkFactory.getApi()
+            .updateLights(LightListBodyBean(dbLights))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun remove(idList: List<Int>) :Observable<String>? {
+        return NetworkFactory.getApi()
+            .deleteLights(BodyBias(idList))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
     }
 }

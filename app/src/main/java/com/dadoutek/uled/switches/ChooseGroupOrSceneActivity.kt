@@ -118,7 +118,7 @@ class ChooseGroupOrSceneActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItem
             }
             when {
                 isGroup -> {
-                    LogUtils.v("chown ==- --=====  ${groupList[currentPosition].meshAddr}")
+//                    LogUtils.v("chown ==- --=====  ${groupList[currentPosition].meshAddr}")
                     setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, groupList[currentPosition]))
                 }
                 else -> setResult(Activity.RESULT_OK, Intent().putExtra(Constant.EIGHT_SWITCH_TYPE, sceneList[currentPosition]))

@@ -9,7 +9,7 @@ import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
-import androidx.fragment.app.Fragment
+//import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
@@ -26,14 +26,14 @@ import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.group.TypeListAdapter
 import com.dadoutek.uled.model.Cmd
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.SharedPreferencesHelper
+//import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.httpModel.UserModel
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.router.bean.RouteGroupingOrDelBean
 import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
-import com.dadoutek.uled.tellink.TelinkLightService
+//import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.BluetoothConnectionFailedDialog
 import com.dadoutek.uled.util.PopUtil
 import com.dadoutek.uled.util.StringUtils
@@ -183,8 +183,8 @@ open class BaseFragment : androidx.fragment.app.Fragment() {
         popMain.isTouchable = true // 设置PopupWindow可触摸补充：
         popMain.isOutsideTouchable = false
 
-        val recyclerView = popView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.pop_recycle)
-        recyclerView.layoutManager = LinearLayoutManager(context, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        val recyclerView = popView.findViewById<RecyclerView>(R.id.pop_recycle)
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapterType
 
         adapterType?.bindToRecyclerView(recyclerView)
@@ -192,8 +192,8 @@ open class BaseFragment : androidx.fragment.app.Fragment() {
         val dialogGroupTypeArrow = popView.findViewById<ImageView>(R.id.dialog_group_type_arrow)
         val dialogGroupCancel = popView.findViewById<TextView>(R.id.dialog_group_cancel)
         val dialogGroupOk = popView.findViewById<TextView>(R.id.dialog_group_ok)
-        dialogGroupType = popView.findViewById<TextView>(R.id.dialog_group_type)
-        dialogGroupName = popView.findViewById<TextView>(R.id.dialog_group_name)
+        dialogGroupType = popView.findViewById(R.id.dialog_group_type)
+        dialogGroupName = popView.findViewById(R.id.dialog_group_name)
 
         dialogGroupTypeArrow.setOnClickListener {
             if (recyclerView.visibility == View.GONE)
@@ -285,13 +285,13 @@ open class BaseFragment : androidx.fragment.app.Fragment() {
     //打开基类的连接状态变化监听
     private fun enableConnectionStatusListener() {
         //先取消，这样可以确保不会重复添加监听
-        TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
-        TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
     }
 
     //关闭基类的连接状态变化监听
     private fun disableConnectionStatusListener() {
-        TelinkLightApplication.getApp()?.removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
+        TelinkLightApplication.getApp().removeEventListener(DeviceEvent.STATUS_CHANGED, StatusChangedListener)
     }
 
     private val StatusChangedListener = EventListener<String?> { event ->

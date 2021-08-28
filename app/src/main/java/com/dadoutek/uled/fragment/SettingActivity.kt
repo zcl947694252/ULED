@@ -14,10 +14,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.PopupWindow
-import android.widget.TextView
+import android.widget.*
 import com.blankj.utilcode.util.CleanUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -96,6 +93,7 @@ class SettingActivity : TelinkBaseActivity() {
                                 adapter.notifyDataSetChanged()
                             }, {
                                 Constant.IS_OPEN_AUXFUN = !Constant.IS_OPEN_AUXFUN
+                                Toast.makeText(this,getString(R.string.config_fail),Toast.LENGTH_SHORT).show()
                                 adapter.notifyDataSetChanged()
                                 ToastUtils.showShort(it.message)
                             })

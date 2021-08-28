@@ -3,7 +3,7 @@ package com.dadoutek.uled.scene
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ClipData
+//import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
-import android.util.Log
+//import android.util.Log
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.PopupWindow
-import com.app.hubert.guide.util.LogUtil
+//import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
@@ -67,7 +67,6 @@ import kotlin.collections.ArrayList
 class NewSceneSetAct : TelinkBaseActivity() {
     private var brightness: Int = 0
     private var whiteLight: Int = 0
-    private var curtainOnOffRange: Int = 100
     private var sceneGroupAdapter: SceneGroupAdapter? = null
     private var rgbGradientId: Int = 1
     private var resId: Int = R.drawable.icon_out
@@ -90,6 +89,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private var sceneEditListAdapter: SceneEditListAdapter? = null
     private var editSceneName: String? = null
     private val groupMeshAddrArrayList = java.util.ArrayList<Int>()
+    private var firstLoad : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,8 +120,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun makePop() {
         getModeData()
-
-        var popView = LayoutInflater.from(this).inflate(R.layout.pop_rgb_mode_list, null)
+        val popView = LayoutInflater.from(this).inflate(R.layout.pop_rgb_mode_list, null)
         rgbRecyclerView = popView.findViewById(R.id.pop_scene_mode_recycle)
         rgbRecyclerView?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         rgbRecyclerView?.adapter = this.rgbSceneModeAdapter
@@ -150,16 +149,16 @@ class NewSceneSetAct : TelinkBaseActivity() {
         buildInModeList.clear()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
         for (i in 1..11) {
-            var item = ItemRgbGradient()
+            val item = ItemRgbGradient()
             item.id = i
             item.gradientType = 2//渐变类型 1：自定义渐变  2：内置渐变
             item.name = presetGradientList[i - 1]
-            buildInModeList?.add(item)
+            buildInModeList.add(item)
         }
 
         diyGradientList = DBUtils.diyGradientList
         diyGradientList.forEach {
-            var item = ItemRgbGradient()
+            val item = ItemRgbGradient()
             item.id = it.id.toInt()
             item.name = it.name
             item.isDiy = true
@@ -406,10 +405,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 showGroupList[position].isOn = false
             showGroupList[position].isEnableBright = false
             showGroupList[position].isEnableWhiteBright = false
-            cb_bright.isChecked = false
-            cb_bright.isEnabled = false
-            cb_white_light.isChecked = false
-            cb_white_light.isEnabled = false
+
             dot_rgb.isEnabled = false
             param = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0C, 0x00, Opcode.CURTAIN_PACK_END)
             // brightness = 0
@@ -420,14 +416,11 @@ class NewSceneSetAct : TelinkBaseActivity() {
             isOpen = true
             showGroupList[position].isEnableBright = true
             showGroupList[position].isEnableWhiteBright = true
-            cb_bright.isChecked = true
-            cb_bright.isEnabled = true
-            cb_white_light.isChecked = true
-            cb_white_light.isEnabled = true
+
             dot_rgb.isEnabled = true
             param = byteArrayOf(Opcode.CURTAIN_PACK_START, 0x0A, 0x00, Opcode.CURTAIN_PACK_END)
         }
-        val addr = showGroupList[position].groupAddress
+//        val addr = showGroupList[position].groupAddress
         if (!Constant.IS_ROUTE_MODE)
             Thread { //chown
                 if (OtherUtils.isCurtain(DBUtils.getGroupByMeshAddr(showGroupList[position].groupAddress))){
@@ -462,7 +455,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
         val addr = showGroupList[position].groupAddress
         if (Constant.IS_ROUTE_MODE) {
-            var isEnableBright = if (showGroupList[position].isEnableBright) 1 else 0
+            val isEnableBright = if (showGroupList[position].isEnableBright) 1 else 0
             routeConfigBriGpOrLight(addr, 97, brightness, isEnableBright, "configBri")
         } else {
             val params: ByteArray = byteArrayOf(brightness.toByte())
@@ -476,10 +469,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
             showGroupList[position].isEnableWhiteBright -> {//enableWhiteLight(false)
                 whiteLight = 0
                 showGroupList[position].isEnableWhiteBright = false
+
             }
             else -> {//enableWhiteLight(true)
                 whiteLight = showGroupList[position].temperature
                 showGroupList[position].isEnableWhiteBright = true
+
             }
         }
         val addr = showGroupList[position].groupAddress
@@ -495,7 +490,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private fun close(position: Int) {
         isOpen = false
         if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-            routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 0, "newScene")//0关1开
+            routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, 0, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = false
             sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
@@ -506,7 +501,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
     private fun open(position: Int) {
         isOpen = true
         if (Constant.IS_ROUTE_MODE) {//meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-            routeOpenOrCloseBase(showGroupList[position]!!.groupAddress, 97, 1, "newScene")//0关1开
+            routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, 1, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = true
             sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
@@ -518,12 +513,12 @@ class NewSceneSetAct : TelinkBaseActivity() {
     open fun routeConfigWhiteGpOrLight(meshAddr: Int, deviceType: Int, white: Int, isWhiteBright: Boolean, serId: String) {
         LogUtils.v("zcl----------- zcl-----------发送路由调白色参数-------$white-------")
         val group = DBUtils.getGroupByID(meshAddr.toLong())
-        var gpColor = group?.color ?: 0
+        val gpColor = group?.color ?: 0
         val red = (gpColor and 0xff0000) shr 16
         val green = (gpColor and 0x00ff00) shr 8
         val blue = gpColor and 0x0000ff
-        var color = (white shl 24) or (red shl 16) or (green shl 8) or blue
-        var isEnableWhiteBright = if (isWhiteBright) 1 else 0
+        val color = (white shl 24) or (red shl 16) or (green shl 8) or blue
+        val isEnableWhiteBright = if (isWhiteBright) 1 else 0
         RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
@@ -595,7 +590,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 else -> {
                     try {
                         val color = data?.getIntExtra("color", 0)
-                        showGroupList!![requestCode].color = color!!
+                        showGroupList[requestCode].color = color!!
                         sceneGroupAdapter?.notifyItemChanged(requestCode)
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -605,7 +600,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
     }
 
-    private var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { adapter, view, position ->
+    private var onItemClickListenerCheck: BaseQuickAdapter.OnItemClickListener = BaseQuickAdapter.OnItemClickListener { _, _, position ->
         changeCheck(position)
     }
 
@@ -655,13 +650,16 @@ class NewSceneSetAct : TelinkBaseActivity() {
         val layoutmanager = LinearLayoutManager(this)
         layoutmanager.orientation = LinearLayoutManager.VERTICAL
         scene_gp_detail_list.layoutManager = layoutmanager
-        scene_gp_detail_list?.addItemDecoration(SpacesItemDecorationScene(40))
+        if (!firstLoad){
+            scene_gp_detail_list?.addItemDecoration(SpacesItemDecorationScene(40))
+            firstLoad = true
+        }
         scene_gp_detail_list.itemAnimator!!.changeDuration = 0
         if (sceneGroupAdapter?.stompRecevice != null)
             unregisterReceiver(sceneGroupAdapter?.stompRecevice)
         sceneSetGpAdapter()
         registBrocaster()
-        //sceneGroupAdapter?.initStompReceiver()
+        //sceneGroupAdapter?.initStompReceiver() // chown chown chown chown
 
         sceneGroupAdapter?.onItemChildClickListener = onItemChildClickListener
     }
@@ -778,7 +776,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun updateSceneName() {
-        val s = OtherUtils.getResourceName(resId!!, this@NewSceneSetAct).split("/")[1]
+        val s = OtherUtils.getResourceName(resId, this@NewSceneSetAct).split("/")[1]
         RouterModel.routeUpdateSceneName((dbScene?.id ?: 0).toInt(), editSceneName!!, s)
                 ?.subscribe({
                     when (it.errorCode) {
@@ -903,6 +901,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
         dbScene?.let {
             DBUtils.saveScene(dbScene!!, false)
         }
+        LogUtils.v("chown -- 同步数据")
+
         SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallbackGet)
         hideLoadingDialog()
         finish()
@@ -955,6 +955,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 sceneActions.gradientSpeed = itemGroup.gradientSpeed
                 sceneActions.gradientName = itemGroup.gradientName
                 sceneActions.curtainOnOffRange = itemGroup.curtainOnOffRange
+//                LogUtils.v("chown --====================================itemGroup.curtainOnOffRange ${itemGroup.curtainOnOffRange}")
             }
         } else {
             sceneActions.isEnableBright = item.isEnableBright
@@ -964,6 +965,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             sceneActions.curtainOnOffRange = item.curtainOnOffRange
             sceneActions.setColor(item.color)
             LogUtils.v("zcl--白色-${(item.color and 0xff000000.toInt()) shr 24}--亮度${item.brightness}---------色温${item.temperature}----")
+//            LogUtils.v("chown --====================================item.curtainOnOffRange ${item.curtainOnOffRange}")
+
         }
         return sceneActions
     }
@@ -1035,6 +1038,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
 
     private fun getSceneId(): Long {
         val list = DBUtils.sceneList
+        LogUtils.v("chown --- hello world  Dbutils.sceneList $list")
         val idList = java.util.ArrayList<Int>()
         for (i in list.indices)
             idList.add(list[i].id!!.toInt())
@@ -1165,7 +1169,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 green = 255
                 blue = 255
             }
-            var w = color shr 24
+            val w = color shr 24
             val range = list[i].curtainOnOffRange.toByte() //chown
             val connectDevice = TelinkApplication.getInstance().connectDevice
             connectDevice?.let {
@@ -1221,7 +1225,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         notCheckedGroupList = ArrayList()
         initChangeState()
 
-        if (showGroupList!!.size == 0) {
+        if (showGroupList.size == 0) {
             ToastUtils.showLong(R.string.add_scene_gp_tip)
             return false
         }
@@ -1261,24 +1265,24 @@ class NewSceneSetAct : TelinkBaseActivity() {
             hideLoadingDialog()
             LogUtils.v("zcl-----------收到路由添加通知-------$routerScene")
             when {
-                routerScene?.finish && routerScene?.status == 0 -> {//-1 全部失败 1 部分成功
+                routerScene.finish && routerScene.status == 0 -> {//-1 全部失败 1 部分成功
                     ToastUtils.showShort(getString(R.string.config_success))
                     disposableRouteTimer?.dispose()
                     hideLoadingDialog()
                     afterSaveScene()
                     getNewScenes()
                 }
-                else -> ToastUtils.showShort(routerScene?.msg)
+                else -> ToastUtils.showShort(routerScene.msg)
             }
         }
     }
 
     override fun tzRouteUpdateScene(cmdBodyBean: CmdBodyBean) {
-        if (cmdBodyBean?.ser_id == "updateScene") {
+        if (cmdBodyBean.ser_id == "updateScene") {
             hideLoadingDialog()
             LogUtils.v("zcl-----------收到路由添加通知-------$cmdBodyBean")
             when {
-                cmdBodyBean?.finish && cmdBodyBean?.status == 0 -> {//-1 全部失败 1 部分成功
+                cmdBodyBean.finish && cmdBodyBean.status == 0 -> {//-1 全部失败 1 部分成功
                     ToastUtils.showShort(getString(R.string.config_success))
                     disposableRouteTimer?.dispose()
                     hideLoadingDialog()

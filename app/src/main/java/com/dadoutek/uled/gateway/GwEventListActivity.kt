@@ -118,7 +118,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         toolbar.setNavigationIcon(R.drawable.icon_return)
         if (TelinkLightApplication.getApp().isConnectGwBle)
             image_bluetooth.setImageResource(R.drawable.cloud)
-        var moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material);
+        val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material);
         if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP);
             toolbar.overflowIcon = moreIcon;
@@ -148,7 +148,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 dbGw?.name = trim
                 toolbarTv.text = trim
                 DBUtils.saveGateWay(dbGw!!, false)
-                renameDialog?.dismiss()
+                renameDialog.dismiss()
             }
         }
     }
@@ -218,7 +218,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                             { s: String ->
                                 dbGw!!.version = s
                                 DBUtils.saveGateWay(dbGw!!, false)
-                                var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
+                                val isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
                                 if (isBoolean) {
                                     transformView()
                                 } else {
@@ -378,13 +378,13 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
     private fun sendGwResetFactory(frist: Int) {
         isDelete = true
-        var labHeadPar = byteArrayOf(frist.toByte(), 0, 0, 0, 0, 0, 0, 0)
+        val labHeadPar = byteArrayOf(frist.toByte(), 0, 0, 0, 0, 0, 0, 0)
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_REST_FACTORY, dbGw?.meshAddr ?: 0, labHeadPar, "1")
     }
 
     private fun configNet() {
         //重新配置  intent = Intent(this@GwDeviceDetailActivity, GwEventListActivity::class.java)
-        var intent = Intent(this@GwEventListActivity, GwLoginActivity::class.java)
+        val intent = Intent(this@GwEventListActivity, GwLoginActivity::class.java)
         SharedPreferencesHelper.putBoolean(this, IS_GW_CONFIG_WIFI, true)
         intent.putExtra("data", dbGw)
         startActivity(intent)
@@ -507,7 +507,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         val yearH = (year shr 8) and (0xff)
         val yearL = year and (0xff)
 
-        var params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+        val params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
                 yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
         LogUtils.v("zcl-----------发送时区-------地址${dbGw?.meshAddr}")
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
@@ -836,13 +836,13 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     private fun getWeekStr(week: Int): String {
-        var tmpWeek = week
+        val tmpWeek = week
         val sb = StringBuilder()
         when (tmpWeek) {
             0b10000000 -> sb.append(getString(R.string.every_day))
             0b00000000 -> sb.append(getString(R.string.only_one))
             else -> {
-                var list = mutableListOf(
+                val list = mutableListOf(
                         WeekBean(getString(R.string.monday), 1, (tmpWeek and MONDAY) != 0),
                         WeekBean(getString(R.string.tuesday), 2, (tmpWeek and TUESDAY) != 0),
                         WeekBean(getString(R.string.wednesday), 3, (tmpWeek and WEDNESDAY) != 0),
@@ -850,10 +850,10 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                         WeekBean(getString(R.string.friday), 5, (tmpWeek and FRIDAY) != 0),
                         WeekBean(getString(R.string.saturday), 6, (tmpWeek and SATURDAY) != 0),
                         WeekBean(getString(R.string.sunday), 7, (tmpWeek and SUNDAY) != 0))
-                for (i in 0 until list!!.size) {
-                    var weekBean = list!![i]
+                for (i in 0 until list.size) {
+                    val weekBean = list[i]
                     if (weekBean.selected) {
-                        if (i == list!!.size - 1)
+                        if (i == list.size - 1)
                             sb.append(weekBean.week)
                         else
                             sb.append(weekBean.week).append(",")
@@ -865,7 +865,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     private fun getOnlyOne(): MutableList<String> {
-        var weekDay = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1) {
+        val weekDay = when (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1) {
             0 -> getString(R.string.sunday)
             1 -> getString(R.string.monday)
             2 -> getString(R.string.tuesday)
@@ -895,7 +895,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                     }
                 }
 
-        var meshAddress = dbGw?.meshAddr ?: 0
+        val meshAddress = dbGw?.meshAddr ?: 0
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
         //从第八位开始opcode, 设备meshAddr  参数11-12-13-14 15-16-17-18
         val calendar = Calendar.getInstance()
@@ -909,7 +909,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
 
         if (!TelinkLightApplication.getApp().isConnectGwBle) {
-            var gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
+            val gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
                     opcodeHead, 0x11, 0x02,
                     dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
                     dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0, 0, 0)
@@ -924,7 +924,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             gattBody.tagName = dbGwTag.tagName
             sendToServer(gattBody)
         } else {
-            var labHeadPar = byteArrayOf(dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),//标签开与关
+            val labHeadPar = byteArrayOf(dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),//标签开与关
                     dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
             TelinkLightService.Instance()?.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
             LogUtils.v("zcl-----------发送命令0xf6-------")
@@ -976,12 +976,12 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             GlobalScope.launch(Dispatchers.Main) {
                 if (currentTime - lastTime < 400)
                     delay(400)
-                var paramer = byteArrayOf(gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
+                val paramer = byteArrayOf(gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0)
                 TelinkLightService.Instance()?.sendCommandResponse(opcodedelete, dbGw?.meshAddr ?: 0, paramer, "1")
             }
         } else {
             setTimerDelay(gwTagBean, currentTime, 6500)
-            var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodedelete, 0x11, 0x02,
+            val labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodedelete, 0x11, 0x02,
                     gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
             LogUtils.v("zcl-----------发送到服务器标签列表删除标签-------$labHeadPar")
             val s = Base64Utils.encodeToStrings(labHeadPar)
@@ -1011,7 +1011,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
     private fun addNewTag() {
-        var list = if (dbGw?.type == 0)
+        val list = if (dbGw?.type == 0)
             listOne
         else
             listTwo
@@ -1111,7 +1111,7 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         if (GW_GATT_LABEL_SWITCH == serId.toInt()) {
             runOnUiThread { hideLoadingDialog() }
             disposableTimer?.dispose()
-        } else if (GW_GATT_DELETE_LABEL == serId?.toInt()) {
+        } else if (GW_GATT_DELETE_LABEL == serId.toInt()) {
             runOnUiThread { deleteSuceess() }
         }
     }

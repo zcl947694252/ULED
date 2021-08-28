@@ -6,7 +6,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.DeviceType
 
 class CWLightFragmentList : BaseGroupFragment() {
-    override fun setIntentDeviceType(): String? {
+    override fun setIntentDeviceType(): String {
         return "cw_light"
     }
 

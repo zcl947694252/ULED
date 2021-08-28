@@ -111,7 +111,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
     }
 
     private fun makePop() {
-        var popView = LayoutInflater.from(this).inflate(R.layout.pop_region_check, null)
+        val popView = LayoutInflater.from(this).inflate(R.layout.pop_region_check, null)
         poptitle = popView.findViewById(R.id.region_dialog_me_net_num)
         poptitleAuthorize = popView.findViewById(R.id.region_dialog_authorize_net_num)
         popRecycle = popView.findViewById(R.id.region_dialog_me_recycleview)
@@ -240,11 +240,13 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
                 isChecked -> {
                     Constant.isDebug = true
                     SharedPreferencesUtils.setTestType(true)
+                    NetworkFactory.getOtherApi()
                     tx_test_version.text = "测试版"
                 }
                 else -> {
                     Constant.isDebug = false
                     SharedPreferencesUtils.setTestType(true)
+                    NetworkFactory.getOtherApi()
                     tx_test_version.text = "正式版"
                 }
             }

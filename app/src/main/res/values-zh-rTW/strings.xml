@@ -363,6 +363,7 @@
 
     <!-- Activity Labels -->
     <string name="app_name">优乐迪</string>
+    <string name="app_another_name">优乐迪测试版</string>
 
     <string name="device_setting_temperature">色温:%1$s</string>
     <!-- GroupSchema Setting -->

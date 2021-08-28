@@ -113,8 +113,8 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         renameConfirm = popReNameView?.findViewById(R.id.pop_rename_confirm)
 
         renameDialog = Dialog(this)
-        renameDialog!!.setContentView(popReNameView!!)
-        renameDialog!!.setCanceledOnTouchOutside(false)
+        renameDialog.setContentView(popReNameView!!)
+        renameDialog.setCanceledOnTouchOutside(false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -197,8 +197,8 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
     }
 
@@ -208,24 +208,28 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 .setPositiveButton(android.R.string.ok) { _, _ ->
                     currentSw = DBUtils.getSwitchByMacAddr(macAddress)
                     currentSw?.let {
-                        if (!Constant.IS_ROUTE_MODE) {
+                        if (!Constant.IS_ROUTE_MODE /*&& TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.isConnected == true*/) { //chown 添加了奇怪的条件
                             showLoadingDialog(getString(R.string.please_wait))
-                            Commander.resetDevice(currentSw!!.meshAddr, true)
+                            LogUtils.v("chown deleteSwitch --- ${currentSw!!.meshAddr}")
+                            Commander.resetDevice(currentSw!!.meshAddr)
                                     .subscribe(
                                             { // deleteData()
+                                                LogUtils.v("chown -- deleteSwtich 订阅成功onNext")
+                                                deleteData()
                                             }, {
-                                        GlobalScope.launch(Dispatchers.Main) {
-                                            /*    showDialogHardDelete?.dismiss()
-                                              showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                                      .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                          showLoadingDialog(getString(R.string.please_wait))
-                                                          deleteData()
-                                                      }
-                                                      .setNegativeButton(R.string.btn_cancel, null)
-                                                      .show()   */
-                                        }
+                                                    GlobalScope.launch(Dispatchers.Main) {
+                                                    /*    showDialogHardDelete?.dismiss()
+                                                      showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                                              .setPositiveButton(android.R.string.ok) { _, _ ->
+                                                                  showLoadingDialog(getString(R.string.please_wait))
+                                                                  deleteData()
+                                                              }
+                                                              .setNegativeButton(R.string.btn_cancel, null)
+                                                              .show()   */
+                                                        hideLoadingDialog()
+                                                        ToastUtils.showShort(getString(R.string.delete_switch_fail))
+                                                }
                                     })
-                            deleteData()
                         } else {
                             routerDeviceResetFactory(currentSw!!.macAddr, currentSw!!.meshAddr, 99, "swFactory")
                         }
@@ -234,6 +238,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                 }
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
+
     }
 
     override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {

@@ -53,8 +53,6 @@ public class InputRGBColorDialog extends AlertDialog implements View.OnClickList
         greenEditText = (EditText) findViewById(R.id.rgb_green);
         blueEditText = (EditText) findViewById(R.id.rgb_blue);
 
-
-
         okBtn = (ConstraintLayout) findViewById(R.id.okBtn);
         cancelBtn = (ConstraintLayout) findViewById(R.id.cancelBtn);
 

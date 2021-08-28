@@ -310,17 +310,19 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         switchData.addAll(DBUtils.getAllSwitch())
 
         setScanningMode(true)
+        LogUtils.v("chown -- 同步数据")
+
         SyncDataPutOrGetUtils.syncPutDataStart(TelinkLightApplication.getApp(), object : SyncCallback {
             override fun start() {
-                LogUtils.v("zcl____同步开关________start")
+//                LogUtils.v("zcl____同步开关________start")
             }
 
             override fun complete() {
-                LogUtils.v("zcl____同步开关________complete")
+//                LogUtils.v("zcl____同步开关________complete")
             }
 
             override fun error(msg: String?) {
-                LogUtils.v("zcl____同步开关________error")
+//                LogUtils.v("zcl____同步开关________error")
             }
         })
         isEmptyDevice()

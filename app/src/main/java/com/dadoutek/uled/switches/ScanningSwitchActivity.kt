@@ -7,6 +7,7 @@ import android.bluetooth.le.ScanFilter
 import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -429,12 +430,15 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
         closeAnimation()
     }
 
+    /**
+     * 给扫描配置过滤条件
+     */
     private fun getSwitchFilters(): MutableList<ScanFilter> {
         val devicetype = intent.getIntExtra("deviceType",0)
-        LogUtils.v("================chown devicetype:$devicetype==================")
+//        LogUtils.v("================chown devicetype:$devicetype==================")
         val scanFilters = ArrayList<ScanFilter>()
-//        Log.d("Chown", "MobilePhoneBrand:"+ Build.BRAND)
-        if (Build.BRAND.contains("samsung") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        Log.d("Chown", "MobilePhoneBrand:"+ Build.BRAND)
+        if (/*Build.BRAND.contains("samsung") && */Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             scanFilters.add(ScanFilter.Builder().setManufacturerData(Constant.VENDOR_ID,
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0x11.toByte()),
                 byteArrayOf(0, 0, 0, 0, 0, 0, 0xFF.toByte())).build())

@@ -284,7 +284,15 @@ object DBUtils {
 
     fun getAllRGBLight(): ArrayList<DbLight> {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder().where(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_RGB)).build()
-        var arrayList: ArrayList<DbLight> = arrayListOf()
+        val arrayList: ArrayList<DbLight> = arrayListOf()
+        arrayList.addAll(query.list())
+        return arrayList
+    }
+
+    fun getLightChanged(tableName: String, type: String) : ArrayList<DbDataChange> {
+        val query = DaoSessionInstance.getInstance().dbDataChangeDao.queryBuilder().where(DbDataChangeDao.Properties.TableName.eq(tableName))
+            .where(DbDataChangeDao.Properties.Type.eq(type)).build()
+        val arrayList: ArrayList<DbDataChange> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }
@@ -820,7 +828,6 @@ object DBUtils {
     fun saveSwitch(db: DbSwitch, isFromServer: Boolean, type: Int = 3, keys: String = "[]") {
         val existList = DaoSessionInstance.getInstance().dbSwitchDao.queryBuilder().where(DbSwitchDao.Properties.MeshAddr.eq(db.meshAddr)).list()
         if (existList.size > 0 && existList[0].macAddr == db.macAddr) {//
-            LogUtils.v("你在保存的时候，已经存在在数据了")
             //如果该mesh地址的数据已经存在，就直接修改
             db.id = existList[0].id
         }
@@ -1123,6 +1130,8 @@ object DBUtils {
     fun updateDbchange(change: DbDataChange) {
         DaoSessionInstance.getInstance().dbDataChangeDao.update(change)
     }
+
+
 
     /********************************************删除 */
 
@@ -1547,6 +1556,8 @@ object DBUtils {
         dataChange.keys = keys
         DaoSessionInstance.getInstance().dbDataChangeDao.insert(dataChange)
     }
+
+
 
 
     fun getSensorByMeshAddr(meshAddr: Int): DbSensor? {

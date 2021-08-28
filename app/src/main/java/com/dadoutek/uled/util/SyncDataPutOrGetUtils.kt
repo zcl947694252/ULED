@@ -2,12 +2,17 @@ package com.dadoutek.uled.util
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.transition.Scene
 import android.util.Log
+import androidx.annotation.MainThread
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
+import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.intf.SyncCallback
+import com.dadoutek.uled.model.BodyBias
 import com.dadoutek.uled.model.Constant
+import com.dadoutek.uled.model.Light
 import com.dadoutek.uled.model.dbModel.*
 import com.dadoutek.uled.model.httpModel.*
 import com.dadoutek.uled.model.SharedPreferencesHelper
@@ -15,6 +20,8 @@ import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkObserver
 import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.network.bean.GradientBody
+import com.dadoutek.uled.network.bean.SceneBody
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.google.gson.Gson
 import com.mob.tools.utils.DeviceHelper
@@ -22,22 +29,110 @@ import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import okhttp3.MediaType
 import okhttp3.RequestBody
+import retrofit2.http.Body
+import java.lang.Thread.sleep
 
-
+/**
+ * chown 改 2021.8.27
+ */
 class SyncDataPutOrGetUtils {
 
     companion object {
 
+        val dbLights : ArrayList<DbLight> = ArrayList() //
+        val delDbLights: ArrayList<Int> = ArrayList() //
+        val dbGroups : ArrayList<DbGroup> = ArrayList() //
+        val delDbGroups : ArrayList<Int> = ArrayList() //
+        val dbScenes : ArrayList<SceneBody> = ArrayList() //
+        val delDbScenes : ArrayList<Int> = ArrayList() //
+        val connectors : ArrayList<DbConnector> = ArrayList() //
+        val delConnectors : ArrayList<Int> = ArrayList() //
+        val switchs : ArrayList<DbSwitch> = ArrayList() //
+        val delSwitchs : ArrayList<Int> = ArrayList() //
+        val sensors : ArrayList<DbSensor> = ArrayList() //
+        val delSensors : ArrayList<Int> = ArrayList() //
+        val curtains : ArrayList<DbCurtain> = ArrayList() //
+        val delCurtains : ArrayList<Int> = ArrayList() //
+        val gradients : ArrayList<GradientBody> = ArrayList() //
+        val delGradients : ArrayList<Int> = ArrayList() //
+        val observableList = ArrayList<Observable<String>>() //所有的被观察者列表
+        private fun addtoObservable() {
+            if (dbGroups.size>0)
+                GroupMdodel.batchAddOrUpdateGp2(dbGroups)?.let {
+                    observableList.add(it)
+                }
+            if (delDbGroups.size>0)
+                GroupMdodel.remove(delDbGroups)?.let {
+                    observableList.add(it)
+                }
+            if (dbLights.size>0)
+                LightModel.batchAddorUpdateLight(dbLights)?.let {
+                    observableList.add(it)
+                }
+            if (delDbLights.size>0)
+                LightModel.remove(delDbLights)?.let {
+                    observableList.add(it)
+                }
+            if (dbScenes.size>0)
+                SceneModel.batchAddOrUpdateScene(dbScenes)?.let {
+                    observableList.add(it)
+                }
+            if (delDbScenes.size>0)
+                SceneModel.remove(delDbScenes)?.let {
+                    observableList.add(it)
+                }
+            if (connectors.size>0)
+                ConnectorModel.batchAddOrUpdateConnector(connectors)?.let {
+                    observableList.add(it)
+                }
+            if (delConnectors.size>0)
+                ConnectorModel.remove(delConnectors)?.let {
+                    observableList.add(it)
+                }
+            if (switchs.size>0)
+                SwitchMdodel.batchAddOrUpdateSwitch(switchs)?.let {
+                    observableList.add(it)
+                }
+            if (delSwitchs.size>0)
+                SwitchMdodel.remove(delSwitchs)?.let {
+                    observableList.add(it)
+                }
+            if (sensors.size>0)
+                SensorMdodel.batchAddOrUpdateSensor(sensors)?.let {
+                    observableList.add(it)
+                }
+            if (delSensors.size>0)
+                SensorMdodel.remove(delSensors)?.let {
+                    observableList.add(it)
+                }
+            if (curtains.size>0)
+                CurtainMdodel.batchAddOrUpdateCurtain(curtains)?.let {
+                    observableList.add(it)
+                }
+            if (delSwitchs.size>0)
+                CurtainMdodel.remove(delSwitchs)?.let {
+                    observableList.add(it)
+                }
+            if (gradients.size>0)
+                GradientModel.batchAddOrUpdateGradient(gradients)?.let {
+                    observableList.add(it)
+                }
+            if (delGradients.size>0)
+                GradientModel.remove(delGradients)?.let {
+                    observableList.add(it)
+                }
+        }
         /********************************同步数据之上传数据 */
+        @SuppressLint("CheckResult")
         @Synchronized
         fun syncPutDataStart(context: Context, syncCallback: SyncCallback) {
             Thread {
                 val dbDataChangeList = DBUtils.dataChangeAll //获取所有改变的数据
+
+                //dbDataChangeLightList
                 val dbUser = DBUtils.lastUser //获取最后一个用户信息
                 if (dbDataChangeList.isEmpty()) {
                     GlobalScope.launch(Dispatchers.Main) {
@@ -46,38 +141,43 @@ class SyncDataPutOrGetUtils {
                     return@Thread
                 }
 
-                val observableList = ArrayList<Observable<String>>() //所有的被观察者列表
 
                 //创建主线程的协程 开始同步 看来得看具体的实现，baseActivity中是直接显示一个同步的dialog
                 GlobalScope.launch(Dispatchers.Main) {
                     syncCallback.start()
                 }
-//                LogUtils.v("zcl得删除添加表$dbDataChangeList")
 
-                for (data in dbDataChangeList) {
+                for (data in dbDataChangeList) { // 此方法不可取，在changed东西太多的时候会开太多线程直接挂掉
                     data.changeId ?: break
                     //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
-                    data?.let {
-                        var observable: Observable<String>? = this.sendDataToServer(data.tableName,
-                                data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "")
-                        observable?.let { observableList.add(it) }
-                    }
+                    /*data?.let {
+                        var observable: Observable<String>? = this.*/sendDataToServer(data.tableName,
+                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "")
+//                        observable?.let { observableList.add(it) }
+//                    }
                 }
 
+                addtoObservable()
+                LogUtils.v("chown ----------observableList------------ ${observableList.size}")
                 val observables = arrayOfNulls<Observable<String>>(observableList.size)
                 observableList.toArray(observables)
 
+                LogUtils.v("chown ------------observables-----toString----- ${observables.size}-- ${observables.toString()}")
+
+
                 if (observables.isNotEmpty()) {
+                    LogUtils.v("chown ------------observables.isNotEmpty   observables.isNotEmpty   observables.isNotEmpty")
                     observables.forEach {
                         it!!.subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread()).subscribe({
-                                    LogUtils.v("zcl合并----------正确-$it-------")
+                                      LogUtils.v("chown ==================================== do do do do do  $it")
                                 }, {
-                                    LogUtils.v("zcl合并-----------错误-------$it")
                                 })
                     }
                     Observable.mergeArrayDelayError(*observables)
-                            .subscribe(object : NetworkObserver<String?>() {
+                        .subscribeOn(Schedulers.io()) // chown
+                        .observeOn(AndroidSchedulers.mainThread()) /// chown
+                            .subscribe(object : NetworkObserver<String?>() {// 显示是这一行中奔溃
                                 override fun onComplete() {
                                     GlobalScope.launch(Dispatchers.Main) {
                                         syncCallback.complete()
@@ -95,29 +195,53 @@ class SyncDataPutOrGetUtils {
                                 }
                             })
                 } else {
+                    LogUtils.v("chown ------------else Complete------==============--=")
+
                     GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
                     }
                 }
             }.start()
+            dbLights.clear()
+            delDbLights.clear()
+            dbGroups.clear()
+            delDbGroups.clear()
+            dbScenes.clear()
+            delDbScenes.clear()
+            connectors.clear()
+            delConnectors.clear()
+            switchs.clear()
+            delSwitchs.clear()
+            sensors.clear()
+            delSensors.clear()
+            curtains.clear()
+            delCurtains.clear()
+            gradients.clear()
+            delGradients.clear()
+            observableList.clear()
         }
 
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
-                                     token: String, id: Long, switchType: Int, keys: String): Observable<String>? {
+                                     token: String, id: Long, switchType: Int, keys: String) {
             if (changeId != null) {
 //                LogUtils.v("zcl", "zcl**tableName****$tableName")
                 when (tableName) {
                     "DB_GROUP" -> {
+                        val group = DBUtils.getGroupByID(changeId)
                         when (type) {
                             Constant.DB_ADD -> {// 添加token lastReginID
-                                val group = DBUtils.getGroupByID(changeId)
-                                return group?.let { GroupMdodel.add(/*token,*/ it, /*group.belongRegionId, */id, changeId) }!!
+                                group?.let {
+                                    dbGroups.add(group)
+                                }
                             }
-                            Constant.DB_DELETE -> return GroupMdodel.delete(token, changeId.toInt(), id)
+                            Constant.DB_DELETE -> {
+                                if (group != null) {
+                                    delDbGroups.add(group.id.toInt())
+                                }
+                            }
                             Constant.DB_UPDATE -> {
-                                val group = DBUtils.getGroupByID(changeId)
-                                return group?.let {
-                                    return GroupMdodel.add(/*token,*/ group, /*group.belongRegionId, */id, changeId)!!
+                                group?.let {
+                                    dbGroups.add(group)
                                 }
                             }
                         }
@@ -132,7 +256,9 @@ class SyncDataPutOrGetUtils {
                                 val list = arrayListOf(changeId.toInt())
                                 val gattBody = GwGattBody()
                                 gattBody.idList = list
-                                return GwModel.deleteGwList(gattBody)
+                                GwModel.deleteGwList(gattBody)?.let {
+                                    observableList.add(it)
+                                }
                             }
                             /* Constant.DB_UPDATE -> {
                                  val gw = DBUtils.getGatewayByID(changeId)
@@ -143,108 +269,104 @@ class SyncDataPutOrGetUtils {
                         }
                     }
                     "DB_LIGHT" -> {
+                        val light = DBUtils.getLightByID(changeId)
                         when (type) {
                             Constant.DB_ADD -> {
-                                val light = DBUtils.getLightByID(changeId)
                                 LogUtils.v("zcl-----------调节开关添加灯-------$light")
-                                return light?.let { LightModel.add(token, it, id, changeId) }
+                                light?.let {
+                                    dbLights.add(light)
+                                }
                             }
                             Constant.DB_DELETE -> {
-                                return LightModel.delete(token, id, changeId.toInt())
+                                if (light != null) {
+                                    delDbLights.add(light.id.toInt())
+                                }
                             }
                             Constant.DB_UPDATE -> {
-                                val light = DBUtils.getLightByID(changeId)
-                                LogUtils.v("zcl-----------调节开关更新灯-------$light")
-
                                 light?.let {
-                                    return LightModel.update(token, light, id, changeId.toInt())
+                                    dbLights.add(light)
                                 }
                             }
                         }
                     }
                     "DB_CONNECTOR" -> {
+                        val connector = DBUtils.getConnectorByID(changeId)
                         when (type) {
                             Constant.DB_ADD -> {
-                                val light = DBUtils.getConnectorByID(changeId)
-                                return light?.let { ConnectorModel.add(token, it, id, changeId) }
+                                connector?.let {
+                                    connectors.add(connector)
+                                }
                             }
                             Constant.DB_DELETE -> {
-                                return ConnectorModel.delete(token, id, changeId.toInt())
+                                if (connector != null) {
+                                    delConnectors.add(connector.id.toInt())
+                                }
                             }
                             Constant.DB_UPDATE -> {
-                                val light = DBUtils.getConnectorByID(changeId)
-                                light?.let {
-                                    return ConnectorModel.update(token, light, id, changeId.toInt())
+                                connector?.let {
+                                    connectors.add(connector)
                                 }
                             }
                         }
                     }
                     "DB_SWITCH", "DB_EIGHT_SWITCH" -> {
+                        val switch = DBUtils.getSwitchByID(changeId)
                         when (type) {
                             Constant.DB_ADD -> {
-                                val switch = DBUtils.getSwitchByID(changeId)
-                                return switch?.let { SwitchMdodel.add(token, it, id, changeId) }
+                                switch?.let {
+                                    switchs.add(switch)
+                                    }
                             }
                             Constant.DB_DELETE -> {
-                                return SwitchMdodel.delete(token, id, changeId.toInt())
+                                if (switch != null) {
+                                    delSwitchs.add(switch.id.toInt())
+                                }
                             }
                             Constant.DB_UPDATE -> {
-                                val switch = DBUtils.getSwitchByID(changeId)
                                 switch?.let {
-                                    return SwitchMdodel.update(token, switch, changeId.toInt(), id)
+                                    switchs.add(switch)
                                 }
                             }
                         }
                     }
 
-                    /*     "DB_EIGHT_SWITCH" -> {
-                             when (type) {
-                                 Constant.DB_ADD -> {
-                                     val switch = DBUtils.getEightSwitchByID(changeId)
-                                     return switch?.let { EightSwitchMdodel.add8k(it, changeId) }
-                                 }
-                                 Constant.DB_DELETE -> {
-                                     return EightSwitchMdodel.delete(id, changeId)
-                                 }
-                                 Constant.DB_UPDATE -> {
-                                     val switch = DBUtils.getEightSwitchByID(changeId)
-                                     switch?.let {
-                                         return EightSwitchMdodel.update8k(switch, changeId)
-                                     }
-                                 }
-                             }
-                         }*/
-
                     "DB_SENSOR" -> {
+                        val sensor = DBUtils.getSensorByID(changeId)
+
                         when (type) {
                             Constant.DB_ADD -> {
-                                val sensor = DBUtils.getSensorByID(changeId)
-                                LogUtils.v("zcl-----------上传数据传感器-------$sensor")
-                                return sensor?.let { SensorMdodel.add(token, it, id, changeId) }
+                                sensor?.let {
+                                    sensors.add(sensor)
+                                    }
                             }
                             Constant.DB_DELETE -> {
-                                return SensorMdodel.delete(token, id, changeId.toInt())
+                                if (sensor != null) {
+                                    delSensors.add(sensor.id.toInt())
+                                }
                             }
                             Constant.DB_UPDATE -> {
-                                val sensor = DBUtils.getSensorByID(changeId)
-                                LogUtils.v("zcl-----------上传数据更新传感器-------$sensor")
-                                sensor?.let { return SensorMdodel.update(token, sensor, changeId.toInt(), id) }
+                                sensor?.let {
+                                    sensors.add(sensor)
+                                }
                             }
                         }
                     }
                     "DB_CURTAIN" -> {
+                        val curtain = DBUtils.getCurtainByID(changeId)
                         when (type) {
                             Constant.DB_ADD -> {
-                                val curtain = DBUtils.getCurtainByID(changeId)
-                                return curtain?.let { CurtainMdodel.add(token, it, id, changeId) }
+                                curtain?.let {
+                                    curtains.add(curtain)
+                                }
                             }
                             Constant.DB_DELETE -> {
-                                return CurtainMdodel.delete(token, id, changeId.toInt())
+                                if (curtain != null) {
+                                    delCurtains.add(curtain.id.toInt())
+                                }
                             }
                             Constant.DB_UPDATE -> {
-                                val curtain = DBUtils.getCurtainByID(changeId)
                                 if (curtain != null) {
-                                    return CurtainMdodel.update(token, curtain, changeId.toInt(), id)
+                                    curtains.add(curtain)
                                 }
                             }
                         }
@@ -253,7 +375,7 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 val region = DBUtils.getRegionByID(changeId)
-                                return RegionModel.add(token, region, id, changeId)
+                                RegionModel.add(token, region, id, changeId)?.let { observableList.add(it) }
                             }
                             // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
                             /*   Constant.DB_UPDATE -> {
@@ -264,105 +386,72 @@ class SyncDataPutOrGetUtils {
                     }
                     "DB_SCENE" -> {
                         val scene = DBUtils.getSceneByID(changeId)
-
-                        lateinit var postInfoStr: String
-                        var bodyScene: RequestBody? = null
+                        var sceneBody : SceneBody? = null
                         if (scene != null && type != Constant.DB_DELETE) {
-                            val body = DbSceneBody()
-                            val gson = Gson()
-                            body.name = scene.name
-                            body.belongRegionId = scene.belongRegionId
-                            body.imgName = scene.imgName
-                            body.actions = DBUtils.getActionsBySceneId(changeId)
-                            postInfoStr = gson.toJson(body)
-
-                            bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                            sceneBody = SceneBody(scene.id,scene.name,scene.actions,scene.index,scene.imgName)
                         }
-
                         when (type) {
                             Constant.DB_ADD -> {
-                                val scene = DBUtils.getSceneByID(changeId)
-                                //("scene_add--id==" + changeId)
-                                if (bodyScene != null) {
-                                    return SceneModel.add(token, bodyScene, id, changeId)
-                                }
+                                if (sceneBody!=null)
+                                    dbScenes.add(sceneBody)
                             }
                             Constant.DB_DELETE -> {
-                                //("scene_delete--id==" + changeId)
-                                return SceneModel.delete(token, changeId.toInt(), id)
-                            }
-                            Constant.DB_UPDATE -> {
-                                //("scene_update--id==" + changeId)
-                                if (bodyScene != null) {
-                                    return SceneModel.update(token, changeId.toInt(), bodyScene, id)
+                                if (sceneBody != null) {
+                                    delDbScenes.add(scene?.id!!.toInt())
                                 }
                             }
-
+                            Constant.DB_UPDATE -> {
+                                if (sceneBody != null) {
+                                    dbScenes.add(sceneBody)
+                                }
+                            }
                         }
                     }
 
+                    // 动态变换 dcs
                     "DB_DIY_GRADIENT" -> {
                         val gradient = DBUtils.getGradientByID(changeId)
-                        lateinit var postInfoStr: String
-                        var bodyGradient: RequestBody? = null
+                        var gradientBody: GradientBody? = null
                         if (gradient != null && type != Constant.DB_DELETE) {
-                            val body: DbGradientBody = DbGradientBody()
-                            val gson: Gson = Gson()
-                            body.name = gradient.name
-                            body.type = gradient.type
-                            body.speed = gradient.speed
-                            body.belongRegionId = gradient.belongRegionId
-                            body.colorNodes = DBUtils.getColorNodeListByDynamicModeId(changeId)
-                            postInfoStr = gson.toJson(body)
-
-                            bodyGradient = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                            gradientBody = GradientBody(gradient.id,gradient.name,gradient.type,gradient.speed,gradient.colorNodes,gradient.index)
                         }
 
                         when (type) {
                             Constant.DB_ADD -> {
-                                val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
-                                if (bodyGradient != null) {
-                                    return GradientModel.add(token, bodyGradient, id, changeId)
+                                if (gradientBody != null) {
+                                    gradients.add(gradientBody)
                                 }
                             }
                             Constant.DB_DELETE -> {
                                 val body = DbDeleteGradientBody()
                                 body.idList = ArrayList()
                                 body.idList.add(changeId.toInt())
-                                return GradientModel.delete(token, body, id)
+                                delGradients.add(gradient?.id!!.toInt())
                             }
                             Constant.DB_UPDATE -> {
-                                if (bodyGradient != null) {
-                                    return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
+                                if (gradientBody != null) {
+                                    gradients.add(gradientBody)
                                 }
                             }
-
                         }
                     }
 
                     "DB_USER" -> {
                         val user = DBUtils.getUserByID(changeId)
-                        if (user == null) {
-                            Log.d("用户数据出错", "")
-                        }
-
                         when (type) {
                             Constant.DB_ADD -> {
                                 //注册时已经添加
-                                return null
                             }
                             Constant.DB_DELETE -> {
                                 //无用户删除操作
-                                return null
                             }
-                            Constant.DB_UPDATE ->
-                                return AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!")
-
+                            Constant.DB_UPDATE ->{
+                                AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!")?.let { observableList.add(it) } // Oh God!
+                            }
                         }
                     }
                 }
             }
-            return null
         }
 
         /********************************同步数据之下拉数据 */
@@ -512,8 +601,10 @@ class SyncDataPutOrGetUtils {
                     .observeOn(AndroidSchedulers.mainThread())!!.subscribe(
                             {
                                 //登录后同步数据完成再上传一次数据
-                                if (!Constant.IS_ROUTE_MODE)
+                                if (!Constant.IS_ROUTE_MODE){
                                     syncPutDataStart(TelinkLightApplication.getApp(), syncCallbackSY)
+                                    LogUtils.v("chown -- 同步数据")
+                                }
                                 SharedPreferencesUtils.saveCurrentUserList(accountNow)
                                 GlobalScope.launch(Dispatchers.Main) {
                                     syncCallBack.complete()
@@ -554,20 +645,20 @@ class SyncDataPutOrGetUtils {
                 val dbRegion = DBUtils.lastRegion
                 val application = DeviceHelper.getApplication() as TelinkLightApplication
                 val mesh = application.mesh
-                mesh.name = dbRegion?.controlMesh
+                mesh.name = dbRegion.controlMesh
                 //mesh.password = dbRegion.controlMeshPwd
-                mesh.password = dbRegion?.belongAccount
-                mesh.factoryName = dbRegion?.installMesh
-                mesh.factoryPassword = dbRegion?.installMeshPwd
+                mesh.password = dbRegion.belongAccount
+                mesh.factoryName = dbRegion.installMesh
+                mesh.factoryPassword = dbRegion.installMeshPwd
                 application.setupMesh(mesh)
-                SharedPreferencesUtils.saveCurrentUseRegionID(dbRegion?.id!!)
+                SharedPreferencesUtils.saveCurrentUseRegionID(dbRegion.id!!)
                 return
             } else {
-                setupMeshCreat(this!!.acc!!)
+                setupMeshCreat(this.acc!!)
             }
         }
 
-        private fun setupMeshCreat(account: String) {
+        private fun setupMeshCreat(accounts: String) {
             val account = SharedPreferencesHelper.getString(TelinkLightApplication.getApp()
                     , Constant.DB_NAME_KEY, "dadou")
             val dbRegio = DbRegion()
@@ -587,4 +678,249 @@ class SyncDataPutOrGetUtils {
             application.setupMesh(mesh)
         }
     }
+
+/*
+    private fun sendDataToServer(tableName: String, changeId: Long, type: String,
+                                     token: String, id: Long, switchType: Int, keys: String): Observable<String>? {
+            if (changeId != null) {
+                when (tableName) {
+                    "DB_GROUP" -> {
+                        val group = DBUtils.getGroupByID(changeId)
+                        when (type) {
+                            Constant.DB_ADD -> {// 添加token lastReginID
+                                return group?.let {
+                                    GroupMdodel.add(/*token,*/ it, /*group.belongRegionId, */id, changeId) }!!
+                            }
+                            Constant.DB_DELETE -> {
+                                return GroupMdodel.delete(token, changeId.toInt(), id)
+                            }
+                            Constant.DB_UPDATE -> {
+                                return group?.let {
+                                    return GroupMdodel.add(/*token,*/ group, /*group.belongRegionId, */id, changeId)!!
+                                }
+                            }
+                        }
+                    }
+                    "DB_GATEWAY" -> {
+                        when (type) {
+                            /*   Constant.DB_ADD -> {
+                                   val gw = DBUtils.getGatewayByID(changeId)
+                                   return gw?.let { GwModel.add(it) }
+                               }*/
+                            Constant.DB_DELETE -> {
+                                val list = arrayListOf(changeId.toInt())
+                                val gattBody = GwGattBody()
+                                gattBody.idList = list
+                                return GwModel.deleteGwList(gattBody)
+                            }
+                            /* Constant.DB_UPDATE -> {
+                                 val gw = DBUtils.getGatewayByID(changeId)
+                                 gw?.let {
+                                     return GwModel.add(gw)
+                                 }
+                             }*/
+                        }
+                    }
+                    "DB_LIGHT" -> {
+                        val light = DBUtils.getLightByID(changeId)
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                return light?.let {
+                                    LightModel.add(token, it, id, changeId)
+                                }
+                            }
+                            Constant.DB_DELETE -> {
+                                return LightModel.delete(token, id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                light?.let {
+                                    return LightModel.update(token, light, id, changeId.toInt())
+                                }
+                            }
+                        }
+                    }
+                    "DB_CONNECTOR" -> {
+                        val connector = DBUtils.getConnectorByID(changeId)
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                return connector?.let {
+                                    ConnectorModel.add(token, it, id, changeId) }
+                            }
+                            Constant.DB_DELETE -> {
+                                return ConnectorModel.delete(token, id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                connector?.let {
+                                    return ConnectorModel.update(token, connector, id, changeId.toInt())
+                                }
+                            }
+                        }
+                    }
+                    "DB_SWITCH", "DB_EIGHT_SWITCH" -> {
+                        val switch = DBUtils.getSwitchByID(changeId)
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                return switch?.let {
+                                    SwitchMdodel.add(token, it, id, changeId) }
+                            }
+                            Constant.DB_DELETE -> {
+                                return SwitchMdodel.delete(token, id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                switch?.let {
+                                    return SwitchMdodel.update(token, switch, changeId.toInt(), id)
+                                }
+                            }
+                        }
+                    }
+
+                    "DB_SENSOR" -> {
+                        val sensor = DBUtils.getSensorByID(changeId)
+
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                return sensor?.let {
+                                    SensorMdodel.add(token, it, id, changeId) }
+                            }
+                            Constant.DB_DELETE -> {
+                                return SensorMdodel.delete(token, id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                sensor?.let {
+                                    return SensorMdodel.update(token, sensor, changeId.toInt(), id) }
+                            }
+                        }
+                    }
+                    "DB_CURTAIN" -> {
+                        val curtain = DBUtils.getCurtainByID(changeId)
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                return curtain?.let {
+                                    CurtainMdodel.add(token, it, id, changeId) }
+                            }
+                            Constant.DB_DELETE -> {
+                                return CurtainMdodel.delete(token, id, changeId.toInt())
+                            }
+                            Constant.DB_UPDATE -> {
+                                if (curtain != null) {
+                                    return CurtainMdodel.update(token, curtain, changeId.toInt(), id)
+                                }
+                            }
+                        }
+                    }
+                    "DB_REGION" -> {
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val region = DBUtils.getRegionByID(changeId)
+                                return RegionModel.add(token, region, id, changeId)
+                            }
+                            // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
+                            /*   Constant.DB_UPDATE -> {
+                                   val region = DBUtils.getRegionByID(changeId)
+                                   return RegionModel.update(changeId.toInt(), region, id)
+                               }*/
+                        }
+                    }
+                    "DB_SCENE" -> {
+                        val scene = DBUtils.getSceneByID(changeId)
+
+                        lateinit var postInfoStr: String
+                        var bodyScene: RequestBody? = null
+                        if (scene != null && type != Constant.DB_DELETE) {
+                            val body = DbSceneBody()
+                            val gson = Gson()
+                            body.name = scene.name
+                            body.belongRegionId = scene.belongRegionId
+                            body.imgName = scene.imgName
+                            body.actions = DBUtils.getActionsBySceneId(changeId)
+                            postInfoStr = gson.toJson(body)
+
+                            bodyScene = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                        }
+
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                //("scene_add--id==" + changeId)
+                                if (bodyScene != null) {
+                                    return SceneModel.add(token, bodyScene, id, changeId)
+                                }
+                            }
+                            Constant.DB_DELETE -> {
+                                return SceneModel.delete(token, changeId.toInt(), id)
+                            }
+                            Constant.DB_UPDATE -> {
+                                if (bodyScene != null) {
+                                    return SceneModel.update(token, changeId.toInt(), bodyScene, id)
+                                }
+                            }
+
+                        }
+                    }
+
+                    // 动态变换 dcs
+                    "DB_DIY_GRADIENT" -> {
+                        val gradient = DBUtils.getGradientByID(changeId)
+                        lateinit var postInfoStr: String
+                        var bodyGradient: RequestBody? = null
+                        if (gradient != null && type != Constant.DB_DELETE) {
+                            val body = DbGradientBody()
+                            val gson = Gson()
+                            body.name = gradient.name
+                            body.type = gradient.type
+                            body.speed = gradient.speed
+                            body.belongRegionId = gradient.belongRegionId
+                            body.colorNodes = DBUtils.getColorNodeListByDynamicModeId(changeId)
+                            postInfoStr = gson.toJson(body)
+
+                            bodyGradient = RequestBody.create(MediaType.parse("application/json; charset=utf-8"), postInfoStr)
+                        }
+
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                val node = DBUtils.getColorNodeListByDynamicModeId(changeId)
+                                if (bodyGradient != null) {
+                                    return GradientModel.add(token, bodyGradient, id, changeId)
+                                }
+                            }
+                            Constant.DB_DELETE -> {
+                                val body = DbDeleteGradientBody()
+                                body.idList = ArrayList()
+                                body.idList.add(changeId.toInt())
+                                return GradientModel.delete(token, body, id)
+                            }
+                            Constant.DB_UPDATE -> {
+                                if (bodyGradient != null) {
+                                    return GradientModel.update(token, changeId.toInt(), bodyGradient, id)
+                                }
+                            }
+
+                        }
+                    }
+
+                    "DB_USER" -> {
+                        val user = DBUtils.getUserByID(changeId)
+                        if (user == null) {
+                            Log.d("用户数据出错", "")
+                        }
+                        when (type) {
+                            Constant.DB_ADD -> {
+                                //注册时已经添加
+                                return null
+                            }
+                            Constant.DB_DELETE -> {
+                                //无用户删除操作
+                                return null
+                            }
+                            Constant.DB_UPDATE ->{
+                                return AccountModel.update(token, user.avatar, user.name, user.email, "oh my god!") // Oh God!
+                            }
+
+                        }
+                    }
+                }
+            }
+            return null
+        }
+
+*/
 }

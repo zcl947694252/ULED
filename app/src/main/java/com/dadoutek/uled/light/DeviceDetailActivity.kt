@@ -25,6 +25,7 @@ import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
 import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.util.Base64Utils
+import com.dadoutek.uled.intf.SyncCallback
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbLight
@@ -43,7 +44,10 @@ import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
+import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+import com.telink.TelinkApplication
 import com.telink.bluetooth.light.ConnectionStatus
+import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -104,7 +108,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             Constant.INSTALL_RGB_LIGHT -> DeviceType.LIGHT_RGB.toLong()
             else -> DeviceType.LIGHT_NORMAL.toLong()
         }
-        var intent = Intent(this, BindRouterActivity::class.java)
+        val intent = Intent(this, BindRouterActivity::class.java)
         intent.putExtra("group", dbGroup)
         startActivity(intent)
     }
@@ -275,20 +279,57 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 //ToastUtils.showShort(getString(R.string.connecting_tip))
                 //autoConnectAll()
                 // sendTimeZone(currentDevice!!)
+                SyncDataPutOrGetUtils.syncPutDataStart(this,syncCallback)
             }
             R.id.template_device_card_delete -> {
                 val string = getString(R.string.sure_delete_device, currentDevice?.name)
                 builder?.setMessage(string)
                 builder?.create()?.show()
             }
-            R.id.template_device_setting -> if (b || Constant.IS_ROUTE_MODE) goSetting()
+            R.id.template_device_setting -> if (b || Constant.IS_ROUTE_MODE) goSetting() // 如果没有登录设备应该重连然后进入设置
+            else { // chown2021.08.19 改
+                goConfig()
+            }
+        }
+    }
+
+    private var syncCallback: SyncCallback = object : SyncCallback {
+        override fun error(msg: String?) {
+        }
+
+        override fun start() {
+        }
+
+        override fun complete() {
+            }
+    }
+
+    /**
+     * 登录设备
+     */
+    private fun goConfig() {
+        if (currentDevice!=null) {
+            TelinkLightService.Instance()?.disconnect()
+            showLoadingDialog(getString(R.string.connecting_tip))
+            disposableRouteTimer?.dispose()
+            Thread.sleep(800)
+            val subscribe = connect(macAddress = currentDevice?.macAddr, retryTimes = 1)
+                ?.subscribe({
+                    hideLoadingDialog()
+                    goSetting() //判断进入那个开关设置界面
+                    LogUtils.d("login success")
+                }, {
+                    hideLoadingDialog()
+                    ToastUtils.showLong(R.string.connect_fail)
+                    LogUtils.d(it)
+                })
         }
     }
 
     private fun sendAfterUpdate() {
         when (type) {
-            Constant.INSTALL_NORMAL_LIGHT -> lightsData[positionCurrent]!!.updateIcon()
-            Constant.INSTALL_RGB_LIGHT -> lightsData[positionCurrent]!!.updateRgbIcon()
+            Constant.INSTALL_NORMAL_LIGHT -> lightsData[positionCurrent].updateIcon()
+            Constant.INSTALL_RGB_LIGHT -> lightsData[positionCurrent].updateRgbIcon()
         }
         DBUtils.updateLight(lightsData[positionCurrent])
         listAdapter?.notifyDataSetChanged()
@@ -572,34 +613,33 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
 
     fun notifyData() {
         if (lightsData.size > 0) {
-            val mOldDatas: MutableList<DbLight>? = lightsData
-            val mNewDatas: ArrayList<DbLight>? = getNewData()
+            val mOldDatas: MutableList<DbLight> = lightsData
+            val mNewDatas: ArrayList<DbLight> = getNewData()
 
             val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    return mOldDatas?.get(oldItemPosition)?.id?.equals(mNewDatas?.get
-                    (newItemPosition)?.id) ?: false
+                    return mOldDatas[oldItemPosition].id?.equals(mNewDatas[newItemPosition].id) ?: false
                 }
 
                 override fun getOldListSize(): Int {
-                    return mOldDatas?.size ?: 0
+                    return mOldDatas.size ?: 0
                 }
 
                 override fun getNewListSize(): Int {
-                    return mNewDatas?.size ?: 0
+                    return mNewDatas.size ?: 0
                 }
 
                 override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-                    val beanOld = mOldDatas?.get(oldItemPosition)
-                    val beanNew = mNewDatas?.get(newItemPosition)
-                    return if (!beanOld?.name.equals(beanNew?.name))
+                    val beanOld = mOldDatas[oldItemPosition]
+                    val beanNew = mNewDatas[newItemPosition]
+                    return if (!beanOld.name.equals(beanNew.name))
                         return false//如果有内容不同，就返回false
                     else
                         true
                 }
             }, true)
             listAdapter?.let { diffResult.dispatchUpdatesTo(it) }
-            lightsData = mNewDatas!!
+            lightsData = mNewDatas
             listAdapter!!.setNewData(lightsData)
         }
     }

@@ -42,7 +42,7 @@ class DeviceDetailListAdapter(layoutResId: Int, data: List<DbLight>?) : BaseQuic
             // groupName.setTextColor(mContext.resources.getColor(R.color.black))
         }
 
-        if (dbLight?.productUUID == DeviceType.LIGHT_RGB)
+        if (dbLight.productUUID == DeviceType.LIGHT_RGB)
             when (dbLight.status) {
                 ConnectionStatus.OFFLINE.value -> {
                     dbLight.icon = R.drawable.icon_rgb_close

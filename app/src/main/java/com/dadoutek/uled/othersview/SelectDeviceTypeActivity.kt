@@ -99,8 +99,12 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
 //                    switchStepOne?.visibility = View.VISIBLE
 //                    switchStepTwo?.visibility = View.VISIBLE
 //                    swicthStepThree?.visibility = View.VISIBLE
-
-                    startActivity(Intent(this,SelectSwitchActivity::class.java))
+                    if (Constant.IS_ROUTE_MODE) {
+                        installId = INSTALL_SWITCH
+                        showInstallDeviceDetail(StringUtils.getInstallDescribe(installId, this), position, getString(R.string.switch_title))
+                    } else {
+                        startActivity(Intent(this,SelectSwitchActivity::class.java))
+                    }
                 }
                 INSTALL_SENSOR -> {
                     installId = INSTALL_SENSOR

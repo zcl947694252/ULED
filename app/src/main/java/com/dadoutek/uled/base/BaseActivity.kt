@@ -84,7 +84,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
         this.mApplication = this.application as TelinkLightApplication
         //注册网络状态监听广播
         netWorkChangReceiver = TelinkBaseActivity.NetWorkChangReceiver()
-        var filter = IntentFilter()
+        val filter = IntentFilter()
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
 
@@ -140,7 +140,8 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
     abstract fun setLayoutID(): Int
     open fun notifyWSData(type: Int, rid: Int) {}
     private fun startTimerUpdate() {
-        upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
+        upDateTimer = Observable.interval(0, 10, TimeUnit.SECONDS).subscribe {
+            LogUtils.v("chown -- 同步数据")
             SyncDataPutOrGetUtils.syncPutDataStart(this@BaseActivity, object : SyncCallback {
                 override fun start() {}
                 override fun complete() {
@@ -209,8 +210,8 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     fun initOnLayoutListener() {//lan加载监听
-        var view = window.decorView
-        var viewTreeObserver = view.viewTreeObserver
+        val view = window.decorView
+        val viewTreeObserver = view.viewTreeObserver
         viewTreeObserver.addOnGlobalLayoutListener {
             view.viewTreeObserver.removeOnGlobalLayoutListener {}
         }
@@ -248,6 +249,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
                                 0)
                     }.create().show()
         } else {
+            LogUtils.v("chown -- 同步数据")
             SyncDataPutOrGetUtils.syncPutDataStart(activity, syncCallback)
         }
     }
@@ -369,7 +371,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
     inner class StompReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val msg = intent?.getStringExtra(Constant.LOGIN_OUT) ?: ""
-            var jsonObject = JSONObject(msg)
+            val jsonObject = JSONObject(msg)
             LogUtils.v("zcl-----------收到路由总通知-------$jsonObject")
             try {
                 val cmd = jsonObject.optInt("cmd")

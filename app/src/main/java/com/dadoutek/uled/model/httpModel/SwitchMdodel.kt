@@ -1,11 +1,15 @@
 package com.dadoutek.uled.model.httpModel
 
 import com.blankj.utilcode.util.LogUtils
+import com.dadoutek.uled.model.BodyBias
+import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbSwitch
 import com.dadoutek.uled.model.dbModel.DbSwitchChild
+import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
+import com.dadoutek.uled.network.bean.SwitchListBodyBean
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -96,5 +100,24 @@ object SwitchMdodel {
                     }
                 }
                 .observeOn(AndroidSchedulers.mainThread())
+    }
+
+    fun batchAddOrUpdateSwitch(list:List<DbSwitch>) : Observable<String>? {
+        return NetworkFactory.getApi()
+            .updateSwitch(SwitchListBodyBean(list))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {  }
+    }
+
+
+    fun remove(list: List<Int>) : Observable<String> ? {
+        return NetworkFactory.getApi()
+            .deleteSwitch(BodyBias(list))
+            .compose(NetworkTransformer())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {  }
     }
 }

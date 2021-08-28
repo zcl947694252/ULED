@@ -1,4 +1,4 @@
-package com.dadoutek.uled.network
+package com.dadoutek.uled.network.bean
 
 import com.dadoutek.uled.model.dbModel.DbGroup
 import java.io.Serializable

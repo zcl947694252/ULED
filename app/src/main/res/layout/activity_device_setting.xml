@@ -165,6 +165,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:min="1"
+            android:max="101"
             android:padding="5dp"
             android:progress="1" />
 
