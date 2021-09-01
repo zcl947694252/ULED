@@ -38,7 +38,9 @@ object GroupMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 
     fun remove(idList: List<Int>): Observable<String>? {
@@ -49,7 +51,9 @@ object GroupMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 
     fun update(token: String, rid: Int, name: String, brightness: Int, colorTemperature: Int,color: Int,id: Long): Observable<String>? {

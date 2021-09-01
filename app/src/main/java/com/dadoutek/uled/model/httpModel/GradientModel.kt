@@ -78,7 +78,9 @@ object GradientModel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 
     fun remove(list: List<Int>) : Observable<String>? {
@@ -87,7 +89,9 @@ object GradientModel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 
 }

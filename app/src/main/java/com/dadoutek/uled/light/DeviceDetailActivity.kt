@@ -279,7 +279,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 //ToastUtils.showShort(getString(R.string.connecting_tip))
                 //autoConnectAll()
                 // sendTimeZone(currentDevice!!)
-                SyncDataPutOrGetUtils.syncPutDataStart(this,syncCallback)
+//                SyncDataPutOrGetUtils.syncPutDataStart(this,syncCallback)
             }
             R.id.template_device_card_delete -> {
                 val string = getString(R.string.sure_delete_device, currentDevice?.name)

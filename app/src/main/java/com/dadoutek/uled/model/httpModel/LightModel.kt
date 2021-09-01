@@ -67,6 +67,9 @@ object LightModel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+
+            }
     }
 
     fun remove(idList: List<Int>) :Observable<String>? {
@@ -76,5 +79,8 @@ object LightModel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .doOnNext {
+
+            }
     }
 }

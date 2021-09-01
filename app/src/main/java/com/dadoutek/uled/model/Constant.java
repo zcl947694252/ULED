@@ -1,4 +1,5 @@
 package com.dadoutek.uled.model;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
@@ -18,10 +19,11 @@ public class Constant implements Serializable {
     //长连接请求服务器域名地址
     public static String WS_BASE_URL = "ws://dev.dadoutek.com/smartlight_java/websocket-endpoint";
     //长连接测试请求服务器域名地址
-    public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
+    public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
+            "-endpoint";
     public static Boolean isDebug = true; //chown
     // 显示测试控件
-//    public static final Boolean isShow = true; //chown
+    public static final Boolean isShow = true; //chown
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -29,14 +31,14 @@ public class Constant implements Serializable {
      * 测试mqtt服务器地址  tcp://47.107.227.130:1885
      * 正式mqtt服务器地址 tcp://smart.dadoutek.com:1883
      */
-    public static String HOST =isDebug ? "47.107.227.130":"smart.dadoutek.com"; //no use
-    public static String HOST2 =isDebug ? "tcp://47.107.227.130":"tcp://smart.dadoutek.com";
-    public static int PORT = isDebug ?1885:1883;
+    public static String HOST = isDebug ? "47.107.227.130" : "smart.dadoutek.com"; //no use
+    public static String HOST2 = isDebug ? "tcp://47.107.227.130" : "tcp://smart.dadoutek.com";
+    public static int PORT = isDebug ? 1885 : 1883;
 
     public static final long downTime = isDebug ? 3 : 11;
-    public static  String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
+    public static String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
-    public static  String DEFAULT_MESH_FACTORY_NAME = /*isDebug ? "dadoutek" : */"dadousmart";
+    public static String DEFAULT_MESH_FACTORY_NAME = /*isDebug ? "dadoutek" : */"dadousmart";
     //public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
 
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";
@@ -47,7 +49,7 @@ public class Constant implements Serializable {
     public static final int MAX_VALUE = 100;
 
     public static final int MAX_SCROLL_DELAY_VALUE = 40;
-   //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
+    //public static final String DEFAULT_MESH_FACTORY_NAME = isTeck?"dadoutek":"dadousmart";
 
     public static final String GROUPS_KEY = "LastGroups";
     public static final String COLOR_NODE_KEY = "COLOR_NODE_KEY";
@@ -198,7 +200,7 @@ public class Constant implements Serializable {
     public static final Long DEVICE_TYPE_LIGHT_SW = 3L;
 
     // 选择了灯的亮度还是色温
-    public static final String IS_BRI="ISBRI"; // no use
+    public static final String IS_BRI = "ISBRI"; // no use
 
     //普通灯分组
     public static final Long DEVICE_TYPE_LIGHT_NORMAL = Long.valueOf(0x04);
@@ -393,19 +395,19 @@ public class Constant implements Serializable {
     public static final int SER_ID_SENSOR_ON = 0x66;
     public static final int SER_ID_SENSOR_OFF = 0x67;
 
-    public static final String LAST_MESS_ADDR="LAST_MESS_ADDR"; //chown
+    public static final String LAST_MESS_ADDR = "LAST_MESS_ADDR"; //chown
     /**
      * 网页锚点
      */
-    public static final String WB_TYPE="wb_type";
+    public static final String WB_TYPE = "wb_type";
     /**
      * 网页锚点
      */
-    public static final String ROUTE_MODE="ROUTE_MODE";
-    public static  Boolean IS_ROUTE_MODE=false;
-    public static  Boolean IS_OPEN_AUXFUN=false;
+    public static final String ROUTE_MODE = "ROUTE_MODE";
+    public static Boolean IS_ROUTE_MODE = false;
+    public static Boolean IS_OPEN_AUXFUN = false;
     @Nullable
-    public static final String ONE_QR="one_qr";
+    public static final String ONE_QR = "one_qr";
     @Nullable//-1：全部失败；0：全部成功；1：部分成功
     public static final int ALL_SUCCESS = 0;
     public static final int ALL_FAILE = -1; // chown
@@ -417,15 +419,15 @@ public class Constant implements Serializable {
     /**
      * 路由器正在扫描 有未确认扫描数据
      */
-    public static final int ROUTER_SCANNING =1;
+    public static final int ROUTER_SCANNING = 1;
     /**
      * 扫描结束，有未确认扫描数据
      */
-    public static final int ROUTER_SCAN_END =2;
+    public static final int ROUTER_SCAN_END = 2;
     /**
      * 路由器OTA中
      */
-    public static final int ROUTER_OTA_ING =3;
-    public static  long SCAN_SERID =0;
-    public static String OTA_TIME ="OTA_TIME";
+    public static final int ROUTER_OTA_ING = 3;
+    public static long SCAN_SERID = 0;
+    public static String OTA_TIME = "OTA_TIME";
 }

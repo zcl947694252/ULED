@@ -108,7 +108,9 @@ object SwitchMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 
 
@@ -118,6 +120,8 @@ object SwitchMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 }

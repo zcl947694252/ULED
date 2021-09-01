@@ -242,7 +242,7 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
             delete.setOnClickListener {
                 if (isRightPos()) return@setOnClickListener
                 //恢复出厂设置
-                var deleteSwitch = switchData[positionCurrent]
+                val deleteSwitch = switchData[positionCurrent]
                 AlertDialog.Builder(Objects.requireNonNull<AppCompatActivity>(this)).setMessage(R.string.delete_switch_confirm)
                         .setPositiveButton(android.R.string.ok) { _, _ ->
                             DBUtils.deleteSwitch(deleteSwitch)

@@ -42,24 +42,24 @@ class SyncDataPutOrGetUtils {
 
     companion object {
 
-        val dbLights : ArrayList<DbLight> = ArrayList() //
-        val delDbLights: ArrayList<Int> = ArrayList() //
-        val dbGroups : ArrayList<DbGroup> = ArrayList() //
-        val delDbGroups : ArrayList<Int> = ArrayList() //
-        val dbScenes : ArrayList<SceneBody> = ArrayList() //
-        val delDbScenes : ArrayList<Int> = ArrayList() //
-        val connectors : ArrayList<DbConnector> = ArrayList() //
-        val delConnectors : ArrayList<Int> = ArrayList() //
-        val switchs : ArrayList<DbSwitch> = ArrayList() //
-        val delSwitchs : ArrayList<Int> = ArrayList() //
-        val sensors : ArrayList<DbSensor> = ArrayList() //
-        val delSensors : ArrayList<Int> = ArrayList() //
-        val curtains : ArrayList<DbCurtain> = ArrayList() //
-        val delCurtains : ArrayList<Int> = ArrayList() //
-        val gradients : ArrayList<GradientBody> = ArrayList() //
-        val delGradients : ArrayList<Int> = ArrayList() //
+        private val dbLights : ArrayList<DbLight> = ArrayList() //
+        private val delDbLights: ArrayList<Int> = ArrayList() //
+        private val dbGroups : ArrayList<DbGroup> = ArrayList() //
+        private val delDbGroups : ArrayList<Int> = ArrayList() //
+        private val dbScenes : ArrayList<SceneBody> = ArrayList() //
+        private val delDbScenes : ArrayList<Int> = ArrayList() //
+        private val connectors : ArrayList<DbConnector> = ArrayList() //
+        private val delConnectors : ArrayList<Int> = ArrayList() //
+        private val switchs : ArrayList<DbSwitch> = ArrayList() //
+        private val delSwitchs : ArrayList<Int> = ArrayList() //
+        private val sensors : ArrayList<DbSensor> = ArrayList() //
+        private val delSensors : ArrayList<Int> = ArrayList() //
+        private val curtains : ArrayList<DbCurtain> = ArrayList() //
+        private val delCurtains : ArrayList<Int> = ArrayList() //
+        private val gradients : ArrayList<GradientBody> = ArrayList() //
+        private val delGradients : ArrayList<Int> = ArrayList() //
         private val dbUser = DBUtils.lastUser //获取最后一个用户信息
-        val observableList : ArrayList<Observable<String>> by lazy { ArrayList<Observable<String>>() }  //所有的被观察者列表
+        private val observableList : ArrayList<Observable<String>> by lazy { ArrayList<Observable<String>>() }  //所有的被观察者列表
         private fun addtoObservable() {
             if (dbGroups.size>0)
                 GroupMdodel.batchAddOrUpdateGp2(dbGroups)?.let {
@@ -155,7 +155,7 @@ class SyncDataPutOrGetUtils {
                     syncCallback.start()
                 }
 
-                for (data in dbDataChangeList) { // 此方法不可取，在changed东西太多的时候会开太多线程直接挂掉
+                for (data in dbDataChangeList) {
                     data.changeId ?: break
                     //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
                     sendDataToServer(data.tableName,
@@ -180,6 +180,11 @@ class SyncDataPutOrGetUtils {
                                 override fun onComplete() {
                                     GlobalScope.launch(Dispatchers.Main) {
                                         syncCallback.complete()
+                                        for (data in dbDataChangeList) {
+                                            data.changeId ?: break
+                                            //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
+                                            DBUtils.deleteDbDataChange(data.id)
+                                        }
                                     }
                                 }
 
@@ -313,14 +318,16 @@ class SyncDataPutOrGetUtils {
                         when (type) {
                             Constant.DB_ADD -> {
                                 switch?.let {
+                                    LogUtils.v("chown   ----  add switch  ")
                                     switchs.add(switch)
                                     }
                             }
                             Constant.DB_DELETE -> {
-//                                delSwitchs.add(data)
+                                LogUtils.v("chown   ----  delete switch  ")
                                 delSwitchs.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
+                                LogUtils.v("chown   ----  update switch  ")
                                 switch?.let {
                                     switchs.add(switch)
                                 }
@@ -657,7 +664,6 @@ class SyncDataPutOrGetUtils {
                 setupMeshCreat(this.acc!!)
             }
         }
-
         private fun setupMeshCreat(accounts: String) {
             val account = SharedPreferencesHelper.getString(TelinkLightApplication.getApp()
                     , Constant.DB_NAME_KEY, "dadou")
@@ -692,11 +698,11 @@ class SyncDataPutOrGetUtils {
                                     GroupMdodel.add(/*token,*/ it, /*group.belongRegionId, */id, changeId) }!!
                             }
                             Constant.DB_DELETE -> {
-                                return GroupMdodel.delete(token, changeId.toInt(), id)
+                                return
                             }
                             Constant.DB_UPDATE -> {
                                 return group?.let {
-                                    return GroupMdodel.add(/*token,*/ group, /*group.belongRegionId, */id, changeId)!!
+                                    return
                                 }
                             }
                         }

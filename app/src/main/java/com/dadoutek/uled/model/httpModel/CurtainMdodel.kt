@@ -65,7 +65,9 @@ object CurtainMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 
     fun remove(list: List<Int>) : Observable<String>? {
@@ -74,6 +76,8 @@ object CurtainMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 }

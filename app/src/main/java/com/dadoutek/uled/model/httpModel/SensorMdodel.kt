@@ -94,7 +94,9 @@ object SensorMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 
     fun remove(list: List<Int>) : Observable<String> ? {
@@ -103,6 +105,8 @@ object SensorMdodel {
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnNext {  }
+            .doOnNext {
+
+            }
     }
 }

@@ -165,7 +165,7 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
         listKeysBean.put(getKeyBean(0x43, 0x06,currentGroup!!.name,mesH,mesL))
         listKeysBean.put(getKeyBean(0x44, 0x02,currentGroup!!.name,mesH,mesL))
         listKeysBean.put(getKeyBean(0x46, 0x07,currentGroup!!.name,mesH,mesL))
-//        LogUtils.v("chown獲得的keys是$listKeysBean")
+        LogUtils.v("chown獲得的keys是$listKeysBean")
 
         if (!Constant.IS_ROUTE_MODE) {
             showLoadingDialog(getString(R.string.setting_switch))
@@ -446,7 +446,7 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
         LogUtils.v("chown ++ -- group1 : $dbGroup1")
         if (dbGroup1 == null || dbGroup1.id == 65536L) {
             opcodeOne = 0x00
-            listKeysBean.put(getKeyBean(firstNum, 0x00, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
         } else {
             isOK = true
             val firstMesAddr = dbGroup1.meshAddr
@@ -463,7 +463,7 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
         var secondH: Byte = 0
         if (dbGroup2 == null || dbGroup2.id == 65536L) {
             opcodeTwo = 0x00
-            listKeysBean.put(getKeyBean(secondNum, 0x00, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt(), name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
         } else {
             isOK = true
             val secondMesAddr = dbGroup2.meshAddr
@@ -602,13 +602,13 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
 
                             val mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            val groupByMeshAddr = if (featureId == 0xff)
+                            val groupByMeshAddr = if (featureId == 0x00)
                                 null
                             else
                                 DBUtils.getGroupByMeshAddr(mesAddress)
 
                             if (groupByMeshAddr != null) {
-                                val count = if (keyId == 0x41) 0 else if (keyId == 0x43) 1 else if (keyId == 0x44) 2 else 3
+                                val count = if (keyId == 0x41) 0 else if (keyId == 0x43) 1 else if (keyId == 0x44) 0 else 1
                                 groupMap[count] = groupByMeshAddr
                                 name = if (groupByMeshAddr.name == "")
                                     getString(R.string.click_config)

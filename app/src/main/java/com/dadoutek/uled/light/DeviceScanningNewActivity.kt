@@ -1344,7 +1344,6 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
                 disposableUpMeshTimer?.dispose()
                 retryScan()
             }
-
             LightAdapter.STATUS_LOGIN -> {
                 if (startConnect)
                     onLogin()

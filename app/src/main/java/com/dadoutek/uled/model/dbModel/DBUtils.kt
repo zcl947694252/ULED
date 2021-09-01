@@ -196,6 +196,10 @@ object DBUtils {
         return DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
     }
 
+    fun getdataChange(id:Long) : DbDataChange {
+        return DaoSessionInstance.getInstance().dbDataChangeDao.load(id)
+    }
+
     val dataChangeAllHaveAboutLight: Boolean
         get() {
             val list = DaoSessionInstance.getInstance().dbDataChangeDao.loadAll()
@@ -1342,6 +1346,9 @@ object DBUtils {
         DaoSessionInstance.getInstance().dbDataChangeDao.deleteByKey(id)
     }
 
+    fun deleteDbDataChangedByChangeId(dbDataChange: DbDataChange) {
+        DaoSessionInstance.getInstance().dbDataChangeDao.deleteInTx(dbDataChange)
+    }
     /********************************************其他 */
 
 
