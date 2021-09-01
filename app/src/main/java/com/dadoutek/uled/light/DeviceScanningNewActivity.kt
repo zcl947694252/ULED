@@ -770,7 +770,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     private fun initToolbar() {
         toolbar?.setNavigationIcon(R.drawable.icon_return)
         toolbar?.setNavigationOnClickListener {
-            /*   if (isScanning) {
+            /*if (isScanning) {
                    cancelf.isClickable = true
                    confirmf.isClickable = true
                    popFinish.showAtLocation(window.decorView, Gravity.CENTER, 0, 0)
@@ -1138,7 +1138,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         } else {
             when {
                 lastUser?.lastGenMeshAddr ?: 0 < get -> lastUser?.lastGenMeshAddr = get
-                else -> lastUser?.lastGenMeshAddr ?: 0
+                else -> lastUser?.lastGenMeshAddr
             }
             lastUser?.lastGenMeshAddr ?: 0
         }
@@ -1164,6 +1164,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
     @SuppressLint("CheckResult")
     private fun isUser(meshAddress: Int): Int {
         var mesh = meshAddress
+        if (mesh == 0) mesh = 1
         while (meshList.contains(mesh)) {
             mesh += 1
         }
@@ -1176,7 +1177,7 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         //     *  "installMeshPwd":"123456",
         //     *  "name":"a region",
         //     *  "lastGenMeshAddr": 0
-        var dbRegion = DbRegion()
+        val dbRegion = DbRegion()
         dbRegion.installMesh = "dadousmart"
         dbRegion.installMeshPwd = "123"
         dbRegion.lastGenMeshAddr = mesh

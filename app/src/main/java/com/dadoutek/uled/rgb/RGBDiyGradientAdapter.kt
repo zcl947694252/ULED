@@ -12,8 +12,8 @@ class RGBDiyGradientAdapter(layoutResId: Int, data: List<DbDiyGradient>?,interna
 
 
     override fun convert(helper: BaseViewHolder, item: DbDiyGradient) {
-        var gpOn = helper.getView<ImageView>(R.id.diy_mode_on)
-        var gpOff = helper.getView<ImageView>(R.id.diy_mode_off)
+        val gpOn = helper.getView<ImageView>(R.id.diy_mode_on)
+        val gpOff = helper.getView<ImageView>(R.id.diy_mode_off)
       /*  var gpOnText = helper.getView<TextView>(R.id.diy_mode_on_text)
         var gpOffText = helper.getView<TextView>(R.id.diy_mode_off_text)*/
 

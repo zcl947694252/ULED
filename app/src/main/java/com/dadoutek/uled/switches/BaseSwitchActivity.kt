@@ -286,7 +286,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
                             return
                         }
                         startActivity<RouterOtaActivity>("deviceMeshAddress" to mDeviceInfo.meshAddress, "deviceType" to mDeviceInfo.productUUID,
-                                "deviceMac" to mDeviceInfo.macAddress, "version" to mDeviceInfo!!.firmwareRevision)
+                                "deviceMac" to mDeviceInfo.macAddress, "version" to mDeviceInfo.firmwareRevision)
                         finish()
                     }
                     else -> bleOta(mDeviceInfo, type)
@@ -296,7 +296,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     private fun bleOta(mDeviceInfo: DeviceInfo, type: Int) {
-        var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+        val isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
         if (TelinkLightApplication.getApp().connectDevice != null && TelinkLightApplication.getApp().connectDevice.macAddress == mDeviceInfo.macAddress) {
             if (isBoolean)
                 transformView(mDeviceInfo, type)
@@ -308,11 +308,11 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
             mConnectDeviceDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
-                    .flatMap { connect(mDeviceInfo?.meshAddress, macAddress = mDeviceInfo?.macAddress) }
+                    .flatMap { connect(mDeviceInfo.meshAddress, macAddress = mDeviceInfo.macAddress) }
                     ?.subscribe({
                         hideLoadingDialog()
                         if (isBoolean) transformView(mDeviceInfo, type)
-                        else OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo?.firmwareRevision, otaPrepareListner)
+                        else OtaPrepareUtils.instance().gotoUpdateView(this@BaseSwitchActivity, mDeviceInfo.firmwareRevision, otaPrepareListner)
                     }, {
                         hideLoadingDialog()
                         ToastUtils.showLong(R.string.connect_fail2)
@@ -342,9 +342,9 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     private fun transformView(mDeviceInfo: DeviceInfo, type: Int) {
         val intent = Intent(this@BaseSwitchActivity, OTAUpdateActivity::class.java)
-        intent.putExtra(Constant.OTA_MAC, mDeviceInfo?.macAddress)
-        intent.putExtra(Constant.OTA_MES_Add, mDeviceInfo?.meshAddress)
-        intent.putExtra(Constant.OTA_VERSION, mDeviceInfo?.firmwareRevision)
+        intent.putExtra(Constant.OTA_MAC, mDeviceInfo.macAddress)
+        intent.putExtra(Constant.OTA_MES_Add, mDeviceInfo.meshAddress)
+        intent.putExtra(Constant.OTA_VERSION, mDeviceInfo.firmwareRevision)
         intent.putExtra(Constant.OTA_TYPE, type)
         val timeMillis = System.currentTimeMillis()
         if (last_start_time == 0 || timeMillis - last_start_time >= debounce_time)

@@ -56,6 +56,7 @@ import kotlinx.android.synthetic.main.fragment_scene.*
 import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.support.v4.runOnUiThread
@@ -540,19 +541,20 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun setScene(id: Long) {
         val opcode = Opcode.SCENE_LOAD
 
-        DBUtils.getSceneByID(id)?.actions?.forEach {
-            if (it.groupAddr == 0xffff) {
-                GlobalScope.launch {
-                    Commander.openOrCloseLights(it.groupAddr, it.isOn)
-                    ToastUtils.showShort(getString(R.string.scene_apply_success))
-                }
-                return
-            }
-        }
+
         GlobalScope.launch {
             val params: ByteArray = byteArrayOf(id.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, 0xFFFF, params)
+            delay(80)
+
+            DBUtils.getSceneByID(id)?.actions?.forEach {
+                if (it.groupAddr == 0xffff) {
+                    Commander.openOrCloseLights(it.groupAddr, it.isOn)
+                }
+            }
         }
+
+
 
         //ToastUtils.showShort(activity, getString(R.string.scene_apply_success))
         ToastUtils.showShort(getString(R.string.scene_apply_success))

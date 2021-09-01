@@ -183,7 +183,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/group_three_switch"
+                android:text="@string/scene_switch"
                 android:textColor="#FF333333"
                 android:textSize="29sp"
                 app:layout_constraintBottom_toBottomOf="parent"

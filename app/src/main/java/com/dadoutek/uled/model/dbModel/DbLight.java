@@ -23,7 +23,7 @@ public class DbLight implements Serializable {
     private int meshAddr;
     private String name;
     private String groupName;
-    private int brightness =1;
+    private int brightness = 1;
     private int colorTemperature= 1;
     private String macAddr;
     private String sixMac;

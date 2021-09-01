@@ -58,72 +58,82 @@ class SyncDataPutOrGetUtils {
         val delCurtains : ArrayList<Int> = ArrayList() //
         val gradients : ArrayList<GradientBody> = ArrayList() //
         val delGradients : ArrayList<Int> = ArrayList() //
-        val observableList = ArrayList<Observable<String>>() //所有的被观察者列表
+        private val dbUser = DBUtils.lastUser //获取最后一个用户信息
+        val observableList : ArrayList<Observable<String>> by lazy { ArrayList<Observable<String>>() }  //所有的被观察者列表
         private fun addtoObservable() {
             if (dbGroups.size>0)
                 GroupMdodel.batchAddOrUpdateGp2(dbGroups)?.let {
-                    observableList.add(it)
-                }
-            if (delDbGroups.size>0)
-                GroupMdodel.remove(delDbGroups)?.let {
                     observableList.add(it)
                 }
             if (dbLights.size>0)
                 LightModel.batchAddorUpdateLight(dbLights)?.let {
                     observableList.add(it)
                 }
-            if (delDbLights.size>0)
-                LightModel.remove(delDbLights)?.let {
-                    observableList.add(it)
-                }
             if (dbScenes.size>0)
                 SceneModel.batchAddOrUpdateScene(dbScenes)?.let {
-                    observableList.add(it)
-                }
-            if (delDbScenes.size>0)
-                SceneModel.remove(delDbScenes)?.let {
                     observableList.add(it)
                 }
             if (connectors.size>0)
                 ConnectorModel.batchAddOrUpdateConnector(connectors)?.let {
                     observableList.add(it)
                 }
-            if (delConnectors.size>0)
-                ConnectorModel.remove(delConnectors)?.let {
-                    observableList.add(it)
-                }
+
             if (switchs.size>0)
                 SwitchMdodel.batchAddOrUpdateSwitch(switchs)?.let {
-                    observableList.add(it)
-                }
-            if (delSwitchs.size>0)
-                SwitchMdodel.remove(delSwitchs)?.let {
                     observableList.add(it)
                 }
             if (sensors.size>0)
                 SensorMdodel.batchAddOrUpdateSensor(sensors)?.let {
                     observableList.add(it)
                 }
-            if (delSensors.size>0)
-                SensorMdodel.remove(delSensors)?.let {
-                    observableList.add(it)
-                }
             if (curtains.size>0)
                 CurtainMdodel.batchAddOrUpdateCurtain(curtains)?.let {
-                    observableList.add(it)
-                }
-            if (delSwitchs.size>0)
-                CurtainMdodel.remove(delSwitchs)?.let {
                     observableList.add(it)
                 }
             if (gradients.size>0)
                 GradientModel.batchAddOrUpdateGradient(gradients)?.let {
                     observableList.add(it)
                 }
-            if (delGradients.size>0)
+            if (delDbLights.size>0) {
+                    LightModel.remove(delDbLights)?.let {
+                        observableList.add(it)
+                    }
+            }
+            if (delDbGroups.size>0) {
+                GroupMdodel.remove(delDbGroups)?.let {
+                    observableList.add(it)
+                }
+            }
+            if (delDbScenes.size>0) {
+                SceneModel.remove(delDbScenes)?.let {
+                    observableList.add(it)
+                }
+            }
+            if (delConnectors.size>0) {
+                ConnectorModel.remove(delConnectors)?.let {
+                    observableList.add(it)
+                }
+            }
+            if (delCurtains.size>0) {
+                CurtainMdodel.remove(delCurtains)?.let {
+                    observableList.add(it)
+                }
+            }
+            if (delSwitchs.size>0) {
+                SwitchMdodel.remove(delSwitchs)?.let {
+                    observableList.add(it)
+                }
+            }
+            if (delSensors.size>0) {
+                SensorMdodel.remove(delSensors)?.let {
+                    observableList.add(it)
+                }
+            }
+            if (delGradients.size>0) {
                 GradientModel.remove(delGradients)?.let {
                     observableList.add(it)
                 }
+            }
         }
         /********************************同步数据之上传数据 */
         @SuppressLint("CheckResult")
@@ -133,14 +143,12 @@ class SyncDataPutOrGetUtils {
                 val dbDataChangeList = DBUtils.dataChangeAll //获取所有改变的数据
 
                 //dbDataChangeLightList
-                val dbUser = DBUtils.lastUser //获取最后一个用户信息
                 if (dbDataChangeList.isEmpty()) {
                     GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete() //如果是空的，直接同步完成
                     }
                     return@Thread
                 }
-
 
                 //创建主线程的协程 开始同步 看来得看具体的实现，baseActivity中是直接显示一个同步的dialog
                 GlobalScope.launch(Dispatchers.Main) {
@@ -150,11 +158,8 @@ class SyncDataPutOrGetUtils {
                 for (data in dbDataChangeList) { // 此方法不可取，在changed东西太多的时候会开太多线程直接挂掉
                     data.changeId ?: break
                     //群组模式 = 0，场景模式 =1 ，自定义模式= 2，非八键开关 = 3
-                    /*data?.let {
-                        var observable: Observable<String>? = this.*/sendDataToServer(data.tableName,
-                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "")
-//                        observable?.let { observableList.add(it) }
-//                    }
+                    sendDataToServer(data.tableName,
+                            data.changeId, data.changeType, dbUser!!.token, data.id!!, data.type, data.keys ?: "", data)
                 }
 
                 addtoObservable()
@@ -162,21 +167,15 @@ class SyncDataPutOrGetUtils {
                 val observables = arrayOfNulls<Observable<String>>(observableList.size)
                 observableList.toArray(observables)
 
-                LogUtils.v("chown ------------observables-----toString----- ${observables.size}-- ${observables.toString()}")
-
-
                 if (observables.isNotEmpty()) {
                     LogUtils.v("chown ------------observables.isNotEmpty   observables.isNotEmpty   observables.isNotEmpty")
                     observables.forEach {
                         it!!.subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread()).subscribe({
-                                      LogUtils.v("chown ==================================== do do do do do  $it")
                                 }, {
                                 })
                     }
                     Observable.mergeArrayDelayError(*observables)
-                        .subscribeOn(Schedulers.io()) // chown
-                        .observeOn(AndroidSchedulers.mainThread()) /// chown
                             .subscribe(object : NetworkObserver<String?>() {// 显示是这一行中奔溃
                                 override fun onComplete() {
                                     GlobalScope.launch(Dispatchers.Main) {
@@ -195,7 +194,7 @@ class SyncDataPutOrGetUtils {
                                 }
                             })
                 } else {
-                    LogUtils.v("chown ------------else Complete------==============--=")
+//                    LogUtils.v("chown ------------else Complete------==============--=")
 
                     GlobalScope.launch(Dispatchers.Main) {
                         syncCallback.complete()
@@ -203,26 +202,26 @@ class SyncDataPutOrGetUtils {
                 }
             }.start()
             dbLights.clear()
-            delDbLights.clear()
             dbGroups.clear()
-            delDbGroups.clear()
             dbScenes.clear()
-            delDbScenes.clear()
             connectors.clear()
-            delConnectors.clear()
             switchs.clear()
-            delSwitchs.clear()
             sensors.clear()
-            delSensors.clear()
             curtains.clear()
-            delCurtains.clear()
             gradients.clear()
-            delGradients.clear()
             observableList.clear()
+            delDbLights.clear()
+            delDbGroups.clear()
+            delDbScenes.clear()
+            delCurtains.clear()
+            delGradients.clear()
+            delSensors.clear()
+            delConnectors.clear()
+            delSwitchs.clear()
         }
 
         private fun sendDataToServer(tableName: String, changeId: Long, type: String,
-                                     token: String, id: Long, switchType: Int, keys: String) {
+                                     token: String, id: Long, switchType: Int, keys: String, data: DbDataChange) {
             if (changeId != null) {
 //                LogUtils.v("zcl", "zcl**tableName****$tableName")
                 when (tableName) {
@@ -232,12 +231,13 @@ class SyncDataPutOrGetUtils {
                             Constant.DB_ADD -> {// 添加token lastReginID
                                 group?.let {
                                     dbGroups.add(group)
+//                                    GradientModel.update(token, changeId.toInt(), bodyGradient, id)
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                if (group != null) {
-                                    delDbGroups.add(group.id.toInt())
-                                }
+                                LogUtils.v("chown --- delete group $group")
+//                                delDbGroups.add(data)
+                                delDbGroups.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 group?.let {
@@ -272,15 +272,15 @@ class SyncDataPutOrGetUtils {
                         val light = DBUtils.getLightByID(changeId)
                         when (type) {
                             Constant.DB_ADD -> {
-                                LogUtils.v("zcl-----------调节开关添加灯-------$light")
                                 light?.let {
+                                    LogUtils.v("chown ---- addlight!--- $light")
                                     dbLights.add(light)
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                if (light != null) {
-                                    delDbLights.add(light.id.toInt())
-                                }
+//                                delDbLights.add(data)
+                                LogUtils.v("chown -- dblight ${id.toInt()} and ${changeId.toInt()}")
+                                delDbLights.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 light?.let {
@@ -298,9 +298,8 @@ class SyncDataPutOrGetUtils {
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                if (connector != null) {
-                                    delConnectors.add(connector.id.toInt())
-                                }
+//                                delConnectors.add(data)
+                                delConnectors.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 connector?.let {
@@ -318,9 +317,8 @@ class SyncDataPutOrGetUtils {
                                     }
                             }
                             Constant.DB_DELETE -> {
-                                if (switch != null) {
-                                    delSwitchs.add(switch.id.toInt())
-                                }
+//                                delSwitchs.add(data)
+                                delSwitchs.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 switch?.let {
@@ -340,9 +338,8 @@ class SyncDataPutOrGetUtils {
                                     }
                             }
                             Constant.DB_DELETE -> {
-                                if (sensor != null) {
-                                    delSensors.add(sensor.id.toInt())
-                                }
+//                                delSensors.add(data)
+                                delSensors.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 sensor?.let {
@@ -360,9 +357,8 @@ class SyncDataPutOrGetUtils {
                                 }
                             }
                             Constant.DB_DELETE -> {
-                                if (curtain != null) {
-                                    delCurtains.add(curtain.id.toInt())
-                                }
+//                                delCurtains.add(data)
+                                delCurtains.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 if (curtain != null) {
@@ -396,9 +392,8 @@ class SyncDataPutOrGetUtils {
                                     dbScenes.add(sceneBody)
                             }
                             Constant.DB_DELETE -> {
-                                if (sceneBody != null) {
-                                    delDbScenes.add(scene?.id!!.toInt())
-                                }
+//                                delDbScenes.add(data)
+                                delDbScenes.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 if (sceneBody != null) {
@@ -426,7 +421,12 @@ class SyncDataPutOrGetUtils {
                                 val body = DbDeleteGradientBody()
                                 body.idList = ArrayList()
                                 body.idList.add(changeId.toInt())
-                                delGradients.add(gradient?.id!!.toInt())
+                                gradients.forEach {
+                                    if (it.id == id)
+                                        gradients.remove(it)
+                                }
+//                                delGradients.add(data)
+                                delGradients.add(changeId.toInt())
                             }
                             Constant.DB_UPDATE -> {
                                 if (gradientBody != null) {

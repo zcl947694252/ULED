@@ -239,7 +239,7 @@ class DeveloperActivity : BaseActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    var num = downTime - 1 - it
+                    val num = downTime - 1 - it
                     if (num == 0L) {
                         setTimerZero()
                     } else {
@@ -367,7 +367,7 @@ class DeveloperActivity : BaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun updateLastMeshZero() {
-        var dbRegion = DbRegion()
+        val dbRegion = DbRegion()
         dbRegion.installMesh = /*"dadousmart"*/Constant.DEFAULT_MESH_FACTORY_NAME
         dbRegion.installMeshPwd = "123"
         dbRegion.lastGenMeshAddr = 0
@@ -460,7 +460,7 @@ class DeveloperActivity : BaseActivity() {
         val curtainList =DBUtils.getAllCurtains()
         val relyList = DBUtils.allRely
 
-        var meshAdre = ArrayList<Int>()
+        val meshAdre = ArrayList<Int>()
         if (lightList.isNotEmpty()) {
             for (k in lightList.indices)
                 meshAdre.add(lightList[k].meshAddr)

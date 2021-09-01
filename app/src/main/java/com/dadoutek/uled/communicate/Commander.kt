@@ -2,14 +2,12 @@ package com.dadoutek.uled.communicate
 
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.AppUtils
-import com.dadoutek.uled.util.RecoverMeshDeviceUtil
 import com.telink.TelinkApplication
 import com.telink.bluetooth.event.DeviceEvent
 import com.telink.bluetooth.event.ErrorReportEvent
@@ -102,8 +100,8 @@ object Commander : EventListener<String> {
     private fun resetLightsOld(lightList: List<Int>, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         LogUtils.e("zcl---添加表 更新数据$lightList")
         val sleepTime: Long = 200
-        val resendCmdTime: Int = 3
-        var connectDeviceIndex: Int = 0
+        val resendCmdTime = 3
+        var connectDeviceIndex = 0
         val lastIndex = lightList.size - 1
         val connectDeviceMeshAddr = TelinkLightApplication.getApp().connectDevice?.meshAddress ?: 0x00
         if (lightList.isNotEmpty()) {
@@ -174,7 +172,7 @@ object Commander : EventListener<String> {
                             if (isSupportFastResetFactory) {
                                 GlobalScope.launch {
                                     TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0xFFFF, paramsKickOut) //直连灯不响应此条命令0xFFFF的目标地址
-                                    delay(500)
+                                    delay(1000)
                                     TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, 0x0000, paramsKickOut) //延时后再给直连灯发恢复出厂设置指令
                                     DBUtils.deleteAllNormalLight()
                                     DBUtils.deleteAllRGBLight()
@@ -201,21 +199,19 @@ object Commander : EventListener<String> {
 
     @Synchronized
     fun resetDevice(deviceMeshAddr: Int, isSensor: Boolean = false): Observable<Boolean> {
-        val deviceMeshAddr = deviceMeshAddr
         val observable = Observable.create<Boolean> { emitter ->
-            var sendCommandNoResponse = TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, deviceMeshAddr, paramsKickOut) //延时后再给直连灯发恢复
+            var sendCommandNoResponse =
+                TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.KICK_OUT, deviceMeshAddr, paramsKickOut) //延时后再给直连灯发恢复
             if (sendCommandNoResponse == null)
                 sendCommandNoResponse = false
             emitter.onNext(sendCommandNoResponse)// 出厂设置指令
         }
 
-        val ret = getDeviceVersion(deviceMeshAddr)
-                .flatMap {
-                    LogUtils.v("chonw -- 获取成功")
-                    observable
-                } // 如果获取没成功就走到外部的error
-
-        return ret
+        return getDeviceVersion(deviceMeshAddr)
+            .flatMap {
+                LogUtils.v("chonw -- 获取成功")
+                observable
+            } // 如果获取没成功就走到外部的error
     }
 
 
@@ -232,10 +228,10 @@ object Commander : EventListener<String> {
             if (light > 99)
                 light = 99
 
-            var red = color and 0xff0000 shr 16
-            var green = color and 0x00ff00 shr 8
-            var blue = color and 0x0000ff
-            var w = color shr 24
+            val red = color and 0xff0000 shr 16
+            val green = color and 0x00ff00 shr 8
+            val blue = color and 0x0000ff
+            val w = color shr 24
 
             params = byteArrayOf(0x01, sceneId.toByte(), light, red.toByte(), green.toByte(), blue.toByte(), temperature, w.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, meshAddr, params)
@@ -243,7 +239,7 @@ object Commander : EventListener<String> {
     }
 
     fun deleteGroup(lightMeshAddr: Int, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
-        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
+        TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_GROUP, this)
         mDstAddr = lightMeshAddr
         mTargetGroupAddr = 0xFFFF
         mGroupSuccess = false
@@ -261,7 +257,7 @@ object Commander : EventListener<String> {
                     var mDisposable: Disposable? = null
                     override fun onComplete() {
                         mDisposable?.dispose()
-                        TelinkLightApplication.getApp()?.removeEventListener(Commander)
+                        TelinkLightApplication.getApp().removeEventListener(Commander)
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -350,7 +346,7 @@ object Commander : EventListener<String> {
      * @return  返回组地址，例如 0x8001
      */
     fun getGroup(deviceAddr: Int): Observable<Int> {
-        TelinkLightApplication.getApp()?.addEventListener(NotificationEvent.GET_GROUP, this)
+        TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_GROUP, this)
         mGotGroupAddr = 0
         mDstAddr = deviceAddr
         val params = byteArrayOf(0x08, 0x01)
@@ -386,7 +382,7 @@ object Commander : EventListener<String> {
     fun updateMeshName(newMeshName: String = DBUtils.lastUser!!.controlMeshName, newMeshAddr: Int =
             Constant.SWITCH_PIR_ADDRESS, successCallback: () -> Unit1, failedCallback: () -> Unit1) {
         mUpdateMeshSuccess = false
-        TelinkLightApplication.getApp()?.addEventListener(DeviceEvent.STATUS_CHANGED, this)
+        TelinkLightApplication.getApp().addEventListener(DeviceEvent.STATUS_CHANGED, this)
         val password = Strings.stringToBytes(NetworkFactory.md5(NetworkFactory.md5(newMeshName) + newMeshName), 16)
         TelinkLightService.Instance()?.adapter!!.mode = LightAdapter.MODE_UPDATE_MESH
         TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight?.newMeshAddress = newMeshAddr
@@ -399,7 +395,7 @@ object Commander : EventListener<String> {
                     var mDisposable: Disposable? = null
                     override fun onComplete() {
                         mDisposable?.dispose()
-                        TelinkLightApplication.getApp()?.removeEventListener(Commander)
+                        TelinkLightApplication.getApp().removeEventListener(Commander)
                     }
 
                     override fun onSubscribe(d: Disposable) {
@@ -539,7 +535,7 @@ object Commander : EventListener<String> {
             return
         }
 
-        var groupAddress: Int
+//        var groupAddress: Int
         val len = params.size
 
         for (j in 0 until len) {
@@ -549,7 +545,7 @@ object Commander : EventListener<String> {
                 mGotGroupAddr = mGotGroupAddr or 0x8000
                 LogUtils.v("zcl----------mGotGroupAddr$mGotGroupAddr---${params[j].toInt()}")
             }
-            var sb = StringBuilder()
+            val sb = StringBuilder()
             for (i in params.indices)
                 sb.append((params[i])).append(" ")
 
@@ -563,21 +559,19 @@ object Commander : EventListener<String> {
 
     //关闭渐变
     fun closeGradient(dstAddr: Int, id: Int, speed: Int) {
-        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val opcode = Opcode.APPLY_RGB_GRADIENT
         //关闭渐变
         val gradientActionType = 0x03
-        val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
+        val params: ByteArray = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
     }
 
     //加载渐变
     fun applyGradient(dstAddr: Int, id: Int, speed: Int, firstAddress: Int) {
-        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val opcode = Opcode.APPLY_RGB_GRADIENT
         //开始内置渐变
         val gradientActionType = 0x02
-        val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
+        val params: ByteArray = byteArrayOf(gradientActionType.toByte(), id.toByte(), speed.toByte(), firstAddress.toByte())
         GlobalScope.launch {
             for (i in 0..2) {
                 TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
@@ -602,7 +596,7 @@ object Commander : EventListener<String> {
     //删除渐变
     fun deleteGradient(dstAddr: Int, id: Int, successCallback: (version: String?) -> Unit1,
                        failedCallback: () -> Unit1) {
-        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val opcode = Opcode.APPLY_RGB_GRADIENT
         //删除渐变
         val gradientActionType = 0x01
         val params: ByteArray
@@ -622,10 +616,9 @@ object Commander : EventListener<String> {
      */
     fun addGradient(dstAddr: Int, id: Int, node: Int, mode: Int, brightness: Int,
                     r: Int, g: Int, b: Int, c: Int = 0xff, w: Int = 0xff) {
-        var opcode = Opcode.APPLY_RGB_GRADIENT
+        val opcode = Opcode.APPLY_RGB_GRADIENT
         val gradientActionType = 0x00
-        val params: ByteArray
-        params = byteArrayOf(gradientActionType.toByte(), id.toByte(), node.toByte(),
+        val params: ByteArray = byteArrayOf(gradientActionType.toByte(), id.toByte(), node.toByte(),
                 mode.toByte(), brightness.toByte(), r.toByte(), g.toByte(), b.toByte(), c.toByte(), w.toByte())
         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
     }
@@ -641,8 +634,8 @@ object Commander : EventListener<String> {
             TelinkApplication.getInstance().isConnect=true
             mConnectObservable = Observable.create<DeviceInfo> { emitter ->
                 TelinkLightService.Instance().idleMode(false)
-                if (macAddress!=null)
-                //TelinkLightService.Instance()?.adapter?.stop()
+//                if (macAddress!=null)
+//                    TelinkLightService.Instance()?.adapter?.stop()
                 mConnectEmitter = emitter
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
@@ -667,7 +660,6 @@ object Commander : EventListener<String> {
                 refreshNotifyParams.setRefreshInterval(2000)
                 //开启自动刷新Notify
                 TelinkLightService.Instance().autoRefreshNotify(refreshNotifyParams)
-
             }.timeout(connectTimeOutTime, TimeUnit.SECONDS) {
                 LogUtils.v("chown -----------连接失败失败-------connect timeout")
                 it.onError(Throwable("connect timeout"))
@@ -681,7 +673,7 @@ object Commander : EventListener<String> {
             DeviceType.NORMAL_SWITCH
             LogUtils.d("zcl-----------连接失败失败-in connecting device mode")
             return null
-        }*/
+        }   */
     }
 
     fun getDeviceVersion(dstAddr: Int, retryTimes: Long = 1): Observable<String> {

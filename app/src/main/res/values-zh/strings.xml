@@ -785,6 +785,7 @@
     <string name="delete_gate_way_label_fail">删除网关标签失败</string>
     <string name="delete_gate_way_task_fail">删除网关任务失败</string>
     <string name="send_gate_way_label_head_fail">发送标签头失败</string>
+    <string name="send_gate_way_fail">操作可能有误，请退出网关界面重新进入</string>
     <string name="config_gate_way_tp_task_fail">配置网关循环模式时间段失败</string>
     <string name="config_gate_way_t_task_fail">配置网关定时模式时间失败</string>
     <string name="gate_way_label_switch_fail">网关标签任务开关失败</string>

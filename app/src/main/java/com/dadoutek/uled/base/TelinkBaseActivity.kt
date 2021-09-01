@@ -302,7 +302,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     //是否最新版
     fun isMostNew(version: String?): Boolean {
         version?.let {
-            val split = version?.split("-")
+            val split = version.split("-")
             if (split.size >= 2) {
                 val versionNum = numberCharat(split[1])
                 LogUtils.v("zcl比较版本号-------$version------${TelinkLightApplication.mapBin[split[0]] ?: 0}-----${versionNum}")

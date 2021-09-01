@@ -1,20 +1,16 @@
 package com.dadoutek.uled.tellink
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
 import com.dadoutek.uled.ble.RxBleManager
-import com.dadoutek.uled.gateway.bean.GwStompBean
 import com.dadoutek.uled.gateway.bean.GwTagBean
 import com.dadoutek.uled.gateway.bean.GwTasksBean
 import com.dadoutek.uled.model.*
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.stomp.StompManager
 import com.dadoutek.uled.util.SharedPreferencesUtils
-import com.google.gson.Gson
 import com.mob.MobSDK
 import com.squareup.leakcanary.RefWatcher
 import com.telink.TelinkApplication
@@ -23,12 +19,7 @@ import com.telink.bluetooth.TelinkLog
 //import com.tencent.bugly.crashreport.CrashReport
 //import com.tencent.bugly.beta.Beta
 import com.uuzuche.lib_zxing.activity.ZXingLibrary
-import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import ua.naiksoftware.stomp.dto.LifecycleEvent
 import java.util.*
-import java.util.logging.Handler
 
 
 class TelinkLightApplication : TelinkApplication() {
@@ -37,18 +28,18 @@ class TelinkLightApplication : TelinkApplication() {
         fun getApp(): TelinkLightApplication{
             return app!!
         }
-        var mapBin: Map<String, Int> = HashMap<String, Int>()
-        open var isLoginAccount: Boolean = true
+        var mapBin: Map<String, Int> = HashMap()
+        var isLoginAccount: Boolean = true
         var isConnecting: Boolean = false
     }
 
-    val randomImei: String? = Random().nextInt(10000).toString()
-    open var refWatcher: RefWatcher? = null
+    val randomImei: String = Random().nextInt(10000).toString()
+    var refWatcher: RefWatcher? = null
     var currentGwTagBean: GwTagBean? = null
     var isConnectGwBle: Boolean = false
     var offLine: Boolean = false
     var listTask: ArrayList<GwTasksBean> = ArrayList()
-    open var mStompManager: StompManager? = null
+    var mStompManager: StompManager? = null
     var lastMeshAddress:Int = 0
 
     val isEmptyMesh: Boolean
@@ -89,7 +80,7 @@ class TelinkLightApplication : TelinkApplication() {
         MobSDK.init(this)
     }
 
-    open fun initData() {
+    fun initData() {
         //super.doInit()
         //AES.Security = true;
         val currentRegionID = SharedPreferencesUtils.getCurrentUseRegionId()
@@ -103,7 +94,7 @@ class TelinkLightApplication : TelinkApplication() {
             if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(pwd)) {
                 mesh = Mesh()
                 mesh.name = name
-                mesh.password = name
+                mesh.password = pwd // mesh.password = name chown changed it
                 mesh.factoryName = Constant.DEFAULT_MESH_FACTORY_NAME
                 mesh.factoryPassword = Constant.DEFAULT_MESH_FACTORY_PASSWORD
                 setupMesh(mesh)

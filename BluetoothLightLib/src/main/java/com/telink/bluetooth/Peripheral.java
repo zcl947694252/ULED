@@ -826,13 +826,16 @@ public class Peripheral extends BluetoothGattCallback {
                     boolean bool = ((Boolean) localMethod.invoke(localBluetoothGatt,
                             new Object[0])).booleanValue();
                     TelinkLog.d("refreshDeviceCache ret = " + bool);
+                    LogUtils.d("refreshDeviceCache ret = " + bool);
                     return bool;
                 } else {
                     TelinkLog.d("refreshDeviceCache localMethod == null");
+                    LogUtils.d("refreshDeviceCache localMethod == null");
                 }
             } catch (Exception localException) {
                 localException.printStackTrace();
                 TelinkLog.d("An exception occured while refreshing device");
+                LogUtils.d("An exception occured while refreshing device");
             }
         }
         return false;
@@ -1059,7 +1062,7 @@ public class Peripheral extends BluetoothGattCallback {
                         if (i5 != 0)
                             version = version + (char) scanRecord[j];
                     }
-                    LogUtils.v("zcl------TelinkBluetoothSDK-----首页相关获取广播版本-------" + version + "--" + Arrays.bytesToHexString(scanRecord, ","));
+//                    LogUtils.v("zcl------TelinkBluetoothSDK-----首页相关获取广播版本-------" + version + "--" + Arrays.bytesToHexString(scanRecord, ","));  //chown
                 }
             }
         }

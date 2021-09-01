@@ -1012,7 +1012,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         TelinkLightService.Instance()?.idleMode(true)
 
         //创建数据库
-        var lastUser = lastUser
+        val lastUser = lastUser
 
         lastUser?.let {
             //更新user

@@ -16,7 +16,7 @@ class ColorSelectDiyRecyclerViewAdapter(layoutResId: Int, data: List<ItemColorPr
 
     override fun convert(helper: BaseViewHolder, item: ItemColorPreset) {
 
-        var doc = helper.getView<Dot>(R.id.btn_diy_preset)
+        val doc = helper.getView<Dot>(R.id.btn_diy_preset)
 
 //        doc.setBackgroundColor(item.color)
 

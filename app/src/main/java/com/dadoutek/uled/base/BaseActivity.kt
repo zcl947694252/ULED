@@ -271,7 +271,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
         override fun complete() {
             hideLoadingDialog()
-            TelinkLightService.Instance()?.idleMode(true)
+//            TelinkLightService.Instance()?.idleMode(true) //chown
             if (this@BaseActivity.isResume && !singleLogin?.isShowing!!) {
                 singleLogin?.dismiss()
                 singleLogin?.show()

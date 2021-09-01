@@ -87,7 +87,7 @@ class GwLoginActivity : TelinkBaseActivity() {
                 Log.e("zcl", "zcl***STATUS_LOGOUT***----------")
                 ToastUtils.showShort(getString(R.string.connecting_tip))
                 connect(macAddress = dbGw?.macAddr, retryTimes = 10)
-                        ?.subscribe({}, { LogUtils.d("connect failed") })
+                    ?.subscribe({}, { LogUtils.d("connect failed") })
             }
 
             override fun setGwComplete(deviceInfo: DeviceInfo) { //Dadou   Dadoutek2018
@@ -169,20 +169,20 @@ class GwLoginActivity : TelinkBaseActivity() {
         val timeZone = NetWorkUtils.getTimeZone()
         val split = timeZone.replace("GMT+", "").split(":")
         RouterModel.routerConfigWifi(mac!!, account, pwd, split[0].toInt(), split[1].toInt(), TAG)
-                ?.subscribe({
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableTimer?.dispose()
-                    disposableTimer = Observable.timer(it.timeout.toLong(), TimeUnit.SECONDS)
-                             .subscribeOn(Schedulers.io())
-                                             .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
-                                hideLoadingDialog()
-                            }
-                }, {
-                    hideLoadingDialog()
-                    ToastUtils.showShort(it.message)
-                })
+            ?.subscribe({
+                showLoadingDialog(getString(R.string.please_wait))
+                disposableTimer?.dispose()
+                disposableTimer = Observable.timer(it.timeout.toLong(), TimeUnit.SECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
+                        hideLoadingDialog()
+                    }
+            }, {
+                hideLoadingDialog()
+                ToastUtils.showShort(it.message)
+            })
     }
 
     override fun routerConfigWIFI(cmdBody: CmdBodyBean) {
@@ -210,22 +210,24 @@ class GwLoginActivity : TelinkBaseActivity() {
 
     private fun sendDeviceMacParmars() {
         val params = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0)
-        TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_GET_MAC, dbGw?.meshAddr
-                ?: 0, params, "0")
+        TelinkLightService.Instance()?.sendCommandResponse(
+            Opcode.CONFIG_GW_GET_MAC, dbGw?.meshAddr
+                ?: 0, params, "0"
+        )
     }
 
 
     private fun sendWIFIParmars(account: String, pwd: String) {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(30000, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    runOnUiThread {
-                        hideLoadingDialog()
-                        ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
-                    }
+            .observeOn(Schedulers.io())
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                runOnUiThread {
+                    hideLoadingDialog()
+                    ToastUtils.showLong(getString(R.string.config_WIFI_FAILE))
                 }
+            }
         showLoadingDialog(getString(R.string.please_wait))
         val byteAccount = account.toByteArray()
         val bytePwd = pwd.toByteArray()
@@ -234,7 +236,14 @@ class GwLoginActivity : TelinkBaseActivity() {
         val accountByteSize = byteAccount.size.toByte()
         val pwdByteSize = bytePwd.size.toByte()
 
-        LogUtils.v("chown----蓝牙数据 wifi账号list-------${Arrays.bytesToHexString(byteAccount, ",")}----------${listAccount.size}-----$accountByteSize")
+        LogUtils.v(
+            "chown----蓝牙数据 wifi账号list-------${
+                Arrays.bytesToHexString(
+                    byteAccount,
+                    ","
+                )
+            }----------${listAccount.size}-----$accountByteSize"
+        )
         LogUtils.v("chown----蓝牙数据 wifi密码list-------${Arrays.bytesToHexString(bytePwd, ",")}----------${listPwd.size}----$pwdByteSize")
 
 
@@ -250,13 +259,13 @@ class GwLoginActivity : TelinkBaseActivity() {
     private fun sendTimeZoneParmars() {
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(1500, TimeUnit.MILLISECONDS).observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    runOnUiThread {
-                        hideLoadingDialog()
-                        ToastUtils.showLong(getString(R.string.get_time_zone_fail))
-                    }
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                runOnUiThread {
+                    hideLoadingDialog()
+                    ToastUtils.showLong(getString(R.string.get_time_zone_fail))
                 }
+            }
         showLoadingDialog(getString(R.string.please_wait))
         val default = TimeZone.getDefault()
         val name = default.getDisplayName(true, TimeZone.SHORT)
@@ -284,12 +293,16 @@ class GwLoginActivity : TelinkBaseActivity() {
         val yearH = (year shr 8) and (0xff)
         val yearL = year and (0xff)
 
-        var labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
-                Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02, tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
-                yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
+        var labHeadPar = byteArrayOf(
+            0x11, 0x11, 0x11, 0, 0, 0, 0,
+            Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_TASK, 0x11, 0x02, tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+            yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte()
+        )
 
-        val params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
-                yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
+        val params = byteArrayOf(
+            tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+            yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte()
+        )
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
     }
 
@@ -303,8 +316,10 @@ class GwLoginActivity : TelinkBaseActivity() {
                 //11-18 11位labelId
                 val offset = i * 8
                 val bytesArray = listParmars[i]
-                val params = byteArrayOf(byteSize, offset.toByte(), bytesArray[0], bytesArray[1], bytesArray[2], bytesArray[3],
-                        bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7])
+                val params = byteArrayOf(
+                    byteSize, offset.toByte(), bytesArray[0], bytesArray[1], bytesArray[2], bytesArray[3],
+                    bytesArray[4], bytesArray[5], bytesArray[6], bytesArray[7]
+                )
 
                 if (isPwd) {
                     LogUtils.v("chown----------蓝牙数据密码参数-------${Arrays.bytesToHexString(params, ",")}")
@@ -378,11 +393,11 @@ class GwLoginActivity : TelinkBaseActivity() {
         }
         setWIFI()
         RxPermissions(this).request(Manifest.permission.CHANGE_WIFI_STATE)
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.newThread())
-                .subscribe({
-                    if (it) setWIFI()
-                }, { LogUtils.d(it) })
+            .subscribeOn(Schedulers.io())
+            .observeOn(Schedulers.newThread())
+            .subscribe({
+                if (it) setWIFI()
+            }, { LogUtils.d(it) })
     }
 
     private fun setWIFI() {

@@ -289,7 +289,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
 
     private fun makePop() {
         // 恢复出厂设置
-        var popView: View = LayoutInflater.from(context).inflate(R.layout.pop_time_cancel, null)
+        val popView: View = LayoutInflater.from(context).inflate(R.layout.pop_time_cancel, null)
         cancel = popView.findViewById(R.id.tip_cancel)
         confirm = popView.findViewById(R.id.tip_confirm)
 
@@ -429,7 +429,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         System.arraycopy(mHints, 1, mHints, 0, mHints.size - 1)
         mHints[mHints.size - 1] = SystemClock.uptimeMillis()
         if (SystemClock.uptimeMillis() - mHints[0] <= 1000) {
-            var intent = Intent(activity, DeveloperActivity::class.java)
+            val intent = Intent(activity, DeveloperActivity::class.java)
             startActivity(intent)
         }
     }
@@ -494,7 +494,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
         val lightList = allLights
         val curtainList = allCutain
         val relyList = allRely
-        var meshAdre = ArrayList<Int>()
+        val meshAdre = ArrayList<Int>()
         if (lightList.isNotEmpty()) {
             for (k in lightList.indices) {
                 meshAdre.add(lightList[k].meshAddr)

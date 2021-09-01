@@ -446,7 +446,7 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
         LogUtils.v("chown ++ -- group1 : $dbGroup1")
         if (dbGroup1 == null || dbGroup1.id == 65536L) {
             opcodeOne = 0x00
-            listKeysBean.put(getKeyBean(firstNum, opcodeOne.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            listKeysBean.put(getKeyBean(firstNum, 0x00, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
         } else {
             isOK = true
             val firstMesAddr = dbGroup1.meshAddr
@@ -463,7 +463,7 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
         var secondH: Byte = 0
         if (dbGroup2 == null || dbGroup2.id == 65536L) {
             opcodeTwo = 0x00
-            listKeysBean.put(getKeyBean(secondNum, opcodeTwo.toInt() and 0xff, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
+            listKeysBean.put(getKeyBean(secondNum, 0x00, name = getString(R.string.click_config), hight8Mes = 0, low8Mes = 0))
         } else {
             isOK = true
             val secondMesAddr = dbGroup2.meshAddr
@@ -528,6 +528,7 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
                 if (this != null && !this.isFinishing)
                     renameDialog.dismiss()
                 LogUtils.v("zcl改名后-----------${DBUtils.getSwitchByMeshAddr(mDeviceInfo?.meshAddress ?: 0)?.name}")
+                toolbarTv.text = trim
             }
         }
         renameCancel?.setOnClickListener {
@@ -694,10 +695,10 @@ class ConfigFourSwitchActivity : BaseSwitchActivity(),View.OnClickListener {
                 four_switch_b3.setTextColor(getColor(R.color.brightness_add_color))
                 four_switch_b4.setTextColor(getColor(R.color.brightness_add_color))
                 configSwitchTypeNum = 0
-                four_switch_b1.text = "ON"
-                four_switch_b2.text = "ON"
-                four_switch_b3.text = "OFF"
-                four_switch_b4.text = "OFF"
+                four_switch_b1.text = "ON\n(亮度调节)"
+                four_switch_b2.text = "ON\n(亮度调节)"
+                four_switch_b3.text = "(色温调节)\nOFF"
+                four_switch_b4.text = "(色温调节)\nOFF"
                 four_group_name.visibility = View.GONE
                 four_switch_b5.visibility = View.VISIBLE
                 four_switch_b6.visibility = View.VISIBLE

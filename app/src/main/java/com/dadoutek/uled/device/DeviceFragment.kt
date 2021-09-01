@@ -334,7 +334,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.main_go_help -> {
-                var intent = Intent(context, InstructionsForUsActivity::class.java)
+                val intent = Intent(context, InstructionsForUsActivity::class.java)
                 intent.putExtra(Constant.WB_TYPE, "#add-and-configure")
                 startActivity(intent)
             }
@@ -344,7 +344,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
                     when {
                         it.id.toString() != it.last_authorizer_user_id -> ToastUtils.showLong(getString(R.string.author_region_warm))
                         else -> {
-                            var intent = Intent(context, SelectDeviceTypeActivity::class.java)
+                            val intent = Intent(context, SelectDeviceTypeActivity::class.java)
                             startActivity(intent)
                         }
                     }

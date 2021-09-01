@@ -301,7 +301,7 @@ object DBUtils {
         val query = DaoSessionInstance.getInstance().dbLightDao.queryBuilder()
                 .whereOr(DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL_OLD), DbLightDao.Properties.ProductUUID.eq(DeviceType.LIGHT_NORMAL)).build()
 
-        var arrayList: ArrayList<DbLight> = arrayListOf()
+        val arrayList: ArrayList<DbLight> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }

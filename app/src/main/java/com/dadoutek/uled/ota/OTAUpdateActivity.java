@@ -15,6 +15,7 @@ import android.os.PowerManager;
 import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -308,9 +309,30 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
 
 
     private void initToolbar() {
+//        toolbarTv.setText(R.string.ota_update_title);
+//        toolbar.setNavigationOnClickListener(v -> finish());
+//        toolbar.setNavigationIcon(R.drawable.icon_return);
         toolbarTv.setText(R.string.ota_update_title);
-        toolbar.setNavigationOnClickListener(v -> finish());
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() { //chown
+            @Override
+            public void onClick(View v) {
+                popFinish.showAtLocation(getWindow().getDecorView().getRootView(), Gravity.CENTER, 0, 0); //chown
+            }
+        });
         toolbar.setNavigationIcon(R.drawable.icon_return);
+        hinitOne.setText(getString(R.string.is_exit_ota));////chown
+        cancelf.setOnClickListener(new View.OnClickListener() {//chown
+            @Override
+            public void onClick(View v) {
+                popFinish.dismiss();
+            }
+        });
+        confirmf.setOnClickListener(new View.OnClickListener() {//chown
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     @Override

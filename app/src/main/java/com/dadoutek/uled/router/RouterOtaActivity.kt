@@ -44,6 +44,7 @@ import java.util.concurrent.TimeUnit
  * 更新描述
  */
 class RouterOtaActivity : TelinkBaseActivity() {
+
     private var deviceVersion: String? = null
     private var isRouter: Boolean = false
     private var clickFinish: Boolean = false
@@ -91,8 +92,9 @@ class RouterOtaActivity : TelinkBaseActivity() {
                                 ToastUtils.showShort(getString(R.string.ota_stop_fail))
                             }
                 }
-                90023 -> ToastUtils.showShort(getString(R.string.startTime_not_exit))
+                90023 -> { ToastUtils.showShort(getString(R.string.startTime_not_exit)) }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
+
                 90018 -> {
                     DBUtils.deleteLocalData()
                     //ToastUtils.showShort(getString(R.string.device_not_exit))
@@ -169,12 +171,14 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     private fun devicesToOTA() {
-        startGetStatuss()
         val currentTimeMillis1 = System.currentTimeMillis()
+        currentTimeMillis = currentTimeMillis1
+        startGetStatuss()
         if (isRouter)
             routerOtaByself(currentTimeMillis1)
-        else
+        else{
             otaDevice(currentTimeMillis1)
+        }
     }
 
     @SuppressLint("CheckResult")
@@ -212,7 +216,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         val meshAddrs = mutableListOf(deviceMeshAddress)
         when {
             meshAddrs.isEmpty() -> ToastUtils.showShort(getString(R.string.no_can_ota_device))
-            else -> RouterModel.toDevicesOTA(meshAddrs, deviceType, currentTimeMillis1, 1, "routerSingle")?.subscribe({
+            else -> RouterModel.toDevicesOTA(meshAddrs, deviceType, currentTimeMillis1, 1, "511")?.subscribe({
                 LogUtils.v("zcl---收到路由升级请求---deviceMeshAddress$deviceMeshAddress--time$currentTimeMillis1--deviceTye${deviceType}--$it")
                 when (it.errorCode) {
                     0 -> {
@@ -274,7 +278,6 @@ class RouterOtaActivity : TelinkBaseActivity() {
     }
 
     private fun startGetStatuss() {
-        LogUtils.v("zcl-----------开始获取路由状态")
         getStatusDispose = Observable.interval(30, 30, TimeUnit.SECONDS).subscribe {
             RouterModel.routerOTAResult(1, 5000, currentTimeMillis)?.subscribe({
                 val filter = it.filter { item -> deviceMac.toString() == item.macAddr }
@@ -285,9 +288,10 @@ class RouterOtaActivity : TelinkBaseActivity() {
                     when (routerOTAResultBean.status) {
                         0 -> afterOtaSuccess()
                         -1, 2 -> afterOtaFailState(routerOTAResultBean)
-                    }
+                   }
                 }
             }, {
+                LogUtils.v("Chown ---startGetStatuss error ")
                 ToastUtils.showShort(it.message)
             })
         }
@@ -306,11 +310,12 @@ class RouterOtaActivity : TelinkBaseActivity() {
 
     private fun setPop() {
         hinitOne.text = getString(R.string.is_exit_ota)
-        cancelf.setOnClickListener { popFinish?.dismiss() }
+        cancelf.setOnClickListener { popFinish.dismiss() }
         confirmf.setOnClickListener {
             clickFinish = true
             devicesStopOTA()
-            popFinish?.dismiss()
+            popFinish.dismiss()
+            finish()
         }
     }
 
@@ -334,6 +339,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         isOtaing = false
         currentTimeMillis = 0
         SharedPreferencesUtils.setLastOtaTime(currentTimeMillis)
+        finish()
     }
 
     override fun tzRouterOTAStopRecevice(routerOTAFinishBean: RouterOTAFinishBean?) {
@@ -363,7 +369,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         isOtaing = false
         when (resultBean.failedCode) {
             -1, 5 -> afterOtaSuccess()
-            -1, 5 -> afterOtaFail()
+            else -> afterOtaFail()
             /*      0 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                   1 -> ToastUtils.showShort(getString(R.string.no_get_version))
                   2 -> ToastUtils.showShort(getString(R.string.no_bind_router_cant_version))
@@ -396,6 +402,7 @@ class RouterOtaActivity : TelinkBaseActivity() {
         twoSecondFinish()
         currentTimeMillis = 0
         SharedPreferencesUtils.setLastOtaTime(currentTimeMillis)
+
     }
 
     @SuppressLint("CheckResult")

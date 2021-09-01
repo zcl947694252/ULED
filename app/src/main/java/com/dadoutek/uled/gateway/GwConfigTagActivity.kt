@@ -476,7 +476,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
             listTask.size > 20 -> toast(getString(R.string.gate_way_time_max))
             index == 0 -> toast(getString(R.string.gate_way_time_max))
             tagBean?.getIsTimer() == true -> {//跳转时间选择界面
-                val intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java)
+                val intent = Intent(this@GwConfigTagActivity, GwChoseTimeActivity::class.java) // 添加定时标签
 
                 val tasksBean = GwTasksBean(index)
                 tasksBean.labelId = tagBean?.tagId ?: 0
@@ -486,7 +486,7 @@ class GwConfigTagActivity : TelinkBaseActivity(), View.OnClickListener{
                 startActivityForResult(intent, requestTimeCode)
             }
             tagBean?.getIsTimer() == false -> {//跳转时间段选择界面
-                val intent = Intent(this@GwConfigTagActivity, GwChoseTimePeriodActivity::class.java)
+                val intent = Intent(this@GwConfigTagActivity, GwChoseTimePeriodActivity::class.java) // 添加循环标签
 
                 val tasksBean = GwTasksBean(index)
                 tasksBean.labelId = tagBean?.tagId ?: 0

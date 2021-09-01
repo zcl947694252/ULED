@@ -173,7 +173,7 @@ public abstract class LightService extends Service implements LightAdapter.Callb
      * @param disconnect 是否断开当前的连接
      */
     public void idleMode(boolean disconnect) {
-
+        LogUtils.v("chwon --- getStackTrack() 断开连接 ");
         if (this.mAdapter == null)
             return;
 

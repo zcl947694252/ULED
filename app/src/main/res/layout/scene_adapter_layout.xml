@@ -350,7 +350,7 @@
                             android:layout_height="30dp"
                             android:max="101"
                             android:min="1"
-                            android:progress="99" />
+                            android:progress="1" />
 
                     <LinearLayout
                             android:layout_width="wrap_content"
@@ -472,7 +472,7 @@
                             android:layout_height="30dp"
                             android:max="101"
                             android:min="1"
-                            android:progress="99" />
+                            android:progress="1" />
 
                     <LinearLayout
                             android:layout_width="wrap_content"
@@ -593,7 +593,7 @@
                     android:min="1"
                     android:paddingStart="25dp"
                     android:paddingEnd="28dp"
-                    android:progress="100"
+                    android:progress="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/normal_title_ld_ly" />
@@ -672,7 +672,7 @@
                     android:min="1"
                     android:paddingStart="25dp"
                     android:paddingEnd="28dp"
-                    android:progress="100"
+                    android:progress="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/normal_title_sw_ly" />

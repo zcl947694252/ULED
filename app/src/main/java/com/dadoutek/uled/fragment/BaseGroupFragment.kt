@@ -432,6 +432,7 @@ abstract class BaseGroupFragment : BaseFragment() {
 
     @SuppressLint("CheckResult")
     private fun sendToServer(gattBody: GwGattBody, open: Boolean) {
+        LogUtils.v("chonw --- 有网关就来此函数")
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
             updateLights(open, currentGroup!!)
@@ -511,17 +512,23 @@ abstract class BaseGroupFragment : BaseFragment() {
         currentPosition = position
         val dstAddr = currentGroup!!.meshAddr
         val groupType = setGroupType()
-
+        val gateWay = DBUtils.getAllGateWay()
+        var isGatt = false
+        if (gateWay.size > 0)
+            isGatt = true
         when (view!!.id) {
+
             R.id.template_device_icon -> {
                 when {
-                    TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE && !TelinkLightApplication.getApp().isConnect -> {
+                    TelinkLightApplication.getApp().connectDevice == null&&  !Constant.IS_ROUTE_MODE &&isGatt/*&& !TelinkLightApplication.getApp().isConnect*/ -> {
+                        LogUtils.v("chown --- 网关是否进入此函数")
                         goConnect()
                         sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
                     }
                     currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
                             || currentGroup!!.deviceType == Constant.DEVICE_TYPE_CONNECTOR || currentGroup!!.deviceType == Constant.DEVICE_TYPE_NO
                             ||currentGroup!!.deviceType == Constant.DEVICE_TYPE_CURTAIN-> {
+                        LogUtils.v("chown --- 网关是否进入第二个函数")
                         when {
                             Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
 

@@ -21,7 +21,7 @@ public class Constant implements Serializable {
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket-endpoint";
     public static Boolean isDebug = true; //chown
     // 显示测试控件
-    public static final Boolean isShow = true; //chown
+//    public static final Boolean isShow = true; //chown
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -36,7 +36,7 @@ public class Constant implements Serializable {
     public static final long downTime = isDebug ? 3 : 11;
     public static  String BASE_URL = isDebug ? BASE_DEBUG_URL : BASE_URL_JAVA;
     public static String WS_STOMP_URL = isDebug ? WS_BASE_URL_DEBUG : WS_BASE_URL;
-    public static  String DEFAULT_MESH_FACTORY_NAME = isDebug ?"dadoutek":"dadousmart";
+    public static  String DEFAULT_MESH_FACTORY_NAME = /*isDebug ? "dadoutek" : */"dadousmart";
     //public static String DEFAULT_MESH_FACTORY_NAME = "dadoutek3";
 
     public static final String DEFAULT_MESH_FACTORY_PASSWORD = "123";

@@ -979,6 +979,7 @@
     <string name="delete_gate_way_label_fail">Failed to remove the gateway label</string>
     <string name="delete_gate_way_task_fail">The delete gateway task failed</string>
     <string name="send_gate_way_label_head_fail">Failed to send tag header</string>
+    <string name="send_gate_way_fail">The operation may be wrong. Please exit the gateway activity and re-enter</string>
     <string name="config_gate_way_tp_task_fail">Failed to configure the gateway loop mode time period</string>
     <string name="config_gate_way_t_task_fail">Failed to configure the gateway timing mode time</string>
     <string name="gate_way_label_switch_fail">Gateway label task switch failed</string>

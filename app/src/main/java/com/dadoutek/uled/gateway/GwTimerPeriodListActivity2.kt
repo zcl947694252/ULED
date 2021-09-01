@@ -383,7 +383,7 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 gattBody.tagName = gwTagBean?.tagName
                 sendToServer(gattBody)
             } else {
-                setHeadTimerDelay(1500L)
+                setHeadTimerDelay(3000L)
 
                 val labHeadPar = byteArrayOf(it.tagId.toByte(), it.status.toByte(),
                         it.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
@@ -399,7 +399,8 @@ class GwTimerPeriodListActivity2 : BaseActivity(), EventListener<String> {
                 .observeOn(Schedulers.io())
                 .subscribeOn(AndroidSchedulers.mainThread()).subscribe {
                     GlobalScope.launch(Dispatchers.Main) {
-                        ToastUtils.showLong(getString(R.string.send_gate_way_label_head_fail))
+                        ToastUtils.showLong(getString(R.string.send_gate_way_fail))
+                        LogUtils.v("chown ============================ ${getString(R.string.send_gate_way_label_head_fail)}")
                     }
                 }
     }

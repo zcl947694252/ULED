@@ -14,3 +14,6 @@ NetworkFactory.java中这里需要修改：
         
         
 RequestInterface.java 类存了我们所有的网络接口
+
+
+TelinkLightApplication 类中 我修改了此处地址 mesh.password = pwd // mesh.password = name chown changed it

@@ -117,6 +117,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
         initLisenter()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initView() {
         toolbar_t_center.text = getString(R.string.chose_time)
         makeStandingTimePop()
@@ -134,8 +135,8 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
         for (i in 1..59)
             list.add(i)
 
-        popRecycle?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
-        val decorations = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
+        popRecycle?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        val decorations = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         decorations.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.black_nine)))
         popRecycle?.addItemDecoration(decorations)
         standingItemAdapter = StandingItemAdapter(R.layout.standing_item, list)
@@ -200,7 +201,7 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
             R.id.gw_times_standing_time_ly -> {
                 if (endTimeNum > startTimeNum)
                 // startActivityForResult(Intent(this, GwSelectStandingTimeActivity::class.java), requestStandingCode)
-                    pop?.showAtLocation(window.decorView, Gravity.BOTTOM, 0, 0)
+                    pop.showAtLocation(window.decorView, Gravity.BOTTOM, 0, 0)
                 else
                     ToastUtils.showShort(getString(R.string.please_chose_right_time))
             }
@@ -260,16 +261,16 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
     @SuppressLint("SetTextI18n")
     private fun setEndTime() {
         endTimeNum = endHourTime * 60 + endMinuteTime
-        var endHourTimeStr = timeStr(endHourTime)
-        var endMinuteTimeStr = timeStr(endMinuteTime)
+        val endHourTimeStr = timeStr(endHourTime)
+        val endMinuteTimeStr = timeStr(endMinuteTime)
         endTime.text = "$endHourTimeStr:$endMinuteTimeStr"
     }
 
     @SuppressLint("SetTextI18n")
     private fun setStartTime() {
         startTimeNum = startHourTime * 60 + startMinuteTime
-        var startHourTimeStr: String = timeStr(startHourTime)
-        var startMinuteTimeStr: String = timeStr(startMinuteTime)
+        val startHourTimeStr: String = timeStr(startHourTime)
+        val startMinuteTimeStr: String = timeStr(startMinuteTime)
         startTime.text = "$startHourTimeStr:$startMinuteTimeStr"
     }
 
@@ -305,11 +306,11 @@ class GwChoseTimePeriodActivity : TelinkBaseActivity(), View.OnClickListener {
                 index += 1
                 LogUtils.v("zcl----时间段-------$time-------$standingNum----$i")
                 if (i in 1 until standingNum) {//如果不足停留时间取结束时间跳出循环
-                    var bean = GwTimePeriodsBean(index, time, endTimeNum, getString(R.string.choose_scene))
+                    val bean = GwTimePeriodsBean(index, time, endTimeNum, getString(R.string.choose_scene))
                     timesList.add(bean)
                     break
                 } else if (endTimeNum - time >= standingNum) {
-                    var bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.choose_scene))
+                    val bean = GwTimePeriodsBean(index, time, time + standingNum, getString(R.string.choose_scene))
                     bean.sceneName = getString(R.string.choose_scene)
                     timesList.add(bean)
                 }

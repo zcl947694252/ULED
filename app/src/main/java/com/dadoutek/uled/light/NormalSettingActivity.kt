@@ -683,6 +683,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setAddMinusIcon() {
         when {
             light_sbBrightness.progress <= 1 -> device_light_minus.setImageResource(R.drawable.icon_minus_no)
@@ -706,6 +707,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun addBtnUi() {
         LogUtils.v("zcl-----设置添加-----isProcessChange--------$isProcessChange")
         when (isProcessChange) {
@@ -1947,6 +1949,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                         .subscribe(
                                                 {
                                                     //deleteData()
+                                                    deleteData()
                                                 }, {
                                             /*   showDialogHardDelete?.dismiss()
                                                showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
@@ -1956,8 +1959,8 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                                        }
                                                        .setNegativeButton(R.string.btn_cancel, null)
                                                        .show()*/
+                                                    Toast.makeText(this,getString(R.string.delete_switch_fail),Toast.LENGTH_SHORT).show()
                                         })
-                                deleteData()
                             } else {
                                 ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                                 finish()
@@ -2000,13 +2003,13 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
         }
         LogUtils.v("chown -- 同步数据")
 
-        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
-            override fun start() {}
-
-            override fun complete() {}
-
-            override fun error(msg: String?) {}
-        })
+//        SyncDataPutOrGetUtils.syncPutDataStart(this, object : SyncCallback {
+//            override fun start() {}
+//
+//            override fun complete() {}
+//
+//            override fun error(msg: String?) {}
+//        })
         finish()
     }
 

@@ -263,8 +263,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
             else -> {// 冷暖灯的场景设置就在这里了
 //                normalVisiableMode(helper, true)
-                helper.setProgress(R.id.normal_sbBrightness, item.brightness)
-                        .setProgress(R.id.normal_temperature, item.temperature)
+                val brightness = if(item.brightness!=0) item.brightness else 50
+                val temperature = if(item.temperature !=0) item.temperature else 50
+                helper.setProgress(R.id.normal_sbBrightness, brightness)
+                        .setProgress(R.id.normal_temperature, temperature)
                         .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
                         .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 // chown changed it

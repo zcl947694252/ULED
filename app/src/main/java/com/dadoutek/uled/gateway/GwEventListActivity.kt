@@ -197,14 +197,14 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             if (Constant.IS_ROUTE_MODE) return@OnMenuItemClickListener true
             showLoadingDialog(getString(R.string.connecting_tip))
             connect(dbGw!!.meshAddr, true)?.subscribeOn(Schedulers.io())
-                    ?.observeOn(AndroidSchedulers.mainThread())
-                    ?.subscribe({
-                        hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.connect_success))
-                    }, {
-                        hideLoadingDialog()
-                        ToastUtils.showShort(getString(R.string.connect_fail))
-                    })
+                ?.observeOn(AndroidSchedulers.mainThread())
+                ?.subscribe({
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.connect_success))
+                }, {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                })
         }
         true
     }
@@ -214,25 +214,26 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         showLoadingDialog(getString(R.string.please_wait))
         if (TelinkApplication.getInstance().connectDevice != null) {
             downloadDispoable = Commander.getDeviceVersion(dbGw!!.meshAddr)
-                    .subscribe(
-                            { s: String ->
-                                dbGw!!.version = s
-                                DBUtils.saveGateWay(dbGw!!, false)
-                                val isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
-                                if (isBoolean) {
-                                    transformView()
-                                } else {
-                                    if (OtaPrepareUtils.instance().checkSupportOta(s)!!)
-                                        OtaPrepareUtils.instance().gotoUpdateView(this@GwEventListActivity, s, otaPrepareListner)
-                                    else
-                                        ToastUtils.showShort(getString(R.string.version_disabled))
-                                }
-                                hideLoadingDialog()
-                            }, {
+                .subscribe(
+                    { s: String ->
+                        dbGw!!.version = s
+                        DBUtils.saveGateWay(dbGw!!, false)
+                        val isBoolean: Boolean =
+                            SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), IS_DEVELOPER_MODE, false)
+                        if (isBoolean) {
+                            transformView()
+                        } else {
+                            if (OtaPrepareUtils.instance().checkSupportOta(s)!!)
+                                OtaPrepareUtils.instance().gotoUpdateView(this@GwEventListActivity, s, otaPrepareListner)
+                            else
+                                ToastUtils.showShort(getString(R.string.version_disabled))
+                        }
+                        hideLoadingDialog()
+                    }, {
                         hideLoadingDialog()
                         ToastUtils.showLong(getString(R.string.get_version_fail))
                     }
-                    )
+                )
         } else {
             ToastUtils.showShort(getString(R.string.connect_fail))
             finish()
@@ -287,38 +288,39 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     private fun deleteDevice() {
         //恢复出厂设置
         showDialogDelete = androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.sure_delete_device2)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    hardTimer()
-                    showLoadingDialog(getString(R.string.please_wait))
-                    sendGwResetFactory(0)////恢复出厂设置
-                    SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
-                }
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show()
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                hardTimer()
+                showLoadingDialog(getString(R.string.please_wait))
+                sendGwResetFactory(0)////恢复出厂设置
+                SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, syncCallbackGet)
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 
     private fun hardTimer() {
         disposableFactoryTimer?.dispose()
         disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    hideLoadingDialog()
-                    CoroutineScope(Dispatchers.Main).launch {
-                        showDialogDelete?.dismiss()
-                        showDialogHardDeleteGw = androidx.appcompat.app.AlertDialog.Builder(this@GwEventListActivity).setMessage(R.string.delete_device_hard_tip)
-                                .setPositiveButton(android.R.string.ok) { _, _ ->
-                                    GlobalScope.launch(Dispatchers.Main) {
-                                        showLoadingDialog(getString(R.string.please_wait))
-                                    }
-                                    showDialogHardDelete?.dismiss()
-                                    isRestSuccess = true
-                                    deleteGwData(isRestSuccess)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                hideLoadingDialog()
+                CoroutineScope(Dispatchers.Main).launch {
+                    showDialogDelete?.dismiss()
+                    showDialogHardDeleteGw =
+                        androidx.appcompat.app.AlertDialog.Builder(this@GwEventListActivity).setMessage(R.string.delete_device_hard_tip)
+                            .setPositiveButton(android.R.string.ok) { _, _ ->
+                                GlobalScope.launch(Dispatchers.Main) {
+                                    showLoadingDialog(getString(R.string.please_wait))
                                 }
-                                .setNegativeButton(R.string.btn_cancel, null)
-                                .show()
-                    }
+                                showDialogHardDelete?.dismiss()
+                                isRestSuccess = true
+                                deleteGwData(isRestSuccess)
+                            }
+                            .setNegativeButton(R.string.btn_cancel, null)
+                            .show()
                 }
+            }
     }
 
     private fun deleteGwData(restSuccess: Boolean = false) {
@@ -353,27 +355,27 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
     private fun userReset() {
         showDialogDelete = androidx.appcompat.app.AlertDialog.Builder(this).setMessage(R.string.user_reset_tip)
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    disposableFactoryTimer?.dispose()
-                    disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.user_reset_faile))
-                            }
-                    GlobalScope.launch(Dispatchers.Main) {
-                        showLoadingDialog(getString(R.string.please_wait))
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                disposableFactoryTimer?.dispose()
+                disposableFactoryTimer = Observable.timer(15000, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.user_reset_faile))
                     }
-                    if (TelinkLightApplication.getApp().connectDevice != null) {
-                        sendGwResetFactory(1)//用户恢复   sendGwResetFactory(0)//恢复出厂设置
-                    } else {
-                        ToastUtils.showShort(getString(R.string.connect_fail))
-                        finish()
-                    }
+                GlobalScope.launch(Dispatchers.Main) {
+                    showLoadingDialog(getString(R.string.please_wait))
                 }
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show()
+                if (TelinkLightApplication.getApp().connectDevice != null) {
+                    sendGwResetFactory(1)//用户恢复   sendGwResetFactory(0)//恢复出厂设置
+                } else {
+                    ToastUtils.showShort(getString(R.string.connect_fail))
+                    finish()
+                }
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 
     private fun sendGwResetFactory(frist: Int) {
@@ -424,21 +426,21 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
 
     private fun retryConnect() {
         connect(macAddress = dbGw!!.macAddr, fastestMode = true)?.subscribe(
-                object : NetworkObserver<DeviceInfo?>() {
-                    override fun onNext(t: DeviceInfo) {
-                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.config_success))
-                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
-                    }
-
-                    override fun onError(e: Throwable) {
-                        super.onError(e)
-                        CoroutineScope(Dispatchers.Main).launch {
-                            TmtUtils.midToast(this@GwEventListActivity, getString(R.string.connect_fail))
-                        }
-                        //DBUtils.saveGateWay(dbGw!!, true)
-                        finish()
-                    }
+            object : NetworkObserver<DeviceInfo?>() {
+                override fun onNext(t: DeviceInfo) {
+                    TmtUtils.midToast(this@GwEventListActivity, getString(R.string.config_success))
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 }
+
+                override fun onError(e: Throwable) {
+                    super.onError(e)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.connect_fail))
+                    }
+                    //DBUtils.saveGateWay(dbGw!!, true)
+                    finish()
+                }
+            }
         )
     }
 
@@ -473,14 +475,14 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         showLoadingDialog(getString(R.string.please_wait))
         disposableTimer?.dispose()
         disposableTimer = Observable.timer(2000, TimeUnit.MILLISECONDS)
-                .observeOn(Schedulers.io())
-                .subscribeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    hideLoadingDialog()
-                    runOnUiThread { ToastUtils.showLong(getString(R.string.get_time_zone_fail)) }
-                    DBUtils.saveGateWay(dbGw!!, true)
-                    finish()
-                }
+            .observeOn(Schedulers.io())
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                hideLoadingDialog()
+                runOnUiThread { ToastUtils.showLong(getString(R.string.get_time_zone_fail)) }
+                DBUtils.saveGateWay(dbGw!!, true)
+                finish()
+            }
         val default = TimeZone.getDefault()
         val name = default.getDisplayName(true, TimeZone.SHORT)
         val split = if (name.contains("+")) //0正时区 1负时区
@@ -507,8 +509,10 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         val yearH = (year shr 8) and (0xff)
         val yearL = year and (0xff)
 
-        val params = byteArrayOf(tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
-                yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte())
+        val params = byteArrayOf(
+            tzHour.toByte(), tzMinutes.toByte(), yearH.toByte(),
+            yearL.toByte(), month.toByte(), day.toByte(), hour.toByte(), minute.toByte(), second.toByte(), week.toByte()
+        )
         LogUtils.v("zcl-----------发送时区-------地址${dbGw?.meshAddr}")
         TelinkLightService.Instance()?.sendCommandResponse(Opcode.CONFIG_GW_SET_TIME_ZONE, dbGw?.meshAddr ?: 0, params, "1")
     }
@@ -766,7 +770,11 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     }
 
 
-    private fun canOpenTG(currentAllTime: MutableList<GwTimeAndDataBean>, oldList: MutableList<GwTimeAndDataBean>, isTimer: Boolean): Boolean {
+    private fun canOpenTG(
+        currentAllTime: MutableList<GwTimeAndDataBean>,
+        oldList: MutableList<GwTimeAndDataBean>,
+        isTimer: Boolean
+    ): Boolean {
         var canOpenTag = true
         currentAllTime.forEach {
             if (canOpenTag)
@@ -817,8 +825,10 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         var splitWeek: List<String> = dbGwTag.weekStr.split(",")
         if (splitWeek.size == 1) {
             if (splitWeek[0] == getString(R.string.every_day)) {
-                splitWeek = mutableListOf(getString(R.string.monday), getString(R.string.tuesday), getString(R.string.wednesday),
-                        getString(R.string.thursday), getString(R.string.friday), getString(R.string.saturday), getString(R.string.sunday))
+                splitWeek = mutableListOf(
+                    getString(R.string.monday), getString(R.string.tuesday), getString(R.string.wednesday),
+                    getString(R.string.thursday), getString(R.string.friday), getString(R.string.saturday), getString(R.string.sunday)
+                )
             } else if (splitWeek[0] == getString(R.string.only_one)) {
                 splitWeek = getOnlyOne()
             }
@@ -843,13 +853,14 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             0b00000000 -> sb.append(getString(R.string.only_one))
             else -> {
                 val list = mutableListOf(
-                        WeekBean(getString(R.string.monday), 1, (tmpWeek and MONDAY) != 0),
-                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and TUESDAY) != 0),
-                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and WEDNESDAY) != 0),
-                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and THURSDAY) != 0),
-                        WeekBean(getString(R.string.friday), 5, (tmpWeek and FRIDAY) != 0),
-                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and SATURDAY) != 0),
-                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and SUNDAY) != 0))
+                    WeekBean(getString(R.string.monday), 1, (tmpWeek and MONDAY) != 0),
+                    WeekBean(getString(R.string.tuesday), 2, (tmpWeek and TUESDAY) != 0),
+                    WeekBean(getString(R.string.wednesday), 3, (tmpWeek and WEDNESDAY) != 0),
+                    WeekBean(getString(R.string.thursday), 4, (tmpWeek and THURSDAY) != 0),
+                    WeekBean(getString(R.string.friday), 5, (tmpWeek and FRIDAY) != 0),
+                    WeekBean(getString(R.string.saturday), 6, (tmpWeek and SATURDAY) != 0),
+                    WeekBean(getString(R.string.sunday), 7, (tmpWeek and SUNDAY) != 0)
+                )
                 for (i in 0 until list.size) {
                     val weekBean = list[i]
                     if (weekBean.selected) {
@@ -883,17 +894,17 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         disposableTimer?.dispose()
         connectCount++
         disposableTimer = Observable.timer(20000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (connectCount < 3)
-                        sendOpenOrCloseGw(dbGwTag, isMutex)
-                    else {
-                        updateBackStatus(isMutex)
-                        hideLoadingDialog()
-                        runOnUiThread { TmtUtils.midToast(this@GwEventListActivity, getString(R.string.gate_way_label_switch_fail)) }
-                    }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (connectCount < 3)
+                    sendOpenOrCloseGw(dbGwTag, isMutex)
+                else {
+                    updateBackStatus(isMutex)
+                    hideLoadingDialog()
+                    runOnUiThread { TmtUtils.midToast(this@GwEventListActivity, getString(R.string.gate_way_label_switch_fail)) }
                 }
+            }
 
         val meshAddress = dbGw?.meshAddr ?: 0
         //p = byteArrayOf(0x02, Opcode.GROUP_BRIGHTNESS_MINUS, 0x00, 0x00, 0x03, Opcode.GROUP_CCT_MINUS, 0x00, 0x00)
@@ -909,10 +920,12 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             Opcode.CONFIG_GW_TIMER_PERIOD_LABLE_HEAD
 
         if (!TelinkLightApplication.getApp().isConnectGwBle) {
-            val gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0,
-                    opcodeHead, 0x11, 0x02,
-                    dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
-                    dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0, 0, 0)
+            val gattPar = byteArrayOf(
+                0x11, 0x11, 0x11, 0, 0, 0, 0,
+                opcodeHead, 0x11, 0x02,
+                dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),
+                dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0, 0, 0
+            )
             LogUtils.v("zcl-----------发送到服务器标签列表开关-------$gattPar")
 
 
@@ -924,8 +937,10 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             gattBody.tagName = dbGwTag.tagName
             sendToServer(gattBody)
         } else {
-            val labHeadPar = byteArrayOf(dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),//标签开与关
-                    dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0)
+            val labHeadPar = byteArrayOf(
+                dbGwTag.tagId.toByte(), dbGwTag.status.toByte(),//标签开与关
+                dbGwTag.week.toByte(), 0, month.toByte(), day.toByte(), 0, 0
+            )
             TelinkLightService.Instance()?.sendCommandResponse(opcodeHead, meshAddress, labHeadPar, "1")
             LogUtils.v("zcl-----------发送命令0xf6-------")
         }
@@ -981,8 +996,10 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
             }
         } else {
             setTimerDelay(gwTagBean, currentTime, 6500)
-            val labHeadPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0, 0, opcodedelete, 0x11, 0x02,
-                    gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+            val labHeadPar = byteArrayOf(
+                0x11, 0x11, 0x11, 0, 0, 0, 0, opcodedelete, 0x11, 0x02,
+                gwTagBean.tagId.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0
+            )
             LogUtils.v("zcl-----------发送到服务器标签列表删除标签-------$labHeadPar")
             val s = Base64Utils.encodeToStrings(labHeadPar)
             val gattBody = GwGattBody()
@@ -997,24 +1014,21 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setTimerDelay(gwTagBean: GwTagBean, currentTime: Long, delay: Long) {
         disposableTimer = Observable.timer(delay, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    if (connectCount < 3)
-                        deleteTimerLable(gwTagBean, currentTime)
-                    else
-                        GlobalScope.launch(Dispatchers.Main) {
-                            hideLoadingDialog()
-                            TmtUtils.midToast(this@GwEventListActivity, getString(R.string.delete_gate_way_label_fail))
-                        }
-                }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                if (connectCount < 3)
+                    deleteTimerLable(gwTagBean, currentTime)
+                else
+                    GlobalScope.launch(Dispatchers.Main) {
+                        hideLoadingDialog()
+                        TmtUtils.midToast(this@GwEventListActivity, getString(R.string.delete_gate_way_label_fail))
+                    }
+            }
     }
 
     private fun addNewTag() {
-        val list = if (dbGw?.type == 0)
-            listOne
-        else
-            listTwo
+        val list = if (dbGw?.type == 0) listOne else listTwo
         if (list.size >= 20)
             toast(getString(R.string.gate_way_time_max))
         else {
@@ -1036,12 +1050,12 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
         receiver?.setOnGwStateChangeListerner(object : GwBrocasetReceiver.GwStateChangeListerner {
             override fun loginSuccess() {
                 if (!Constant.IS_ROUTE_MODE)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
             }
 
             override fun loginFail() {
                 if (!Constant.IS_ROUTE_MODE)
-                toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                 // retryConnect()
             }
 
@@ -1142,11 +1156,11 @@ class GwEventListActivity : TelinkBaseActivity(), BaseQuickAdapter.OnItemChildCl
                 }
                 LightAdapter.STATUS_LOGIN -> {
                     if (!Constant.IS_ROUTE_MODE)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.icon_bluetooth)
                 }
                 LightAdapter.STATUS_LOGOUT -> {
                     if (!Constant.IS_ROUTE_MODE)
-                    toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
+                        toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).setImageResource(R.drawable.bluetooth_no)
                     if (!isRestSuccess)
                         retryConnect()
                 }

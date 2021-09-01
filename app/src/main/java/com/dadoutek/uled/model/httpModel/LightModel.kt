@@ -62,7 +62,6 @@ object LightModel {
     }
 
     fun batchAddorUpdateLight(dbLights: List<DbLight>): Observable<String>? {
-        LogUtils.v("chown ------batchAddorUpdateLight ${LightListBodyBean(dbLights).toString()}")
         return NetworkFactory.getApi()
             .updateLights(LightListBodyBean(dbLights))
             .compose(NetworkTransformer())
@@ -71,6 +70,7 @@ object LightModel {
     }
 
     fun remove(idList: List<Int>) :Observable<String>? {
+        LogUtils.v("chown idList ${BodyBias(idList)}")
         return NetworkFactory.getApi()
             .deleteLights(BodyBias(idList))
             .compose(NetworkTransformer())

@@ -100,10 +100,10 @@ class GroupOTAListActivity : TelinkBaseActivity() {
 
     private fun setPop() {
         hinitOne.text = getString(R.string.is_exit_ota)
-        cancelf.setOnClickListener { popFinish?.dismiss() }
+        cancelf.setOnClickListener { popFinish.dismiss() }
         confirmf.setOnClickListener {
             devicesStopOTA()
-            popFinish?.dismiss()
+            popFinish.dismiss()
         }
     }
 

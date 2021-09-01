@@ -583,12 +583,12 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
                 six_switch_b5.setTextColor(getColor(R.color.brightness_add_color))
                 six_switch_b6.setTextColor(getColor(R.color.brightness_add_color))
                 configSwitchTypeNum = 0
-                six_switch_b1.text = "ON"
-                six_switch_b2.text = "ON"
-                six_switch_b3.text = "ON"
-                six_switch_b4.text = "OFF"
-                six_switch_b5.text = "OFF"
-                six_switch_b6.text = "OFF"
+                six_switch_b1.text = "ON\n(亮度调节)"
+                six_switch_b2.text = "ON\n(亮度调节)"
+                six_switch_b3.text = "ON\n(亮度调节)"
+                six_switch_b4.text = "(色温调节)\nOFF"
+                six_switch_b5.text = "(色温调节)\nOFF"
+                six_switch_b6.text = "(色温调节)\nOFF"
                 six_switch_b7.visibility = View.VISIBLE
                 six_switch_b8.visibility = View.VISIBLE
                 six_switch_b9.visibility = View.VISIBLE

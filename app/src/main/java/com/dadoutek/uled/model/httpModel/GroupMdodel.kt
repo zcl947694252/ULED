@@ -1,5 +1,6 @@
 package com.dadoutek.uled.model.httpModel
 
+import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.BodyBias
 import com.dadoutek.uled.model.Response
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -40,9 +41,11 @@ object GroupMdodel {
             .doOnNext {  }
     }
 
-    fun remove(list: List<Int>): Observable<String>? {
+    fun remove(idList: List<Int>): Observable<String>? {
+        LogUtils.v("chown bodybias ${BodyBias(idList).idList}")
         return NetworkFactory.getApi()
-            .deleteGroups(BodyBias(list))
+            .deleteGroups(BodyBias(idList))
+//            .deleteGroups2(list)
             .compose(NetworkTransformer())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

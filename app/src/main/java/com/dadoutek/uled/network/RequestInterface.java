@@ -1581,7 +1581,10 @@ public interface RequestInterface {
     Observable<Response<String>> updateLights(@Body LightListBodyBean lights);
 
     @HTTP(method = "DELETE", path = "light/remove", hasBody = true)
-    Observable<Response<String>> deleteLights(@Body BodyBias lightId);
+    Observable<Response<String>> deleteLights(@Body BodyBias idList);
+
+    @POST("light/remove")
+    Observable<Response<String>> deleteLights2(@Field("idList") List<Long> idList);
 
     /**
      * 批量组更新
@@ -1592,7 +1595,8 @@ public interface RequestInterface {
     Observable<Response<String>> updateGroups(@Field("groups") List<DbGroup> groups);
 
     @HTTP(method = "DELETE", path = "group/remove", hasBody = true)
-    Observable<Response<String>> deleteGroups(@Body BodyBias groupId);
+    Observable<Response<String>> deleteGroups(@Body BodyBias idList);
+
 
     /**
      * 批量场景更新
@@ -1603,7 +1607,7 @@ public interface RequestInterface {
     Observable<Response<String>> updateScenes(@Body SceneListBodyBean2 scenes);
 
     @HTTP(method = "DELETE", path = "scene/remove", hasBody = true)
-    Observable<Response<String>> deleteScenes(@Body BodyBias sceneId);
+    Observable<Response<String>> deleteScenes(@Body BodyBias idList);
 
     /**
      * 批量窗帘更新
@@ -1614,7 +1618,7 @@ public interface RequestInterface {
     Observable<Response<String>> updateCurtain(@Body CurtainListBodyBean curtains);
 
     @HTTP(method = "DELETE", path = "curtain/remove", hasBody = true)
-    Observable<Response<String>> deleteCurtains(@Body BodyBias curtainId);
+    Observable<Response<String>> deleteCurtains(@Body BodyBias idList);
 
     /**
      * 批量添加更新连接器
@@ -1625,7 +1629,7 @@ public interface RequestInterface {
     Observable<Response<String>> updateRelay(@Body ConnectorBodyBean connectors);
 
     @HTTP(method = "DELETE", path = "relay/remove", hasBody = true)
-    Observable<Response<String>> deleteRelay(@Body BodyBias relayId);
+    Observable<Response<String>> deleteRelay(@Body BodyBias idList);
 
     /**
      * 批量添加更新传感器
@@ -1636,7 +1640,7 @@ public interface RequestInterface {
     Observable<Response<String>> updateSensors(@Body SensorListBodyBean sensors);
 
     @HTTP(method = "DELETE", path = "sensor/remove", hasBody = true)
-    Observable<Response<String>> deleteSensor(@Body BodyBias sensorId);
+    Observable<Response<String>> deleteSensor(@Body BodyBias idList);
 
     /**
      * 批量添加更新开关
@@ -1647,7 +1651,7 @@ public interface RequestInterface {
     Observable<Response<String>> updateSwitch(@Body SwitchListBodyBean switches);
 
     @HTTP(method = "DELETE", path = "switch/remove", hasBody = true)
-    Observable<Response<String>> deleteSwitch(@Body BodyBias switchId);
+    Observable<Response<String>> deleteSwitch(@Body BodyBias idList);
 
     /**
      * 批量处理动态变换更新与添加
@@ -1658,7 +1662,7 @@ public interface RequestInterface {
     Observable<Response<String>> updateDynamic(@Body GradientListBodyBean dynamics);
 
     @HTTP(method = "DELETE", path = "dynamic-change/remove", hasBody = true)
-    Observable<Response<String>> deleteDynamic(@Body BodyBias dynamicId);
+    Observable<Response<String>> deleteDynamic(@Body BodyBias idList);
 
 
     /**
