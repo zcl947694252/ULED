@@ -39,6 +39,7 @@ import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.rgb.RGBSettingActivity
+import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
@@ -81,7 +82,6 @@ private const val SCAN_BEST_RSSI_DEVICE_TIMEOUT_SECOND: Long = 1
 
 class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, SearchView.OnQueryTextListener, View.OnClickListener {
     private var isOpen: Int = 0
-    private var bindRouter: MenuItem? = null
     private val REQ_LIGHT_SETTING: Int = 0x01
     private lateinit var group: DbGroup
     private var mDataManager: DataManager? = null
@@ -102,9 +102,10 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     private var mCheckRssiDisposal: Disposable? = null
     private var mNotFoundSnackBar: Snackbar? = null
     private var acitivityIsAlive = true
-    private var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
+    private var recyclerView: RecyclerView? = null
     private var deleteDevice: MenuItem? = null
     private var onlineUpdate: MenuItem? = null
+    private var bindRouter: MenuItem? = null
     private var batchGp: MenuItem? = null
     private var isDelete: Boolean = false
 
@@ -164,11 +165,11 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         startActivity(intent)
     }
 
-
     private fun initToolbar() {
-        toolbarTv?.text = getString(R.string.group_setting_header)
+        toolbarTv.setText(R.string.group_setting_header)
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
+
         val moreIcon = ContextCompat.getDrawable(toolbar.context, R.drawable.abc_ic_menu_overflow_material)
         if (moreIcon != null) {
             moreIcon.setColorFilter(ContextCompat.getColor(toolbar.context, R.color.black), PorterDuff.Mode.SRC_ATOP)
@@ -211,14 +212,16 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun bindDeviceRouter() {
-
+        val intent = Intent(this, BindRouterActivity::class.java)
+        intent.putExtra("group", group)
+        startActivity(intent)
     }
 
     private fun skipeBatch() {
         when {
             DBUtils.getAllRelay().size == 0 -> ToastUtils.showShort(getString(R.string.no_device))
             TelinkLightApplication.getApp().connectDevice != null || Constant.IS_ROUTE_MODE ->
-                startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group?.meshAddr)
+                startActivity<BatchGroupFourDeviceActivity>(Constant.DEVICE_TYPE to DeviceType.SMART_RELAY, "gp" to group.meshAddr)
             else -> ToastUtils.showShort(getString(R.string.connect_fail))
         }
     }
@@ -227,7 +230,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
         if (DBUtils.getAllRelay().size == 0)
             ToastUtils.showShort(getString(R.string.no_device))
         else
-            startActivity<GroupOTAListActivity>("group" to group!!, "DeviceType" to DeviceType.SMART_RELAY)
+            startActivity<GroupOTAListActivity>("group" to group, "DeviceType" to DeviceType.SMART_RELAY)
     }
 
     private fun editeDevice() {
@@ -316,11 +319,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
     private fun initData() {
         lightList = ArrayList()
-        when (group.meshAddr) {
-            0xffff -> filter("", false)
-            else -> lightList = DBUtils.getRelayByGroupID(group.id)
-        }
-        toolbar.title = group?.name + "(${group?.deviceCount})"
+        lightList = DBUtils.getRelayByGroupID(group.id)
+        toolbar.title = group.name + "(${group.deviceCount})"
         if (lightList.size > 0) {
             recycler_view_lights.visibility = View.VISIBLE
             no_light_ly.visibility = View.GONE
@@ -331,15 +331,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
     }
 
     private fun getNewData(): MutableList<DbConnector> {
-        when (group.meshAddr) {
-            0xffff -> filter("", false)
-            else -> lightList = DBUtils.getRelayByGroupID(group.id)
-        }
-
-        when (group.meshAddr) {
-            0xffff -> toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
-            else -> toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
-        }
+        lightList = DBUtils.getRelayByGroupID(group.id)
+        toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
         return lightList
     }
 
@@ -375,10 +368,7 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
 
     private fun initView() {
-        when (group.meshAddr) {
-            0xffff -> toolbarTv.text = getString(R.string.allLight) + " (" + lightList.size + ")"
-            else -> toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
-        }
+        toolbarTv.text = (group.name ?: "") + " (" + lightList.size + ")"
         light_add_device_btns.setOnClickListener(this)
         recyclerView = findViewById(R.id.recycler_view_lights)
         recyclerView!!.layoutManager = GridLayoutManager(this, 2)
@@ -514,8 +504,8 @@ class ConnectorOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Se
 
 
     private fun deletePreGroup(dbLight: DbConnector) {
-        if (DBUtils.getGroupByID(dbLight!!.belongGroupId!!) != null) {
-            val groupAddress = DBUtils.getGroupByID(dbLight!!.belongGroupId!!)?.meshAddr
+        if (DBUtils.getGroupByID(dbLight.belongGroupId!!) != null) {
+            val groupAddress = DBUtils.getGroupByID(dbLight.belongGroupId!!)?.meshAddr
             val opcode = Opcode.SET_GROUP
             val params = byteArrayOf(0x00, (groupAddress!! and 0xFF).toByte(), (groupAddress shr 8 and 0xFF).toByte())//0x00表示删除组
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dbLight.meshAddr, params)

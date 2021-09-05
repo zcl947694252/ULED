@@ -188,10 +188,11 @@ class GwLoginActivity : TelinkBaseActivity() {
     override fun routerConfigWIFI(cmdBody: CmdBodyBean) {
         if (TAG == cmdBody.ser_id) {
             if (cmdBody.status == Constant.ALL_SUCCESS) {
-                ToastUtils.showShort(getString(R.string.config_WIFI_success))
+                ToastUtils.showLong(getString(R.string.config_WIFI_success))
                 SharedPreferencesHelper.putBoolean(this, Constant.IS_GW_CONFIG_WIFI, false)
                 ActivityUtils.finishAllActivities()
                 ActivityUtils.startActivity(MainActivity::class.java)
+
             } else {
                 ToastUtils.showShort(getString(R.string.config_WIFI_FAILE))
             }

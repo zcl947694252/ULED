@@ -111,6 +111,7 @@
     <string name="delete_device">删除设备</string>
     <string name="group_switch">群组开关</string>
     <string name="eight_switch">多功能开关</string>
+    <string name="eight_switch1">八键</string>
     <string name="choose_scene">选择场景</string>
     <!--   //开关，传感器 End -->
 
@@ -243,7 +244,9 @@
     <string name="scene_switch">场景开关</string>
     <string name="curtain_switch">窗帘开关</string>
     <string name="four_switch">四键开关</string>
+    <string name="four_switch1">四键</string>
     <string name="six_switch">六键开关</string>
+    <string name="six_switch1">六键</string>
 
     <string name="button1">按键1</string>
     <string name="button2">按键2</string>

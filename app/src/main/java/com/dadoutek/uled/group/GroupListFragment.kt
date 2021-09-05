@@ -45,6 +45,7 @@ import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.ItemTypeGroup
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.MainActivity
 import com.dadoutek.uled.othersview.ViewPagerAdapter
@@ -463,7 +464,7 @@ class GroupListFragment : BaseFragment() {
                     }
                     val low = allGroup!!.meshAddr and 0xff
                     val hight = (allGroup!!.meshAddr shr 8) and 0xff
-                    val gattBody = GwGattBody()
+                    val gattBody = GwGattBody2()
                     var gattPar: ByteArray = byteArrayOf()
                     if (isOpen) {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
@@ -490,7 +491,7 @@ class GroupListFragment : BaseFragment() {
     }
 
     @SuppressLint("CheckResult")
-    private fun sendToServer(gattBody: GwGattBody) {
+    private fun sendToServer(gattBody: GwGattBody2) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
             LogUtils.v("zcl-----------远程控制-------$it")

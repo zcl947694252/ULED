@@ -84,7 +84,7 @@ class SettingActivity : TelinkBaseActivity() {
                     when (position) {
                         0 -> showResetTipPop()
                         1 -> {
-                            var intent = Intent(this, SafeLockActivity::class.java)
+                            val intent = Intent(this, SafeLockActivity::class.java)
                             startActivity(intent)
                         }
                         2 -> {
@@ -99,11 +99,11 @@ class SettingActivity : TelinkBaseActivity() {
                             })
                         }
                         3 -> {
-                            var intent = Intent(this, ChooseModeActivity::class.java)
+                            val intent = Intent(this, ChooseModeActivity::class.java)
                             startActivity(intent)
                         }
                         4-> {
-                            var intent = Intent(this, CloudAssistantActivity::class.java)
+                            val intent = Intent(this, CloudAssistantActivity::class.java)
                             startActivity(intent)
                         }
                         else->{}
@@ -137,7 +137,7 @@ class SettingActivity : TelinkBaseActivity() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { it1 ->
-                        var num = Constant.downTime - 1 - it1
+                        val num = Constant.downTime - 1 - it1
                         when (num) {
                             0L -> setTimerZero()
                             else -> {
@@ -201,7 +201,7 @@ class SettingActivity : TelinkBaseActivity() {
     }
 
     private fun makePop2() {
-        var popView: View = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
+        val popView: View = LayoutInflater.from(this).inflate(R.layout.pop_time_cancel, null)
         hinitOne1 = popView.findViewById(R.id.hinit_one)
         hinitTwo = popView.findViewById(R.id.hinit_two)
         hinitThree = popView.findViewById(R.id.hinit_three)
@@ -211,13 +211,13 @@ class SettingActivity : TelinkBaseActivity() {
         cancelConfirmLy = popView.findViewById(R.id.cancel_confirm_ly)
         cancelConfirmVertical = popView.findViewById(R.id.tip_center_vertical)
 
-        hinitOne?.text = getString(R.string.user_reset_all1)
+        hinitOne.text = getString(R.string.user_reset_all1)
         hinitTwo?.text = getString(R.string.user_reset_all2)
         hinitThree?.text = getString(R.string.user_reset_all3)
 
-        var cs: ClickableSpan = object : ClickableSpan() {
+        val cs: ClickableSpan = object : ClickableSpan() {
             override fun onClick(widget: View) {
-                var intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
+                val intent = Intent(this@SettingActivity, InstructionsForUsActivity::class.java)
                 intent.putExtra(Constant.WB_TYPE, "#user-reset")
                 startActivity(intent)
             }
@@ -230,7 +230,7 @@ class SettingActivity : TelinkBaseActivity() {
         }
 
         val str = getString(R.string.have_question_look_notice)
-        var ss = SpannableString(str)
+        val ss = SpannableString(str)
         val start: Int = if (Locale.getDefault().language.contains("zh")) str.length - 7 else str.length - 26
         val end = str.length
         ss.setSpan(cs, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

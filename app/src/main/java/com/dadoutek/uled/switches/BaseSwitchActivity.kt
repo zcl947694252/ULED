@@ -91,7 +91,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
     }
 
     private fun initToolbar() {
-        var toolbar = setToolBar()
+        val toolbar = setToolBar()
 
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener { finish() }
@@ -387,6 +387,7 @@ abstract class BaseSwitchActivity : TelinkBaseActivity() {
 
     @SuppressLint("CheckResult")
     open fun routerRenameSw(sw: DbSwitch, trim: String) {
+        toolbarTv.text = trim
         RouterModel.routeUpdateSw(sw.id, trim)?.subscribe({
             routerRenameSwSuccess(trim)
             SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)

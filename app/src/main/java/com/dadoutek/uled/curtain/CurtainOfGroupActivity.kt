@@ -453,7 +453,7 @@ class CurtainOfGroupActivity : TelinkBaseActivity(), EventListener<String>, Sear
         builder.setPositiveButton(getString(android.R.string.ok)) { _, _ ->
             deletePreGroup(dbLight)
 
-            DBUtils.updateGroup(group!!)
+            DBUtils.updateGroup(group)
 
             dbLight.hasGroup = false
             dbLight.belongGroupId = 1

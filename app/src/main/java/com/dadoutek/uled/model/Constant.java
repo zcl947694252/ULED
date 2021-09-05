@@ -21,9 +21,9 @@ public class Constant implements Serializable {
     //长连接测试请求服务器域名地址
     public static String WS_BASE_URL_DEBUG = "ws://dev.dadoutek.com/smartlight_test/websocket" +
             "-endpoint";
-    public static Boolean isDebug = true; //chown
+    public static Boolean isDebug = false; //chown
     // 显示测试控件
-    public static final Boolean isShow = true; //chown
+    public static final Boolean isShow = false; //chown
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadourd";
     //public static final String DEFAULT_MESH_FACTORY_NAME = "dadousmart";
     /**
@@ -373,6 +373,7 @@ public class Constant implements Serializable {
      * 通过服务器转发命令到网关CMD
      */
     public static final int CMD_MQTT_CONTROL = 2500;
+//    public static final int CMD_MQTT_CONTROL = 999;
     /**
      * Y远程控制业务标识
      */

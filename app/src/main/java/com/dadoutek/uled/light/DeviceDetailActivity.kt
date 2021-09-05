@@ -14,6 +14,7 @@ import android.text.TextUtils
 import android.text.TextWatcher
 import android.view.*
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
@@ -34,6 +35,7 @@ import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.rgb.RGBSettingActivity
@@ -44,20 +46,21 @@ import com.dadoutek.uled.stomp.MqttBodyBean
 import com.dadoutek.uled.tellink.TelinkLightApplication
 import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
-import com.dadoutek.uled.util.SyncDataPutOrGetUtils
-import com.telink.TelinkApplication
+//import com.dadoutek.uled.util.SyncDataPutOrGetUtils
+//import com.telink.TelinkApplication
 import com.telink.bluetooth.light.ConnectionStatus
-import com.telink.bluetooth.light.DeviceInfo
+//import com.telink.bluetooth.light.DeviceInfo
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_device_detail.*
 import kotlinx.android.synthetic.main.template_search_tool.*
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.Dispatchers
+//import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.bluetoothManager
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -248,7 +251,7 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
             if (currentDevice?.status == ConnectionStatus.OFFLINE.value)
                 return@OnItemChildClickListener
             positionCurrent = position
-            itemClikMethod(view)
+            itemClikMethod(view, position)
             /*    when {
                     Constant.IS_ROUTE_MODE -> itemClikMethod(view)
                     else -> when {
@@ -263,17 +266,22 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun itemClikMethod(view: View) {
+    private fun itemClikMethod(view: View , position: Int) {
         val b = TelinkLightService.Instance().isLogin && TelinkLightApplication.getApp().connectDevice != null
         when (view.id) {
             R.id.template_device_icon -> {
                 when {
                     Constant.IS_ROUTE_MODE -> openOrClose(currentDevice!!)
                     b -> {
+                        LogUtils.v("chown -- b")
                         openOrClose(currentDevice!!)
                         sendAfterUpdate()
                     }
-                    else -> sendToGw()
+                    else -> {
+                        sendToGw()
+                        LogUtils.v("chown -- else")
+                        sendAfterUpdate()
+                    }
                 }
                 //如果不是路由模式则直接更新icon
                 //ToastUtils.showShort(getString(R.string.connecting_tip))
@@ -287,8 +295,10 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 builder?.create()?.show()
             }
             R.id.template_device_setting -> if (b || Constant.IS_ROUTE_MODE) goSetting() // 如果没有登录设备应该重连然后进入设置
-            else { // chown2021.08.19 改
+            else if(TelinkLightService.Instance().bluetoothManager.adapter.isEnabled){ // chown2021.08.19 改
                 goConfig()
+            }else {
+                Toast.makeText(this,getString(R.string.bluetooth_connect_off),Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -335,9 +345,11 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
         listAdapter?.notifyDataSetChanged()
     }
 
+    @SuppressLint("CheckResult")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw() {
         val gateWay = DBUtils.getAllGateWay()
+        val meshAddr = allLightData[positionCurrent].meshAddr//currentDevice?.meshAddr //allLightData[position].meshAddr
         if (gateWay.size > 0)
             GwModel.getGwList()?.subscribe({
                 TelinkLightApplication.getApp().offLine = true
@@ -348,14 +360,17 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                         TelinkLightApplication.getApp().offLine = false
                 }
                 if (!TelinkLightApplication.getApp().offLine) {
+                    LogUtils.v("chown -- hello offline !!!")
                     disposableTimer?.dispose()
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
                         hideLoadingDialog()
                         runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
                     }
-                    val low = currentDevice!!.meshAddr and 0xff
-                    val hight = (currentDevice!!.meshAddr shr 8) and 0xff
-                    val gattBody = GwGattBody()
+//                    val low = currentDevice!!.meshAddr and 0xff
+                    val low = meshAddr.and(0xff)
+//                    val hight = (currentDevice!!.meshAddr shr 8) and 0xff
+                    val hight = (meshAddr.shr(8)).and(0xff)
+                    val gattBody = GwGattBody2()
                     var gattPar: ByteArray = byteArrayOf()
                     when (currentDevice!!.connectionStatus) {
                         ConnectionStatus.OFF.value -> {
@@ -379,7 +394,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                     val s = Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
                     gattBody.cmd = Constant.CMD_MQTT_CONTROL
-                    gattBody.meshAddr = currentDevice!!.meshAddr
+//                    gattBody.meshAddr = currentDevice!!.meshAddr
+                    gattBody.meshAddr = meshAddr
                     sendToServer(gattBody)
                 } else ToastUtils.showShort(getString(R.string.gw_not_online))
             }, {
@@ -389,14 +405,14 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     @SuppressLint("CheckResult")
-    private fun sendToServer(gattBody: GwGattBody) {
+    private fun sendToServer(gattBody: GwGattBody2) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
-            LogUtils.v("zcl-----------远程控制-------$it")
+            LogUtils.v("chown-----------远程控制-------$it")
         }, {
             disposableTimer?.dispose()
             ToastUtils.showShort(it.message)
-            LogUtils.v("zcl-----------远程控制-------${it.message}")
+            LogUtils.v("chown-----------远程控制-------${it.message}")
         })
     }
 
@@ -407,8 +423,8 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
     }
 
     private fun sendTimeZone(scannedDeviceItem: DbLight) {
-        val meshAddress = scannedDeviceItem?.meshAddr
-        val mac = scannedDeviceItem?.sixMac?.split(":")
+        val meshAddress = scannedDeviceItem.meshAddr
+        val mac = scannedDeviceItem.sixMac?.split(":")
         if (mac != null && mac.size >= 6) {
             val mac1 = Integer.valueOf(mac[2], 16)
             val mac2 = Integer.valueOf(mac[3], 16)
@@ -479,7 +495,6 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 ConnectionStatus.OFF.value -> this.currentDevice?.connectionStatus = ConnectionStatus.ON.value
                 else -> this.currentDevice?.connectionStatus = ConnectionStatus.OFF.value
             }
-
 
             when (cmdBean.status) {
                 0 -> sendAfterUpdate()

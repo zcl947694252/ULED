@@ -1,5 +1,6 @@
 package com.dadoutek.uled.communicate
 
+import android.widget.Toast
 import com.blankj.utilcode.util.LogUtils
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.Opcode
@@ -189,7 +190,6 @@ object Commander : EventListener<String> {
 
                         },
                         {
-
                             resetLightsOld(lightList, successCallback, failedCallback)
                         }
                 )
@@ -636,6 +636,7 @@ object Commander : EventListener<String> {
                 TelinkLightService.Instance().idleMode(false)
 //                if (macAddress!=null)
 //                    TelinkLightService.Instance()?.adapter?.stop()
+//                    TelinkLightService.Instance().idleMode(true)
                 mConnectEmitter = emitter
                 val connectParams = Parameters.createAutoConnectParameters()
                 connectParams.setMeshName(meshName)
@@ -678,17 +679,18 @@ object Commander : EventListener<String> {
 
     fun getDeviceVersion(dstAddr: Int, retryTimes: Long = 1): Observable<String> {
         TelinkLightApplication.getApp().addEventListener(NotificationEvent.GET_DEVICE_STATE, this)
+        LogUtils.v("chown -- ============================== dstAddr $dstAddr")
         return Observable.create<String> {
             mGetVersionObservable = it
             mDstAddr = dstAddr
             var opcode = Opcode.GET_VERSION          //0xFC 代表获取灯版本的指令
             val params: ByteArray
             if (TelinkApplication.getInstance().connectDevice.meshAddress == dstAddr) {
-                params = byteArrayOf(0x00, 0x00) // 很明显 如果是switch的话，走的都是这个函数，所以指令就发不出去
+                params = byteArrayOf(0x00, 0x00)
             } else {
                 opcode = Opcode.SEND_MESSAGE_BY_MESH
                 val meshAddr = TelinkApplication.getInstance().connectDevice.meshAddress
-                params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte())  //第二个byte是地址的低byte，第三个byte是地址的高byte
+                params = byteArrayOf(0x3c, (meshAddr and 0xFF).toByte(), ((meshAddr shr 8) and 0xFF).toByte()) //第二个byte是地址的低byte，第三个byte是地址的高byte
             }
             TelinkLightService.Instance()?.sendCommandNoResponse(opcode, dstAddr, params)
         }.retry(retryTimes)
@@ -704,7 +706,6 @@ object Commander : EventListener<String> {
                     TelinkLightApplication.getApp().removeEventListener(NotificationEvent.GET_DEVICE_STATE, this)
                 }
     }
-
 
     private fun onGetLightVersion(event: NotificationEvent) {
         val data = event.args.params

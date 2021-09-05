@@ -1,6 +1,8 @@
 package com.dadoutek.uled.connector
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import androidx.appcompat.widget.*
@@ -8,6 +10,8 @@ import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import com.blankj.utilcode.util.LogUtils
@@ -16,6 +20,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseToolbarActivity
 import com.dadoutek.uled.communicate.Commander
+import com.dadoutek.uled.gateway.util.Base64Utils
 import com.dadoutek.uled.light.DeviceScanningNewActivity
 import com.dadoutek.uled.model.Constant
 import com.dadoutek.uled.model.dbModel.DBUtils
@@ -23,14 +28,18 @@ import com.dadoutek.uled.model.dbModel.DbConnector
 import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.Opcode
 import com.dadoutek.uled.model.dbModel.DbGroup
+import com.dadoutek.uled.model.httpModel.GwModel
+import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.router.BindRouterActivity
 import com.dadoutek.uled.router.bean.CmdBodyBean
 import com.dadoutek.uled.scene.NewSceneSetAct
 import com.dadoutek.uled.tellink.TelinkLightApplication
+import com.dadoutek.uled.tellink.TelinkLightService
 import com.dadoutek.uled.util.StringUtils
 import com.telink.bluetooth.light.ConnectionStatus
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
@@ -43,14 +52,16 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.anko.bluetoothManager
 import org.jetbrains.anko.singleLine
+import java.util.concurrent.TimeUnit
 
 /**
  * 蓝牙接收器列表
  */
 class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickListener {
     private var launch: Job? = null
-    private val relayDatas: MutableList<DbConnector> = mutableListOf()
+    private val relayDatas: MutableList<DbConnector> = arrayListOf()
     private var inflater: LayoutInflater? = null
     private var relayAdaper: DeviceDetailConnectorAdapter? = null
     private var currentDevice: DbConnector? = null
@@ -81,7 +92,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         val dbGroup = DbGroup()
         dbGroup.brightness = 10000
         dbGroup.deviceType = DeviceType.SMART_RELAY.toLong()
-        var intent = Intent(this, BindRouterActivity::class.java)
+        val intent = Intent(this, BindRouterActivity::class.java)
         intent.putExtra("group", dbGroup)
         startActivity(intent)
     }
@@ -90,6 +101,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         return true
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun setDeletePositiveBtn() {
         currentDevice?.let {
             showLoadingDialog(getString(R.string.please_wait))
@@ -121,6 +133,7 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun editeDeviceAdapter() {
         relayAdaper!!.changeState(isEdite)
         relayAdaper!!.notifyDataSetChanged()
@@ -151,8 +164,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         relayAdaper = DeviceDetailConnectorAdapter(R.layout.template_device_type_item, relayDatas)
         relayAdaper!!.onItemChildClickListener = onItemChildClickListener
         relayAdaper!!.bindToRecyclerView(recycleView)
-        for (i in relayDatas?.indices!!) {
-            relayDatas!![i].updateIcon()
+        for (i in relayDatas.indices) {
+            relayDatas[i].updateIcon()
         }
         install_device = findViewById(R.id.install_device)
         create_group = findViewById(R.id.create_group)
@@ -253,63 +266,86 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         startActivityForResult(intent, 0)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        currentDevice = relayDatas?.get(position)
+        currentDevice = relayDatas[position]
         positionCurrent = position
         Opcode.LIGHT_ON_OFF
+        val b = TelinkLightService.Instance().isLogin && TelinkLightApplication.getApp().connectDevice != null
         val unit = when (view.id) {
             R.id.template_device_icon -> {
-                if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
-                    autoConnect(true)
-                } else {
-                    canBeRefresh = true
-
-                    when (currentDevice!!.connectionStatus) {
-                        ConnectionStatus.OFF.value -> {
-                            if (Constant.IS_ROUTE_MODE)
-                                routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 1, "relayOpen")
-                            else {
-                                Commander.openOrCloseLights(currentDevice!!.meshAddr, true)
-                                afterOpenOrClose(adapter!!)
-                            }
+                when {
+                    Constant.IS_ROUTE_MODE -> {
+                        if (currentDevice!!.connectionStatus == ConnectionStatus.OFF.value) {
+                            routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 1, "relayOpen")
+                        } else {
+                            routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 0, "relayClose")
                         }
-                        else -> {
-                            if (Constant.IS_ROUTE_MODE)
-                                routeOpenOrCloseBase(currentDevice!!.meshAddr, currentDevice!!.productUUID, 0, "relayClose")
-                            else {
-                                Commander.openOrCloseLights(currentDevice!!.meshAddr, false)
-                                afterOpenOrClose(adapter!!)
-                            }
+                    }
+                    b -> {
+                        if (currentDevice!!.connectionStatus == ConnectionStatus.OFF.value) {
+                            Commander.openOrCloseLights(currentDevice!!.meshAddr, true)
+                            afterOpenOrClose(adapter!!)
+                        } else {
+                            Commander.openOrCloseLights(currentDevice!!.meshAddr, false)
+                            afterOpenOrClose(adapter!!)
                         }
+                    }
+                    else -> {
+                        sendToGw()
+                        afterOpenOrClose(relayAdaper)
                     }
                 }
             }
             R.id.template_device_setting -> {
                 val lastUser = DBUtils.lastUser
                 lastUser?.let {
-                    if (it.id.toString() != it.last_authorizer_user_id)
-                        ToastUtils.showLong(getString(R.string.author_region_warm))
-                    else {
-                        if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
-                            currentDevice?.let { itd ->
-                                showLoadingDialog(getString(R.string.connecting_tip))
-                                connect()
-                                        ?.subscribeOn(Schedulers.io())
-                                        ?.observeOn(AndroidSchedulers.mainThread())
-                                        ?.subscribe({
-                                            hideLoadingDialog()
-                                        }, {
-                                            hideLoadingDialog()
-                                        })
-                            }
-                        } else {
-                            var intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
-                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDevice)
-                            intent.putExtra(Constant.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
-                            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
-                            startActivityForResult(intent, REQ_LIGHT_SETTING)
+
+                    if (b || Constant.IS_ROUTE_MODE) {
+                        val intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
+                        intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDevice)
+                        intent.putExtra(Constant.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
+                        intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+                        startActivityForResult(intent, REQ_LIGHT_SETTING)
+                    } else if(TelinkLightService.Instance().bluetoothManager.adapter.isEnabled){ // chown2021.08.19 改
+                        currentDevice?.let { itd ->
+                            showLoadingDialog(getString(R.string.connecting_tip))
+                            connect()
+                                ?.subscribeOn(Schedulers.io())
+                                ?.observeOn(AndroidSchedulers.mainThread())
+                                ?.subscribe({
+                                    hideLoadingDialog()
+                                }, {
+                                    hideLoadingDialog()
+                                })
                         }
+                    } else {
+                        Toast.makeText(this,getString(R.string.bluetooth_connect_off), Toast.LENGTH_SHORT).show()
                     }
+
+//                    if (it.id.toString() != it.last_authorizer_user_id)
+//                        ToastUtils.showLong(getString(R.string.author_region_warm))
+//                    else {
+//                        if (TelinkLightApplication.getApp().connectDevice == null && !Constant.IS_ROUTE_MODE) {
+//                            currentDevice?.let { itd ->
+//                                showLoadingDialog(getString(R.string.connecting_tip))
+//                                connect()
+//                                        ?.subscribeOn(Schedulers.io())
+//                                        ?.observeOn(AndroidSchedulers.mainThread())
+//                                        ?.subscribe({
+//                                            hideLoadingDialog()
+//                                        }, {
+//                                            hideLoadingDialog()
+//                                        })
+//                            }
+//                        } else {
+//                            val intent = Intent(this@ConnectorDeviceDetailActivity, ConnectorSettingActivity::class.java)
+//                            intent.putExtra(Constant.LIGHT_ARESS_KEY, currentDevice)
+//                            intent.putExtra(Constant.GROUP_ARESS_KEY, currentDevice!!.meshAddr)
+//                            intent.putExtra(Constant.LIGHT_REFRESH_KEY, Constant.LIGHT_REFRESH_KEY_OK)
+//                            startActivityForResult(intent, REQ_LIGHT_SETTING)
+//                        }
+//                    }
                 }
             }
             R.id.template_device_card_delete -> {
@@ -321,11 +357,94 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         }
     }
 
+    private fun sendAfterUpdate() {
+        when (type) {
+            Constant.INSTALL_CONNECTOR -> relayDatas[positionCurrent].updateIcon()
+        }
+        DBUtils.updateConnector(relayDatas[positionCurrent])
+        relayAdaper?.notifyDataSetChanged()
+    }
+
+
+
+    @SuppressLint("CheckResult")
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun sendToGw() {
+        val gateWay = DBUtils.getAllGateWay()
+        val meshAddr = currentDevice!!.meshAddr //currentDevice?.meshAddr //allLightData[position].meshAddr
+        if (gateWay.size > 0)
+            GwModel.getGwList()?.subscribe({
+                TelinkLightApplication.getApp().offLine = true
+                hideLoadingDialog()
+                it.forEach { db ->
+                    //网关在线状态，1表示在线，0表示离线
+                    if (db.state == 1)
+                        TelinkLightApplication.getApp().offLine = false
+                }
+                if (!TelinkLightApplication.getApp().offLine) {
+                    LogUtils.v("chown -- hello offline !!!")
+                    disposableTimer?.dispose()
+                    disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS).subscribe {
+                        hideLoadingDialog()
+                        runOnUiThread { ToastUtils.showShort(getString(R.string.gate_way_offline)) }
+                    }
+//                    val low = currentDevice!!.meshAddr and 0xff
+                    val low = meshAddr.and(0xff)
+//                    val hight = (currentDevice!!.meshAddr shr 8) and 0xff
+                    val hight = (meshAddr.shr(8)).and(0xff)
+                    val gattBody = GwGattBody2()
+                    var gattPar: ByteArray = byteArrayOf()
+                    when (currentDevice!!.connectionStatus) {
+                        ConnectionStatus.OFF.value -> {
+                            if (currentDevice!!.productUUID == DeviceType.SMART_RELAY) {//开灯
+                                gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                gattBody.ser_id = Constant.SER_ID_LIGHT_ON
+                            }
+                        }
+                        else -> {
+                            if (currentDevice!!.productUUID == DeviceType.SMART_RELAY) {
+                                gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                                    0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                                gattBody.ser_id = Constant.SER_ID_LIGHT_OFF
+                            }
+                        }
+                    }
+
+                    val s = Base64Utils.encodeToStrings(gattPar)
+                    gattBody.data = s
+                    gattBody.cmd = Constant.CMD_MQTT_CONTROL
+//                    gattBody.meshAddr = currentDevice!!.meshAddr
+                    gattBody.meshAddr = meshAddr
+                    sendToServer(gattBody)
+                } else ToastUtils.showShort(getString(R.string.gw_not_online))
+            }, {
+                hideLoadingDialog()
+                ToastUtils.showShort(getString(R.string.gw_not_online))
+            })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun sendToServer(gattBody: GwGattBody2) {
+        GwModel.sendDeviceToGatt(gattBody)?.subscribe({
+            disposableTimer?.dispose()
+            LogUtils.v("chown-----------远程控制-------$it")
+        }, {
+            disposableTimer?.dispose()
+            ToastUtils.showShort(it.message)
+            LogUtils.v("chown-----------远程控制-------${it.message}")
+        })
+    }
+
     override fun tzRouterOpenOrClose(cmdBean: CmdBodyBean) {
         LogUtils.v("zcl-----------收到路由relayOpen通知-------$cmdBean")
         if (cmdBean.ser_id == "relayOpen" || cmdBean.ser_id == "relayClose") {
             disposableRouteTimer?.dispose()
             hideLoadingDialog()
+//            when (currentDevice?.connectionStatus ?: 1) {
+//                ConnectionStatus.OFF.value -> this.currentDevice?.connectionStatus = ConnectionStatus.ON.value
+//                else -> this.currentDevice?.connectionStatus = ConnectionStatus.OFF.value
+//            }
             if (cmdBean.status == 0) {
                 afterOpenOrClose(relayAdaper)
             } else {
@@ -337,6 +456,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         }
     }
 
+
+    @SuppressLint("NotifyDataSetChanged")
     private fun afterOpenOrClose(adapter: BaseQuickAdapter<*, *>?) {
         when (currentDevice!!.connectionStatus) {
             ConnectionStatus.OFF.value -> currentDevice!!.connectionStatus = ConnectionStatus.ON.value
@@ -354,8 +475,8 @@ class ConnectorDeviceDetailActivity : TelinkBaseToolbarActivity(), View.OnClickL
         relayDatas.clear()
         val allLightData = DBUtils.getAllRelay()
         if (allLightData.size > 0) {
-            var listGroup: ArrayList<DbConnector> = ArrayList()
-            var noGroup: ArrayList<DbConnector> = ArrayList()
+            val listGroup: ArrayList<DbConnector> = ArrayList()
+            val noGroup: ArrayList<DbConnector> = ArrayList()
             for (i in allLightData.indices)
                 if (StringUtils.getConnectorGroupName(allLightData[i]) == TelinkLightApplication.getApp().getString(R.string.not_grouped))
                     noGroup.add(allLightData[i])

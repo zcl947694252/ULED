@@ -330,6 +330,7 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
         confirmf.setOnClickListener(new View.OnClickListener() {//chown
             @Override
             public void onClick(View v) {
+                TelinkLightService.Instance().idleMode(true);
                 finish();
             }
         });
@@ -495,6 +496,9 @@ public class OTAUpdateActivity extends TelinkMeshErrorDealActivity implements Ev
             this.sendStopMeshOTACommand();
         }
         this.mode = MODE_COMPLETE;
+        stopScanTimer();
+        stopConnectTimer();
+        stopTimerUpdate();
         //        TelinkLightService instance = TelinkLightService.Instance();
         //        if (instance != null)
         //            instance.idleMode(true);

@@ -790,7 +790,9 @@
     <string name="scene_switch">Сцены</string>
     <string name="curtain_switch">гардины</string>
     <string name="four_switch">четырехклавишный выключатель</string>
+    <string name="four_switch1">четверная связь</string>
     <string name="six_switch">шестикнопочный выключатель</string>
+    <string name="six_switch1">шестиконечная связь</string>
     <string name="night_light">Ночной свет</string>
     <string name="click_config">Нажмите Настройку</string>
     <string name="choose_scene">Выбор сцены</string>
@@ -887,6 +889,7 @@
     <string name="right">n.:</string>
     <string name="single_brighress_group_switch">Коммутатор регуляторов яркости</string>
     <string name="eight_switch">восьмёрка</string>
+    <string name="eight_switch1">восьмёрка</string>
     <string name="select_switch">селекторный переключатель</string>
     <string name="double_switch">две группы </string>
     <string name="delete_device">Удалить устройство</string>

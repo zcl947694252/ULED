@@ -478,13 +478,13 @@ class ConfigSixSwitchActivity: BaseSwitchActivity(), View.OnClickListener {
 
                             val mesAddress = (highMes shl 8) or lowMes
                             //赋值旧的设置数据
-                            val groupByMeshAddr = if (featureId == 0xff)
+                            val groupByMeshAddr = if (featureId == 0x00)
                                 null
                             else
                                 DBUtils.getGroupByMeshAddr(mesAddress)
 
                             if (groupByMeshAddr != null) {
-                                groupMap[keyId-0x61] = groupByMeshAddr
+                                groupMap[(keyId-0x61)%3] = groupByMeshAddr
                                 name = if (groupByMeshAddr.name == "")
                                     getString(R.string.click_config)
                                 else

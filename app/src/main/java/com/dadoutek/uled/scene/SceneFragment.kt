@@ -32,6 +32,7 @@ import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.network.NetworkStatusCode.OK
 import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_ALL_OFFLINE
 import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE
@@ -286,7 +287,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                     val gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
                             dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-                    val gattBody = GwGattBody()
+                    val gattBody = GwGattBody2()
                     gattBody.ser_id = Constant.SER_ID_SCENE_ON
                     val s = Base64Utils.encodeToStrings(gattPar)
                     gattBody.data = s
@@ -304,7 +305,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     }
 
     @SuppressLint("CheckResult")
-    private fun sendToServer(gattBody: GwGattBody) {
+    private fun sendToServer(gattBody: GwGattBody2) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
             LogUtils.v("zcl-----------远程控制-------$it")

@@ -364,7 +364,7 @@ class ScanningSwitchActivity() : TelinkBaseActivity(), EventListener<String> {
                 Thread {
                     TelinkLightService.Instance()?.idleMode(true)
                     TelinkLightService.Instance()?.disconnect()
-                    val mesh = mApplication?.mesh
+                    val mesh = mApplication.mesh
                     //扫描参数
                     val params = LeScanParameters.create()
                     if (!AppUtils.isExynosSoc)

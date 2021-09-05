@@ -50,6 +50,7 @@ import com.dadoutek.uled.model.SharedPreferencesHelper
 import com.dadoutek.uled.model.httpModel.GroupMdodel
 import com.dadoutek.uled.model.routerModel.RouterModel
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.network.RouterDelGpBody
 import com.dadoutek.uled.othersview.BaseFragment
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
@@ -383,6 +384,7 @@ abstract class BaseGroupFragment : BaseFragment() {
     abstract fun getGroupData(): Collection<DbGroup>
 
 
+    @SuppressLint("CheckResult")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(isOpen: Boolean) {
         val gateWay = DBUtils.getAllGateWay()
@@ -403,20 +405,20 @@ abstract class BaseGroupFragment : BaseFragment() {
                     }
                     val low = currentGroup!!.meshAddr and 0xff
                     val hight = (currentGroup!!.meshAddr shr 8) and 0xff
-                    val gattBody = GwGattBody()
+                    val gattBody = GwGattBody2()
                     val gattPar: ByteArray
                     if (isOpen) {
-                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), 0xD0.toByte(), //
                                 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        LogUtils.v("chown --0---0-0-0-0-0-0-0-0  0x11, 0x11, 0x11, 0, 0, ${low.toByte()}, ${hight.toByte()}, ${Opcode.LIGHT_ON_OFF}, 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0")
                         gattBody.ser_id = Constant.SER_ID_GROUP_ON
                     } else {
                         gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
                                 0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        LogUtils.v("chown --0---0-0-0-0-0-0-0-0  0x11, 0x11, 0x11, 0, 0, ${low.toByte()}, ${hight.toByte()}, ${Opcode.LIGHT_ON_OFF}, 0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0")
                         gattBody.ser_id = Constant.SER_ID_GROUP_OFF
                     }
 
-                    //val encoder = Base64.getEncoder()
-                    // val s = encoder.encodeToString(gattPar)
                     gattBody.data = Base64Utils.encodeToStrings(gattPar)
                     gattBody.cmd = Constant.CMD_MQTT_CONTROL
                     gattBody.meshAddr = currentGroup!!.meshAddr
@@ -431,16 +433,16 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     @SuppressLint("CheckResult")
-    private fun sendToServer(gattBody: GwGattBody, open: Boolean) {
+    private fun sendToServer(gattBody: GwGattBody2, open: Boolean) {
         LogUtils.v("chonw --- 有网关就来此函数")
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
             updateLights(open, currentGroup!!)
-            LogUtils.v("zcl-----------远程控制-------$it")
+            LogUtils.v("chown-----------远程控制-------$it")
         }, {
             disposableTimer?.dispose()
             ToastUtils.showShort(it.message)
-            LogUtils.v("zcl-----------远程控制-------${it.message}")
+            LogUtils.v("chown-----------远程控制-------${it.message}")
         })
     }
 
@@ -520,9 +522,9 @@ abstract class BaseGroupFragment : BaseFragment() {
 
             R.id.template_device_icon -> {
                 when {
-                    TelinkLightApplication.getApp().connectDevice == null&&  !Constant.IS_ROUTE_MODE &&isGatt/*&& !TelinkLightApplication.getApp().isConnect*/ -> {
+                    TelinkLightApplication.getApp().connectDevice == null &&  !Constant.IS_ROUTE_MODE && isGatt/*&& !TelinkLightApplication.getApp().isConnect*/ -> {
                         LogUtils.v("chown --- 网关是否进入此函数")
-                        goConnect()
+//                        goConnect()
                         sendToGw(currentGroup?.connectionStatus == ConnectionStatus.OFF.value)
                     }
                     currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_RGB || currentGroup!!.deviceType == Constant.DEVICE_TYPE_LIGHT_NORMAL
@@ -531,11 +533,14 @@ abstract class BaseGroupFragment : BaseFragment() {
                         LogUtils.v("chown --- 网关是否进入第二个函数")
                         when {
                             Constant.IS_ROUTE_MODE -> {// status 是	int	0关1开   meshType普通灯 = 4 彩灯 = 6 连接器 = 5 组 = 97
-
-                                val status = if (currentGroup!!.connectionStatus == 0) 1 else 0
-                                LogUtils.v("zcl---请求路由开关组之前--connectionStatus-----${currentGroup!!.connectionStatus}--status--$status")
-                                routeOpenOrClose(currentGroup!!.meshAddr, 97, status, "zu")
-                                currentGroup?.connectionStatus = status
+                                if (currentGroup!!.deviceType == Constant.DEVICE_TYPE_CURTAIN) {
+                                    routeSwitchCurtain()
+                                } else {
+                                    val status = if (currentGroup!!.connectionStatus == 0) 1 else 0
+                                    LogUtils.v("zcl---请求路由开关组之前--connectionStatus-----${currentGroup!!.connectionStatus}--status--$status")
+                                    routeOpenOrClose(currentGroup!!.meshAddr, 97, status, "zu")
+                                    currentGroup?.connectionStatus = status
+                                }
                             }
                             else -> {
                                 val isopen = currentGroup!!.connectionStatus == 0 //0位关闭 则去打开
@@ -554,10 +559,6 @@ abstract class BaseGroupFragment : BaseFragment() {
                         }
                         if (Constant.IS_ROUTE_MODE)
                             DBUtils.saveGroup(currentGroup!!, true)
-                    }
-                    currentGroup!!.deviceType == Constant.DEVICE_TYPE_CURTAIN -> {
-                        if (Constant.IS_ROUTE_MODE)
-                            routeSwitchCurtain()
                     }
                 }
             }

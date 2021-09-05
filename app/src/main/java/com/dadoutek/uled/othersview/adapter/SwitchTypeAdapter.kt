@@ -1,5 +1,6 @@
 package com.dadoutek.uled.othersview.adapter
 
+import android.view.View
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
 import com.dadoutek.uled.R
@@ -21,31 +22,57 @@ class SwitchTypeAdapter(resuresId: Int, data: MutableList<DeviceItem>) : BaseQui
         helper?.setText(R.id.select_tv_name, item.name)
         when (item.productUUID) {
             DeviceType.NORMAL_SWITCH -> {
-                helper?.setImageResource(R.id.select_device_image, R.mipmap.normal_switch)
+                if (item.number == 0) {
+                    helper?.setImageResource(R.id.select_device_image, R.mipmap.touch_light_color1)
+                    helper?.setGone(R.id.select_tv_name2, true)
+                        ?.setText(R.id.select_tv_name2,R.string.monotonic)
+                } else {
+                    helper?.setImageResource(R.id.select_device_image, R.mipmap.touch_light_color1)
+                    helper?.setGone(R.id.select_tv_name2, true)
+                        ?.setText(R.id.select_tv_name2,R.string.dimming)
+                }
             }
             DeviceType.NORMAL_SWITCH2 -> {
-                helper?.setImageResource(R.id.select_device_image, R.mipmap.normal_switch2)
+                if (item.number == 0){
+                    helper?.setImageResource(R.id.select_device_image, R.mipmap.light_only1)
+                    helper?.setGone(R.id.select_tv_name2, true)
+                        ?.setText(R.id.select_tv_name2,R.string.monotonic)
+                }
+                else {
+                    helper?.setImageResource(R.id.select_device_image, R.mipmap.light_color1)
+                    helper?.setGone(R.id.select_tv_name2, true)
+                        ?.setText(R.id.select_tv_name2,R.string.dimming)
+                }
             }
             DeviceType.EIGHT_SWITCH -> {
-                helper?.setImageResource(R.id.select_device_image, R.mipmap.eight_switch)
+                helper?.setImageResource(R.id.select_device_image, R.mipmap.eight_switch1)
             }
             DeviceType.DOUBLE_SWITCH -> {
-                helper?.setImageResource(R.id.select_device_image, R.mipmap.normal_switch)
+                helper?.setImageResource(R.id.select_device_image, R.mipmap.touch_only_light1)
+                helper?.setGone(R.id.select_tv_name2, true)
+                    ?.setText(R.id.select_tv_name2,R.string.two_switch2)
             }
-
             DeviceType.SCENE_SWITCH -> {
-                helper?.setImageResource(R.id.select_device_image, R.drawable.icon_switch_device)
+                if (item.number == 0) {
+                    helper?.setImageResource(R.id.select_device_image, R.mipmap.light_scene1)
+                    helper?.setGone(R.id.select_tv_name2, true)
+                        ?.setText(R.id.select_tv_name2,R.string.scene_text)
+                }
+                else {
+                    helper?.setImageResource(R.id.select_device_image, R.mipmap.touch_scene1)
+                    helper?.setGone(R.id.select_tv_name2, true)
+                        ?.setText(R.id.select_tv_name2,R.string.scene_text)
+                }
             }
             DeviceType.SMART_CURTAIN_SWITCH -> {
-                helper?.setImageResource(R.id.select_device_image, R.mipmap.normal_switch2)
+                helper?.setImageResource(R.id.select_device_image, R.mipmap.curtain_switch1)
             }
             DeviceType.FOUR_SWITCH -> {
-                helper?.setImageResource(R.id.select_device_image, R.mipmap.normal_switch2)
+                helper?.setImageResource(R.id.select_device_image, R.mipmap.four_switch1)
             }
             DeviceType.SIX_SWITCH -> {
-                helper?.setImageResource(R.id.select_device_image, R.mipmap.normal_switch2)
+                helper?.setImageResource(R.id.select_device_image, R.mipmap.six_switch1)
             }
-
 
         }
     }

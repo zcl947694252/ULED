@@ -1,15 +1,11 @@
 package com.dadoutek.uled.switches
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
-import com.blankj.utilcode.util.ToastUtils
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.device.model.DeviceItem
-import com.dadoutek.uled.model.Constant
-import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.DeviceType.DOUBLE_SWITCH
 import com.dadoutek.uled.model.DeviceType.EIGHT_SWITCH
 import com.dadoutek.uled.model.DeviceType.FOUR_SWITCH
@@ -23,7 +19,6 @@ import com.dadoutek.uled.util.StringUtils
 import kotlinx.android.synthetic.main.activity_select_device_type.*
 import kotlinx.android.synthetic.main.activity_select_switch.*
 import kotlinx.android.synthetic.main.template_recycleview.*
-import kotlinx.android.synthetic.main.template_recycleview.template_recycleView
 import kotlinx.android.synthetic.main.toolbar.*
 
 /**
@@ -44,14 +39,17 @@ class SelectSwitchActivity : TelinkBaseActivity() {
 
     fun initData() {
         deviceTypeList.clear()
-        deviceTypeList.add(DeviceItem(getString(R.string.normal_swith), 0, DeviceType.NORMAL_SWITCH)) // 普通触摸开关
-        deviceTypeList.add(DeviceItem(getString(R.string.normal_swith2), 0, DeviceType.NORMAL_SWITCH2)) // 普通面板光能开关
-        deviceTypeList.add(DeviceItem(getString(R.string.eight_switch), 0, DeviceType.EIGHT_SWITCH)) // 八键开关
-        deviceTypeList.add(DeviceItem(getString(R.string.double_switch), 0, DeviceType.DOUBLE_SWITCH)) // 双组开关
-        deviceTypeList.add(DeviceItem(getString(R.string.scene_switch), 0, DeviceType.SCENE_SWITCH)) // 场景开关
-        deviceTypeList.add(DeviceItem(getString(R.string.curtain_switch), 0, DeviceType.SMART_CURTAIN_SWITCH)) // 窗帘开关
-        deviceTypeList.add(DeviceItem(getString(R.string.four_switch),0,DeviceType.FOUR_SWITCH))
-        deviceTypeList.add(DeviceItem(getString(R.string.six_switch),0,DeviceType.SIX_SWITCH))
+        deviceTypeList.add(DeviceItem(getString(R.string.four_switch1), 0, FOUR_SWITCH)) // 四键
+        deviceTypeList.add(DeviceItem(getString(R.string.six_switch1), 0, SIX_SWITCH)) // 六键
+        deviceTypeList.add(DeviceItem(getString(R.string.eight_switch1), 0, EIGHT_SWITCH)) // 八键
+        deviceTypeList.add(DeviceItem(getString(R.string.switch_light1), 0, NORMAL_SWITCH2)) // 光能单调光
+        deviceTypeList.add(DeviceItem(getString(R.string.scene_switch1), 0, SCENE_SWITCH)) // 光能场景
+        deviceTypeList.add(DeviceItem(getString(R.string.switch_light2), 1, NORMAL_SWITCH2)) // 光能调光调色
+        deviceTypeList.add(DeviceItem(getString(R.string.switch_touch1),0, NORMAL_SWITCH)) // 触摸单调光
+        deviceTypeList.add(DeviceItem(getString(R.string.scene_switch2),1, SCENE_SWITCH)) // 触摸场景
+        deviceTypeList.add(DeviceItem(getString(R.string.switch_touch2),1, NORMAL_SWITCH)) // 触摸调光调色
+        deviceTypeList.add(DeviceItem(getString(R.string.switch_touch1),0, DOUBLE_SWITCH)) // 触摸双组开关：
+        deviceTypeList.add(DeviceItem(getString(R.string.curtain_switch1),0, SMART_CURTAIN_SWITCH)) // 窗帘开关
         deviceAdapter.notifyDataSetChanged()
     }
 
@@ -71,28 +69,37 @@ class SelectSwitchActivity : TelinkBaseActivity() {
         deviceAdapter.setOnItemClickListener { _, _, position ->
             when (position) {
                 0 -> {
-                    switchId = NORMAL_SWITCH
+                    switchId = FOUR_SWITCH
                 }
                 1 -> {
-                    switchId = NORMAL_SWITCH2
+                    switchId = SIX_SWITCH
                 }
                 2 -> {
                     switchId = EIGHT_SWITCH
                 }
                 3 -> {
-                    switchId = DOUBLE_SWITCH
+                    switchId = NORMAL_SWITCH2
                 }
                 4 -> {
                     switchId = SCENE_SWITCH
                 }
                 5 -> {
-                    switchId = SMART_CURTAIN_SWITCH
+                    switchId = NORMAL_SWITCH2
                 }
                 6 -> {
-                    switchId = FOUR_SWITCH
+                    switchId = NORMAL_SWITCH
                 }
                 7 -> {
-                    switchId = SIX_SWITCH
+                    switchId = SCENE_SWITCH
+                }
+                8 -> {
+                    switchId = NORMAL_SWITCH
+                }
+                9 -> {
+                    switchId = DOUBLE_SWITCH
+                }
+                10 -> {
+                    switchId = SMART_CURTAIN_SWITCH
                 }
                 else -> {
                     switchId = INSTALL_SWITCH

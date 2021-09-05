@@ -62,6 +62,7 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
     private val SCENE_MAX_COUNT = 100
 
     val CREATE_SCENE_REQUESTCODE = 2
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? { //初始化显示控件
         return initLayout(inflater)
     }

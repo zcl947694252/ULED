@@ -66,7 +66,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
     private var isGlassSwitch = false
     override val setLayoutId: Int
         get() {
-            return R.layout.activity_switch_group
+            return R.layout.activity_switch_group // 调光调色光能开光
         }
 
     override fun setToolBar(): Toolbar {
@@ -94,7 +94,7 @@ class ConfigNormalSwitchActivity : BaseSwitchActivity(), EventListener<String> {
         //单调光光能开关 sl bl   触摸单调光 btl sts
         if (!isTouchSw) {
             if (localVersion.contains("SL") || localVersion.contains("BL"))
-                sw_normal_iv.setImageResource(R.drawable.sw_normal_single)
+                sw_normal_iv.setImageResource(R.drawable.sw_normal_single) // 平板
             else
                 sw_normal_iv.setImageResource(R.drawable.sw_normal_add_minus)
             toolbarTv.text = getString(R.string.light_sw)

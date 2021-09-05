@@ -95,8 +95,8 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -203,13 +203,13 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         bundle.putInt(Constant.DEVICE_TYPE, Constant.DEVICE_TYPE_CONNECTOR.toInt())
         intent.putExtras(bundle)
         startActivityForResult(intent, requestCodeNum)
-        this?.setResult(Constant.RESULT_OK)
+        this.setResult(Constant.RESULT_OK)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == requestCodeNum) {
-            var group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
+            val group = data?.getSerializableExtra(Constant.EIGHT_SWITCH_TYPE) as DbGroup
             updateGroupResult(currentDbConnector!!, group)
         }
     }
@@ -226,7 +226,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                     DBUtils.updateConnector(light)
                     ToastUtils.showShort(getString(R.string.grouping_success_tip))
                     if (group != null)
-                        DBUtils.updateGroup(group!!)//更新组类型
+                        DBUtils.updateGroup(group)//更新组类型
                 }, {
                     ToastUtils.showShort(getString(R.string.grouping_fail))
                 })
@@ -239,12 +239,12 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         if (bean?.ser_id == "connectorGp") {
             LogUtils.v("zcl-----------收到路由普通灯分组通知-------$bean")
             disposableRouteTimer?.dispose()
-            if (bean?.finish) {
+            if (bean.finish) {
                 hideLoadingDialog()
-                when (bean?.status) {
+                when (bean.status) {
                     -1 -> ToastUtils.showShort(getString(R.string.group_failed))
                     0, 1 -> {
-                        if (bean?.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        if (bean.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
                         SyncDataPutOrGetUtils.syncGetDataStart(DBUtils.lastUser!!, object : SyncCallback {
                             override fun start() {}
                             override fun complete() {}
@@ -295,7 +295,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                         failedCallback = failedCallback)
                             })
                 } else {    //超过了重试次数
-                    this?.runOnUiThread {
+                    this.runOnUiThread {
                         failedCallback.invoke()
                     }
                 }
@@ -377,10 +377,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun checkPermission() {
         mDisposable.add(
-                RxPermissions(this)!!.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
+                RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe { granted ->
                     when {
                         granted!! -> {
-                            var isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
+                            val isBoolean: Boolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
                             when {
                                 isBoolean -> transformView()
                                 else -> OtaPrepareUtils.instance().gotoUpdateView(this@ConnectorSettingActivity, localVersion, otaPrepareListner)
@@ -459,14 +459,15 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         finish()
     }
 
+    @SuppressLint("CheckResult")
     private fun renameDevice() {
         if (!TextUtils.isEmpty(currentDbConnector?.name))
             renameEt?.setText(currentDbConnector?.name)
         renameEt?.setSelection(renameEt?.text.toString().length)
 
         if (this != null && !this.isFinishing) {
-            renameDialog?.dismiss()
-            renameDialog?.show()
+            renameDialog.dismiss()
+            renameDialog.show()
         }
 
         renameConfirm?.setOnClickListener {    // 获取输入框的内容
@@ -578,7 +579,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                     }
                 }
                 R.id.toolbar_f_delete -> remove()
-                R.id.toolbar_on_line -> renameGroup()
+                R.id.toolbar_f_version -> {
+//                    renameGroup()
+                    updateVersion()
+                }
             }
         } else {
             showLoadingDialog(getString(R.string.connecting_tip))
@@ -594,6 +598,32 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         true
     }
 
+    private fun updateVersion() {
+        if(TelinkApplication.getInstance().connectDevice != null && !Constant.IS_ROUTE_MODE) {
+            val disposable = Commander.getDeviceVersion(currentDbConnector!!.meshAddr)
+                .subscribe(
+                    { s: String ->
+                        LogUtils.v("chown -- ============================== s $s")
+                        localVersion = s
+                        if (TextUtils.isEmpty(s))
+                            localVersion = getString(R.string.number_no)
+                        currentDbConnector!!.version = localVersion
+                        fiVersion?.title = localVersion
+                        if (TextUtils.isEmpty(localVersion))
+                            localVersion = getString(R.string.number_no)
+                        runOnUiThread { fiVersion?.title = localVersion }
+                        DBUtils.saveConnector(currentDbConnector!!, false)
+                    },
+                    {
+                        LogUtils.v("chown -- ============================== error")
+                        autoConnect()
+                        if (TextUtils.isEmpty(localVersion))
+                            localVersion = getString(R.string.number_no)
+                        runOnUiThread { fiVersion?.title = localVersion }
+                    }
+                )
+        }
+    }
 
     override fun onStop() {
         super.onStop()
@@ -625,7 +655,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
     }
 
     private fun initType() {
-        var type = intent.getStringExtra(Constant.TYPE_VIEW)
+        val type = intent.getStringExtra(Constant.TYPE_VIEW)
         isConfigGroup = type == Constant.TYPE_GROUP
         if (isConfigGroup) {
             currentShowPageGroup = true
@@ -661,7 +691,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
 
     private fun openOrClose(b: Boolean) {
         isOpen = b
-        var status = if (b) 1 else 0
+        val status = if (b) 1 else 0
         if (isConfigGroup) {
             if (Constant.IS_ROUTE_MODE) {
                 routeOpenOrCloseBase(currentGroup!!.meshAddr, 97, status, "switchGp")
@@ -749,6 +779,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         }
         toolbarTv.text = currentDbConnector?.name ?: ""
         mConnectDevice = TelinkLightApplication.getApp().connectDevice
+        LogUtils.v("chown -- mConnectDevice   ${mConnectDevice.toString()}")
 
     }
 
@@ -759,6 +790,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 val disposable = Commander.getDeviceVersion(currentDbConnector!!.meshAddr)
                         .subscribe(
                                 { s: String ->
+                                    LogUtils.v("chown -- ============================== s $s")
                                     localVersion = s
                                     if (TextUtils.isEmpty(s))
                                         localVersion = getString(R.string.number_no)
@@ -770,6 +802,7 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                                     DBUtils.saveConnector(currentDbConnector!!, false)
                                 },
                                 {
+                                    LogUtils.v("chown -- ============================== error")
                                     if (TextUtils.isEmpty(localVersion))
                                         localVersion = getString(R.string.number_no)
                                     runOnUiThread { fiVersion?.title = localVersion }
@@ -784,10 +817,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
         if (routerVersion?.ser_id == "getRalyVersion") {
             disposableRouteTimer?.dispose()
             hideLoadingDialog()
-            if (routerVersion?.status == 0) {
-                currentDbConnector?.version = routerVersion?.succeedNow[0].version
+            if (routerVersion.status == 0) {
+                currentDbConnector?.version = routerVersion.succeedNow[0].version
                 DBUtils.saveConnector(currentDbConnector!!, false)
-                localVersion = routerVersion?.succeedNow[0].version
+                localVersion = routerVersion.succeedNow[0].version
                 runOnUiThread { fiVersion?.title = localVersion }
             } else {
                 ToastUtils.showShort(getString(R.string.get_version_fail))

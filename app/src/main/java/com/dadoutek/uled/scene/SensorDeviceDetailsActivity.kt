@@ -29,6 +29,7 @@ import com.dadoutek.uled.model.dbModel.DbGroup
 import com.dadoutek.uled.model.dbModel.DbSensor
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import com.dadoutek.uled.pir.ConfigSensorAct
@@ -145,7 +146,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     override fun bindDeviceRouter() {
         val dbGroup = DbGroup()
         dbGroup.deviceType = DeviceType.SENSOR.toLong()
-        var intent = Intent(this, BindRouterActivity::class.java)
+        val intent = Intent(this, BindRouterActivity::class.java)
         intent.putExtra("group", dbGroup)
         startActivity(intent)
     }
@@ -411,7 +412,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
                 showLoadingDialog(getString(R.string.please_wait))
                 val low = currentDevice?.meshAddr ?: 0 and 0xff
                 val hight = (currentDevice?.meshAddr ?: 0 shr 8) and 0xff
-                val gattBody = GwGattBody()
+                val gattBody = GwGattBody2()
                 var gattPar: ByteArray
                 if (currentDevice?.status == 1) {
                     currentDevice?.status == 0
@@ -442,7 +443,7 @@ class SensorDeviceDetailsActivity : TelinkBaseToolbarActivity(), EventListener<S
     }
 
     @SuppressLint("CheckResult")
-    private fun sendToServer(gattBody: GwGattBody) {
+    private fun sendToServer(gattBody: GwGattBody2) {
         GwModel.sendDeviceToGatt(gattBody)?.subscribe({
             disposableTimer?.dispose()
             if (currentDevice?.status == 1) {

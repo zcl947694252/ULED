@@ -70,7 +70,7 @@ import java.util.concurrent.TimeUnit
  * Created by hejiajun on 2018/4/16.
  */
 
-class MeFragment() : BaseFragment(), View.OnClickListener {
+class MeFragment : BaseFragment(), View.OnClickListener {
     private var disposableInterval: Disposable? = null
     private var popUser: PopupWindow? = null
     private var cancelConfirmVertical: View? = null
@@ -340,13 +340,13 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
             R.id.constantQuestion -> startActivity(Intent(activity, AboutSomeQuestionsActivity::class.java))
 //            R.id.showGuideAgain -> showGuideAgainFun()
             R.id.instructions -> {
-                var intent = Intent(activity, InstructionsForUsActivity::class.java)
+                val intent = Intent(activity, InstructionsForUsActivity::class.java)
                 intent.putExtra(Constant.WB_TYPE, "")
                 startActivity(intent)
             }
 
             R.id.user_agreenment -> {
-                var intent = Intent(activity, UserAgreementActivity::class.java)
+                val intent = Intent(activity, UserAgreementActivity::class.java)
                 startActivity(intent)
             }
             R.id.updata -> {
@@ -359,7 +359,7 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                var num = Constant.downTime - 1 - it
+                                val num = Constant.downTime - 1 - it
                                 if (num == 0L) {
                                     setTimerZero()
                                 } else {
@@ -392,23 +392,23 @@ class MeFragment() : BaseFragment(), View.OnClickListener {
                 }
             }
             R.id.rlRegion -> {
-                var intent = Intent(activity, NetworkActivity::class.java)
+                val intent = Intent(activity, NetworkActivity::class.java)
                 startActivity(intent)
             }
             R.id.developer -> {
-                var intent = Intent(activity, DeveloperOtaActivity::class.java)
+                val intent = Intent(activity, DeveloperOtaActivity::class.java)
                 startActivity(intent)
             }
             R.id.save_lock_ly -> {
-                var intent = Intent(activity, SafeLockActivity::class.java)
+                val intent = Intent(activity, SafeLockActivity::class.java)
                 startActivity(intent)
             }
             R.id.bind_router -> {
-                var intent = Intent(activity, BindRouterActivity::class.java)
+                val intent = Intent(activity, BindRouterActivity::class.java)
                 startActivity(intent)
             }
             R.id.setting -> {
-                var intent = Intent(activity, SettingActivity::class.java)
+                val intent = Intent(activity, SettingActivity::class.java)
                 startActivity(intent)
             }
         }

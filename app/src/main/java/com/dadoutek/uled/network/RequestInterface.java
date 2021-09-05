@@ -815,7 +815,7 @@ public interface RequestInterface {
      * meshAddr	是	int	设备or组的mesh地址，推送中回传
      */
     @POST("mqtt/control")
-    Observable<Response<String>> sendDeviceToMqtt(@Body GwGattBody body);
+    Observable<Response<String>> sendDeviceToMqtt(@Body GwGattBody2 body);
 
     /**
      * 12、网关数据复位（new）

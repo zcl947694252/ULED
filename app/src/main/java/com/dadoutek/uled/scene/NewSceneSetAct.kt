@@ -122,7 +122,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         getModeData()
         val popView = LayoutInflater.from(this).inflate(R.layout.pop_rgb_mode_list, null)
         rgbRecyclerView = popView.findViewById(R.id.pop_scene_mode_recycle)
-        rgbRecyclerView?.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        rgbRecyclerView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rgbRecyclerView?.adapter = this.rgbSceneModeAdapter
         rgbSceneModeAdapter.notifyDataSetChanged()
         rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->
@@ -590,8 +590,10 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 else -> {
                     try {
                         val color = data?.getIntExtra("color", 0)
-                        showGroupList[requestCode].color = color!!
+//                        showGroupList[requestCode].color = color!!
+                        showGroupList[requestCode].color = (showGroupList[requestCode].color and 0xff000000.toInt()) or color!! //chown
                         sceneGroupAdapter?.notifyItemChanged(requestCode)
+//                        sceneGroupAdapter?.notifyDataSetChanged()
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -1150,7 +1152,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 else -> 0
             }
             if (temperature > 99)
-                temperature = 99
+                temperature = 100
 
             var light: Byte = when {
                 list[i].isOn && list[i].isEnableBright -> list[i].brightness.toByte()
@@ -1158,7 +1160,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             }
 
             if (light > 99)
-                light = 99
+                light = 100
 
             val color = list[i].getColor()
             var red = color and 0xff0000 shr 16

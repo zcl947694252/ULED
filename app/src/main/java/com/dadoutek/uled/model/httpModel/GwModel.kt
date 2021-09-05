@@ -3,6 +3,7 @@ package com.dadoutek.uled.model.httpModel
 import com.dadoutek.uled.gateway.bean.ClearGwBean
 import com.dadoutek.uled.gateway.bean.DbGateway
 import com.dadoutek.uled.network.GwGattBody
+import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.network.NetworkFactory
 import com.dadoutek.uled.network.NetworkTransformer
 import io.reactivex.Observable
@@ -50,7 +51,7 @@ object GwModel {
                 .doOnNext { }
                 .observeOn(AndroidSchedulers.mainThread())
     }
-    fun sendDeviceToGatt(gattBody: GwGattBody): Observable<String>? {
+    fun sendDeviceToGatt(gattBody: GwGattBody2): Observable<String>? {
         return NetworkFactory.getApi().sendDeviceToMqtt(gattBody)
                 .compose(NetworkTransformer())
                 .subscribeOn(Schedulers.io())

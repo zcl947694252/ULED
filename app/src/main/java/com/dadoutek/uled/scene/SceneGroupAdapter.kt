@@ -16,6 +16,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils.runOnUiThread
@@ -157,6 +158,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
 
         val w = (item.color and 0xff000000.toInt()) shr 24
+        LogUtils.v("chown --=-=-=-=-=--=- item.color $w")
         val r = Color.red(item.color)
         val g = Color.green(item.color)
         val b = Color.blue(item.color)
@@ -263,8 +265,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             }
             else -> {// 冷暖灯的场景设置就在这里了
 //                normalVisiableMode(helper, true)
-                val brightness = if(item.brightness!=0) item.brightness else 50
-                val temperature = if(item.temperature !=0) item.temperature else 50
+                val brightness = if(item.brightness!=50) item.brightness else 50
+                val temperature = if(item.temperature !=50) item.temperature else 50
                 helper.setProgress(R.id.normal_sbBrightness, brightness)
                         .setProgress(R.id.normal_temperature, temperature)
                         .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
@@ -457,6 +459,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private fun isJBVisable(item: ItemGroup, helper: BaseViewHolder, position: Int) {
         when {
             OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+//                getViewByPosition(recyclerView,position,R.id.cw_scene)?.visibility = View.GONE
                 helper.setGone(R.id.tv_select_color, true)
                         .setGone(R.id.top_rg_ly, true)
                         .setGone(R.id.switch_scene, false)
@@ -790,7 +793,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             null -> {
             }
             else -> {
-                when (clickType) {//普通色温亮度 彩灯亮度白光
+                when (clickType) { //普通色温亮度 彩灯亮度白光
                     1, 2 -> {
                         seekBar = getViewByPosition(currentPostion, R.id.normal_temperature) as SeekBar
                         routeConfigTempGpOrLight(group.groupAddress, 97, seekBar.progress, "gpTem")
@@ -845,10 +848,15 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         LogUtils.v("zcl----------- zcl-----------发送路由调白色参数-------$white-------")
         val group = DBUtils.getGroupByID(meshAddr.toLong())
         val gpColor = group?.color ?: 0
+//        val gpColor = data[currentPostion].color //chown
+        LogUtils.v("chown ---=-=-==-=-= ${gpColor.toInt()}")
         val red = (gpColor and 0xff0000) shr 16
         val green = (gpColor and 0x00ff00) shr 8
         val blue = gpColor and 0x0000ff
         val color = (white shl 24) or (red shl 16) or (green shl 8) or blue
+//        val color = (white shl 24) or (gpColor and 0xffffff)
+        LogUtils.v("chown ---=-=-==-=-= $color")
+
         val isEnableWhiteBright = if (white == 0) 0 else 1
         RouterModel.routeConfigWhiteNum(meshAddr, deviceType, color, isEnableWhiteBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
@@ -1720,10 +1728,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 val lessImage = getViewByPosition(pos, R.id.cw_brightness_less) as ImageView?
                 val addImage = getViewByPosition(pos, R.id.cw_brightness_add) as ImageView?
 
-//                sbBrightnessCW   //seekbar 替换seek
-//                lessBrightnessCW   //image 替换lessImage
-//                addBrightnessCW   //image 替换addImage
-
                 itemGroup.brightness = sbBrightnessCW!!.progress
                 opcode = Opcode.SET_LUM
                 clickType = 3
@@ -1774,7 +1778,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         lessImage!!.isEnabled = true
                     }
                 }
-
             }
             R.id.rgb_sbBrightness -> {
                 val progress = seekBar.progress
@@ -1801,7 +1804,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         lessImage?.isEnabled = true
                     }
                 }
-
             }
             R.id.rgb_white_seekbar -> {
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.sb_w_bright_num)) as TextView).text = seekBar.progress.toString() + "%"
@@ -1863,7 +1865,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             Constant.IS_ROUTE_MODE -> routerConfigBrightnesssOrColorTemp()
             else -> GlobalScope.launch { sendCmd(opcode, address, seekBar.progress) }
         }
-//        notifyItemRangeChanged(seekBar.tag as Int, data.size)
+//        notifyItemRangeChanged(seekBar.tag as Int, data.size) //chown
     }
 
     @SuppressLint("SetTextI18n")
@@ -1876,7 +1878,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     //  data[position].brightness = progress
                     tvBrightness.text = "$progress%"
                 }
-                //notifyItemRangeChanged(position, data.size)
             }
             R.id.normal_temperature -> {
                 val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
@@ -1884,7 +1885,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     tvTemperature.text = "$progress%"
                     // data[position].temperature = progress
                 }
-                //notifyItemRangeChanged(position, data.size)
             }
             R.id.rgb_sbBrightness -> {
                 val tvBrightnessRGB = getViewByPosition(position, R.id.sbBrightness_num) as TextView?

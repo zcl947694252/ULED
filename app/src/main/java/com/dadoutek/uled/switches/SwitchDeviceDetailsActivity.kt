@@ -328,22 +328,25 @@ class SwitchDeviceDetailsActivity : TelinkBaseToolbarActivity() {
         isEmptyDevice()
     }
 
+    @SuppressLint("CheckResult")
     private fun onLogin(bestRSSIDevice: DeviceInfo) {
         mScanTimeoutDisposal?.dispose()
         hideLoadingDialog()
         if (TelinkApplication.getInstance().connectDevice != null)
-            Commander.getDeviceVersion(bestRSSIDevice!!.meshAddress)
+            Commander.getDeviceVersion(bestRSSIDevice.meshAddress)
                     .subscribe(
                             { version ->
                                 if (version != null && version != "") {
                                     skipeSw(bestRSSIDevice, version)
                                 } else {
-                                    ToastUtils.showLong(getString(R.string.get_version_fail))
+//                                    ToastUtils.showLong(getString(R.string.get_version_fail))
+                                    LogUtils.v("chown -- ${getString(R.string.get_version_fail)}")
                                     initData()
                                 }
                             },
                             {
-                                showToast(getString(R.string.get_version_fail))
+//                                showToast(getString(R.string.get_version_fail))
+                                LogUtils.v("chown -- ${getString(R.string.get_version_fail)}")
                             }
                     )
     }
