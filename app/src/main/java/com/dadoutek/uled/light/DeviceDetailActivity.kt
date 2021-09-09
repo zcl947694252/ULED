@@ -273,13 +273,11 @@ class DeviceDetailAct : TelinkBaseToolbarActivity(), View.OnClickListener {
                 when {
                     Constant.IS_ROUTE_MODE -> openOrClose(currentDevice!!)
                     b -> {
-                        LogUtils.v("chown -- b")
                         openOrClose(currentDevice!!)
                         sendAfterUpdate()
                     }
                     else -> {
                         sendToGw()
-                        LogUtils.v("chown -- else")
                         sendAfterUpdate()
                     }
                 }

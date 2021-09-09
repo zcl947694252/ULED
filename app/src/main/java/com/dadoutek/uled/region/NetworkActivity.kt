@@ -456,6 +456,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     /**
      * 弹框各个view监听
      */
+    @SuppressLint("CheckResult")
     override fun onClick(v: View?) {
        // DBUtils.deleteAllSensorAndSwitch() 取消对开关和传感器的控制
         when (v!!.id) {
@@ -490,7 +491,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     ToastUtils.showLong(getString(R.string.delete_region_tip))
                 else
                     RegionModel.removeRegion(regionBean!!.id)!!.subscribe({
-
                             LogUtils.e("zcl====删除区域$it----删除信息$regionBean")
                             PopUtil.dismiss(pop)
                             regionBean?.let {itr->
@@ -914,7 +914,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     private fun trsansferCodeUsefulOrUnuseful(itView: View) {
          RegionModel.lookTransforRegionCode(regionBean!!.id)
                 ?.subscribe( {
-                        var isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
+                        val isNewQr = it.code == null || it.code.trim() == "" || it.expire <= 0
                         if (!isNewQr){
                             itView.findViewById<ImageView>(R.id.pop_transfer_region).setImageResource(R.drawable.icon_code)
                             itView.findViewById<TextView>(R.id.pop_transfer_region_tv)?.text = getString(R.string.see_qr)
@@ -1093,9 +1093,9 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         when (requestCode) {
             REQUEST_CODE -> {  //处理扫描结果
                 if (null != data) {
-                    var bundle: Bundle? = data.extras ?: return
+                    val bundle: Bundle? = data.extras ?: return
                     if (bundle!!.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
-                        var result = bundle.getString(CodeUtils.RESULT_STRING)
+                        val result = bundle.getString(CodeUtils.RESULT_STRING)
                         Log.e(TAG, "zcl***parse_result***$result")
                         postParseCode(result)
                     } else if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_FAILED) {
@@ -1121,7 +1121,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_CODE_CARMER) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
+                val intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
                 startActivityForResult(intent, REQUEST_CODE)
             } else {
                 ToastUtils.showLong(getString(R.string.fail_parse_qr))
@@ -1130,7 +1130,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
     }
 
     private fun openScan() {
-        var intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
+        val intent = Intent(this@NetworkActivity, CaptureActivity::class.java)
         startActivityForResult(intent, REQUEST_CODE)
     }
 

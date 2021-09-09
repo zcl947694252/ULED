@@ -200,8 +200,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            dispos = RxPermissions(this).request(Manifest.permission.READ_PHONE_STATE).subscribe({}, {})
+        if (SharedPreferencesHelper.getBoolean(this,"PERMISION_PHONE",true) && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            dispos = RxPermissions(this).request(Manifest.permission.READ_PHONE_STATE).subscribe({
+                SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
+            }, {
+                SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
+            })
         }
 //        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
 //            TelinkLightApplication.getApp().initStompClient()
@@ -336,7 +340,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     private fun startTimerUpdate() {
         upDateTimer?.dispose()//interval 每隔一段时间发送一个事件
-        upDateTimer = Observable.interval(0, 10, TimeUnit.SECONDS).subscribe {
+        upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
             if (netWorkCheck(this) && !Constant.IS_ROUTE_MODE)
                 CoroutineScope(Dispatchers.IO).launch {
                     LogUtils.v("chown -- 同步数据")

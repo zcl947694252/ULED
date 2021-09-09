@@ -8,7 +8,7 @@ import kotlinx.android.synthetic.main.activity_instructions_for_us.*
 import kotlinx.android.synthetic.main.activity_user_agreement.*
 import kotlinx.android.synthetic.main.toolbar.*
 
-class UserAgreementActivity :BaseActivity(){
+class UserAgreementActivity : BaseActivity() {
     override fun initListener() {}
     override fun initData() {}
     override fun initView() {
@@ -54,7 +54,7 @@ class UserAgreementActivity :BaseActivity(){
         return false
     }
 
-    private   fun isZh(context: Context): Boolean {
+    private fun isZh(context: Context): Boolean {
         val locale = context.resources.configuration.locale
         val language = locale.language
         return language.endsWith("zh")

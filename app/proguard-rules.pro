@@ -44,6 +44,8 @@
 -keep public class com.android.vending.licensing.ILicensingService
 -keep class android.support.** {*;}
 
+
+
 -keepclasseswithmembernames class * {
     native <methods>;
 }
@@ -100,8 +102,8 @@
 #----------------------------------------------------------------------------
 #---------------------------------------------------------------------------------------------------
 
--dontwarn com.tencent.bugly.**
--keep public class com.tencent.bugly.**{*;}
+# -dontwarn com.tencent.bugly.** #chown
+# -keep public class com.tencent.bugly.**{*;}
 
 -keep public class com.avast.android.butterknifezelezny.**{*;}
 -dontwarn com.avast.android.butterknifezelezny.**

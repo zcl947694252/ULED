@@ -228,6 +228,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                             val subscribe = Commander.resetDevice(light!!.meshAddr)
                                     .subscribe({  //deleteData()
                                         deleteData()
+                                        SyncDataPutOrGetUtils.syncPutDataStart(this,syncCallbackUp)
                                     }, {
                                         Toast.makeText(this,getString(R.string.delete_device_fail),Toast.LENGTH_SHORT).show()
 //                                        GlobalScope.launch(Dispatchers.Main) {

@@ -155,10 +155,10 @@ class DeviceScanningNewActivity : TelinkMeshErrorDealActivity(), EventListener<S
         super.onCreate(savedInstanceState)
         disableConnectionStatusListener()
         mRxPermission = RxPermissions(this)
-        //设置屏幕常亮***
-        isScanningJM = true
+        //  设置屏幕常亮 * * *
+        isScanningJM = true //
         window.setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        //***
+        //  * * *
         setContentView(R.layout.activity_device_scanning)
         meshList.clear()
         TelinkLightService.Instance()?.idleMode(true)

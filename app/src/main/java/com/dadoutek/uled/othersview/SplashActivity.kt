@@ -45,9 +45,17 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         changeLanguage()
         init()
         initListener()
-        Constant.IS_ROUTE_MODE =  SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
+        Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         //Constant.IS_ROUTE_MODE = false
-        LogUtils.v("zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
+        LogUtils.v(
+            "zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${
+                SharedPreferencesHelper.getBoolean(
+                    this,
+                    Constant.ROUTE_MODE,
+                    false
+                )
+            }-"
+        )
     }
 
     private fun changeLanguage() {
@@ -149,11 +157,16 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                     it.findViewById<TextView>(R.id.code_warm_context).text = getString(R.string.privacy_statement_content)
                     val cb = it.findViewById<CheckBox>(R.id.code_warm_cb)
                     val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
+                    val cancle = it.findViewById<TextView>(R.id.cancel_tv)
                     cb.setOnCheckedChangeListener { _, isChecked ->
-                        iSee.text = if (isChecked)
+                        iSee.text = if (isChecked){
+                            cancle.visibility = View.VISIBLE
                             getString(R.string.i_know)
-                        else
+                        }
+                        else {
+                            cancle.visibility = View.GONE
                             getString(R.string.read_agreen)
+                        }
                     }
                     iSee.setOnClickListener {
                         if (cb.isChecked) {
@@ -162,7 +175,9 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                         } else
                             ToastUtils.showShort(getString(R.string.read_agreen))
                     }
-
+                    cancle.setOnClickListener {
+                        PopUtil.dismiss(pop)
+                    }
                     try {
                         if (!this@SplashActivity.isFinishing && !pop.isShowing)
                             pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 50)

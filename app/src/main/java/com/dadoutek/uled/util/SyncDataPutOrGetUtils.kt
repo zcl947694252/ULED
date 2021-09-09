@@ -163,12 +163,12 @@ class SyncDataPutOrGetUtils {
                 }
 
                 addtoObservable()
-                LogUtils.v("chown ----------observableList------------ ${observableList.size}")
+//                LogUtils.v("chown ----------observableList------------ ${observableList.size}")
                 val observables = arrayOfNulls<Observable<String>>(observableList.size)
                 observableList.toArray(observables)
 
                 if (observables.isNotEmpty()) {
-                    LogUtils.v("chown ------------observables.isNotEmpty   observables.isNotEmpty   observables.isNotEmpty")
+//                    LogUtils.v("chown ------------observables.isNotEmpty   observables.isNotEmpty   observables.isNotEmpty")
                     observables.forEach {
                         it!!.subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread()).subscribe({
@@ -381,10 +381,10 @@ class SyncDataPutOrGetUtils {
                                 RegionModel.add(token, region, id, changeId)?.let { observableList.add(it) }
                             }
                             // Constant.DB_DELETE -> return RegionModel.delete(token, changeId.toInt(), id)
-                            /*   Constant.DB_UPDATE -> {
+                            /* Constant.DB_UPDATE -> {
                                    val region = DBUtils.getRegionByID(changeId)
                                    return RegionModel.update(changeId.toInt(), region, id)
-                               }*/
+                               } */
                         }
                     }
                     "DB_SCENE" -> {

@@ -82,7 +82,7 @@ class GroupListFragment : BaseFragment() {
     private var toolbarTv: TextView? = null
     private var showList: List<ItemTypeGroup>? = null
     private var updateLightDisposal: Disposable? = null
-    private val SCENE_MAX_COUNT = 255
+    private val SCENE_MAX_COUNT = 128
     private var viewPager: androidx.viewpager.widget.ViewPager? = null
     internal var deviceName: ArrayList<DbDeviceName>? = null
     private lateinit var cwLightFragment: CWLightFragmentList

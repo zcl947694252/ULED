@@ -373,7 +373,7 @@ public class Constant implements Serializable {
      * 通过服务器转发命令到网关CMD
      */
     public static final int CMD_MQTT_CONTROL = 2500;
-//    public static final int CMD_MQTT_CONTROL = 999;
+    //    public static final int CMD_MQTT_CONTROL = 999;
     /**
      * Y远程控制业务标识
      */

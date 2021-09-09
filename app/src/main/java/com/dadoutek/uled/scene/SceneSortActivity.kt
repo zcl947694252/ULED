@@ -1,10 +1,7 @@
 package com.dadoutek.uled.scene
 
-import android.graphics.Color
-import android.os.Bundle
-import android.os.Vibrator
+import android.app.Activity
 import android.view.View
-import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +11,6 @@ import com.dadoutek.uled.base.BaseActivity
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.switches.SceneRecycleGridAdapter
-import com.dadoutek.uled.tellink.TelinkLightApplication
 import kotlinx.android.synthetic.main.toolbar.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -40,13 +36,16 @@ class SceneSortActivity : BaseActivity() {
         toolbar.setNavigationOnClickListener {
             // 在finish之前更新数据库的index属性 发现无用，还是删除所有数据库在进行保存
             for ((i, dbscene) in scenesListData.withIndex()) {
+//                DBUtils.getSceneByID(dbscene.id) // chown
                 DBUtils.deleteScene(dbscene)
             }
             for ((i, dbscene) in scenesListData.withIndex()) {
                 dbscene.id = i.toLong() + 1
+                dbscene.index = i
                 DBUtils.saveScene(dbscene,false)
             }
-
+            setResult(Activity.RESULT_OK)
+            LogUtils.v("chown ====--====== $scenesListData")
             finish()
         }
         adapter = SceneRecycleGridAdapter(R.layout.template_device_type_item, scenesListData)

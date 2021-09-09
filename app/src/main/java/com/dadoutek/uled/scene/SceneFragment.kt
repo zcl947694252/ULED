@@ -1,6 +1,7 @@
 package com.dadoutek.uled.scene
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -15,6 +16,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.app.hubert.guide.core.Builder
+import com.app.hubert.guide.util.LogUtil
 //import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -107,6 +109,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
+    @SuppressLint("CheckResult")
     @RequiresApi(Build.VERSION_CODES.O)
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
         if (position>scenesListData.size)
@@ -264,6 +267,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
        // refreshView()
     }
 
+    @SuppressLint("CheckResult")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(dbScene: DbScene) {
         if (DBUtils.getAllGateWay().size > 0)
@@ -535,8 +539,18 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 4) {
+            if (resultCode == Activity.RESULT_OK)  {
+                LogUtils.v("chown ====--====== $scenesListData")
+                scenesListData.clear()
+                scenesListData = DBUtils.sceneList
+                LogUtils.v("chown ====--====== $scenesListData")
+                adaper?.notifyDataSetChanged()
+            }
+        }
         initData()
         initView()
+
     }
 
     private fun setScene(id: Long) {

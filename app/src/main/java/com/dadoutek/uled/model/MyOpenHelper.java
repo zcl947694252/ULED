@@ -2,6 +2,7 @@ package com.dadoutek.uled.model;
 
 import android.content.Context;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.dadoutek.uled.dao.DaoMaster;
 import com.dadoutek.uled.dao.DaoSession;
 import com.dadoutek.uled.dao.DbColorNodeDao;
@@ -19,9 +20,11 @@ import com.dadoutek.uled.dao.DbSensorDao;
 import com.dadoutek.uled.dao.DbSwitchDao;
 import com.dadoutek.uled.dao.DbUserDao;
 import com.dadoutek.uled.model.dbModel.DBUtils;
+import com.dadoutek.uled.model.dbModel.DbDeleteGradientBody;
 import com.dadoutek.uled.model.dbModel.DbGroup;
 import com.dadoutek.uled.model.dbModel.DbLight;
 import com.dadoutek.uled.tellink.TelinkLightApplication;
+import com.dadoutek.uled.util.DBManager;
 import com.github.yuweiguocn.library.greendao.MigrationHelper;
 
 import org.greenrobot.greendao.database.Database;
@@ -44,7 +47,7 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
 
     @Override
     public void onUpgrade(Database db, int oldVersion, int newVersion) {
-
+        LogUtils.v("chown ====== oldversion = " + oldVersion + "     newversion = " + newVersion);
         if (oldVersion < newVersion) {
             MigrationHelper.migrate(db, new MigrationHelper.ReCreateAllTableListener(){
                         @Override
@@ -108,7 +111,6 @@ public class MyOpenHelper extends DaoMaster.OpenHelper {
                     }
                 }).start();
                 break;
-
         }
     }
 }

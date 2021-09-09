@@ -158,7 +158,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
 
         val w = (item.color and 0xff000000.toInt()) shr 24
-        LogUtils.v("chown --=-=-=-=-=--=- item.color $w")
+//        LogUtils.v("chown --=-=-=-=-=--=- item.color $w")
         val r = Color.red(item.color)
         val g = Color.green(item.color)
         val b = Color.blue(item.color)
@@ -1720,7 +1720,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         val address = if (pos < data.size) data[pos].groupAddress else 0
         var opcode: Byte = Opcode.SET_LUM
         val itemGroup = data[pos]
-        LogUtils.v("chown -- onStop ${address.toString()}")
+//        LogUtils.v("chown -- onStop ${address.toString()}")
         when (seekBar.id) {
             R.id.normal_sbBrightness -> {
                 (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.cw_brightness_num)) as TextView).text = seekBar.progress.toString() + "%"

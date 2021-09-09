@@ -5,11 +5,13 @@
     <!-- 蓝牙权限 -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
+            tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION " /> <!-- <uses-permission android:name="android.permission.READ_PHONE_STATE" /> -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION " />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission
@@ -533,11 +535,12 @@
 
         <uses-library
                 android:name="org.apache.http.legacy"
-                android:required="false" /> <!-- bugly升级sdk用的 -->
-        <activity
-                android:name="com.tencent.bugly.beta.ui.BetaActivity"
-                android:configChanges="keyboardHidden|orientation|screenSize|locale"
-                android:theme="@android:style/Theme.Translucent" />
+                android:required="false" />
+        <!-- bugly升级sdk用的 -->
+<!--        <activity-->
+<!--                android:name="com.tencent.bugly.beta.ui.BetaActivity"-->
+<!--                android:configChanges="keyboardHidden|orientation|screenSize|locale"-->
+<!--                android:theme="@android:style/Theme.Translucent" />-->
         <activity android:name=".switches.fourkey.ConfigFourSwitchActivity"
                 android:screenOrientation="portrait"
                 tools:ignore="LockedOrientationActivity"/>

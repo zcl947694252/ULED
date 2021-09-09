@@ -26,7 +26,7 @@ object AccountModel {
         return NetworkFactory.getApi()
                 .getAccount(phone, "dadou")
                 .compose(NetworkTransformer())
-                .flatMap { response: String ->
+                .flatMap { response: String -> //login之后保存最近的一个用户的信息 ： 电话、密码、账号 // 获取盐 再通过md5 加密密码
                     account = response
                     SharedPreferencesUtils.saveLastUser("$phone-$password-$account")
                     NetworkFactory.getApi()
@@ -149,7 +149,7 @@ object AccountModel {
         DaoSessionUser.destroySession()
         DaoSessionUser.getInstance()
 
-        if (user.last_authorizer_user_id == null)//不是切换区域就是登录
+        if (user.last_authorizer_user_id == null)   //不是切换区域就是登录
             user.last_authorizer_user_id = user.id.toString()
 
         DBUtils.saveUser(user)

@@ -123,9 +123,8 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
     @SuppressLint("CheckResult")
     private fun openScan() {
         RxPermissions(this).request(Manifest.permission.CAMERA).subscribe({
-            var intent = Intent(this@SelectDeviceTypeActivity, MyScanActivity::class.java)
+            val intent = Intent(this@SelectDeviceTypeActivity, MyScanActivity::class.java)
             //var intent = Intent(this@SelectDeviceTypeActivity, CaptureActivity::class.java)
-            LogUtils.v("==============================去到MyScanActivity界面=======================================")
             startActivityForResult(intent, REQUEST_CODE)
         },{
             ToastUtils.showShort(it.message)
@@ -143,10 +142,10 @@ class SelectDeviceTypeActivity : TelinkBaseActivity() {
             REQUEST_CODE -> {  //处理扫描结果
                 LogUtils.v("==================================处理路由扫描结果========================================")
                 if (null != data) {
-                    var bundle: Bundle? = data.extras ?: return
+                    val bundle: Bundle? = data.extras ?: return
                     when {
                         bundle!!.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS -> {
-                            var result = bundle.getString(CodeUtils.RESULT_STRING)
+                            val result = bundle.getString(CodeUtils.RESULT_STRING)
                             LogUtils.v("zcl-----------------解析路由器扫描的一维码-$result")
                             if (result != null) {
                                 LogUtils.v("==============================result 不为空 ======================================================")

@@ -1950,6 +1950,7 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                                 {
                                                     //deleteData()
                                                     deleteData()
+                                                    SyncDataPutOrGetUtils.syncPutDataStart(this,syncCallbackUp)
                                                 }, {
                                             /*   showDialogHardDelete?.dismiss()
                                                showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)

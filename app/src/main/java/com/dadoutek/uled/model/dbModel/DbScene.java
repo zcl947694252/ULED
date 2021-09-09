@@ -277,4 +277,5 @@ public class DbScene implements Parcelable{
     public boolean getChecked() {
         return this.checked;
     }
+
 }

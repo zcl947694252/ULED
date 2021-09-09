@@ -281,7 +281,7 @@ object DBUtils {
 
     fun getAllUser(): ArrayList<DbUser> {
         val query = DaoSessionUser.getInstance().dbUserDao.queryBuilder().build()
-        var arrayList: ArrayList<DbUser> = arrayListOf()
+        val arrayList: ArrayList<DbUser> = arrayListOf()
         arrayList.addAll(query.list())
         return arrayList
     }

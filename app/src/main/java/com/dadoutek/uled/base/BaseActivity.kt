@@ -140,7 +140,7 @@ abstract class BaseActivity : AppCompatActivity(), IGetMessageCallBack {
     abstract fun setLayoutID(): Int
     open fun notifyWSData(type: Int, rid: Int) {}
     private fun startTimerUpdate() {
-        upDateTimer = Observable.interval(0, 10, TimeUnit.SECONDS).subscribe {
+        upDateTimer = Observable.interval(0, 5, TimeUnit.SECONDS).subscribe {
             LogUtils.v("chown -- 同步数据")
             SyncDataPutOrGetUtils.syncPutDataStart(this@BaseActivity, object : SyncCallback {
                 override fun start() {}

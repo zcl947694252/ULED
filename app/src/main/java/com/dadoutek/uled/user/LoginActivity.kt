@@ -385,7 +385,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
 
     private fun verificationCode() {
         returnView()
-        var intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
+        val intent = Intent(this@LoginActivity, VerificationCodeActivity::class.java)
         intent.putExtra("type", Constant.TYPE_VERIFICATION_CODE)
         returnView()
         startActivityForResult(intent, 0)
@@ -414,10 +414,10 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
         if (isPhone) {
             isShowPhoneList(true)
 
-            val layoutmanager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+            val layoutmanager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
             recyclerView!!.layoutManager = layoutmanager //一定要设置布局管理器，否则界面出不来
             adapter = PhoneListRecycleViewAdapter(R.layout.recyclerview_phone_list, phoneList!!)
-            val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
+            val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
             decoration.setDrawable(ColorDrawable(ContextCompat.getColor(this, R.color.divider)))
             //添加分割线
             recyclerView?.addItemDecoration(decoration)
@@ -515,7 +515,7 @@ class LoginActivity : TelinkBaseActivity(), View.OnClickListener, TextWatcher {
             edit_user_password!!.setText(message[1])
             edit_user_password!!.visibility = View.GONE
 
-            if (currentUser?.phone == message!![0]) {
+            if (currentUser?.phone == message[0]) {
                 SharedPreferencesHelper.removeKey(this, Constant.USER_INFO)
                 edit_user_phone_or_email!!.setText("")
                 edit_user_phone_or_email_line.background = getDrawable(R.drawable.line_gray)

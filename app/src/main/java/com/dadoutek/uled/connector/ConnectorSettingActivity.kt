@@ -556,7 +556,10 @@ class ConnectorSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionLi
                 R.id.toolbar_f_ota -> {
                     when {
                         !TextUtils.isEmpty(localVersion) -> when {
-                            !isSuportOta(currentDbConnector?.version) -> ToastUtils.showShort(getString(R.string.dissupport_ota))
+                            !isSuportOta(currentDbConnector?.version) -> {
+                                ToastUtils.showShort(getString(R.string.dissupport_ota))
+                                LogUtils.v("chown ----===--=-=-= ${currentDbConnector?.version}")
+                            }
                             isMostNew(currentDbConnector?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
                             else -> {
                                 when {
