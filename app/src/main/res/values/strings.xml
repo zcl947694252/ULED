@@ -1059,6 +1059,7 @@
     <string name="user_agreement_context">《User agreement and privacy notes》have been agreed.</string>
     <string name="not_use">Not to use</string>
     <string name="read_agreen">Please read the agreement for approval</string>
+    <string name="must_agree">You need to agree to this policy before you can use the app</string>
     <string name="user_agreement">User agreement and privacy statement</string>
     <string name="verification_code_login">Verification code Login</string>
     <string name="no_connect_device">No automatic connection!</string>

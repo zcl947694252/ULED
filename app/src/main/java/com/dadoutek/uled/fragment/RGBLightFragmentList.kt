@@ -21,6 +21,7 @@ class RGBLightFragmentList : BaseGroupFragment() {
             list.add(0, allGroups[0])
         }
         list.addAll(DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_RGB))
+        list.sortBy { it.index }
         return list
     }
 

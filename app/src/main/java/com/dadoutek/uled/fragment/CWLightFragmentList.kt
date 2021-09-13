@@ -21,6 +21,7 @@ class CWLightFragmentList : BaseGroupFragment() {
             list.add(0, allGroups[0])
         list.addAll(DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL))
         list.addAll(DBUtils.getGroupsByDeviceType(DeviceType.LIGHT_NORMAL_OLD))
+        list.sortBy { it.index }
         return list
     }
 

@@ -864,6 +864,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         dbScene?.name = name
         dbScene?.imgName = sceneIcon
         dbScene?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
+        dbScene?.index = getSceneIndex()
 
         val belongSceneId = dbScene?.id!!
         DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(belongSceneId))
@@ -1038,6 +1039,19 @@ class NewSceneSetAct : TelinkBaseActivity() {
         afterSaveScene()
     }
 
+    private fun getSceneIndex(): Int {
+        val list = DBUtils.sceneList
+        val idList = arrayListOf<Int>()
+        for (i in list) {
+            idList.add(i.index)
+        }
+        for (i in 0..254) {
+            if (!idList.contains(i))
+                return i
+        }
+        return 0
+    }
+
     private fun getSceneId(): Long {
         val list = DBUtils.sceneList
         LogUtils.v("chown --- hello world  Dbutils.sceneList $list")
@@ -1046,7 +1060,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             idList.add(list[i].id!!.toInt())
 
         var id = 0
-        loop@ for (i in 1..100) {
+        loop@ for (i in 1..255) {
             when {
                 !idList.contains(i) -> {
                     id = i

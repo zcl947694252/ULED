@@ -94,7 +94,7 @@
                     android:layout_marginTop="@dimen/dp_15"
                     android:gravity="center"
                     android:padding="@dimen/dp_10"
-                    android:text="@string/read_agreen"
+                    android:text="@string/i_know"
                     android:textColor="@color/blue_background"
                     android:textSize="15sp"
                     android:textStyle="bold" />

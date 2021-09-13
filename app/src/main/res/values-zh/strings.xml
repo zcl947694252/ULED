@@ -861,6 +861,7 @@
     <string name="user_agreement_context">已同意《用户协议及隐私说明》</string>
     <string name="not_use">暂不使用</string>
     <string name="read_agreen">请阅读协议是否同意</string>
+    <string name="must_agree">需要同意该政策，才能使用APP</string>
     <string name="user_agreement">用户协议及隐私说明</string>
     <string name="group_ota">群组升级</string>
     <string name="get_bin_fail">获取bin文件失败</string>

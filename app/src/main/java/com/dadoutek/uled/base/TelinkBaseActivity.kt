@@ -9,12 +9,16 @@ import android.app.Dialog
 import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.TextPaint
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,12 +27,15 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 //import androidx.recyclerview.widget.RecyclerView
 import android.text.TextUtils
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import cn.smssdk.SMSSDK
+import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -56,6 +63,7 @@ import com.dadoutek.uled.mqtt.MqttService
 import com.dadoutek.uled.mqtt.MyServiceConnection
 import com.dadoutek.uled.network.*
 import com.dadoutek.uled.othersview.InstructionsForUsActivity
+import com.dadoutek.uled.othersview.UserAgreementActivity
 import com.dadoutek.uled.pir.ScanningSensorActivity
 import com.dadoutek.uled.router.RouterOtaActivity
 import com.dadoutek.uled.router.bean.*
@@ -83,10 +91,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.toolbar.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 //import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.singleLine
 //import org.jetbrains.anko.startActivity
@@ -200,13 +205,14 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         makeDialog()
         initStompReceiver()
         initChangeRecevicer()
-        if (SharedPreferencesHelper.getBoolean(this,"PERMISION_PHONE",true) && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+
+       /* if (SharedPreferencesHelper.getBoolean(this,"PERMISION_PHONE",true) && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
             dispos = RxPermissions(this).request(Manifest.permission.READ_PHONE_STATE).subscribe({
                 SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
             }, {
                 SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
             })
-        }
+        }*/
 //        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
 //            TelinkLightApplication.getApp().initStompClient()
         receiver = BluetoothListenerReceiver()

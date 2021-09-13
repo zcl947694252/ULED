@@ -11,12 +11,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:gravity="center"
-
-
             android:layout_marginBottom="100dp"
-            android:textColor="@color/gray_e"
+
+
+            android:gravity="center"
             android:text="@string/have_account"
+            android:textColor="@color/gray_e"
             android:textSize="18sp" />
 
     <TextView
@@ -31,4 +31,6 @@
             android:text="@string/create_account"
             android:textColor="@color/white"
             android:textSize="15sp" />
+
+
 </RelativeLayout>

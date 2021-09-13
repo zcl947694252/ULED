@@ -629,7 +629,6 @@ object DBUtils {
         for (type in types) {
             val group = DaoSessionInstance.getInstance().dbGroupDao.queryBuilder().where(DbGroupDao.Properties.DeviceType.eq(type)).list()
             groups.addAll(group)
-
         }
         return groups
     }

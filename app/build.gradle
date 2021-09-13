@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao' // apply plugin
 apply plugin: 'com.mob.sdk'
+//apply plugin: 'io.fabric' //chown
 
 // 在MobSDK的扩展中注册SMSSDK的相关信息
 MobSDK {
@@ -45,7 +46,7 @@ android {
         applicationId "com.dadoutek.uled"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 303
+        versionCode 304
         versionName "5.0.7"
 
         multiDexEnabled true
@@ -84,6 +85,7 @@ android {
 }
 
 repositories {
+    maven { url 'https://maven.fabric.io/public' } //chown
     flatDir {
         dirs 'libs'
     }
@@ -101,6 +103,11 @@ greendao {
 }
 
 dependencies {
+
+    implementation ('com.crashlytics.sdk.android:crashlytics:2.5.2') {
+        transitive = true;
+    }//chown
+
     //compile(name: "libTelinkLight", ext: "aar")
     //    compile 'com.android.support:support-v4:26.1.0'
     implementation 'com.blankj:utilcode:1.25.5'
@@ -125,7 +132,7 @@ dependencies {
 //    implementation 'com.tencent.bugly:crashreport:2.8.6'
     //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
 
-//    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1'
+//    implementation 'com.tencent.bugly:crashreport_upgrade:1.4.1' // 神奇的东西，竟然跟扫灯有关系
 
 //    compile 'com.tencent.bugly:crashreport:latest.release' //其中latest.release指代最新Bugly SDK版本号，也可以指定明确的版本号，例如2.1.9
 //    compile 'com.tencent.bugly:nativecrashreport:latest.release' //其中latest.release指代最新Bugly NDK版本号，也可以指定明确的版本号，例如3.0

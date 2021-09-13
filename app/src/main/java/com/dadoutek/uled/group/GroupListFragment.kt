@@ -163,6 +163,7 @@ class GroupListFragment : BaseFragment() {
         toolbar!!.findViewById<ImageView>(R.id.image_bluetooth).visibility = View.VISIBLE
         toolbar!!.findViewById<ImageView>(R.id.img_function1).visibility = View.GONE//加号
         toolbar!!.findViewById<ImageView>(R.id.img_function2).visibility = View.GONE//删除
+
         SharedPreferencesUtils.setDelete(false)
     }
 
@@ -217,6 +218,13 @@ class GroupListFragment : BaseFragment() {
         toolbar = viewContent.findViewById(R.id.toolbar)
         toolbarTv = viewContent.findViewById(R.id.toolbarTv)
         toolbarTv!!.setText(R.string.group_title)
+        val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
+        orderScene?.visibility=View.VISIBLE // chown
+        orderScene?.setOnClickListener {
+            val intent = Intent(activity,GroupListOrderActivity::class.java)
+
+            startActivity(intent)
+        }
 
         // allLightText = viewContent.findViewById(R.id.textView6)
         val btnDelete = toolbar!!.findViewById<ImageView>(R.id.img_function2)
@@ -444,6 +452,7 @@ class GroupListFragment : BaseFragment() {
         }
     }
 
+    @SuppressLint("CheckResult")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun sendToGw(isOpen: Boolean) {
         val gateWay = DBUtils.getAllGateWay()

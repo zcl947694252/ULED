@@ -19,6 +19,7 @@ class CurtainFragmentList : BaseGroupFragment() {
     override fun getGroupData(): Collection<DbGroup> {
         val list = mutableListOf<DbGroup>()
         list.addAll( DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN))
+        list.sortBy { it.index }
         return list
     }
 

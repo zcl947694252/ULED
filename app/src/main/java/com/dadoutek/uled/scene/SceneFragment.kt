@@ -16,7 +16,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.annotation.RequiresApi
 import com.app.hubert.guide.core.Builder
-import com.app.hubert.guide.util.LogUtil
 //import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
@@ -33,7 +32,6 @@ import com.dadoutek.uled.model.dbModel.DbScene
 import com.dadoutek.uled.model.dbModel.DbSceneActions
 import com.dadoutek.uled.model.httpModel.GwModel
 import com.dadoutek.uled.model.routerModel.RouterModel
-import com.dadoutek.uled.network.GwGattBody
 import com.dadoutek.uled.network.GwGattBody2
 import com.dadoutek.uled.network.NetworkStatusCode.OK
 import com.dadoutek.uled.network.NetworkStatusCode.ROUTER_ALL_OFFLINE
@@ -61,7 +59,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.support.v4.runOnUiThread
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -209,6 +206,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }
     }
 
+    @SuppressLint("CheckResult")
     private fun showDeleteSingleDialog(dbScene: DbScene) {
         val builder = AlertDialog.Builder(activity)
         builder.setMessage(R.string.sure_delete)
@@ -403,7 +401,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btnAdd = toolbar?.findViewById<ImageView>(R.id.img_function1)
         val btnDelete = toolbar?.findViewById<ImageView>(R.id.img_function2)
         val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
-//        orderScene?.visibility=View.VISIBLE // chown
+        orderScene?.visibility=View.VISIBLE // chown
         btnAdd?.visibility = View.GONE
 
         btnAdd?.setOnClickListener(this)
@@ -428,7 +426,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         telinkLightApplication = this.activity!!.application as TelinkLightApplication
         scenesListData.clear()
         scenesListData = DBUtils.sceneList
-
+        scenesListData.sortBy { it.index }
         img_function2?.visibility = View.GONE
         toolbar?.navigationIcon = null
         image_bluetooth?.visibility = View.VISIBLE
@@ -541,10 +539,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 4) {
             if (resultCode == Activity.RESULT_OK)  {
-                LogUtils.v("chown ====--====== $scenesListData")
                 scenesListData.clear()
                 scenesListData = DBUtils.sceneList
-                LogUtils.v("chown ====--====== $scenesListData")
+                scenesListData.sortBy {
+                    it.index
+                }
                 adaper?.notifyDataSetChanged()
             }
         }
@@ -555,7 +554,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
     private fun setScene(id: Long) {
         val opcode = Opcode.SCENE_LOAD
-
 
         GlobalScope.launch {
             val params: ByteArray = byteArrayOf(id.toByte())
@@ -568,8 +566,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 }
             }
         }
-
-
 
         //ToastUtils.showShort(activity, getString(R.string.scene_apply_success))
         ToastUtils.showShort(getString(R.string.scene_apply_success))
@@ -589,7 +585,9 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     fun refreshView() {
         if (activity != null) {
             scenesListData = DBUtils.sceneList
-
+            scenesListData.sortBy {
+                it.index
+            }
             toolbar?.let {
                 it.navigationIcon = null
                 toolbarTv?.setText(R.string.scene_name)
@@ -636,6 +634,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             }, true)
 
             scenesListData = mNewDatas
+            scenesListData.sortBy { it.index }
             adaper!!.setNewData(scenesListData)
             diffResult.dispatchUpdatesTo(adaper!!)
         }

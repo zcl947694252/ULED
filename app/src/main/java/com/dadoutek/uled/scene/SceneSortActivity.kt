@@ -29,6 +29,7 @@ class SceneSortActivity : BaseActivity() {
         recyclerView = findViewById(R.id.rv_order_scene)
         recyclerView?.layoutManager = GridLayoutManager(this,2)
         scenesListData = DBUtils.sceneList // 获取场景的数据
+        scenesListData.sortBy { it.index }
         image_bluetooth.visibility = View.GONE
         order_scene.visibility = View.GONE
         toolbarTv.text = getString(R.string.sort)
@@ -40,7 +41,6 @@ class SceneSortActivity : BaseActivity() {
                 DBUtils.deleteScene(dbscene)
             }
             for ((i, dbscene) in scenesListData.withIndex()) {
-                dbscene.id = i.toLong() + 1
                 dbscene.index = i
                 DBUtils.saveScene(dbscene,false)
             }
@@ -49,8 +49,6 @@ class SceneSortActivity : BaseActivity() {
             finish()
         }
         adapter = SceneRecycleGridAdapter(R.layout.template_device_type_item, scenesListData)
-//        adapter?.onItemChildClickListener = onItemChildClickListener
-//        adapter?.onItemLongClickListener = onItemChildLongClickListener
         adapter?.bindToRecyclerView(recyclerView)
         adapter?.notifyDataSetChanged()
         helper.attachToRecyclerView(recyclerView)
@@ -61,9 +59,6 @@ class SceneSortActivity : BaseActivity() {
     }
 
     override fun initData() {
-        scenesListData = DBUtils.sceneList // 获取场景的数据
-//        LogUtils.v("========================================${scenesListData.toString()}============================================")
-        adapter?.notifyDataSetChanged()
     }
 
     var helper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
