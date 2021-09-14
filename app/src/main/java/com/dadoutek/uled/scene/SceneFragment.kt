@@ -401,7 +401,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btnAdd = toolbar?.findViewById<ImageView>(R.id.img_function1)
         val btnDelete = toolbar?.findViewById<ImageView>(R.id.img_function2)
         val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
-        orderScene?.visibility=View.VISIBLE // chown
+//        orderScene?.visibility=View.VISIBLE // chown
         btnAdd?.visibility = View.GONE
 
         btnAdd?.setOnClickListener(this)

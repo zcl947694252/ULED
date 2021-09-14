@@ -15,6 +15,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.text.Spannable
 import android.text.SpannableString
@@ -96,6 +97,7 @@ import kotlinx.coroutines.*
 import org.jetbrains.anko.singleLine
 //import org.jetbrains.anko.startActivity
 import java.util.concurrent.TimeUnit
+import kotlin.system.exitProcess
 
 ///TelinkLog 打印
 
@@ -189,6 +191,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     @SuppressLint("ShowToast", "CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        makeDialogAndPop()
+        makeInstallView()
+        makeRenamePopuwindow()
+        makeStopScanPop()
+        makeDialog()
         this.mApplication = this.application as TelinkLightApplication
         isScanningJM = false
         enableConnectionStatusListener()    //尽早注册监听 添加状态变化监听事件
@@ -198,11 +205,6 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION)
         registerReceiver(netWorkChangReceiver, filter)
         initOnLayoutListener()//加载view监听
-        makeDialogAndPop()
-        makeInstallView()
-        makeRenamePopuwindow()
-        makeStopScanPop()
-        makeDialog()
         initStompReceiver()
         initChangeRecevicer()
 
@@ -212,7 +214,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             }, {
                 SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
             })
-        }*/
+        } */
 //        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
 //            TelinkLightApplication.getApp().initStompClient()
         receiver = BluetoothListenerReceiver()

@@ -73,9 +73,9 @@ class DeviceFragment : BaseFragment(), View.OnClickListener {
         initData()
         initView()
         initListener()
-        for (i  in 0..10){
-            LogUtils.v("zcl-----------获取正常数据-------${i}")
-        }
+//        for (i  in 0..10){
+//            LogUtils.v("zcl-----------获取正常数据-------${i}")
+//        }
     }
 
     private fun initListener() {

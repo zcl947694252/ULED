@@ -1057,8 +1057,14 @@
     <string name="privacy_statement">Privacy statement</string>
     <string name="privacy_statement_content">Uled smart platform understands the importance of your privacy to you and fully respects it.The mobile phone number registered on Uled platform is only used for the operation of Uled smart products.Without your consent, we will not access or process your content data for any purpose except as required by applicable laws and regulations.</string>
     <string name="user_agreement_context">《User agreement and privacy notes》have been agreed.</string>
+    <string name="agree_and_continue">Please agree to 《User agreement and privacy notes》 before continuing to use this software</string>
+    <string name="insist_on_quitting">Insist on quitting</string>
+    <string name="agree_to_continue">Agree and continue</string>
+    <string name="reminder">REMINDER</string>
     <string name="not_use">Not to use</string>
     <string name="read_agreen">Please read the agreement for approval</string>
+    <string name="agree">Agree</string>
+    <string name="NoAgree">Disagree</string>
     <string name="must_agree">You need to agree to this policy before you can use the app</string>
     <string name="user_agreement">User agreement and privacy statement</string>
     <string name="verification_code_login">Verification code Login</string>

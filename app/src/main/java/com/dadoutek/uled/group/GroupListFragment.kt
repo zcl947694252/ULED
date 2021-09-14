@@ -219,7 +219,7 @@ class GroupListFragment : BaseFragment() {
         toolbarTv = viewContent.findViewById(R.id.toolbarTv)
         toolbarTv!!.setText(R.string.group_title)
         val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
-        orderScene?.visibility=View.VISIBLE // chown
+//        orderScene?.visibility=View.VISIBLE // chown
         orderScene?.setOnClickListener {
             val intent = Intent(activity,GroupListOrderActivity::class.java)
 
