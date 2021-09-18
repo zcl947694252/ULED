@@ -68,7 +68,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class GroupListFragment : BaseFragment() {
-//    private var groupAllLy: ConstraintLayout? = null
+    //    private var groupAllLy: ConstraintLayout? = null
     private var disposableTimer: Disposable? = null
     private lateinit var viewContent: View
     private var inflater: LayoutInflater? = null
@@ -104,14 +104,16 @@ class GroupListFragment : BaseFragment() {
     private var totalNum: TextView? = null
     private var btnOn: ImageView? = null
     private var btnOff: ImageView? = null
-//    private var btnSet: ImageView? = null
+
+    //    private var btnSet: ImageView? = null
     private var allGroup: DbGroup? = null
     private var cwLightGroup: String? = null
     private var switchFragment: String? = null
     private lateinit var localBroadcastManager: androidx.localbroadcastmanager.content.LocalBroadcastManager
     private lateinit var br: BroadcastReceiver
     private var isFirst: Boolean = false
-//    private var allLightText: TextView? = null
+
+    //    private var allLightText: TextView? = null
     private var onText: TextView? = null
     private var offText: TextView? = null
     private var fragmentPosition = 0
@@ -219,10 +221,10 @@ class GroupListFragment : BaseFragment() {
         toolbarTv = viewContent.findViewById(R.id.toolbarTv)
         toolbarTv!!.setText(R.string.group_title)
         val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
-//        orderScene?.visibility=View.VISIBLE // chown
+        orderScene?.visibility = View.VISIBLE // chown
         orderScene?.setOnClickListener {
-            val intent = Intent(activity,GroupListOrderActivity::class.java)
-
+            val intent = Intent(activity, GroupListOrderActivity::class.java)
+            intent.putExtra("PAGE",viewPager!!.currentItem)
             startActivity(intent)
         }
 
@@ -298,8 +300,10 @@ class GroupListFragment : BaseFragment() {
         }
 
         deviceName = ArrayList()
-        val stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light), TelinkLightApplication.getApp().getString(R.string.rgb_light),
-                TelinkLightApplication.getApp().getString(R.string.curtain), TelinkLightApplication.getApp().getString(R.string.relay))
+        val stringName = arrayOf(
+            TelinkLightApplication.getApp().getString(R.string.normal_light), TelinkLightApplication.getApp().getString(R.string.rgb_light),
+            TelinkLightApplication.getApp().getString(R.string.curtain), TelinkLightApplication.getApp().getString(R.string.relay)
+        )
 
         for (i in stringName.indices) {
             val device = DbDeviceName()
@@ -328,8 +332,10 @@ class GroupListFragment : BaseFragment() {
 
 
         application = activity!!.application as TelinkLightApplication
-        dataManager = DataManager(TelinkLightApplication.getApp(),
-                application!!.mesh.name, application!!.mesh.password)
+        dataManager = DataManager(
+            TelinkLightApplication.getApp(),
+            application!!.mesh.name, application!!.mesh.password
+        )
     }
 
     /**
@@ -378,21 +384,21 @@ class GroupListFragment : BaseFragment() {
         //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(activity)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
-                        refreshView()
-                        dialog.dismiss()
-                    }
+            .setTitle(R.string.create_new_group)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .setView(textGp)
+            .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                // 获取输入框的内容
+                if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                    ToastUtils.showLong(getString(R.string.rename_tip_check))
+                } else {
+                    //往DB里添加组数据
+                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
+                    refreshView()
+                    dialog.dismiss()
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
+            }
+            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, which -> dialog.dismiss() }.show()
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
@@ -430,10 +436,12 @@ class GroupListFragment : BaseFragment() {
                 totalNum?.text = getString(R.string.total) + (0) + getString(R.string.piece)
             }
 
-            val stringName = arrayOf(TelinkLightApplication.getApp().getString(R.string.normal_light),
-                    TelinkLightApplication.getApp().getString(R.string.rgb_light),
-                    TelinkLightApplication.getApp().getString(R.string.curtain),
-                    TelinkLightApplication.getApp().getString(R.string.relay))
+            val stringName = arrayOf(
+                TelinkLightApplication.getApp().getString(R.string.normal_light),
+                TelinkLightApplication.getApp().getString(R.string.rgb_light),
+                TelinkLightApplication.getApp().getString(R.string.curtain),
+                TelinkLightApplication.getApp().getString(R.string.relay)
+            )
 
             for (i in stringName.indices) {
                 val device = DbDeviceName()
@@ -476,12 +484,16 @@ class GroupListFragment : BaseFragment() {
                     val gattBody = GwGattBody2()
                     var gattPar: ByteArray = byteArrayOf()
                     if (isOpen) {
-                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattPar = byteArrayOf(
+                            0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                            0x11, 0x02, 0x01, 0x64, 0, 0, 0, 0, 0, 0, 0, 0
+                        )
                         gattBody.ser_id = Constant.SER_ID_GROUP_ALLON
                     } else {
-                        gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
-                                0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0)
+                        gattPar = byteArrayOf(
+                            0x11, 0x11, 0x11, 0, 0, low.toByte(), hight.toByte(), Opcode.LIGHT_ON_OFF,
+                            0x11, 0x02, 0x00, 0x64, 0, 0, 0, 0, 0, 0, 0, 0
+                        )
                         gattBody.ser_id = Constant.SER_ID_GROUP_ALLOFF
                     }
 
@@ -614,15 +626,15 @@ class GroupListFragment : BaseFragment() {
 
                 if (deleteList.size > 0) {
                     androidx.appcompat.app.AlertDialog.Builder(Objects.requireNonNull<androidx.fragment.app.FragmentActivity>(mContext as androidx.fragment.app.FragmentActivity?))
-                            .setMessage(getString(R.string.delete_group_confirm, deleteList[0].name))
-                            .setPositiveButton(android.R.string.ok) { _, _ ->
-                                //showLoadingDialog(getString(R.string.deleting))
-                                val intent = Intent("delete")
-                                intent.putExtra("delete", "true")
-                                androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
-                            }
-                            .setNegativeButton(R.string.btn_cancel, null)
-                            .show()
+                        .setMessage(getString(R.string.delete_group_confirm, deleteList[0].name))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            //showLoadingDialog(getString(R.string.deleting))
+                            val intent = Intent("delete")
+                            intent.putExtra("delete", "true")
+                            androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!).sendBroadcast(intent)
+                        }
+                        .setNegativeButton(R.string.btn_cancel, null)
+                        .show()
                 }
             }
             /*   R.id.textView6 -> {
@@ -651,7 +663,7 @@ class GroupListFragment : BaseFragment() {
         val intent = Intent("switch_here")
         intent.putExtra("switch_here", "false")
         androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this.mContext!!)
-                .sendBroadcast(intent)
+            .sendBroadcast(intent)
     }
 
     val CREATE_SCENE_REQUESTCODE = 3
@@ -711,38 +723,38 @@ class GroupListFragment : BaseFragment() {
     private fun updateLights(isOpen: Boolean, group: DbGroup) {
         updateLightDisposal?.dispose()
         updateLightDisposal = Observable.timer(300, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    var lightList: MutableList<DbLight> = ArrayList()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                var lightList: MutableList<DbLight> = ArrayList()
 
-                    if (group.meshAddr == 0xffff) {
-                        //            lightList = DBUtils.getAllLight();
-                        val list = DBUtils.groupList
-                        for (j in list.indices) {
-                            lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
-                        }
-                    } else {
-                        lightList = DBUtils.getLightByGroupID(group.id)
+                if (group.meshAddr == 0xffff) {
+                    //            lightList = DBUtils.getAllLight();
+                    val list = DBUtils.groupList
+                    for (j in list.indices) {
+                        lightList.addAll(DBUtils.getLightByGroupID(list[j].id))
                     }
+                } else {
+                    lightList = DBUtils.getLightByGroupID(group.id)
+                }
 
+                if (isOpen) {
+                    group.connectionStatus = ConnectionStatus.ON.value
+                    DBUtils.updateGroup(group)
+                } else {
+                    group.connectionStatus = ConnectionStatus.OFF.value
+                    DBUtils.updateGroup(group)
+                }
+
+                for (dbLight: DbLight in lightList) {
                     if (isOpen) {
-                        group.connectionStatus = ConnectionStatus.ON.value
-                        DBUtils.updateGroup(group)
+                        dbLight.connectionStatus = ConnectionStatus.ON.value
                     } else {
-                        group.connectionStatus = ConnectionStatus.OFF.value
-                        DBUtils.updateGroup(group)
+                        dbLight.connectionStatus = ConnectionStatus.OFF.value
                     }
-
-                    for (dbLight: DbLight in lightList) {
-                        if (isOpen) {
-                            dbLight.connectionStatus = ConnectionStatus.ON.value
-                        } else {
-                            dbLight.connectionStatus = ConnectionStatus.OFF.value
-                        }
-                        DBUtils.updateLightLocal(dbLight)
-                    }
-                }, {})
+                    DBUtils.updateLightLocal(dbLight)
+                }
+            }, {})
     }
 
     fun notifyDataSetChanged() {

@@ -45,8 +45,8 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
     private var mApplication: TelinkLightApplication? = null
     private var mIsFirstData = true
     private var mIsLogging = false
-//    private var mHandler: Handler? = null
-//    private var goTo = false
+    private var mHandler: Handler? = null
+    private var goTo = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +54,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         changeLanguage()
         init()
         initListener()
-//        mHandler = Handler()
+        mHandler = Handler()
         Constant.IS_ROUTE_MODE = SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)
         //Constant.IS_ROUTE_MODE = false
         LogUtils.v(
@@ -66,9 +66,9 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                 )
             }-"
         )
-//        if (!SharedPreferencesHelper.getBoolean(this, "PERMISSION_POLICY_AGREE", false)) {
-//            mHandler!!.post(runnable)
-//        }
+        if (!SharedPreferencesHelper.getBoolean(this, "PERMISSION_POLICY_AGREE", false)) {
+            mHandler!!.post(runnable)
+        }
 
     }
 
@@ -94,6 +94,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
     private fun initListener() {
         splash_to_login.setOnClickListener(this)
         splash_to_regist.setOnClickListener(this)
+        splash_user_private.setOnClickListener(this)
     }
 
     override fun onResume() {
@@ -143,9 +144,13 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         when (v?.id) {
             R.id.splash_to_login -> gotoLoginSetting(false)
 
+            R.id.splash_user_private -> {
+                val intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
+                startActivity(intent)
+            }
+
             R.id.splash_to_regist -> {
-                goRegist()
-                /*popView?.let {
+                popView?.let {
                     val userAgreenment = it.findViewById<TextView>(R.id.code_warm_user_agreenment)
                     val ss = SpannableString(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
                     val cs: ClickableSpan = object : ClickableSpan() {
@@ -176,16 +181,15 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                     val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
                     val cancle = it.findViewById<TextView>(R.id.cancel_tv)
                     cancle.visibility = View.VISIBLE
-*//*                    cb.setOnCheckedChangeListener { _, isChecked ->
+                    cb.setOnCheckedChangeListener { _, isChecked ->
                         iSee.text = if (isChecked){
                             cancle.visibility = View.VISIBLE
-                            getString(R.string.i_know)
+                            getString(R.string.agree)
                         }
                         else {
-                            cancle.visibility = View.GONE
                             getString(R.string.read_agreen)
                         }
-                    }*//*
+                    }
                     iSee.setOnClickListener {
                         if (cb.isChecked) {
                             PopUtil.dismiss(pop)
@@ -202,7 +206,7 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
                     } catch (e: Exception) {
                         LogUtils.v("zcl弹框出现问题${e.localizedMessage}")
                     }
-                }*/
+                }
             }
         }
     }
@@ -226,131 +230,131 @@ class SplashActivity : TelinkMeshErrorDealActivity(), View.OnClickListener {
         PopUtil.dismiss(popMain)
     }
 
-//    private val runnable = object : Runnable {
-//        override fun run() {
-//            val view = findViewById<TextView>(R.id.splash_to_regist)
-//            // 如何根元素的width和height大于0说明activity已经初始化完毕
-//            if (view != null && view.width > 0 && view.height > 0) {
-//                // 显示popwindow
-//                if (!goTo)
-//                    requestPer()
-//                else {
-//                    Thread.sleep(400)
-//                    gotoAnother()
-//                }
-//                mHandler!!.removeCallbacks(this);
-//            } else {
-//                // 如果activity没有初始化完毕则等待5毫秒再次检测
-//                mHandler!!.postDelayed(this, 10);
-//            }
-//        }
-//    }
+    private val runnable = object : Runnable {
+        override fun run() {
+            val view = findViewById<TextView>(R.id.splash_to_regist)
+            // 如何根元素的width和height大于0说明activity已经初始化完毕
+            if (view != null && view.width > 0 && view.height > 0) {
+                // 显示popwindow
+                if (!goTo)
+                    requestPer()
+                else {
+                    Thread.sleep(400)
+                    gotoAnother()
+                }
+                mHandler!!.removeCallbacks(this);
+            } else {
+                // 如果activity没有初始化完毕则等待5毫秒再次检测
+                mHandler!!.postDelayed(this, 10);
+            }
+        }
+    }
 
-//    private fun requestPer() {
-//        popView?.let {
-//            val userAgreenment = it.findViewById<TextView>(R.id.code_warm_user_agreenment)
-//            val ss = SpannableString(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
-//            val cs: ClickableSpan = object : ClickableSpan() {
-//                override fun onClick(widget: View) {
-//                    val intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
-//                    startActivity(intent)
-//                }
-//                override fun updateDrawState(ds: TextPaint) {
-//                    super.updateDrawState(ds)
-//                    ds.color = Color.BLUE//设置超链接的颜色
-//                    ds.isUnderlineText = false
-//                }
-//            }
-//            val start = if (isZh(this)) 3 else 0
-//            val end = if (isZh(this)) ss.length else ss.length - 17
-//            ss.setSpan(cs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-//            userAgreenment.text = ss
-//            userAgreenment?.movementMethod = LinkMovementMethod.getInstance()//必须要加否则不能点击
-//
-//            it.findViewById<LinearLayout>(R.id.pop_view).background = getDrawable(R.drawable.rect_r15_de)
-//            it.findViewById<TextView>(R.id.code_warm_hinit).text = getString(R.string.privacy_statement)
-//            it.findViewById<TextView>(R.id.code_warm_title).visibility = View.GONE
-//            it.findViewById<LinearLayout>(R.id.code_warm_user_ly).visibility = View.VISIBLE
-//            it.findViewById<TextView>(R.id.code_warm_context).gravity = Gravity.CENTER_VERTICAL
-//            it.findViewById<TextView>(R.id.code_warm_context).text = getString(R.string.privacy_statement_content)
-//            val cb = it.findViewById<CheckBox>(R.id.code_warm_cb)
-//            val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
-//            val cancle = it.findViewById<TextView>(R.id.cancel_tv)
-//            cancle.visibility = View.VISIBLE
-//            iSee.setOnClickListener {
-//                if (cb.isChecked) {
-//                    SharedPreferencesHelper.putBoolean(this, "PERMISSION_POLICY_AGREE", true)
-//                    PopUtil.dismiss(pop)
-//                } else
-//                    ToastUtils.showShort(getString(R.string.read_agreen))
-//            }
-//            cancle.setOnClickListener {
-//                ToastUtils.showShort(getString(R.string.must_agree))
-//                PopUtil.dismiss(pop)
-//                goTo = true
-//                mHandler!!.post(runnable)
-//            }
-//            try {
-////                if (!this@SplashActivity.isFinishing && !pop.isShowing)
-////                pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 50)
-//                pop.showAsDropDown(popView)
-//            } catch (e: Exception) {
-//                PopUtil.dismiss(pop)
-//                LogUtils.v("chown弹框出现问题${e.localizedMessage}")
-//            }
-//        }
-//    }
+    private fun requestPer() {
+        popView?.let {
+            val userAgreenment = it.findViewById<TextView>(R.id.code_warm_user_agreenment)
+            val ss = SpannableString(getString(R.string.user_agreement_context))//已同意《用户协议及隐私说明》
+            val cs: ClickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    val intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
+                    startActivity(intent)
+                }
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = Color.BLUE//设置超链接的颜色
+                    ds.isUnderlineText = false
+                }
+            }
+            val start = if (isZh(this)) 3 else 0
+            val end = if (isZh(this)) ss.length else ss.length - 17
+            ss.setSpan(cs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            userAgreenment.text = ss
+            userAgreenment?.movementMethod = LinkMovementMethod.getInstance()//必须要加否则不能点击
+
+            it.findViewById<LinearLayout>(R.id.pop_view).background = getDrawable(R.drawable.rect_r15_de)
+            it.findViewById<TextView>(R.id.code_warm_hinit).text = getString(R.string.privacy_statement)
+            it.findViewById<TextView>(R.id.code_warm_title).visibility = View.GONE
+            it.findViewById<LinearLayout>(R.id.code_warm_user_ly).visibility = View.VISIBLE
+            it.findViewById<TextView>(R.id.code_warm_context).gravity = Gravity.CENTER_VERTICAL
+            it.findViewById<TextView>(R.id.code_warm_context).text = getString(R.string.privacy_statement_content)
+            val cb = it.findViewById<CheckBox>(R.id.code_warm_cb)
+            val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
+            val cancle = it.findViewById<TextView>(R.id.cancel_tv)
+            cancle.visibility = View.VISIBLE
+            iSee.setOnClickListener {
+                if (cb.isChecked) {
+                    SharedPreferencesHelper.putBoolean(this, "PERMISSION_POLICY_AGREE", true)
+                    PopUtil.dismiss(pop)
+                } else
+                    ToastUtils.showShort(getString(R.string.read_agreen))
+            }
+            cancle.setOnClickListener {
+                ToastUtils.showShort(getString(R.string.must_agree))
+                PopUtil.dismiss(pop)
+                goTo = true
+                mHandler!!.post(runnable)
+            }
+            try {
+//                if (!this@SplashActivity.isFinishing && !pop.isShowing)
+//                pop.showAtLocation(window.decorView, Gravity.CENTER, 0, 50)
+                pop.showAsDropDown(popView)
+            } catch (e: Exception) {
+                PopUtil.dismiss(pop)
+                LogUtils.v("chown弹框出现问题${e.localizedMessage}")
+            }
+        }
+    }
 
 
-//    private fun gotoAnother() {
-//        popView?.let {
-//            val codeWarm: TextView = it.findViewById(R.id.code_warm_context)
-//            val ss = SpannableString(getString(R.string.agree_and_continue))//请同意《用户协议及隐私说明》才能继续使用此软件
-//            val cs: ClickableSpan = object : ClickableSpan() {
-//                override fun onClick(widget: View) {
-//                    val intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
-//                    startActivity(intent)
-//                }
-//
-//                override fun updateDrawState(ds: TextPaint) {
-//                    super.updateDrawState(ds)
-//                    ds.color = Color.BLUE //设置超链接的颜色
-//                    ds.isUnderlineText = false
-//                }
-//            }
-//            val start = if (isZh(this)) 3 else 16
-//            val end = if (isZh(this)) ss.length - 9 else 50
-//            ss.setSpan(cs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-//            codeWarm.text = ss
-//            codeWarm.movementMethod = LinkMovementMethod.getInstance()//必须要加否则不能点击
-//
-//            it.findViewById<CheckBox>(R.id.code_warm_cb).visibility = View.GONE
-//            it.findViewById<TextView>(R.id.code_warm_title).visibility = View.GONE
-//            it.findViewById<LinearLayout>(R.id.code_warm_user_ly).visibility = View.GONE
-//            it.findViewById<TextView>(R.id.code_warm_user_agreenment).visibility = View.GONE
-//            it.findViewById<LinearLayout>(R.id.pop_view).background = getDrawable(R.drawable.rect_r15_de)
-//            it.findViewById<TextView>(R.id.code_warm_hinit).text = getString(R.string.reminder)
-//            codeWarm.gravity = Gravity.CENTER_VERTICAL
-//            val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
-//            val cancle = it.findViewById<TextView>(R.id.cancel_tv)
-//            cancle.visibility = View.VISIBLE
-//            cancle.text = getString(R.string.insist_on_quitting)
-//            iSee.text = getString(R.string.agree_to_continue)
-//            iSee.setOnClickListener {
-//                SharedPreferencesHelper.putBoolean(this, "PERMISSION_POLICY_AGREE", true)
-//                PopUtil.dismiss(pop)
-//            }
-//            cancle.setOnClickListener {
-//                exitProcess(0)
-//            }
-//            try {
-//                pop.showAsDropDown(popView)
-//            } catch (e: Exception) {
-//                PopUtil.dismiss(pop)
-//                LogUtils.v("chown弹框出现问题${e.localizedMessage}")
-//            }
-//
-//        }
-//    }
+    private fun gotoAnother() {
+        popView?.let {
+            val codeWarm: TextView = it.findViewById(R.id.code_warm_context)
+            val ss = SpannableString(getString(R.string.agree_and_continue))//请同意《用户协议及隐私说明》才能继续使用此软件
+            val cs: ClickableSpan = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    val intent = Intent(this@SplashActivity, UserAgreementActivity::class.java)
+                    startActivity(intent)
+                }
+
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.color = Color.BLUE //设置超链接的颜色
+                    ds.isUnderlineText = false
+                }
+            }
+            val start = if (isZh(this)) 3 else 16
+            val end = if (isZh(this)) ss.length - 9 else 50
+            ss.setSpan(cs, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            codeWarm.text = ss
+            codeWarm.movementMethod = LinkMovementMethod.getInstance()//必须要加否则不能点击
+
+            it.findViewById<CheckBox>(R.id.code_warm_cb).visibility = View.GONE
+            it.findViewById<TextView>(R.id.code_warm_title).visibility = View.GONE
+            it.findViewById<LinearLayout>(R.id.code_warm_user_ly).visibility = View.GONE
+            it.findViewById<TextView>(R.id.code_warm_user_agreenment).visibility = View.GONE
+            it.findViewById<LinearLayout>(R.id.pop_view).background = getDrawable(R.drawable.rect_r15_de)
+            it.findViewById<TextView>(R.id.code_warm_hinit).text = getString(R.string.reminder)
+            codeWarm.gravity = Gravity.CENTER_VERTICAL
+            val iSee = it.findViewById<TextView>(R.id.code_warm_i_see)
+            val cancle = it.findViewById<TextView>(R.id.cancel_tv)
+            cancle.visibility = View.VISIBLE
+            cancle.text = getString(R.string.insist_on_quitting)
+            iSee.text = getString(R.string.agree_to_continue)
+            iSee.setOnClickListener {
+                SharedPreferencesHelper.putBoolean(this, "PERMISSION_POLICY_AGREE", true)
+                PopUtil.dismiss(pop)
+            }
+            cancle.setOnClickListener {
+                exitProcess(0)
+            }
+            try {
+                pop.showAsDropDown(popView)
+            } catch (e: Exception) {
+                PopUtil.dismiss(pop)
+                LogUtils.v("chown弹框出现问题${e.localizedMessage}")
+            }
+
+        }
+    }
 
 }

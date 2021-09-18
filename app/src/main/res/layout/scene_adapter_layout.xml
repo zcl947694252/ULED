@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -258,10 +259,11 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="10dp"
-                            android:max="101"
+                            android:max="100"
                             android:min="1"
                             android:padding="5dp"
-                            android:progress="1" />
+                            android:progress="100"
+                             />
 
                     <LinearLayout
                             android:id="@+id/speed_seekbar_alg"
@@ -348,7 +350,7 @@
                             style="@style/SeekBarStyle"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
-                            android:max="101"
+                            android:max="100"
                             android:min="1"
                             android:progress="1" />
 
@@ -470,7 +472,7 @@
                             style="@style/SeekBarStyle"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
-                            android:max="101"
+                            android:max="100"
                             android:min="1"
                             android:progress="1" />
 
@@ -748,9 +750,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:visibility="gone"
-                    android:progress="101"
+                    android:progress="100"
                     android:min="1"
-                    android:max="101"
+                    android:max="100"
                     app:layout_constraintTop_toBottomOf="@+id/tv_cur_range"
                     />
             <LinearLayout

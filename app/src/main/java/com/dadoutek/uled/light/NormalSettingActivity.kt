@@ -1960,8 +1960,10 @@ class NormalSettingActivity : TelinkBaseActivity(), TextView.OnEditorActionListe
                                                        }
                                                        .setNegativeButton(R.string.btn_cancel, null)
                                                        .show()*/
-                                                    Toast.makeText(this,getString(R.string.delete_switch_fail),Toast.LENGTH_SHORT).show()
-                                        })
+//                                                Toast.makeText(this,getString(R.string.delete_device_fail),Toast.LENGTH_SHORT).show()
+                                                ToastUtils.showShort(R.string.delete_device_fail)
+                                                finish()
+                                            })
                             } else {
                                 ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
                                 finish()

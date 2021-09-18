@@ -381,7 +381,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
                     (byte) (mac4 & 0xFF), second, minute, hour, day};
         } else {
             params = new byte[]{(byte) (newAddress & 0xFF), (byte) (newAddress >> 8 & 0xFF)};
-       }
+        }
         TelinkLog.d("完整流程prepare update mesh address -->" + light.getMacAddress() + " src : " + Integer.toHexString(oldAddress) + " new : " + Integer.toHexString(newAddress));
 
         this.sendCommand(this.normalCallback, opcode, 0x0000, params, true,
@@ -714,11 +714,13 @@ public final class LightController extends EventBus<Integer> implements LightPer
         int sn = this.sequenceNumber;
 
         TelinkLog.d("LightController#sendCommand#NoEncrypt: " + Arrays.bytesToHexString(commandData, ":"));
-//        LogUtils.d("LightController#sendCommand#NoEncrypt: " + Arrays.bytesToHexString(commandData, ":"));
+        //        LogUtils.d("LightController#sendCommand#NoEncrypt: " + Arrays.bytesToHexString
+        //        (commandData, ":"));
         byte[] macAddress = this.light.getMacBytes();
         byte[] nonce = this.getSecIVM(macAddress, sn);
         byte[] data = AES.encrypt(sk, nonce, commandData);
-//        LogUtils.v("chown ++++++ commandData " + Arrays.bytesToHexString(commandData,","));
+        //        LogUtils.v("chown ++++++ commandData " + Arrays.bytesToHexString(commandData,",
+        //        "));
         Manufacture manufacture = Manufacture.getDefault();
         UUID serviceUUID = manufacture.getUUID(Manufacture.UUIDType.SERVICE);
         UUID characteristicUUID = manufacture.getUUID(Manufacture.UUIDType.COMMAND);
@@ -728,7 +730,7 @@ public final class LightController extends EventBus<Integer> implements LightPer
             command.type = noResponse ? Command.CommandType.WRITE_NO_RESPONSE :
                     Command.CommandType.WRITE;
             command.data = data;
-//            LogUtils.v(" chown ++ AES command" + Arrays.bytesToHexString(data,","));
+            //            LogUtils.v(" chown ++ AES command" + Arrays.bytesToHexString(data,","));
             command.serviceUUID = serviceUUID;
             command.characteristicUUID = characteristicUUID;
             command.tag = tag;
@@ -790,8 +792,8 @@ public final class LightController extends EventBus<Integer> implements LightPer
         if (params != null) {
             System.arraycopy(params, 0, command, offset, params.length);
         }
-        LogUtils.v(" chown ++ --- command " +  Arrays.bytesToHexString(command,","));
-//        LogUtils.v(" chown ++ --- params" +  Arrays.bytesToHexString(params,","));
+        LogUtils.v(" chown ++ --- command " + Arrays.bytesToHexString(command, ","));
+        //        LogUtils.v(" chown ++ --- params" +  Arrays.bytesToHexString(params,","));
 
         return this.sendCommand(callback, command, noResponse, tag, delay);
     }

@@ -146,24 +146,24 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     @SuppressLint("StringFormatInvalid")
     private fun removeGroup() {
         AlertDialog.Builder(Objects.requireNonNull<FragmentActivity>(this))
-                .setMessage(getString(R.string.delete_group_confirm, group?.name))
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    this.showLoadingDialog(getString(R.string.deleting))
-                    if (Constant.IS_ROUTE_MODE) {
-                        routeDeleteGroup("delRGBGp", group!!)
-                    } else {
-                        deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
-                                successCallback = {
-                                    deleteGpSuccess()
-                                },
-                                failedCallback = {
-                                    this.hideLoadingDialog()
-                                    ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
-                                })
-                    }
+            .setMessage(getString(R.string.delete_group_confirm, group?.name))
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                this.showLoadingDialog(getString(R.string.deleting))
+                if (Constant.IS_ROUTE_MODE) {
+                    routeDeleteGroup("delRGBGp", group!!)
+                } else {
+                    deleteGroup(DBUtils.getLightByGroupID(group!!.id), group!!,
+                        successCallback = {
+                            deleteGpSuccess()
+                        },
+                        failedCallback = {
+                            this.hideLoadingDialog()
+                            ToastUtils.showLong(R.string.move_out_some_lights_in_group_failed)
+                        })
                 }
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show()
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 
 
@@ -217,40 +217,42 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     fun remove() {
         AlertDialog.Builder(this).setMessage(getString(R.string.sure_delete_device2))
-                .setPositiveButton(android.R.string.ok) { _, _ ->
-                    if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter!!
-                                    .mLightCtrl.currentLight.isConnected || Constant.IS_ROUTE_MODE) {
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                if (TelinkLightService.Instance()?.adapter?.mLightCtrl?.currentLight != null && TelinkLightService.Instance()?.adapter!!
+                        .mLightCtrl.currentLight.isConnected || Constant.IS_ROUTE_MODE
+                ) {
 
-                        if (Constant.IS_ROUTE_MODE) {
-                            routerDeviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "rgbFactory")
-                        } else {
-                            showLoadingDialog(getString(R.string.please_wait))
-                            val subscribe = Commander.resetDevice(light!!.meshAddr)
-                                    .subscribe({  //deleteData()
-                                        deleteData()
-                                        SyncDataPutOrGetUtils.syncPutDataStart(this,syncCallbackUp)
-                                    }, {
-                                        Toast.makeText(this,getString(R.string.delete_device_fail),Toast.LENGTH_SHORT).show()
-//                                        GlobalScope.launch(Dispatchers.Main) {
-                                            /*  showDialogHardDelete?.dismiss()
-                                             showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
-                                                     .setPositiveButton(android.R.string.ok) { _, _ ->
-                                                         showLoadingDialog(getString(R.string.please_wait))
-                                                         deleteData()
-                                                     }
-                                                     .setNegativeButton(R.string.btn_cancel, null)
-                                                     .show() */
-//                                        }
-                                    })
-                        }
-
+                    if (Constant.IS_ROUTE_MODE) {
+                        routerDeviceResetFactory(light!!.macAddr, light!!.meshAddr, light!!.productUUID, "rgbFactory")
                     } else {
-                        ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
-                        this.finish()
+                        showLoadingDialog(getString(R.string.please_wait))
+                        val subscribe = Commander.resetDevice(light!!.meshAddr)
+                            .subscribe({  //deleteData()
+                                deleteData()
+                                SyncDataPutOrGetUtils.syncPutDataStart(this, syncCallbackUp)
+                            }, {
+                                ToastUtils.showShort(R.string.delete_device_fail)
+                                finish()
+//                                        GlobalScope.launch(Dispatchers.Main) {
+                                /*  showDialogHardDelete?.dismiss()
+                                 showDialogHardDelete = android.app.AlertDialog.Builder(this).setMessage(R.string.delete_device_hard_tip)
+                                         .setPositiveButton(android.R.string.ok) { _, _ ->
+                                             showLoadingDialog(getString(R.string.please_wait))
+                                             deleteData()
+                                         }
+                                         .setNegativeButton(R.string.btn_cancel, null)
+                                         .show() */
+//                                        }
+                            })
                     }
+
+                } else {
+                    ToastUtils.showLong(getString(R.string.bluetooth_open_connet))
+                    this.finish()
                 }
-                .setNegativeButton(R.string.btn_cancel, null)
-                .show()
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 
 
@@ -316,15 +318,18 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
 
     private fun checkPermission() {
         mDisposable.add(
-                RxPermissions(this).request(Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            isDirectConnectDevice(it)
-                        }, {
+            RxPermissions(this).request(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    isDirectConnectDevice(it)
+                }, {
 
-                        }))
+                })
+        )
     }
 
     private fun isDirectConnectDevice(granted: Boolean) {
@@ -333,12 +338,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             isMostNew(light?.version) -> ToastUtils.showShort(getString(R.string.the_last_version))
             else -> {
                 if (Constant.IS_ROUTE_MODE) {
-                    if (TextUtils.isEmpty(light?.boundMac)){
+                    if (TextUtils.isEmpty(light?.boundMac)) {
                         ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                         return
                     }
-                    startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr, "deviceType" to light!!.productUUID,
-                            "deviceMac" to light!!.macAddr, "version" to light!!.version)
+                    startActivity<RouterOtaActivity>(
+                        "deviceMeshAddress" to light!!.meshAddr, "deviceType" to light!!.productUUID,
+                        "deviceMac" to light!!.macAddr, "version" to light!!.version
+                    )
                     finish()
                 } else {
                     val isBoolean = SharedPreferencesHelper.getBoolean(TelinkLightApplication.getApp(), Constant.IS_DEVELOPER_MODE, false)
@@ -356,26 +363,25 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         showLoadingDialog(getString(R.string.please_wait))
                         TelinkLightService.Instance()?.idleMode(true)
                         mConnectDeviceDisposable = Observable.timer(800, TimeUnit.MILLISECONDS)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .flatMap {
-                                    connect(light!!.meshAddr, macAddress = light!!.macAddr)
-                                }
-                                ?.subscribe(
-                                        {
-                                            hideLoadingDialog()
-                                            if (isBoolean) {
-                                                transformView()
-                                            } else {
-                                                OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
-                                            }
-                                        }
-                                        ,
-                                        {
-                                            hideLoadingDialog()
-                                            runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
-                                            LogUtils.d(it)
-                                        })
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .flatMap {
+                                connect(light!!.meshAddr, macAddress = light!!.macAddr)
+                            }
+                            ?.subscribe(
+                                {
+                                    hideLoadingDialog()
+                                    if (isBoolean) {
+                                        transformView()
+                                    } else {
+                                        OtaPrepareUtils.instance().gotoUpdateView(this@RGBSettingActivity, localVersion, otaPrepareListner)
+                                    }
+                                },
+                                {
+                                    hideLoadingDialog()
+                                    runOnUiThread { ToastUtils.showLong(R.string.connect_fail2) }
+                                    LogUtils.d(it)
+                                })
                     }
                 }
             }
@@ -443,12 +449,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             else -> {
 
                 if (Constant.IS_ROUTE_MODE) {
-                    if (TextUtils.isEmpty(light?.boundMac)){
+                    if (TextUtils.isEmpty(light?.boundMac)) {
                         ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
                         return
                     }
-                    startActivity<RouterOtaActivity>("deviceMeshAddress" to light!!.meshAddr,
-                            "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr)
+                    startActivity<RouterOtaActivity>(
+                        "deviceMeshAddress" to light!!.meshAddr,
+                        "deviceType" to light!!.productUUID, "deviceMac" to light!!.macAddr
+                    )
                     finish()
                 } else {
                     val intent = Intent(this@RGBSettingActivity, OTAUpdateActivity::class.java)
@@ -598,12 +606,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             when {
                 Constant.IS_ROUTE_MODE -> routerGetVersion(mutableListOf(light?.meshAddr ?: 0), 6, "rgbVersion")
                 else -> Commander.getDeviceVersion(light!!.meshAddr)
-                        .subscribe({ s ->
-                            updateVersion(s)
-                            null
-                        }, {
-                            LogUtils.d(it)
-                        })
+                    .subscribe({ s ->
+                        updateVersion(s)
+                        null
+                    }, {
+                        LogUtils.d(it)
+                    })
             }
         }
     }
@@ -971,12 +979,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
-                           /* if (Constant.IS_ROUTE_MODE)
-                                when {
-                                    currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
-                                    else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID
-                                            ?: 0).toInt(), tvValue, "rgbwhite")
-                                }*/
+                            /* if (Constant.IS_ROUTE_MODE)
+                                 when {
+                                     currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
+                                     else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID
+                                             ?: 0).toInt(), tvValue, "rgbwhite")
+                                 }*/
                             val msg = handler_less.obtainMessage()
                             msg.arg1 = tvValue
                             handler_less.sendMessage(msg)
@@ -992,11 +1000,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 onBtnTouch = false
                 if (thisTime - downTime < 500) {
                     tvValue++
-                 /*   if (Constant.IS_ROUTE_MODE)
-                        when {
-                            currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
-                            else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), tvValue, "rgbwhite")
-                        }*/
+                    /*   if (Constant.IS_ROUTE_MODE)
+                           when {
+                               currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
+                               else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), tvValue, "rgbwhite")
+                           }*/
                     val msg = handler_less.obtainMessage()
                     msg.arg1 = tvValue
                     handler_less.sendMessage(msg)
@@ -1016,12 +1024,12 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                         thisTime = System.currentTimeMillis()
                         if (thisTime - downTime >= 500) {
                             tvValue++
-                           /* if (Constant.IS_ROUTE_MODE)
-                                when {
-                                    currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
-                                    else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID
-                                            ?: 0).toInt(), tvValue, "rgbwhite")
-                                } */
+                            /* if (Constant.IS_ROUTE_MODE)
+                                 when {
+                                     currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
+                                     else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID
+                                             ?: 0).toInt(), tvValue, "rgbwhite")
+                                 } */
                             val msg = handler.obtainMessage()
                             msg.arg1 = tvValue
                             handler.sendMessage(msg)
@@ -1035,11 +1043,11 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                 onBtnTouch = false
                 if (thisTime - downTime < 500) {
                     tvValue++
-              /*      if (Constant.IS_ROUTE_MODE)
-                        when {
-                            currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
-                            else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), tvValue, "rgbwhite")
-                        }*/
+                    /*      if (Constant.IS_ROUTE_MODE)
+                              when {
+                                  currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, tvValue, "rgbwhite")
+                                  else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), tvValue, "rgbwhite")
+                              }*/
                     val msg = handler.obtainMessage()
                     msg.arg1 = tvValue
                     handler.sendMessage(msg)
@@ -1053,7 +1061,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private val handler = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            if(rgb_white_seekbar.progress!=100) rgb_white_seekbar.progress++
+            if (rgb_white_seekbar.progress != 100) rgb_white_seekbar.progress++
             when {
                 rgb_white_seekbar.progress > 100 -> {
                     briCheckUi(false)
@@ -1070,14 +1078,14 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     stopTracking = true
                 }
             }
-            }
+        }
     }
 
     @SuppressLint("HandlerLeak")
     private val handler_brightness_add = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            if (rgb_sbBrightness.progress!=100) rgb_sbBrightness.progress++
+            if (rgb_sbBrightness.progress != 100) rgb_sbBrightness.progress++
             when {
                 rgb_sbBrightness.progress > 100 -> {
                     briCheckUi(false)
@@ -1107,7 +1115,7 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
     private val handler_brightness_less = object : Handler() {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            if (rgb_sbBrightness.progress!=1) rgb_sbBrightness.progress--
+            if (rgb_sbBrightness.progress != 1) rgb_sbBrightness.progress--
             when {
                 rgb_sbBrightness.progress < 1 -> {
                     briCheckUi(false)
@@ -1203,13 +1211,19 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             R.id.normal_rgb -> toNormalView()
             R.id.tvRename -> renameLight()
             R.id.ll_r -> {
-                val dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
-                    redColor = red.toInt()
-                    greenColor = green.toInt()
-                    blueColor = blue.toInt()
+                val dialog = InputRGBColorDialog(
+                    this,
+                    R.style.Dialog,
+                    color_r.text.toString(),
+                    color_g.text.toString(),
+                    color_b.text.toString(),
+                    InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                        redColor = red.toInt()
+                        greenColor = green.toInt()
+                        blueColor = blue.toInt()
 
-                    setColorPicker()
-                })
+                        setColorPicker()
+                    })
                 dialog.show()
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
 
@@ -1227,28 +1241,40 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             R.id.main_add_device -> transAddAct()
 
             R.id.ll_g -> {
-                val dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
-                    redColor = red.toInt()
-                    greenColor = green.toInt()
-                    blueColor = blue.toInt()
-                    /**
-                     * 设置颜色选择器颜色处
-                     */
-                    setColorPicker()
+                val dialog = InputRGBColorDialog(
+                    this,
+                    R.style.Dialog,
+                    color_r.text.toString(),
+                    color_g.text.toString(),
+                    color_b.text.toString(),
+                    InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                        redColor = red.toInt()
+                        greenColor = green.toInt()
+                        blueColor = blue.toInt()
+                        /**
+                         * 设置颜色选择器颜色处
+                         */
+                        setColorPicker()
 
-                })
+                    })
                 dialog.show()
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
 
             }
             R.id.ll_b -> {
-                val dialog = InputRGBColorDialog(this, R.style.Dialog, color_r.text.toString(), color_g.text.toString(), color_b.text.toString(), InputRGBColorDialog.RGBColorListener { red, green, blue ->
-                    redColor = red.toInt()
-                    greenColor = green.toInt()
-                    blueColor = blue.toInt()
+                val dialog = InputRGBColorDialog(
+                    this,
+                    R.style.Dialog,
+                    color_r.text.toString(),
+                    color_g.text.toString(),
+                    color_b.text.toString(),
+                    InputRGBColorDialog.RGBColorListener { red, green, blue ->
+                        redColor = red.toInt()
+                        greenColor = green.toInt()
+                        blueColor = blue.toInt()
 
-                    setColorPicker()
-                })
+                        setColorPicker()
+                    })
                 dialog.show()
 
                 dialog.window!!.clearFlags(WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM)
@@ -1328,16 +1354,16 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
             if (!Constant.IS_ROUTE_MODE) {
                 applyDisposable?.dispose()
                 applyDisposable = Observable.timer(50, TimeUnit.MILLISECONDS, Schedulers.io())
-                        .subscribe {
-                            GlobalScope.launch {
-                                for (i in 0..2) {
-                                    stopGradient()
-                                    delay(50)
-                                }
+                    .subscribe {
+                        GlobalScope.launch {
+                            for (i in 0..2) {
+                                stopGradient()
+                                delay(50)
                             }
-                            positionState = position + 1
-                            Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
                         }
+                        positionState = position + 1
+                        Commander.applyGradient(dstAddress, positionState, speed, firstLightAddress)
+                    }
                 postionAndNum?.position = position
                 systemGradientApply(clickPostion)
             } else {
@@ -1384,9 +1410,9 @@ class RGBSettingActivity : TelinkBaseActivity(), View.OnTouchListener {
                     updateGroupResult(light!!, group)
         } else {
             if (Constant.IS_ROUTE_MODE)
-                    lookService()
-else
-            setNewDiyData()
+                lookService()
+            else
+                setNewDiyData()
         }
     }
 
@@ -1413,7 +1439,9 @@ else
                 when (bean.status) {
                     -1 -> ToastUtils.showShort(getString(R.string.group_failed))
                     0, 1 -> {
-                        if (bean.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(getString(R.string.group_some_fail))
+                        if (bean.status == 0) ToastUtils.showShort(getString(R.string.grouping_success_tip)) else ToastUtils.showShort(
+                            getString(R.string.group_some_fail)
+                        )
                         SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, object : SyncCallback {
                             override fun start() {}
                             override fun complete() {}
@@ -1447,7 +1475,8 @@ else
     }
 
     private fun applyDiyView() {
-        builtDiyModeRecycleView!!.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        builtDiyModeRecycleView!!.layoutManager =
+            LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         rgbDiyGradientAdapter = RGBDiyGradientAdapter(R.layout.diy_gradient_item, diyGradientList, isDelete)
         builtDiyModeRecycleView?.itemAnimator = DefaultItemAnimator()
         val decoration = DividerItemDecoration(this, androidx.recyclerview.widget.DividerItemDecoration.VERTICAL)
@@ -1502,8 +1531,10 @@ else
                 GlobalScope.launch {
                     stopGradient()
                     delay(200)
-                    Commander.applyDiyGradient(dstAddress, diyGradientList[clickPostion].id.toInt(),
-                            diyGradientList[position].speed, firstLightAddress)
+                    Commander.applyDiyGradient(
+                        dstAddress, diyGradientList[clickPostion].id.toInt(),
+                        diyGradientList[position].speed, firstLightAddress
+                    )
                 }
                 diyOpenGradientResult(clickPostion)
             } else {
@@ -1579,35 +1610,38 @@ else
                         diyGradientList.filter { it.selected }.forEach {
                             mutableListOf.add(it.id.toInt())
                         }
-                        RouterModel.routerDelGradient(DelGradientBodyBean(mutableListOf, dstAddress, deviceType, "delGradient"))?.subscribe({
-                            //    "errorCode": 90018,"该设备不存在，请重新刷新数据"    "errorCode": 90008, "以下路由没有上线，无法删除自定义渐变"   "errorCode": 90004, "账号下区域下没有路由，无法操作"
-                            //    "errorCode": 90007, "该组不存在，无法操作"    "errorCode": 90005,"以下路由没有上线，无法删除自定义渐变"
-                            LogUtils.v("zcl---收到路由删除渐变请求--id$mutableListOf--dstAddress$dstAddress---$it")
-                            when (it.errorCode) {
-                                0 -> {
-                                    disposableTimer?.dispose()
-                                    disposableTimer = Observable.timer(it.t.timeout.toLong()+2, TimeUnit.SECONDS)
+                        RouterModel.routerDelGradient(DelGradientBodyBean(mutableListOf, dstAddress, deviceType, "delGradient"))
+                            ?.subscribe({
+                                //    "errorCode": 90018,"该设备不存在，请重新刷新数据"    "errorCode": 90008, "以下路由没有上线，无法删除自定义渐变"   "errorCode": 90004, "账号下区域下没有路由，无法操作"
+                                //    "errorCode": 90007, "该组不存在，无法操作"    "errorCode": 90005,"以下路由没有上线，无法删除自定义渐变"
+                                LogUtils.v("zcl---收到路由删除渐变请求--id$mutableListOf--dstAddress$dstAddress---$it")
+                                when (it.errorCode) {
+                                    0 -> {
+                                        disposableTimer?.dispose()
+                                        disposableTimer = Observable.timer(it.t.timeout.toLong() + 2, TimeUnit.SECONDS)
                                             .subscribe {
                                                 ToastUtils.showShort(getString(R.string.del_gradient_fail))
                                                 hideLoadingDialog()
                                             }
+                                    }
+                                    90018 -> {
+                                        DBUtils.deleteLocalData()
+                                        //ToastUtils.showShort(getString(R.string.device_not_exit))
+                                        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                                        finish()
+                                    }
+                                    90008 -> {
+                                        hideLoadingDialog()
+                                        ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                                    }
+                                    90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
+                                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                                    90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
+                                    else -> ToastUtils.showShort(it.message)
                                 }
-                                90018 -> {
-                                    DBUtils.deleteLocalData()
-                                    //ToastUtils.showShort(getString(R.string.device_not_exit))
-                                    SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
-                                    finish()
-                                }
-                                90008 -> {hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
-                                90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
-                                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
-                                else -> ToastUtils.showShort(it.message)
-                            }
-                        }, {
-                            ToastUtils.showShort(it.message)
-                        })
+                            }, {
+                                ToastUtils.showShort(it.message)
+                            })
                     } else {
                         bleDelGradient(true)
                     }
@@ -1988,7 +2022,7 @@ else
                 sb_w_bright_add.isEnabled = false
                 sb_w_bright_less.isEnabled = true
             }
-            rgb_white_seekbar.progress <= 1  -> {
+            rgb_white_seekbar.progress <= 1 -> {
                 sb_w_bright_less.isEnabled = false
                 sb_w_bright_add.isEnabled = true
             }
@@ -2021,94 +2055,96 @@ else
     }
 
     @SuppressLint("SetTextI18n")
-    private var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { _, _, position ->
-        val color = if (cb_brightness_enable.isChecked) presetColors?.get(position)?.color else 0
-        var brightness = if (cb_white_enable.isChecked) presetColors?.get(position)?.brightness else 0
-        var w = (color!! and 0xff000000.toInt()) shr 24
-        val red = (color and 0xff0000) shr 16
-        val green = (color and 0x00ff00) shr 8
-        val blue = color and 0x0000ff
+    private var diyOnItemChildClickListener: BaseQuickAdapter.OnItemChildClickListener =
+        BaseQuickAdapter.OnItemChildClickListener { _, _, position ->
+            val color = if (cb_brightness_enable.isChecked) presetColors?.get(position)?.color else 0
+            var brightness = if (cb_white_enable.isChecked) presetColors?.get(position)?.brightness else 0
+            var w = (color!! and 0xff000000.toInt()) shr 24
+            val red = (color and 0xff0000) shr 16
+            val green = (color and 0x00ff00) shr 8
+            val blue = color and 0x0000ff
 
-        color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
+            color_picker.setInitialColor((color and 0xffffff) or 0xff000000.toInt())
 
-        GlobalScope.launch {
-            try {
+            GlobalScope.launch {
+                try {
 
-                val addr: Int = when {
-                    currentShowGroupSetPage -> group?.meshAddr!!
-                    else -> light?.meshAddr!!
-                }
-
-                val opcode: Byte = Opcode.SET_LUM
-                val opcodeW: Byte = Opcode.SET_W_LUM
-                w = isZeroOrHundred(w)
-                brightness = isZeroOrHundred(brightness ?: 0)
-
-                val paramsW: ByteArray = byteArrayOf(w.toByte())
-                val params: ByteArray = byteArrayOf(brightness!!.toByte())
-
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
-                delay(30)
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
-                delay(30)
-
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
-                delay(30)
-                TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
-                delay(30)
-
-                changeColor(red, green, blue, true)
-                if (!Constant.IS_ROUTE_MODE)
-                    if (currentShowGroupSetPage) {
-                        group?.brightness = brightness!!
-                        group?.color = color
-                    } else {
-                        light?.brightness = brightness!!
-                        light?.color = color
+                    val addr: Int = when {
+                        currentShowGroupSetPage -> group?.meshAddr!!
+                        else -> light?.meshAddr!!
                     }
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
+
+                    val opcode: Byte = Opcode.SET_LUM
+                    val opcodeW: Byte = Opcode.SET_W_LUM
+                    w = isZeroOrHundred(w)
+                    brightness = isZeroOrHundred(brightness ?: 0)
+
+                    val paramsW: ByteArray = byteArrayOf(w.toByte())
+                    val params: ByteArray = byteArrayOf(brightness!!.toByte())
+
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
+                    delay(30)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcodeW, addr, paramsW)
+                    delay(30)
+
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                    delay(30)
+                    TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params)
+                    delay(30)
+
+                    changeColor(red, green, blue, true)
+                    if (!Constant.IS_ROUTE_MODE)
+                        if (currentShowGroupSetPage) {
+                            group?.brightness = brightness!!
+                            group?.color = color
+                        } else {
+                            light?.brightness = brightness!!
+                            light?.color = color
+                        }
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
             }
+
+
+            rgb_sbBrightness?.progress = brightness!!
+            sb_w_bright_num.text = "$brightness%"
+            sb_w_bright_num.text = "$w%"
+
+            color_r?.text = red.toString()
+            color_g?.text = green.toString()
+            color_b?.text = blue.toString()
         }
-
-
-        rgb_sbBrightness?.progress = brightness!!
-        sb_w_bright_num.text = "$brightness%"
-        sb_w_bright_num.text = "$w%"
-
-        color_r?.text = red.toString()
-        color_g?.text = green.toString()
-        color_b?.text = blue.toString()
-    }
 
     @SuppressLint("SetTextI18n")
-    internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener = BaseQuickAdapter.OnItemChildLongClickListener { adapter, _, position ->
-        if (currentShowGroupSetPage) {
-            presetColors?.get(position)!!.color = group!!.color
-            presetColors?.get(position)!!.brightness =  group!!.brightness
-        } else {
-            presetColors?.get(position)!!.color = light!!.color
-            presetColors?.get(position)!!.brightness =  light!!.brightness
-        }
-        val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as Dot?
-        if (currentShowGroupSetPage) {
-            try {
-                textView?.setChecked(true, 0xff000000.toInt() or group!!.color)
-                SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
-            } catch (e: Exception) {
-                e.printStackTrace()
+    internal var diyOnItemChildLongClickListener: BaseQuickAdapter.OnItemChildLongClickListener =
+        BaseQuickAdapter.OnItemChildLongClickListener { adapter, _, position ->
+            if (currentShowGroupSetPage) {
+                presetColors?.get(position)!!.color = group!!.color
+                presetColors?.get(position)!!.brightness = group!!.brightness
+            } else {
+                presetColors?.get(position)!!.color = light!!.color
+                presetColors?.get(position)!!.brightness = light!!.brightness
             }
-        } else {
-            try {
-                textView?.setChecked(true, 0xff000000.toInt() or light!!.color)
-                SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
-            } catch (e: Exception) {
-                e.printStackTrace()
+            val textView = adapter.getViewByPosition(position, R.id.btn_diy_preset) as Dot?
+            if (currentShowGroupSetPage) {
+                try {
+                    textView?.setChecked(true, 0xff000000.toInt() or group!!.color)
+                    SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                try {
+                    textView?.setChecked(true, 0xff000000.toInt() or light!!.color)
+                    SharedPreferencesHelper.putObject(this, Constant.PRESET_COLOR, presetColors)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
-        }
 
-        true
-    }
+            true
+        }
 
     private fun toRGBGradientView() {
         if (currentShowGroupSetPage) {
@@ -2209,7 +2245,7 @@ else
         @SuppressLint("SetTextI18n")
         private fun onValueChangeView(view: View, progress: Int) {
             val progressNoZero = when {
-                progress <= 1  -> 1
+                progress <= 1 -> 1
                 progress >= 100 -> 100
                 else -> progress
             }
@@ -2262,10 +2298,10 @@ else
                     if (Constant.IS_ROUTE_MODE) {
                         routerConfigBrightness()
                     } else {
-                         brightness = when {
-                             cb_brightness_enable.isChecked -> brightness
-                             else -> 0
-                         }
+                        brightness = when {
+                            cb_brightness_enable.isChecked -> brightness
+                            else -> 0
+                        }
                         params = byteArrayOf(brightness.toByte())
                         TelinkLightService.Instance()?.sendCommandNoResponse(opcode, addr, params, immediate)
                         afterStopBri(progress)
@@ -2333,10 +2369,10 @@ else
                     //showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.config_white_fail))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.config_white_fail))
+                        }
                 }
                 90018 -> {
                     DBUtils.deleteLocalData()
@@ -2344,8 +2380,10 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 ->{hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 else -> ToastUtils.showShort(it.message)
@@ -2373,10 +2411,10 @@ else
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.gradient_apply_fail))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.gradient_apply_fail))
+                        }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
@@ -2385,8 +2423,10 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> {hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2414,10 +2454,10 @@ else
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.gradient_apply_fail))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.gradient_apply_fail))
+                        }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
@@ -2426,8 +2466,10 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> {hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2454,10 +2496,10 @@ else
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.gradient_stop_fail))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.gradient_stop_fail))
+                        }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
@@ -2466,8 +2508,10 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> {hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2543,7 +2587,8 @@ else
                 }
                 else -> {
                     hideLoadingDialog()
-                    val ws = if (currentShowGroupSetPage) (group?.color!! and 0xff000000.toInt()) shr 24 else (light?.color!! and 0xff000000.toInt()) shr 24
+                    val ws =
+                        if (currentShowGroupSetPage) (group?.color!! and 0xff000000.toInt()) shr 24 else (light?.color!! and 0xff000000.toInt()) shr 24
                     rgb_white_seekbar.progress = ws
                     //sb_w_bright_num.text="$ws%"
                     if (isClickSw) {
@@ -2766,10 +2811,10 @@ else
                     // showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.congfig_rgb_fail))
+                        }
                 }
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
                 90018 -> {
@@ -2778,8 +2823,10 @@ else
                     SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
                     finish()
                 }
-                90008 -> {hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))}
+                90008 -> {
+                    hideLoadingDialog()
+                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                }
                 90007 -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 90005 -> ToastUtils.showShort(getString(R.string.router_offline))
                 90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
@@ -2799,8 +2846,10 @@ else
     /**
      * 删除组，并且把组里的灯的组也都删除。
      */
-    private fun deleteGroup(lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
-                            successCallback: () -> Unit, failedCallback: () -> Unit) {
+    private fun deleteGroup(
+        lights: MutableList<DbLight>, group: DbGroup, retryCount: Int = 0,
+        successCallback: () -> Unit, failedCallback: () -> Unit
+    ) {
         Thread {
 
             if (lights.count() != 0) {
@@ -2809,32 +2858,36 @@ else
                     val light = lights[0]
                     val lightMeshAddr = light.meshAddr
                     Commander.deleteGroup(lightMeshAddr,
-                            successCallback = {
-                                light.belongGroupId = DBUtils.groupNull!!.id//该等所在组
-                                DBUtils.updateLight(light)
-                                lights.remove(light)
+                        successCallback = {
+                            light.belongGroupId = DBUtils.groupNull!!.id//该等所在组
+                            DBUtils.updateLight(light)
+                            lights.remove(light)
 
-                                //修改分组成功后删除场景信息。
-                                deleteAllSceneByLightAddr(light.meshAddr)
-                                Thread.sleep(100)
-                                if (lights.count() == 0) {
-                                    //所有灯都删除了分组
-                                    DBUtils.deleteGroupOnly(group)
-                                    this.runOnUiThread {
-                                        successCallback.invoke()
-                                    }
-                                } else {
-                                    //还有灯要删除分组
-                                    deleteGroup(lights, group,
-                                            successCallback = successCallback,
-                                            failedCallback = failedCallback)
+                            //修改分组成功后删除场景信息。
+                            deleteAllSceneByLightAddr(light.meshAddr)
+                            Thread.sleep(100)
+                            if (lights.count() == 0) {
+                                //所有灯都删除了分组
+                                DBUtils.deleteGroupOnly(group)
+                                this.runOnUiThread {
+                                    successCallback.invoke()
                                 }
-                            },
-                            failedCallback = {
-                                deleteGroup(lights, group, retryCount = retryCount + 1,
-                                        successCallback = successCallback,
-                                        failedCallback = failedCallback)
-                            })
+                            } else {
+                                //还有灯要删除分组
+                                deleteGroup(
+                                    lights, group,
+                                    successCallback = successCallback,
+                                    failedCallback = failedCallback
+                                )
+                            }
+                        },
+                        failedCallback = {
+                            deleteGroup(
+                                lights, group, retryCount = retryCount + 1,
+                                successCallback = successCallback,
+                                failedCallback = failedCallback
+                            )
+                        })
                 } else {    //超过了重试次数
                     this.runOnUiThread {
                         failedCallback.invoke()
@@ -2891,7 +2944,7 @@ else
 
 
                 if (canSave) {
-                group?.name = renameEt?.text.toString().trim { it <= ' ' }
+                    group?.name = renameEt?.text.toString().trim { it <= ' ' }
                     val subscribe = GroupMdodel.add(group!!, group!!.id, group!!.id)?.subscribe(fun(_: String) {
                         DBUtils.updateGroup(group!!)
                         toolbarTv.text = group?.name
@@ -2928,9 +2981,9 @@ else
         }
         when {
             Constant.IS_ROUTE_MODE -> when {
-                    currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, white, "rgbwhite")
-                    else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), white, "rgbwhite")
-                }
+                currentShowGroupSetPage -> routeConfigWhiteGpOrLight(group?.meshAddr ?: 0, 97, white, "rgbwhite")
+                else -> routeConfigWhiteGpOrLight(light?.meshAddr ?: 0, (light?.productUUID ?: 0).toInt(), white, "rgbwhite")
+            }
             else -> {
                 val whiteNum = if (cb_white_enable.isChecked) white else 0
                 val params: ByteArray = byteArrayOf(whiteNum.toByte())
@@ -3044,30 +3097,30 @@ else
     @SuppressLint("CheckResult")
     private fun lookService() {
         NetworkFactory.getApi()
-                .getGradientList(lastUser?.token)
-                .compose(NetworkTransformer())
-                .subscribe({
-                    val sb = StringBuilder()
-                    it.forEach {itg->
-                        sb.append(itg.name).append("==id==").append(itg.id).append("----")
-                    }
-                    LogUtils.v("zcl----------路由删除后服务器渐变-------${sb}")
-                    deleteDiyGradientAll()
-                    deleteColorNodeAll()
-                    for (item in it) {
-                        DBUtils.saveGradient(item, true)
-                        for (i in item.colorNodes.indices) {
-                            //("是不是空的"+item.id)
-                            if (i < 8) {
-                                val k = i + 1
-                                DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
-                            }
+            .getGradientList(lastUser?.token)
+            .compose(NetworkTransformer())
+            .subscribe({
+                val sb = StringBuilder()
+                it.forEach { itg ->
+                    sb.append(itg.name).append("==id==").append(itg.id).append("----")
+                }
+                LogUtils.v("zcl----------路由删除后服务器渐变-------${sb}")
+                deleteDiyGradientAll()
+                deleteColorNodeAll()
+                for (item in it) {
+                    DBUtils.saveGradient(item, true)
+                    for (i in item.colorNodes.indices) {
+                        //("是不是空的"+item.id)
+                        if (i < 8) {
+                            val k = i + 1
+                            DBUtils.saveColorNodes(item.colorNodes[i], k.toLong(), item.id)
                         }
-                        setNewDiyData()
                     }
-                }, {
-                    ToastUtils.showShort(it.message)
-                })
+                    setNewDiyData()
+                }
+            }, {
+                ToastUtils.showShort(it.message)
+            })
     }
 
     override fun tzRouterResetFactory(cmdBean: CmdBodyBean) {

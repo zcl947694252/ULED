@@ -314,20 +314,20 @@
 
         <activity
                 android:name=".othersview.start.FirstActivity"
+                android:exported="true"
+                android:screenOrientation="nosensor"
+                />
+        <activity
+                android:name=".othersview.SplashActivity"
                 android:screenOrientation="nosensor"
                 android:theme="@style/AppTheme.customeTheme"
-                android:exported="true">
+                android:exported="true"
+                >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-                android:name=".othersview.SplashActivity"
-                android:screenOrientation="nosensor"
-                android:theme="@style/AppTheme.customeTheme">
-            <!-- android:theme="@style/AppTheme"> -->
 
         </activity>
         <activity

@@ -860,6 +860,7 @@
     <string name="privacy_statement">隐私声明</string>
     <string name="privacy_statement_content">优乐迪智能平台深知您的隐私对您的重要性，并充分尊重您的隐私。在优乐迪平台注册的手机号码，仅用于对优乐迪智能产品的操作使用。未经您的同意，我们不会出于任何目的访问或处理您的内容数据，除非适用的法律法规要求。</string>
     <string name="user_agreement_context">已同意《用户协议及隐私说明》</string>
+    <string name="user_context_privary">《用户协议及隐私说明》</string>
     <string name="agree_and_continue">请同意《用户协议及隐私说明》才能继续使用此软件</string>
     <string name="insist_on_quitting">坚持退出</string>
     <string name="agree_to_continue">同意并继续</string>
@@ -1083,7 +1084,7 @@
     <string name="no_connect_device">无可自动连接设备!</string>
     <string name="select_icon_dot">选择图标:</string>
     <string name="select_icon">选择图标</string>
-    <string name="delete_device_fail">删除设备失败</string>
+    <string name="delete_device_fail">删除设备失败,请检查设备是否在当前账户下或断电</string>
     <string name="delete_success">删除成功</string>
     <string name="edite_device">编辑设备</string>
     <string name="cancel_edite">取消编辑</string>

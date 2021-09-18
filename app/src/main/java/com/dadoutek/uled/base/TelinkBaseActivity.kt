@@ -208,13 +208,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         initStompReceiver()
         initChangeRecevicer()
 
-       /* if (SharedPreferencesHelper.getBoolean(this,"PERMISION_PHONE",true) && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            dispos = RxPermissions(this).request(Manifest.permission.READ_PHONE_STATE).subscribe({
-                SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
-            }, {
-                SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
-            })
-        } */
+        /* if (SharedPreferencesHelper.getBoolean(this,"PERMISION_PHONE",true) && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+             dispos = RxPermissions(this).request(Manifest.permission.READ_PHONE_STATE).subscribe({
+                 SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
+             }, {
+                 SharedPreferencesHelper.putBoolean(this,"PERMISION_PHONE",false)
+             })
+         } */
 //        if (TelinkLightApplication.getApp().mStompManager?.mStompClient?.isConnected != true)
 //            TelinkLightApplication.getApp().initStompClient()
         receiver = BluetoothListenerReceiver()
@@ -388,11 +388,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 Thread.sleep(800)
                 mConnectDisposable?.dispose()
                 mConnectDisposable = connect(deviceTypes = deviceTypes, retryTimes = 3, fastestMode = true)
-                        ?.subscribe({
-                            LogUtils.d("connection success")
-                        }, {
-                            LogUtils.d("connect failed")
-                        })
+                    ?.subscribe({
+                        LogUtils.d("connection success")
+                    }, {
+                        LogUtils.d("connect failed")
+                    })
 
             }
         }
@@ -401,13 +401,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     //弹出其他设备登录弹窗
     private fun makeDialogAndPop() {
         singleLogin = AlertDialog.Builder(this)
-                .setTitle(R.string.other_device_login)
-                .setMessage(getString(R.string.single_login_warm))
-                .setCancelable(false)
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    dialog.dismiss() //消灭弹窗
-                    restartApplication() //重启app杀死原进程
-                }.create()//创建弹窗
+            .setTitle(R.string.other_device_login)
+            .setMessage(getString(R.string.single_login_warm))
+            .setCancelable(false)
+            .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                dialog.dismiss() //消灭弹窗
+                restartApplication() //重启app杀死原进程
+            }.create()//创建弹窗
         //没有.show不展示，只是创建了这个其他设备登录之后的弹窗，这还需要一个广播
         popView = LayoutInflater.from(this).inflate(R.layout.code_warm, null)
         pop = PopupWindow(popView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -421,7 +421,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     //初始化分组提示框
     private fun makeDialog() {
         dialog = Dialog(this@TelinkBaseActivity)
-        list = mutableListOf(getString(R.string.normal_light), getString(R.string.rgb_light), getString(R.string.curtain), getString(R.string.relay))
+        list = mutableListOf(
+            getString(R.string.normal_light),
+            getString(R.string.rgb_light),
+            getString(R.string.curtain),
+            getString(R.string.relay)
+        )
         adapterType = TypeListAdapter(R.layout.item_group, list!!)
 
         val popView = View.inflate(this@TelinkBaseActivity, R.layout.dialog_add_group, null)
@@ -431,7 +436,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         popMain.isOutsideTouchable = false
 
         val recyclerView = popView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.pop_recycle)
-        recyclerView.layoutManager = LinearLayoutManager(this@TelinkBaseActivity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        recyclerView.layoutManager =
+            LinearLayoutManager(this@TelinkBaseActivity, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapterType
 
         adapterType?.bindToRecyclerView(recyclerView)
@@ -513,7 +519,15 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
      * @param isConnected       是否是连接状态
      */
     open fun changeDisplayImgOnToolbar(isConnected: Boolean) {
-        LogUtils.v("zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${SharedPreferencesHelper.getBoolean(this, Constant.ROUTE_MODE, false)}-")
+        LogUtils.v(
+            "zcl--获取状态-------${Constant.IS_ROUTE_MODE}--------${
+                SharedPreferencesHelper.getBoolean(
+                    this,
+                    Constant.ROUTE_MODE,
+                    false
+                )
+            }-"
+        )
         if (Constant.IS_ROUTE_MODE)
             toolbar?.findViewById<ImageView>(R.id.image_bluetooth)?.setImageResource(R.drawable.icon_cloud)
         else {
@@ -631,14 +645,14 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         if (netWorkCheck(this))
             UpdateModel.run {
                 isVersionAvailable(0, version)
-                        .subscribe({
-                            if (!it.isUsable) {
-                                loginOutMethod()
-                            }
-                            SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", it.isUsable)
-                        }, {
-                            //ToastUtils.showLong(R.string.get_server_version_fail)
-                        })
+                    .subscribe({
+                        if (!it.isUsable) {
+                            loginOutMethod()
+                        }
+                        SharedPreferencesHelper.putBoolean(TelinkLightApplication.getApp(), "isShowDot", it.isUsable)
+                    }, {
+                        //ToastUtils.showLong(R.string.get_server_version_fail)
+                    })
             }
     }
 
@@ -787,13 +801,14 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     protected fun checkNetworkAndSync(activity: Activity?) {
         if (!NetWorkUtils.isNetworkAvalible(activity!!)) {
             AlertDialog.Builder(activity)
-                    .setTitle(R.string.network_tip_title)
-                    .setMessage(R.string.net_disconnect_tip_message)
-                    .setPositiveButton(android.R.string.ok
-                    ) { _, _ ->
-                        // 跳转到设置界面
-                        activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
-                    }.create().show()
+                .setTitle(R.string.network_tip_title)
+                .setMessage(R.string.net_disconnect_tip_message)
+                .setPositiveButton(
+                    android.R.string.ok
+                ) { _, _ ->
+                    // 跳转到设置界面
+                    activity.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
+                }.create().show()
         } else {
             LogUtils.v("chown -- 同步数据")
 
@@ -804,8 +819,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     open var syncCallbackGet: SyncCallback = object : SyncCallback {
         override fun start() {}
         override fun complete() {}
+
         @SuppressLint("CheckResult")
-        override fun error(msg: String) {}
+        override fun error(msg: String) {
+        }
     }
 
     /**
@@ -915,7 +932,7 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             val cmdBean: CmdBodyBean = Gson().fromJson(msg, CmdBodyBean::class.java)
             //var jsonObject = JSONObject(msg)
             LogUtils.v("zcl------------------收到信息长连接---cmdbean$cmdBean")
-            if(cmdBean.cmd == Cmd.routeOTAFinish && cmdBean.ser_id == "3027") {
+            if (cmdBean.cmd == Cmd.routeOTAFinish && cmdBean.ser_id == "3027") {
                 tzRouterConfigFourSwRecevice(cmdBean)
                 return
             } else if (cmdBean.cmd == Cmd.routeOTAFinish && cmdBean.ser_id == "3028") {
@@ -927,7 +944,12 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     val codeBean = Gson().fromJson(msg, MqttBodyBean::class.java)
                     when (cmdBean.cmd) {
                         Cmd.singleLogin -> singleDialog(codeBean)//单点登录
-                        Cmd.parseQR -> makeCodeDialog(codeBean.type, codeBean.ref_user_phone, codeBean.region_name, codeBean.rid)//推送二维码扫描解析结果
+                        Cmd.parseQR -> makeCodeDialog(
+                            codeBean.type,
+                            codeBean.ref_user_phone,
+                            codeBean.region_name,
+                            codeBean.rid
+                        )//推送二维码扫描解析结果
                         Cmd.unbindRegion -> unbindDialog(codeBean)//解除授权信息
                         Cmd.gwStatus -> TelinkLightApplication.getApp().offLine = codeBean.state == 0//1上线了，0下线了
                         Cmd.gwCreateCallback -> if (codeBean.status == 0) receviedGwCmd2000(codeBean.ser_id)//下发标签结果
@@ -995,7 +1017,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     val routerOTAFinishBean = Gson().fromJson(msg, RouterOTAFinishBean::class.java)
                     tzRouterOTAStopRecevice(routerOTAFinishBean)
                 }
-                Cmd.tzRouteAddGradient, Cmd.tzRouteDelGradient, Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(cmdBean)
+                Cmd.tzRouteAddGradient, Cmd.tzRouteDelGradient, Cmd.tzRouteUpdateGradient -> tzRouterAddOrDelOrUpdateGradientRecevice(
+                    cmdBean
+                )
                 Cmd.tzRouteConnectOrDisConnectSwSe -> tzRouterConnectOrDisconnectSwSeRecevice(cmdBean)
                 Cmd.routeDeleteGroup -> {
                     val routerGroup = Gson().fromJson(msg, RouteGroupingOrDelBean::class.java)
@@ -1126,7 +1150,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         val user = lastUser
         user?.let {
             if (it.last_authorizer_user_id == codeBean.authorizer_user_id.toString() && it.last_region_id == codeBean.rid.toString()
-                    && it.id.toString() == it.last_authorizer_user_id) {//是自己的区域
+                && it.id.toString() == it.last_authorizer_user_id
+            ) {//是自己的区域
                 user.last_region_id = 1.toString()
                 user.last_authorizer_user_id = user.id.toString()
                 DBUtils.deleteAllData()
@@ -1161,13 +1186,14 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     open fun loginOutMethod() = if (!NetWorkUtils.isNetworkAvalible(this)) {
         AlertDialog.Builder(this)
-                .setTitle(R.string.network_tip_title)
-                .setMessage(R.string.net_disconnect_tip_message)
-                .setPositiveButton(android.R.string.ok
-                ) { _, _ ->
-                    // 跳转到设置界面
-                    this.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
-                }.create().show()
+            .setTitle(R.string.network_tip_title)
+            .setMessage(R.string.net_disconnect_tip_message)
+            .setPositiveButton(
+                android.R.string.ok
+            ) { _, _ ->
+                // 跳转到设置界面
+                this.startActivityForResult(Intent(Settings.ACTION_WIRELESS_SETTINGS), 0)
+            }.create().show()
     } else {
         LogUtils.v("chown -- 同步数据")
 
@@ -1271,22 +1297,26 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
         locationServiceDialog?.hide()
     }
 
-    fun connect(meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = lastUser?.controlMeshName,
-                meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16), retryTimes: Long = 2,
-                deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 13): Observable<DeviceInfo>? {
-        LogUtils.v("zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}--" +
-                "----${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---")
+    fun connect(
+        meshAddress: Int = 0, fastestMode: Boolean = false, macAddress: String? = null, meshName: String? = lastUser?.controlMeshName,
+        meshPwd: String? = NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16), retryTimes: Long = 2,
+        deviceTypes: List<Int>? = null, connectTimeOutTime: Long = 13
+    ): Observable<DeviceInfo>? {
+        LogUtils.v(
+            "zcl-----连接中判断${mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false}--" +
+                    "----${!Constant.IS_ROUTE_MODE}----${TelinkLightApplication.getApp().connectDevice == null}---"
+        )
         return if (mConnectDisposable == null && TelinkLightService.Instance()?.isLogin == false && !Constant.IS_ROUTE_MODE) {
             return Commander.connect(meshAddress, fastestMode, macAddress, meshName, meshPwd, retryTimes, deviceTypes, connectTimeOutTime)
-                    ?.doOnSubscribe {
-                        mConnectDisposable = it
-                    }?.doFinally {
-                        mConnectDisposable = null
-                    }?.doOnError {
-                        // TelinkLightService.Instance()?.idleMode(false)
-                        LogUtils.v("zcl-----------连接失败失败-------doOnError")
-                        // ToastUtils.showShort(getString(R.string.connect_fail))
-                    }/*?.doOnNext {
+                ?.doOnSubscribe {
+                    mConnectDisposable = it
+                }?.doFinally {
+                    mConnectDisposable = null
+                }?.doOnError {
+                    // TelinkLightService.Instance()?.idleMode(false)
+                    LogUtils.v("zcl-----------连接失败失败-------doOnError")
+                    // ToastUtils.showShort(getString(R.string.connect_fail))
+                }/*?.doOnNext {
                         it.boundMac = when (it.productUUID) {
                             DeviceType.LIGHT_NORMAL, DeviceType.LIGHT_NORMAL_OLD, DeviceType.LIGHT_RGB -> DBUtils.getLightByID(it.id.toLong())?.boundMac
                             DeviceType.NORMAL_SWITCH, DeviceType.EIGHT_SWITCH, DeviceType.SMART_CURTAIN_SWITCH, DeviceType.SCENE_SWITCH,
@@ -1324,28 +1354,32 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             TelinkLightService.Instance()?.idleMode(true)
             Thread.sleep(200)
             RxPermissions(this).request(Manifest.permission.ACCESS_FINE_LOCATION)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        if (TelinkLightApplication.getApp().connectDevice == null/*!TelinkLightService.Instance().isLogin*/) {
-                            showLoadingDialog(getString(R.string.please_wait))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (TelinkLightApplication.getApp().connectDevice == null/*!TelinkLightService.Instance().isLogin*/) {
+                        showLoadingDialog(getString(R.string.please_wait))
 
-                            val meshName = lastUser!!.controlMeshName
+                        val meshName = lastUser!!.controlMeshName
 
-                            GlobalScope.launch {
-                                //自动重连参数
-                                val connectParams = Parameters.createAutoConnectParameters()
-                                connectParams.setMeshName(meshName)
-                                connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
-                                connectParams.autoEnableNotification(true)
-                                connectParams.setConnectMac(macAddr)
-                                LogUtils.v("autoconnect  meshName = $meshName   meshPwd = ${NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)}   macAddress = ${macAddr}")
+                        GlobalScope.launch {
+                            //自动重连参数
+                            val connectParams = Parameters.createAutoConnectParameters()
+                            connectParams.setMeshName(meshName)
+                            connectParams.setPassword(NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16))
+                            connectParams.autoEnableNotification(true)
+                            connectParams.setConnectMac(macAddr)
+                            LogUtils.v(
+                                "autoconnect  meshName = $meshName   meshPwd = ${
+                                    NetworkFactory.md5(NetworkFactory.md5(meshName) + meshName).substring(0, 16)
+                                }   macAddress = ${macAddr}"
+                            )
 
-                                //连接，如断开会自动重连
-                                TelinkLightService.Instance()?.autoConnect(connectParams)
-                            }
+                            //连接，如断开会自动重连
+                            TelinkLightService.Instance()?.autoConnect(connectParams)
                         }
-                    }, { LogUtils.d(it) })
+                    }
+                }, { LogUtils.d(it) })
         }
     }
 
@@ -1551,8 +1585,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                         }
                         INSTALL_SWITCH -> {
                             if (!Constant.IS_ROUTE_MODE) { //chown SelectSwitchActivity跳转选择相关开关类型
-                                val intent = Intent(this,ScanningSwitchActivity::class.java )
-                                intent.putExtra("deviceType",switchId)
+                                val intent = Intent(this, ScanningSwitchActivity::class.java)
+                                intent.putExtra("deviceType", switchId)
 //                                startActivity(Intent(this,SelectSwitchActivity::class.java)) //chown
                                 startActivity(intent)
                             } else {
@@ -1650,10 +1684,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     if (it.errorCode == 0) {
                         disposableRouteTimer?.dispose()
                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                .subscribe {
-                                    hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.delete_gp_fail))
-                                }
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.delete_gp_fail))
+                            }
                     } else {
                         DBUtils.deleteGroupOnly(dbGroup)
                         deleteGpSuccess()
@@ -1680,8 +1714,8 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     @SuppressLint("CheckResult")
     open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, isEnableBright: Int, serId: String) {
         val bri = when {
-            brightness<1 -> 1
-            brightness>100 -> 100
+            brightness < 1 -> 1
+            brightness > 100 -> 100
             else -> brightness
         }
         LogUtils.v("zcl-----------发送路由调光参数-------$bri")
@@ -1698,9 +1732,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     open fun routeConfigTempGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
-        val  bri = when {
-            brightness<1 -> 1
-            brightness>100 -> 100
+        val bri = when {
+            brightness < 1 -> 1
+            brightness > 100 -> 100
             else -> brightness
         }
         LogUtils.v("zcl----------- zcl-----------发送路由调色参数-------$bri-------")
@@ -1723,15 +1757,15 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                 //showLoadingDialog(getString(R.string.please_wait))
                 disposableRouteTimer?.dispose()
                 disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                        .subscribe {
-                            hideLoadingDialog()
-                            when (isBri) {
-                                0 -> ToastUtils.showShort(getString(R.string.config_bri_fail))
-                                1 -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
-                                2 -> ToastUtils.showShort(getString(R.string.config_white_fail))
-                                else -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
-                            }
+                    .subscribe {
+                        hideLoadingDialog()
+                        when (isBri) {
+                            0 -> ToastUtils.showShort(getString(R.string.config_bri_fail))
+                            1 -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
+                            2 -> ToastUtils.showShort(getString(R.string.config_white_fail))
+                            else -> ToastUtils.showShort(getString(R.string.config_color_temp_fail))
                         }
+                    }
             }
             90018 -> {
                 DBUtils.deleteLocalData()
@@ -1758,9 +1792,9 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(itR.t.timeout + 3L, TimeUnit.SECONDS)
-                            .subscribe {
-                                ToastUtils.showShort(getString(R.string.group_timeout))
-                            }
+                        .subscribe {
+                            ToastUtils.showShort(getString(R.string.group_timeout))
+                        }
                 }
                 NetworkStatusCode.CURRENT_GP_NOT_EXITE -> ToastUtils.showShort(getString(R.string.gp_not_exit))
                 NetworkStatusCode.PRODUCTUUID_NOT_MATCH_DEVICE_TYPE -> ToastUtils.showShort(getString(R.string.device_type_not_match))
@@ -1777,34 +1811,35 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     @SuppressLint("CheckResult")
     open fun routerDeviceResetFactory(mac: String, meshAddr: Int, productUUID: Int, ser_id: String) {
         //    "errorCode": 20030,已生成移交码，此时不支持任何恢复操作，请删除移交码再重试"  窗帘 = 0x10
-        RouterModel.routeResetFactory(MacResetBody(macAddr = mac, meshAddr = meshAddr, meshType = productUUID, ser_id = ser_id))?.subscribe({
-            when (it.errorCode) {
-                0 -> {
-                    LogUtils.v("zcl-----------收到路由的恢复出厂结果-------$it")
-                    showLoadingDialog(getString(R.string.please_wait))
-                    disposableRouteTimer?.dispose()
-                    disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
+        RouterModel.routeResetFactory(MacResetBody(macAddr = mac, meshAddr = meshAddr, meshType = productUUID, ser_id = ser_id))
+            ?.subscribe({
+                when (it.errorCode) {
+                    0 -> {
+                        LogUtils.v("zcl-----------收到路由的恢复出厂结果-------$it")
+                        showLoadingDialog(getString(R.string.please_wait))
+                        disposableRouteTimer?.dispose()
+                        disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
                             .subscribe {
                                 hideLoadingDialog()
                                 ToastUtils.showShort(getString(R.string.reset_factory_fail))
                             }
+                    }
+                    90030 -> ToastUtils.showShort(getString(R.string.transfer_accounts_code_exit_cont_perform))
+                    900018 -> {
+                        ToastUtils.showShort(getString(R.string.device_not_exit))
+                        finish()
+                    }
+                    90008 -> {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                    }
+                    90005 -> ToastUtils.showShort(getString(R.string.router_offline))
+                    90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
+                    else -> ToastUtils.showShort(it.message)
                 }
-                90030 -> ToastUtils.showShort(getString(R.string.transfer_accounts_code_exit_cont_perform))
-                900018 -> {
-                    ToastUtils.showShort(getString(R.string.device_not_exit))
-                    finish()
-                }
-                90008 -> {
-                    hideLoadingDialog()
-                    ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                }
-                90005 -> ToastUtils.showShort(getString(R.string.router_offline))
-                90004 -> ToastUtils.showShort(getString(R.string.region_no_router))
-                else -> ToastUtils.showShort(it.message)
-            }
-        }, {
-            ToastUtils.showShort(it.message)
-        })
+            }, {
+                ToastUtils.showShort(it.message)
+            })
     }
 
     @SuppressLint("CheckResult")
@@ -1819,11 +1854,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                if (productUUID == DeviceType.LIGHT_NORMAL)
-                                    ToastUtils.showShort(getString(R.string.open_light_faile))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            if (productUUID == DeviceType.LIGHT_NORMAL)
+                                ToastUtils.showShort(getString(R.string.open_light_faile))
+                        }
                 }
                 90018 -> {
                     DBUtils.deleteLocalData()
@@ -1854,13 +1889,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                /* if (status == 1)
-                                     ToastUtils.showShort(getString(R.string.open_faile))
-                                 else
-                                     ToastUtils.showShort(getString(R.string.close_faile))*/
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            /* if (status == 1)
+                                 ToastUtils.showShort(getString(R.string.open_faile))
+                             else
+                                 ToastUtils.showShort(getString(R.string.close_faile))*/
+                        }
                 }
                 90030 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
@@ -1881,7 +1916,11 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     }
 
     @SuppressLint("CheckResult")//op	否	int	0连接，1断开。默认0
-    open fun routerConnectSw(it: DbSwitch, op: Int, ser_id: String) {  //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+    open fun routerConnectSw(
+        it: DbSwitch,
+        op: Int,
+        ser_id: String
+    ) {  //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
         LogUtils.v("zcl-----------收到路由请求连接开关id-------${it.id}")
         RouterModel.routerConnectSwOrSe(it?.id ?: 0, 99, op, ser_id)?.subscribe({
             LogUtils.v("zcl-----------收到路由请求连接成功是否是连接--${op == 0}-----$it")
@@ -1890,10 +1929,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     if (op == 0) {
                         disposableRouteTimer?.dispose()
                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong() + 2, TimeUnit.SECONDS)
-                                .subscribe {
-                                    hideLoadingDialog()
-                                    ToastUtils.showShort(getString(R.string.connect_fail))
-                                }
+                            .subscribe {
+                                hideLoadingDialog()
+                                ToastUtils.showShort(getString(R.string.connect_fail))
+                            }
                     }
                 }
                 90018 -> {
@@ -1920,44 +1959,48 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
 
     @SuppressLint("CheckResult")
     //否	int	0连接，1断开。默认0
-    open fun routerConnectSensor(it: DbSensor, op: Int, ser_id: String) {  //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
+    open fun routerConnectSensor(
+        it: DbSensor,
+        op: Int,
+        ser_id: String
+    ) {  //直连开关或传感器meshType 开关 = 99 或 0x20 或 0x22 或 0x21 或 0x28 或 0x27 或 0x25 传感器 = 98 或 0x23 或 0x24
         if (it.id == 0L)
             return
         RouterModel.routerConnectSwOrSe(it.id, it.productUUID, op, ser_id)
-                ?.subscribe({ response ->
-                    LogUtils.v("zcl-----------收到路由请求连接开关或者传感器是否是连接--${op == 0}-------$response")
-                    when (response.errorCode) {
-                        0 -> {
-                            if (op == 0) {
-                                disposableRouteTimer?.dispose()
-                                disposableRouteTimer = Observable.timer((response.t.timeout).toLong() + 1, TimeUnit.SECONDS)
-                                        .subscribe {
-                                            hideLoadingDialog()
-                                            ToastUtils.showShort(getString(R.string.connect_fail))
-                                        }
-                            }
-                        }
-                        90018 -> {
-                            DBUtils.deleteLocalData()
-                            hideLoadingDialog()
-                            // ToastUtils.showShort(getString(R.string.device_not_exit))
-                            SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
-                            finish()
-                        }
-                        90008 -> {
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
-                        }
-                        90005 -> {
-                            hideLoadingDialog()
-                            ToastUtils.showShort(getString(R.string.router_offline))
+            ?.subscribe({ response ->
+                LogUtils.v("zcl-----------收到路由请求连接开关或者传感器是否是连接--${op == 0}-------$response")
+                when (response.errorCode) {
+                    0 -> {
+                        if (op == 0) {
+                            disposableRouteTimer?.dispose()
+                            disposableRouteTimer = Observable.timer((response.t.timeout).toLong() + 1, TimeUnit.SECONDS)
+                                .subscribe {
+                                    hideLoadingDialog()
+                                    ToastUtils.showShort(getString(R.string.connect_fail))
+                                }
                         }
                     }
+                    90018 -> {
+                        DBUtils.deleteLocalData()
+                        hideLoadingDialog()
+                        // ToastUtils.showShort(getString(R.string.device_not_exit))
+                        SyncDataPutOrGetUtils.syncGetDataStart(lastUser!!, syncCallbackGet)
+                        finish()
+                    }
+                    90008 -> {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.no_bind_router_cant_perform))
+                    }
+                    90005 -> {
+                        hideLoadingDialog()
+                        ToastUtils.showShort(getString(R.string.router_offline))
+                    }
+                }
 
-                }, { it1 ->
-                    hideLoadingDialog()
-                    ToastUtils.showShort(it1.message)
-                })
+            }, { it1 ->
+                hideLoadingDialog()
+                ToastUtils.showShort(it1.message)
+            })
     }
 
     @SuppressLint("CheckResult")
@@ -1971,10 +2014,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong() + 1, TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.get_version_fail))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.get_version_fail))
+                        }
                 }
                 90997 -> ToastUtils.showShort(getString(R.string.get_versioning))
                 90020 -> ToastUtils.showShort(getString(R.string.gradient_not_exit))
@@ -2022,10 +2065,10 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
                     showLoadingDialog(getString(R.string.please_wait))
                     disposableRouteTimer?.dispose()
                     disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                            .subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.config_fail))
-                            }
+                        .subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.config_fail))
+                        }
                 }
                 90022 -> {
                     ToastUtils.showShort(getString(R.string.device_not_exit))
@@ -2065,13 +2108,13 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
     @SuppressLint("CheckResult")
     open fun updateAllSensor() {
         NetworkFactory.getApi()
-                .getSensorList(lastUser?.token)
-                .compose(NetworkTransformer())
-                .subscribe({
-                    DBUtils.deleteAllSensor()
-                    for (item in it)
-                        DBUtils.saveSensor(item, true)
-                }, {})
+            .getSensorList(lastUser?.token)
+            .compose(NetworkTransformer())
+            .subscribe({
+                DBUtils.deleteAllSensor()
+                for (item in it)
+                    DBUtils.saveSensor(item, true)
+            }, {})
     }
 
     open fun renameSucess() {
@@ -2090,13 +2133,14 @@ abstract class TelinkBaseActivity : AppCompatActivity(), IGetMessageCallBack {
             0b00000000 -> sb.append(getString(R.string.only_one)).toString()
             else -> {
                 val list = mutableListOf(
-                        WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
-                        WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
-                        WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
-                        WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constant.THURSDAY) != 0),
-                        WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
-                        WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
-                        WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0))
+                    WeekBean(getString(R.string.monday), 1, (tmpWeek and Constant.MONDAY) != 0),
+                    WeekBean(getString(R.string.tuesday), 2, (tmpWeek and Constant.TUESDAY) != 0),
+                    WeekBean(getString(R.string.wednesday), 3, (tmpWeek and Constant.WEDNESDAY) != 0),
+                    WeekBean(getString(R.string.thursday), 4, (tmpWeek and Constant.THURSDAY) != 0),
+                    WeekBean(getString(R.string.friday), 5, (tmpWeek and Constant.FRIDAY) != 0),
+                    WeekBean(getString(R.string.saturday), 6, (tmpWeek and Constant.SATURDAY) != 0),
+                    WeekBean(getString(R.string.sunday), 7, (tmpWeek and Constant.SUNDAY) != 0)
+                )
                 for (i in 0 until list.size) {
                     if (list[i].selected)
                         sb.append(list[i].week).append(",")

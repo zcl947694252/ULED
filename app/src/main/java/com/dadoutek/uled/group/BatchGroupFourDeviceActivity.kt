@@ -1227,7 +1227,8 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     ToastUtils.showLong(R.string.tip_add_gp)
                     return
                 }
-                when (deviceType) {
+
+            /*  when (deviceType) { // chown
                     DeviceType.LIGHT_RGB, DeviceType.LIGHT_NORMAL -> {
                         showLoadingDialog(resources.getString(R.string.grouping_wait_tip, deviceDataLightAll.filter { it.isSelected }.size.toString()))
                     }
@@ -1237,7 +1238,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                     DeviceType.SMART_RELAY -> {
                         showLoadingDialog(resources.getString(R.string.grouping_connector_wait_tip, deviceDataRelayAll.filter { it.isSelected }.size.toString()))
                     }
-                }
+                }*/
                 //将灯列表的灯循环设置分组
                 setGroup(deviceType)
                 setDeviceStopBlink(deviceType)
@@ -1299,6 +1300,7 @@ class BatchGroupFourDeviceActivity : TelinkBaseActivity(), EventListener<String>
                 }
             }
         }
+
     }
 
     private fun completeGroup(deviceType: Int) {

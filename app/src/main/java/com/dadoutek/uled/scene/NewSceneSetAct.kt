@@ -53,6 +53,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
@@ -124,7 +125,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
         rgbRecyclerView = popView.findViewById(R.id.pop_scene_mode_recycle)
         rgbRecyclerView?.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         rgbRecyclerView?.adapter = this.rgbSceneModeAdapter
-        rgbSceneModeAdapter.notifyDataSetChanged()
+        rgbSceneModeAdapter.notifyDataSetChanged() //chown
+//        rgbSceneModeAdapter.notifyLoadMoreToLoading()
+
         rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->
             currentRgbGradient = buildInModeList[position]
             if (currentPosition != 1000000) {
@@ -374,18 +377,20 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 rgbGradientId = 1
                 itemGroup?.gradientId = rgbGradientId
                 itemGroup?.gradientType = 2 //渐变类型 1：自定义渐变  2：内置渐变
-                itemGroup?.gradientSpeed = 1 //渐变类型 1：自定义渐变  2：内置渐变
+//                itemGroup?.gradientSpeed = 1 //渐变类型 1：自定义渐变  2：内置渐变
             }
             0 -> {
-                itemGroup?.brightness = 50
-                itemGroup?.color = (50 shl 24) or (255 shl 16) or (255 shl 8) or 255
-                itemGroup?.temperature = 50
-                itemGroup?.checked = true
-                itemGroup?.enableCheck = false
+//                itemGroup?.brightness = 50
+//                itemGroup?.color = (50 shl 24) or (255 shl 16) or (255 shl 8) or 255
+//                itemGroup?.temperature = 50
+//                itemGroup?.checked = true
+//                itemGroup?.enableCheck = false
             }
         }
         showGroupList[pos].rgbType = rgbType
-        sceneGroupAdapter?.notifyDataSetChanged()
+//        sceneGroupAdapter?.notifyDataSetChanged()
+        sceneGroupAdapter?.refreshNotifyItemChanged(currentPosition)
+        sceneGroupAdapter?.notifyItemChanged(currentPosition)
     }
 
     private fun showPopMode(position: Int) {
@@ -437,8 +442,22 @@ class NewSceneSetAct : TelinkBaseActivity() {
             val status = if (isOpen) 1 else 0
             routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, status, "openOrCloseGp")
         }
-        sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
-        //sceneSetGpAdapter()
+//        sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+        runBlocking {
+            sceneGroupAdapter?.notifyItemChanged(currentPosition)
+        }
+//        sceneGroupAdapter?.notifyItemChanged(currentPosition) //chown
+//        sceneSetGpAdapter()
+//        sceneGroupAdapter?.refreshNotifyItemChanged(currentPosition)
+//        var i = 0
+//        while (i<showGroupList.size) {
+//            LogUtils.v("Chown ---=-=---- new $i")
+//            i++
+//            GlobalScope.launch {
+//                sceneGroupAdapter?.notifyItemChanged(i)
+//            }
+//        }
+//        sceneSetGpAdapter()
     }
 
     private fun switchBright(position: Int) {
@@ -461,7 +480,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             val params: ByteArray = byteArrayOf(brightness.toByte())
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_LUM, addr, params, true)
         }
-        sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+//        sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+        sceneGroupAdapter?.notifyItemChanged(position)
     }
 
     private fun switchWhiteLight(position: Int) {
@@ -484,7 +504,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
             val params: ByteArray = byteArrayOf(whiteLight.toByte())//设置白色
             TelinkLightService.Instance()?.sendCommandNoResponse(Opcode.SET_W_LUM, addr, params, true)
         }
-        sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+//        sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+        sceneGroupAdapter?.notifyItemChanged(position)
     }
 
     private fun close(position: Int) {
@@ -493,7 +514,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
             routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, 0, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = false
-            sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+            sceneGroupAdapter?.notifyItemChanged(position)
+            sceneGroupAdapter?.refreshNotifyItemChanged(position)
+//            sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
             Commander.openOrCloseLights(showGroupList[position].groupAddress, false)
         }
     }
@@ -504,7 +527,9 @@ class NewSceneSetAct : TelinkBaseActivity() {
             routeOpenOrCloseBase(showGroupList[position].groupAddress, 97, 1, "newScene")//0关1开
         } else {
             this.showGroupList[position].isOn = true
-            sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+//            sceneGroupAdapter?.notifyItemChanged(position, showGroupList.size)
+            sceneGroupAdapter?.notifyItemChanged(position)
+            sceneGroupAdapter?.refreshNotifyItemChanged(position)
             Commander.openOrCloseLights(showGroupList[position].groupAddress, true)
         }
     }
@@ -551,7 +576,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
                         ToastUtils.showShort(getString(R.string.config_white_fail))
                     }
                 }
-                sceneGroupAdapter?.notifyDataSetChanged()
+//                sceneGroupAdapter?.notifyDataSetChanged()
+                sceneGroupAdapter?.notifyItemChanged(currentPosition)
             }
         }
     }
@@ -576,7 +602,8 @@ class NewSceneSetAct : TelinkBaseActivity() {
                         sceneGroupAdapter?.data?.get(currentPosition)?.gradientId = rgbGradientId
                         sceneGroupAdapter?.data?.get(currentPosition)?.gradientType = itemRgbGradient.gradientType //渐变类型 1：自定义渐变  2：内置渐变
                     }
-                    sceneGroupAdapter?.notifyDataSetChanged()
+//                    sceneGroupAdapter?.notifyDataSetChanged()
+                    sceneGroupAdapter?.notifyItemChanged(currentPosition)
                 }
                 1100 -> {
                     when (val intExtra = data?.getIntExtra("ID", 0)) {
@@ -592,6 +619,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                         val color = data?.getIntExtra("color", 0)
 //                        showGroupList[requestCode].color = color!!
                         showGroupList[requestCode].color = (showGroupList[requestCode].color and 0xff000000.toInt()) or color!! //chown
+                        LogUtils.v("chown =-=-=color-=-=-=- $color")
                         sceneGroupAdapter?.notifyItemChanged(requestCode)
 //                        sceneGroupAdapter?.notifyDataSetChanged()
                     } catch (e: Exception) {
@@ -629,7 +657,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                                 showCheckListData!![index].isChecked = false
                             }
                         }
-                        adapter.notifyDataSetChanged()
+                        adapter.notifyItemRemoved(position)
                         hideLoadingDialog()
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
@@ -713,7 +741,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         // recyclerView_select_group_list_view.layoutManager = layoutmanager
         scene_gp_bottom_list.layoutManager = GridLayoutManager(this, 4)
 
-        var list = ArrayList<DbGroup>()
+        val list = ArrayList<DbGroup>()
         showCheckListData?.forEach {
             list.add(it)
         }
@@ -831,6 +859,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         newItemGroup.enableCheck = false
         newItemGroup.gpName = showCheckListData!![i].name
         newItemGroup.groupAddress = showCheckListData!![i].meshAddr
+        newItemGroup.gradientSpeed = 50
         newItemGroup.curtainOnOffRange = 100
 
         return newItemGroup
@@ -991,16 +1020,16 @@ class NewSceneSetAct : TelinkBaseActivity() {
                     else -> 0
                 }
 
-                if (temperature > 99)
-                    temperature = 99
+                if (temperature >= 100)
+                    temperature = 100
 
                 var light: Byte = when {
                     list[i].isOn && list[i].isEnableBright -> list[i].brightness.toByte()
                     else -> 0
                 }
 
-                if (light > 99)
-                    light = 99
+                if (light >= 100)
+                    light = 100
                 val meshAddress = TelinkApplication.getInstance().connectDevice?.meshAddress ?: 0
                 val mesH = (meshAddress shr 8) and 0xff //相同为1 不同为0
                 val mesL = meshAddress and 0xff
@@ -1071,7 +1100,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         }
 
         if (list.size == 0)
-            id = 1
+            id = 0
 
         return java.lang.Long.valueOf(id.toLong())
     }
@@ -1165,7 +1194,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 list[i].isEnableWhiteBright -> list[i].colorTemperature.toByte()
                 else -> 0
             }
-            if (temperature > 99)
+            if (temperature >= 100)
                 temperature = 100
 
             var light: Byte = when {
@@ -1173,7 +1202,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 else -> 0
             }
 
-            if (light > 99)
+            if (light >= 100)
                 light = 100
 
             val color = list[i].getColor()

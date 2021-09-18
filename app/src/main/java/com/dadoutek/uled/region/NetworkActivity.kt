@@ -109,7 +109,6 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
      */
     var qrCodeType = 0
 
-
     private var isAddRegion = true
     override fun setLayoutID(): Int {
         return R.layout.activity_network
@@ -133,7 +132,8 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                 transfer_account_tv.text = if (isNewQr) getString(R.string.transfer_accounts) else getString(R.string.to_receive)
             }, {
                 ToastUtils.showLong(it.message)
-        })
+                LogUtils.v("Chown --=-=---- qr ${it.message}")
+            })
     }
 
     private fun initToolBar() {
@@ -221,10 +221,11 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                  initData()
             },{
                 ToastUtils.showLong(it.message)
+            LogUtils.v("chown -=--addRegions=-= ${it.message}")
         })
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "CheckResult")
     override fun initData() {
         hideLoadingDialog()
         showLoadingDialog(getString(R.string.get_data_please_wait))
@@ -236,12 +237,14 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     setMeData(it)
                 }, {
                     ToastUtils.showLong(it.message)
+                    LogUtils.v("chown -=-=- ${it.message}")
                     hideLoadingDialog()
                 })
                 2 -> RegionModel.getAuthorizerList()?.subscribe({
                         setAuthorizeData(it)
                     }, {
                         ToastUtils.showLong(it.message)
+                        LogUtils.v("chown -=-=- ${it.message}")
                         hideLoadingDialog()
                     }
                 )
@@ -256,6 +259,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             setAuthorizeData(it)
                         },{
                             ToastUtils.showLong(it.message)
+                            LogUtils.v("chown -=-=- ${it.message}")
                             hideLoadingDialog()
                     })
                 }
@@ -479,6 +483,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             setCancel()
                         },{
                             ToastUtils.showLong(it.message)
+                            LogUtils.v("chown -=-=- ${it.message}")
                     })
                 PopUtil.dismiss(pop)
             }
@@ -507,6 +512,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                             initData()
                         },{
                             ToastUtils.showLong(it.message)
+                            LogUtils.v("chown -=-=- ${it.message}")
                     })
             }
             R.id.pop_transfer_region -> {
@@ -592,6 +598,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                                 setCreatShareCodeState()
                             },{
                                 ToastUtils.showLong(it.message)
+                                LogUtils.v("chown -=-=- ${it.message}")
                         })
                         3 -> /*RegionModel.removeQrCode(transferRegionCode)
                                 ?.subscribe({
@@ -604,6 +611,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                                                 ToastUtils.showShort(getString(R.string.QR_canceled))
                                             },{
                                                 ToastUtils.showShort(it.message)
+                                                LogUtils.v("chown -=-=- ${it.message}")
                                         })
                     }
 
@@ -632,6 +640,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
             },{
                 ToastUtils.showLong(it.message)
+                LogUtils.v("chown -=-=- ${it.message}")
         })
     }
 
@@ -655,6 +664,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
             }, {
                 ToastUtils.showLong(it.message)
+                LogUtils.v("chown -=-=- ${it.message}")
         })
     }
 
@@ -677,6 +687,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                     transfer_account_tv.text = getString(R.string.to_receive)
             },{
                 ToastUtils.showLong(it.message)
+                LogUtils.v("chown -- --- --- ${it.message}")
         })
     }
 
@@ -951,6 +962,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
 
              },{
                  ToastUtils.showLong(it.message)
+                 LogUtils.v("chown -=-=- ${it.message}")
                  showPop(pop!!, Gravity.BOTTOM)
          })
     }
@@ -1144,6 +1156,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
         super.onPause()
     }
 
+    @SuppressLint("CheckResult")
     override fun notifyWSData(type: Int, rid: Int) {
         PopUtil.dismiss(pop)
         PopUtil.dismiss(popAdd)
@@ -1164,6 +1177,7 @@ class NetworkActivity : BaseActivity(), View.OnClickListener {
                         setMeData(it)
                     }, {
                         ToastUtils.showLong(it.message)
+                        LogUtils.v("chown ----- ----- - ${it.message}")
                         hideLoadingDialog()
                 })
             }

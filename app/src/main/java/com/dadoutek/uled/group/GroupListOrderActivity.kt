@@ -2,8 +2,6 @@ package com.dadoutek.uled.group
 
 import android.graphics.Color
 import android.view.View
-import android.widget.GridLayout
-import android.widget.RadioButton
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -15,7 +13,6 @@ import com.dadoutek.uled.model.DeviceType
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbGroup
 import kotlinx.android.synthetic.main.toolbar.*
-import org.greenrobot.greendao.DbUtils
 import org.jetbrains.anko.textColor
 import java.util.*
 import kotlin.collections.ArrayList
@@ -26,7 +23,7 @@ import kotlin.collections.ArrayList
  * 创建时间   2021/9/9 19:19
  * 描述
  */
-class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
+class GroupListOrderActivity : BaseActivity(), View.OnClickListener {
 
     private lateinit var normalTv: TextView
     private lateinit var rgbTv: TextView
@@ -47,7 +44,7 @@ class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
 
     override fun initData() {
         groupList.clear()
-        when(currentPosition) {
+        when (currentPosition) {
             0 -> {
                 setTextColor(0)
                 val allGroups = DBUtils.allGroups
@@ -65,11 +62,11 @@ class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
             }
             2 -> {
                 setTextColor(2)
-                groupList.addAll( DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN))
+                groupList.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SMART_CURTAIN))
             }
             3 -> {
                 setTextColor(3)
-                groupList.addAll( DBUtils.getGroupsByDeviceType(DeviceType.SMART_RELAY))
+                groupList.addAll(DBUtils.getGroupsByDeviceType(DeviceType.SMART_RELAY))
             }
         }
         groupList.sortBy { it.index }
@@ -77,14 +74,14 @@ class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
     }
 
     fun setTextColor(index: Int) {
-        when(index) {
+        when (index) {
             0 -> {
                 normalTv.textColor = getColor(R.color.blue_background)
                 rgbTv.textColor = Color.GRAY
                 curtainTv.textColor = Color.GRAY
                 relayTv.textColor = Color.GRAY
             }
-            1-> {
+            1 -> {
                 normalTv.textColor = Color.GRAY
                 rgbTv.textColor = getColor(R.color.blue_background)
                 curtainTv.textColor = Color.GRAY
@@ -108,9 +105,10 @@ class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
     override fun initView() {
         toolbarTv.text = getString(R.string.group_title)
         toolbar.setNavigationIcon(R.drawable.icon_return)
+        currentPosition = intent.getIntExtra("PAGE",0)
         toolbar.setNavigationOnClickListener {
             var i = 0
-            groupList.forEach{
+            groupList.forEach {
                 it.index = i++
                 DBUtils.updateGroup(it)
             }
@@ -129,9 +127,9 @@ class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
         curtainTv = findViewById(R.id.page3)
         relayTv = findViewById(R.id.page4)
         orderRecycler = findViewById(R.id.order_group_recycler)
-        orderRecycler.layoutManager = GridLayoutManager(this,2)
+        orderRecycler.layoutManager = GridLayoutManager(this, 2)
 
-        adapter = GroupOrderAdapter(R.layout.template_device_type_item,groupList,false)
+        adapter = GroupOrderAdapter(R.layout.template_device_type_item, groupList, false)
 
         adapter?.bindToRecyclerView(orderRecycler)
         helper.attachToRecyclerView(orderRecycler)
@@ -147,20 +145,20 @@ class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
         override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
             val fromPosition = viewHolder.adapterPosition
             val toPosition = target.adapterPosition
-            if (currentPosition == 0 ||currentPosition ==1) {
+            if (currentPosition == 0 || currentPosition == 1) {
                 if (fromPosition == 0 || toPosition == 0)
                     return false
             }
             if (fromPosition < toPosition) {
                 for (i in fromPosition until toPosition) {
-                    Collections.swap(groupList,i,i+1)
+                    Collections.swap(groupList, i, i + 1)
                 }
             } else {
                 for (i in fromPosition downTo toPosition + 1) {
-                    Collections.swap(groupList,i,i-1)
+                    Collections.swap(groupList, i, i - 1)
                 }
             }
-            adapter?.notifyItemMoved(fromPosition,toPosition)
+            adapter?.notifyItemMoved(fromPosition, toPosition)
             return true
         }
 
@@ -171,7 +169,7 @@ class GroupListOrderActivity: BaseActivity(), View.OnClickListener {
     })
 
     override fun onClick(v: View?) {
-        when(v?.id) {
+        when (v?.id) {
             R.id.page1 -> {
                 currentPosition = 0
                 initData()

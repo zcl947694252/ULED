@@ -645,13 +645,14 @@ abstract class BaseGroupFragment : BaseFragment() {
     }
 
     @SuppressLint("CheckResult")
-    private fun routeSwitchCurtain() {//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea 换向 = 0x11
+    private fun routeSwitchCurtain() {//controlCmd 开 = 0x0a 暂停 = 0x0b 关 = 0x0c 调节速度 = 0x15 恢复出厂 = 0xec 重启 = 0xea 换向 = 0x11
+        LogUtils.v("chown -- join in ")
         currentGroup?.let {
             val opcode = if (it.status == 1) 0x0c else 0x0a
 
             RouterModel.routeControlCurtain(it.meshAddr, 97, opcode, 1, "groupSwCurtain")//换向 = 0x11
                     ?.subscribe({ itr ->
-                        LogUtils.v("zcl-----------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
+                        LogUtils.v("chown-----------收到路由控制-开0x0a 暂停0x0b 关0x0c调节速度 0x15 恢复出厂 0xec 重启 0xea 0x11--$opcode----$it")
                         when (itr.errorCode) {
                             0 -> {
                                 showLoadingDialog(getString(R.string.please_wait))

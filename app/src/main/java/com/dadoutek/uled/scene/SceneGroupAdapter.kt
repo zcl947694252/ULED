@@ -11,12 +11,10 @@ import android.os.Handler
 import android.os.Message
 import androidx.annotation.RequiresApi
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import com.app.hubert.guide.util.LogUtil
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils.runOnUiThread
@@ -36,17 +34,13 @@ import com.dadoutek.uled.util.OtherUtils
 import com.dadoutek.uled.util.SyncDataPutOrGetUtils
 import com.google.gson.Gson
 import com.warkiz.widget.IndicatorSeekBar
-//import com.warkiz.widget.OnSeekChangeListener
-//import com.warkiz.widget.SeekParams
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-//import org.jetbrains.anko.sdk27.coroutines.onSeekBarChangeListener
 import org.json.JSONException
-import java.lang.NumberFormatException
 import java.lang.Thread.sleep
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -106,6 +100,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     @SuppressLint("ClickableViewAccessibility")
     override fun convert(helper: BaseViewHolder, item: ItemGroup) {
         val position = helper.adapterPosition
+        currentPostion = position
         sbBrightnessCW = helper.getView(R.id.normal_sbBrightness)
         sbtemperature = helper.getView(R.id.normal_temperature)
         addBrightnessCW = helper.getView(R.id.cw_brightness_add)
@@ -154,15 +149,14 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         // 窗帘的初始化
         curtainSeekbar.progress = item.curtainOnOffRange
-        tvCurRange.text = "幅度：${curtainSeekbar.progress}%"
+        tvCurRange.text = mContext.getString(R.string.curtain_range)+"${curtainSeekbar.progress}%"
 
-
-        val w = (item.color and 0xff000000.toInt()) shr 24
 //        LogUtils.v("chown --=-=-=-=-=--=- item.color $w")
         val r = Color.red(item.color)
         val g = Color.green(item.color)
         val b = Color.blue(item.color)
         //0x4FFFE0  不在使用  使用0来判断
+
         docOne.setChecked(true, if (r == 0 && g == 0 && b == 0) {
             docOneLy.visibility = View.GONE
             dotRgb.visibility = View.VISIBLE
@@ -175,106 +169,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             dotRgb.visibility = View.GONE
             (0x00ff0000 shl 8) or (item.color and 0xffffff)
         })
+
         helper.setText(R.id.name_gp, item.gpName)
-
-        when {
-            OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-                val progress = if (item.brightness != 0) item.brightness else 50
-                val white = if (w != 0) w else 50
-
-                helper.setProgress(R.id.rgb_sbBrightness, progress) // rgb 亮度
-                        .setProgress(R.id.rgb_white_seekbar, white) // 白光
-                        .setGone(R.id.speed_seekbar_alg_tv,true) // 速度显示
-                        .setProgress(R.id.speed_seekbar, item.gradientSpeed) // 速度条
-                        .setChecked(R.id.color_mode_rb, item.rgbType == 0) //颜色模式
-                        .setChecked(R.id.gradient_mode_rb, item.rgbType == 1) // 渐变模式
-                        .setText(R.id.sbBrightness_num, "$progress%") // 亮度百分值
-                        .setText(R.id.sb_w_bright_num, sbWhiteLightRGB.progress.toString() + "%") // 白光百分值
-                        .setText(R.id.speed_seekbar_alg_tv, (progress).toString() + "%") // 速度百分值
-                speedSeekbar?.progress = item.gradientSpeed.toFloat().toInt() //chown
-                helper.setText(R.id.speed_seekbar_alg_tv, (speedSeekbar?.progress).toString() + "%")
-
-                when (item.rgbType) {
-                    0 -> {
-                        visiableMode(helper, true)
-//                        setAlgClickAble(item, addBrightnessRGB, lessBrightnessRGB)
-                        if (item.isOn) {
-                            cbWhiteLight.isEnabled = true
-                            cbBright.isEnabled = true
-                            if (item.isEnableBright) { //chown 亮度
-                                sbBrightnessRGB.isEnabled = true
-                                when {
-                                    progress <= 1 -> {
-                                        addBrightnessRGB.isEnabled = true
-                                        lessBrightnessRGB.isEnabled = false
-                                    }
-                                    progress >=100 -> {
-                                        addBrightnessRGB.isEnabled = false
-                                        lessBrightnessRGB.isEnabled = true
-                                    }
-                                    else -> {
-                                        addBrightnessRGB.isEnabled = true
-                                        lessBrightnessRGB.isEnabled = true
-                                    }
-                                }
-                            } else {
-                                addBrightnessRGB.isEnabled = false
-                                lessBrightnessRGB.isEnabled = false
-                                sbBrightnessRGB.isEnabled = false
-                            }
-                            if (item.isEnableWhiteBright) {//chown 白光
-                                sbWhiteLightRGB.isEnabled = true
-                                when {
-                                    white <= 1 -> {
-                                        addWhiteLightRGB.isEnabled = true
-                                        lessWhiteLightRGB.isEnabled = false
-                                    }
-                                    white >= 100 -> {
-                                        addWhiteLightRGB.isEnabled = false
-                                        lessWhiteLightRGB.isEnabled = true
-                                    }
-                                    else -> {
-                                        addWhiteLightRGB.isEnabled = true
-                                        lessWhiteLightRGB.isEnabled = true
-                                    }
-                                }
-                            } else {
-                                sbWhiteLightRGB.isEnabled = false
-                                addWhiteLightRGB.isEnabled = false
-                                lessWhiteLightRGB.isEnabled = false
-                            }
-
-                        } else {
-                            cbWhiteLight.isEnabled = false
-                            cbBright.isEnabled = false
-                            addBrightnessRGB.isEnabled = false
-                            lessBrightnessRGB.isEnabled = false
-                            addWhiteLightRGB.isEnabled = false
-                            lessWhiteLightRGB.isEnabled = false
-                            sbWhiteLightRGB.isEnabled = false
-                            sbBrightnessRGB.isEnabled = false
-                        }
-                    }
-                    else -> {//渐变模式
-                        if (!TextUtils.isEmpty(item.gradientName))
-                            algText?.text = item.gradientName
-                        visiableMode(helper, false)
-//                        setAlgClickAble(item, addAlgSpeed!!, lessAlgSpeed!!, true)
-                    }
-                }
-            }
-            else -> {// 冷暖灯的场景设置就在这里了
-//                normalVisiableMode(helper, true)
-                val brightness = if(item.brightness!=50) item.brightness else 50
-                val temperature = if(item.temperature !=50) item.temperature else 50
-                helper.setProgress(R.id.normal_sbBrightness, brightness)
-                        .setProgress(R.id.normal_temperature, temperature)
-                        .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
-                        .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
-                // chown changed it
-            }
-        }
-
         isJBVisable(item, helper, position)
 
         sbBrightnessCW!!.tag = position
@@ -289,68 +185,22 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         sbBrightnessRGB.setOnSeekBarChangeListener(this)
         sbWhiteLightRGB.setOnSeekBarChangeListener(this)
         curtainSeekbar.setOnSeekBarChangeListener(this)
-//        curtainSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-//            @SuppressLint("SetTextI18n")
-//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-//                LogUtils.v("chown -- onprogress ${curtainSeekbar.progress} %")
-//                tvCurRange.text = "幅度：${curtainSeekbar.progress}%"
-//                data[position].curtainOnOffRange = progress
-//                item.curtainOnOffRange = progress
-//                when {
-//                    progress >= 100 -> {
-//                        curtainSeekbar.progress = 100
-//                        curtainRangeLess.isEnabled = true
-//                        curtainRangeAdd.isEnabled = false
-//                    }
-//                    progress <= 1 -> {
-//                        curtainSeekbar.progress = 1
-//                        curtainRangeLess.isEnabled = false
-//                        curtainRangeAdd.isEnabled = true
-//                    }
-//                    else -> {
-//                        curtainRangeLess.isEnabled = true
-//                        curtainRangeAdd.isEnabled = true
-//                    }
-//                }
-//            }
-//
-//            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-//
-//            }
-//
-//            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-//
-//            }
-//
-//        })
+
         speedSeekbar!!.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                val value = seekBar?.progress ?: 0
+                var value = seekBar?.progress ?: 1
+                if (value<1) value = 1
                 helper.setGone(R.id.speed_seekbar_alg_tv,true)
                 helper.setText(R.id.speed_seekbar_alg_tv, "$value%")
                 data[position].gradientSpeed = value
-                when {
-                    value >= 100 -> {
-                        seekBar?.progress = 100
-                        lessAlgSpeed?.isEnabled = true
-                        addAlgSpeed?.isEnabled = false
-                    }
-                    value <= 1 -> {
-                        seekBar?.progress = 1
-                        lessAlgSpeed?.isEnabled = false
-                        addAlgSpeed?.isEnabled = true
-                    }
-                    else -> {
-                        lessAlgSpeed?.isEnabled = true
-                        addAlgSpeed?.isEnabled = true
-                    }
-                }
+                LogUtils.v("chown ---- speed ${data[position].gradientSpeed}")
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                notifyItemChanged(position)
             }
 
 
@@ -368,6 +218,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 .addOnClickListener(R.id.cb_white_light)
                 .addOnClickListener(R.id.color_mode_rb)
                 .addOnClickListener(R.id.gradient_mode_rb)
+
 
         addTemperatureCW!!.setOnTouchListener { _, event ->
             currentPostion = position
@@ -429,58 +280,56 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         }
         curtainRangeAdd.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
+                currentPostion = position
                 val value = ++curtainSeekbar.progress
                 data[position].curtainOnOffRange = curtainSeekbar.progress
                 item.curtainOnOffRange = curtainSeekbar.progress
                 curtainRangeAdd.isEnabled = value < 100
-            }
-            if(event.action== MotionEvent.ACTION_MOVE) {
-                val value = ++curtainSeekbar.progress
-                data[position].curtainOnOffRange = curtainSeekbar.progress
-                item.curtainOnOffRange = curtainSeekbar.progress
-                curtainRangeAdd.isEnabled = value < 100
-                GlobalScope.launch {
-                    delay(200)
-                }
+                helper.setText(R.id.tv_cur_range,mContext.getString(R.string.curtain_range)+curtainSeekbar.progress.toString()+"%")
             }
             true
         }
         curtainRangeLess.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP){
+                currentPostion = position
                 val value = --curtainSeekbar.progress
                 data[position].curtainOnOffRange = curtainSeekbar.progress
                 item.curtainOnOffRange = curtainSeekbar.progress
-                curtainRangeLess.isEnabled = value != 1
+                curtainRangeLess.isEnabled = value > 1
+                helper.setText(R.id.tv_cur_range,mContext.getString(R.string.curtain_range)+curtainSeekbar.progress.toString()+"%")
             }
             true
         }
+
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position
+    }
+
+    override fun getItemCount(): Int {
+        return data.size
     }
 
     private fun isJBVisable(item: ItemGroup, helper: BaseViewHolder, position: Int) {
         when {
-            OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
-//                getViewByPosition(recyclerView,position,R.id.cw_scene)?.visibility = View.GONE
-                helper.setGone(R.id.tv_select_color, true)
-                        .setGone(R.id.top_rg_ly, true)
-                        .setGone(R.id.switch_scene, false)
-                        .setGone(R.id.cw_scene, false) //chown
-                when (item.rgbType) {//rgb 类型 0:颜色模式 1：渐变模式
-                    0 -> visiableMode(helper, true)
-                    1 -> visiableMode(helper, false)
-                }
-            }
             OtherUtils.isNormalGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) || item.groupAddress == 0xffff -> {
-                getViewByPosition(position,R.id.cw_scene)?.visibility = View.VISIBLE
                 helper.setGone(R.id.oval, true)
-                        .setGone(R.id.tv_select_color, false)
-                        .setGone(R.id.dot_rgb, false)
-                        .setGone(R.id.dot_one_ly, false)
-                        .setGone(R.id.rgb_scene, false)
-                        .setGone(R.id.top_rg_ly, false)
-                        .setGone(R.id.alg_ly, false)
-//                        .setGone(R.id.cw_scene, true)
-                        .setGone(R.id.switch_scene, false)
-                topRgLy?.visibility = View.GONE
+                    .setGone(R.id.cw_scene, true)
+                    .setGone(R.id.tv_select_color, false)
+                    .setGone(R.id.dot_rgb, false)
+                    .setGone(R.id.dot_one_ly, false)
+                    .setGone(R.id.rgb_scene, false)
+                    .setGone(R.id.top_rg_ly, false)
+                    .setGone(R.id.alg_ly, false)
+                    .setGone(R.id.switch_scene, false)
+
+                val brightness = if(item.brightness!=50) item.brightness else 50
+                val temperature = if(item.temperature !=50) item.temperature else 50
+                helper.setProgress(R.id.normal_sbBrightness, brightness)
+                    .setProgress(R.id.normal_temperature, temperature)
+                    .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
+                    .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
                 if (item.isOn) {
                     sbBrightnessCW!!.isEnabled = true
                     sbtemperature!!.isEnabled = true
@@ -496,6 +345,103 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     lessTemperatureCW!!.isEnabled = false
                     addTemperatureCW!!.isEnabled = false
                 }
+            }
+            OtherUtils.isRGBGroup(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
+                helper.setGone(R.id.tv_select_color, true)
+                        .setGone(R.id.top_rg_ly, true)
+                        .setGone(R.id.switch_scene, false)
+                        .setGone(R.id.cw_scene, false)
+                val w = (item.color and 0xff000000.toInt()) shr 24
+                val progress = if (item.brightness != 0) item.brightness else 50
+                val white = if (w != 0) w else 50
+                LogUtils.v("chown ---- speedbar ---${item.gradientSpeed}")
+                helper.setProgress(R.id.rgb_sbBrightness, progress) // rgb 亮度
+                    .setProgress(R.id.rgb_white_seekbar, white) // 白光
+                    .setGone(R.id.speed_seekbar_alg_tv,true) // 速度显示
+                    .setProgress(R.id.speed_seekbar, item.gradientSpeed) // 速度条
+                    .setOnCheckedChangeListener(R.id.color_mode_rb,null)
+                    .setChecked(R.id.color_mode_rb, item.rgbType == 0) //颜色模式
+                    .setOnCheckedChangeListener(R.id.color_mode_rb,null)
+                    .setOnCheckedChangeListener(R.id.gradient_mode_rb,null)
+                    .setChecked(R.id.gradient_mode_rb, item.rgbType == 1) // 渐变模式
+                    .setOnCheckedChangeListener(R.id.gradient_mode_rb,null)
+                    .setText(R.id.sbBrightness_num, "$progress%") // 亮度百分值
+                    .setText(R.id.sb_w_bright_num, sbWhiteLightRGB.progress.toString() + "%") // 白光百分值
+                    .setText(R.id.speed_seekbar_alg_tv, item.gradientSpeed.toString() + "%") // 速度百分值
+
+                when (item.rgbType) {
+                    0 -> {
+                        visiableMode(helper, true)
+//                        setAlgClickAble(item, addBrightnessRGB, lessBrightnessRGB)
+                        if (item.isOn) {
+                            cbWhiteLight.isEnabled = true
+                            cbBright.isEnabled = true
+                            if (item.isEnableBright) { //chown 亮度
+                                sbBrightnessRGB.isEnabled = true
+                                when {
+                                    progress <= 1 -> {
+                                        sbBrightnessRGB.progress = 1
+                                        addBrightnessRGB.isEnabled = true
+                                        lessBrightnessRGB.isEnabled = false
+                                    }
+                                    progress >=100 -> {
+                                        sbBrightnessRGB.progress = 100
+                                        addBrightnessRGB.isEnabled = false
+                                        lessBrightnessRGB.isEnabled = true
+                                    }
+                                    else -> {
+                                        addBrightnessRGB.isEnabled = true
+                                        lessBrightnessRGB.isEnabled = true
+                                    }
+                                }
+                            } else {
+                                addBrightnessRGB.isEnabled = false
+                                lessBrightnessRGB.isEnabled = false
+                                sbBrightnessRGB.isEnabled = false
+                            }
+                            if (item.isEnableWhiteBright) {//chown 白光
+                                sbWhiteLightRGB.isEnabled = true
+                                when {
+                                    white <= 1 -> {
+                                        sbWhiteLightRGB.progress = 1
+                                        addWhiteLightRGB.isEnabled = true
+                                        lessWhiteLightRGB.isEnabled = false
+                                    }
+                                    white >= 100 -> {
+                                        sbWhiteLightRGB.progress = 100
+                                        addWhiteLightRGB.isEnabled = false
+                                        lessWhiteLightRGB.isEnabled = true
+                                    }
+                                    else -> {
+                                        addWhiteLightRGB.isEnabled = true
+                                        lessWhiteLightRGB.isEnabled = true
+                                    }
+                                }
+                            } else {
+                                sbWhiteLightRGB.isEnabled = false
+                                addWhiteLightRGB.isEnabled = false
+                                lessWhiteLightRGB.isEnabled = false
+                            }
+
+                        } else {
+                            cbWhiteLight.isEnabled = false
+                            cbBright.isEnabled = false
+                            addBrightnessRGB.isEnabled = false
+                            lessBrightnessRGB.isEnabled = false
+                            addWhiteLightRGB.isEnabled = false
+                            lessWhiteLightRGB.isEnabled = false
+                            sbWhiteLightRGB.isEnabled = false
+                            sbBrightnessRGB.isEnabled = false
+                        }
+                    }
+                    else -> {//渐变模式
+                        if (!TextUtils.isEmpty(item.gradientName))
+                            algText?.text = item.gradientName
+                        visiableMode(helper, false)
+//                        setAlgClickAble(item, addAlgSpeed!!, lessAlgSpeed!!, true)
+                    }
+                }
+
             }
             OtherUtils.isConnector(DBUtils.getGroupByMeshAddr(item.groupAddress)) -> {
                 helper.setGone(R.id.oval, true)
@@ -515,11 +461,15 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 topRgLy?.visibility = View.GONE
                 when {
                     item.isOn -> {
-                        helper.setChecked(R.id.rg_xx, true)
+                        helper.setOnCheckedChangeListener(R.id.rg_xx,null)
+                            .setChecked(R.id.rg_xx, true)
+                            .setOnCheckedChangeListener(R.id.rg_xx,null)
                         helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_yes)
                     }
                     else -> {
-                        helper.setChecked(R.id.rg_yy, true)
+                        helper.setOnCheckedChangeListener(R.id.rg_yy,null)
+                            .setChecked(R.id.rg_yy, true)
+                            .setOnCheckedChangeListener(R.id.rg_yy,null)
                         helper.setImageResource(R.id.scene_relay, R.drawable.scene_acceptor_no)
                     }
                 }
@@ -541,12 +491,16 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.curtain_seekbar,true)
                 topRgLy?.visibility = View.GONE
                 if (item.isOn) {
-                    helper.setChecked(R.id.rg_xx, true)
+                    helper.setOnCheckedChangeListener(R.id.rg_xx,null)
+                        .setChecked(R.id.rg_xx, true)
+                        .setOnCheckedChangeListener(R.id.rg_xx,null)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_yes)
                     curtainRangeLess.isEnabled = curtainSeekbar.progress > 1
                     curtainRangeAdd.isEnabled = curtainSeekbar.progress < 100
                 } else {
-                    helper.setChecked(R.id.rg_yy, true)
+                    helper.setOnCheckedChangeListener(R.id.rg_yy,null)
+                        .setChecked(R.id.rg_yy, true)
+                        .setOnCheckedChangeListener(R.id.rg_yy,null)
                     helper.setImageResource(R.id.scene_curtain, R.drawable.scene_curtain_no)
                     curtainRangeLess.isEnabled = curtainSeekbar.progress > 1
                     curtainRangeAdd.isEnabled = curtainSeekbar.progress < 100
@@ -562,7 +516,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                         .setGone(R.id.alg_ly, false)
                         .setGone(R.id.cw_scene, true)
                         .setGone(R.id.switch_scene, false)
-                topRgLy?.visibility = View.GONE
+
             }
         }
     }
@@ -624,37 +578,18 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 .setGone(R.id.alg_ly, !isVisible)
         when {
             isVisible -> {
-                algLy?.visibility = View.GONE
+//                algLy?.visibility = View.GONE
                 helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.blue_text))
                         .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.gray9))
             }
             else -> {
-                algLy?.visibility = View.VISIBLE
+//                algLy?.visibility = View.VISIBLE
                 helper.setTextColor(R.id.color_mode_rb, mContext.getColor(R.color.gray9))
                         .setTextColor(R.id.gradient_mode_rb, mContext.getColor(R.color.blue_text))
             }
         }
     }
-//    private fun normalVisiableMode(helper: BaseViewHolder, isVisible: Boolean) {
-//        helper.setGone(R.id.cw_scene,isVisible)
-//    }
-//
-//    private fun setAlgClickAble(item: ItemGroup, addBtn: ImageView, lessBtn: ImageView, isGradient: Boolean = false) {
-//        when {
-//            item.brightness <= 1 -> {
-//                addBtn.isEnabled = true
-//                lessBtn.isEnabled = false
-//            }
-//            item.brightness >= 100 -> {
-//                addBtn.isEnabled = false
-//                lessBtn.isEnabled = true
-//            }
-//            else -> {
-//                addBtn.isEnabled = true
-//                lessBtn.isEnabled = true
-//            }
-//        }
-//    }
+
 
     private fun lessAlgSpeedNum(event: MotionEvent?, position: Int) {
         when {
@@ -833,7 +768,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     @SuppressLint("CheckResult")
     open fun routeConfigBriGpOrLight(meshAddr: Int, deviceType: Int, brightness: Int, serId: String) {
         LogUtils.v("zcl-----------发送路由调光参数-------$brightness")
-        var isEnableBright = if (brightness == 0) 0 else 1
+        val isEnableBright = if (brightness == 0) 0 else 1
         RouterModel.routeConfigBrightness(meshAddr, deviceType, brightness, isEnableBright, serId)?.subscribe({
             //    "errorCode": 90018"该设备不存在，请重新刷新数据"    "errorCode": 90008,"该设备没有绑定路由，无法操作"
             //    "errorCode": 90007,"该组不存在，请重新刷新数据    "errorCode": 90005"message": "该设备绑定的路由没在线"
@@ -1616,7 +1551,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         val red = Color.red(itemGroup.color) //
         val green = Color.green(itemGroup.color) //
-        val blue = Color.red(itemGroup.color) //
+        val blue = Color.blue(itemGroup.color) //
 
         when {
             seekBar.progress < 1 -> {
@@ -1677,7 +1612,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
         val red = Color.red(itemGroup.color)
         val green = Color.green(itemGroup.color)
-        val blue = Color.red(itemGroup.color)
+        val blue = Color.blue(itemGroup.color)
         when {
             seekBar.progress > 100 -> {
                 addImage!!.isEnabled = false
@@ -1733,12 +1668,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 clickType = 3
                 when {
                     seek!!.progress <= 1 -> {
-                        sbBrightnessCW!!.progress = 1
+                        seek.progress = 1
                         lessImage!!.isEnabled = false
                         addImage!!.isEnabled = true
                     }
                     seek.progress >= 100 -> {
-                        sbBrightnessCW!!.progress = 100
+                        seek.progress = 100
                         lessBrightnessCW!!.isEnabled = true
                         addImage!!.isEnabled = false
                     }
@@ -1754,9 +1689,6 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 val lessImage = getViewByPosition(pos, R.id.temperature_less) as ImageView?
                 val addImage = getViewByPosition(pos, R.id.temperature_add) as ImageView?
 
-//                sbtemperature  //替换seek
-//                lessTemperatureCW // 替换lessImage
-//                addTemperatureCW //替换addImage
                 itemGroup.temperature = sbtemperature!!.progress
                 opcode = Opcode.SET_TEMPERATURE
                 clickType = 1
@@ -1764,12 +1696,12 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
 
                 when {
                     seek!!.progress <= 1 -> {
-                        sbtemperature!!.progress = 1
+                        seek.progress = 1
                         addImage!!.isEnabled = true
                         lessImage!!.isEnabled = false
                     }
                     seek.progress >= 100 -> {
-                        sbtemperature!!.progress = 100
+                        seek.progress = 100
                         addImage!!.isEnabled = false
                         lessImage!!.isEnabled = true
                     }
@@ -1812,7 +1744,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 val addImage = getViewByPosition(pos, R.id.sb_w_bright_add) as ImageView?
                 val red = Color.red(itemGroup.color)
                 val green = Color.green(itemGroup.color)
-                val blue = Color.red(itemGroup.color)
+                val blue = Color.blue(itemGroup.color)
                 itemGroup.color = (seek!!.progress shl 24) or (red shl 16) or (green shl 8) or blue
                 opcode = Opcode.SET_W_LUM
                 clickType = 7
@@ -1834,8 +1766,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 }
             }
             R.id.curtain_seekbar -> {
-                LogUtils.v("chown -- onprogress ${curtainSeekbar.progress} %")
-                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.tv_cur_range)) as TextView).text = "幅度：" + seekBar.progress.toString() + "%"
+                (Objects.requireNonNull<View>(getViewByPosition(pos, R.id.tv_cur_range)) as TextView).text = mContext.getString(R.string.curtain_range) + seekBar.progress.toString() + "%"
                 val seek = getViewByPosition(pos, R.id.curtain_seekbar) as SeekBar?
                 val lessImage = getViewByPosition(pos, R.id.curtain_range_less) as ImageView?
                 val addImage = getViewByPosition(pos, R.id.curtain_range_add) as ImageView?
@@ -1875,21 +1806,27 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 LogUtils.v("zcl--进度条-----position$position----------")
                 val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
                 if (tvBrightness != null) {
+                    if (progress<=1)
+                        tvBrightness.text = "1%"
                     //  data[position].brightness = progress
-                    tvBrightness.text = "$progress%"
+                    else
+                        tvBrightness.text = "$progress%"
                 }
             }
             R.id.normal_temperature -> {
                 val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
                 if (tvTemperature != null) {
-                    tvTemperature.text = "$progress%"
+                    if (progress<=1)
+                        tvTemperature.text = "1%"
+                    else
+                        tvTemperature.text = "$progress%"
                     // data[position].temperature = progress
                 }
             }
             R.id.rgb_sbBrightness -> {
                 val tvBrightnessRGB = getViewByPosition(position, R.id.sbBrightness_num) as TextView?
                 if (tvBrightnessRGB != null) {
-                    if (progress == 0)
+                    if (progress <= 1)
                         tvBrightnessRGB.text = "1%"
                     else
                         tvBrightnessRGB.text = "$progress%"
@@ -1899,18 +1836,25 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             R.id.rgb_white_seekbar -> {
                 val tvSbWhiteLight = getViewByPosition(position, R.id.sb_w_bright_num) as TextView?
                 if (tvSbWhiteLight != null) {
-                    tvSbWhiteLight.text = "$progress%"
+                    if (progress <= 1)
+                        tvSbWhiteLight.text = "1%"
+                    else
+                        tvSbWhiteLight.text = "$progress%"
                     val itemGroup = data[position]
                     val red = Color.red(itemGroup.color)
                     val green = Color.green(itemGroup.color)
-                    val blue = Color.red(itemGroup.color)
+                    val blue = Color.blue(itemGroup.color)
                     itemGroup.color = (progress shl 24) or (red shl 16) or (green shl 8) or blue
+                    LogUtils.v("Chown ----0-0--0- color   ${itemGroup.color}")
                 }
             }
             R.id.curtain_seekbar -> {
                 val tvCurtain = getViewByPosition(position, R.id.tv_cur_range) as TextView?
                 if (tvCurtain!=null) {
-                    tvCurtain.text = "幅度：$progress%"
+                    if (progress <= 1)
+                        tvCurtain.text = mContext.getString(R.string.curtain_range)+"1%"
+                    else
+                        tvCurtain.text = mContext.getString(R.string.curtain_range)+"$progress%"
                 }
             }
         }
@@ -1933,6 +1877,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             Opcode.SET_W_LUM -> {
                 data[currentPostion].color = (progressCmd shl 24) or (Color.red(data[currentPostion].color) shl 16) or
                         (Color.green(data[currentPostion].color) shl 8) or Color.blue(data[currentPostion].color)
+                LogUtils.v("chown -=-=-=- color   ${data[currentPostion].color}")
                 byteArrayOf(progressCmd.toByte())
             }
             else -> {

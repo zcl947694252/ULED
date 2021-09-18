@@ -109,7 +109,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     @SuppressLint("CheckResult")
     @RequiresApi(Build.VERSION_CODES.O)
     internal var onItemChildClickListener = BaseQuickAdapter.OnItemChildClickListener { adapter, view, position ->
-        if (position>scenesListData.size)
+        if (position > scenesListData.size)
             return@OnItemChildClickListener
         currentDbScene = scenesListData[position]
         if (dialog_pop.visibility == View.GONE || dialog_pop == null) {
@@ -156,12 +156,12 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                                                         showLoadingDialog(getString(R.string.please_wait))
                                                         disposableRouteTimer?.dispose()
                                                         disposableRouteTimer = Observable.timer(it.t.timeout.toLong(), TimeUnit.SECONDS)
-                                                                .subscribeOn(Schedulers.io())
-                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                .subscribe {
-                                                                    hideLoadingDialog()
-                                                                    ToastUtils.showShort(getString(R.string.scene_apply_fail))
-                                                                }
+                                                            .subscribeOn(Schedulers.io())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe {
+                                                                hideLoadingDialog()
+                                                                ToastUtils.showShort(getString(R.string.scene_apply_fail))
+                                                            }
                                                     }
                                                     90011 -> ToastUtils.showShort(getString(R.string.scene_cont_exit_to_refresh))
                                                     90005 -> ToastUtils.showShort(getString(R.string.router_offline))
@@ -215,21 +215,24 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
             val list = DBUtils.getActionsBySceneId(id)
             if (Constant.IS_ROUTE_MODE) {
                 RouterModel.routeDelScene(id.toInt())
-                        ?.subscribe({
-                            when (it.errorCode) {
-                                OK->{
-                                    startDelSceneTimeOut(it.t)
-                                }
-                                ROUTER_DEL_SCENE_NOT_EXITE, ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE, ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(list, dbScene)
-                                //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
-                                // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
-                                ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
-                                ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
-                                else -> ToastUtils.showShort(it.message)
+                    ?.subscribe({
+                        when (it.errorCode) {
+                            OK -> {
+                                startDelSceneTimeOut(it.t)
                             }
-                        }, {
-                            ToastUtils.showShort(it.message)
-                        })
+                            ROUTER_DEL_SCENE_NOT_EXITE, ROUTER_DEL_SCENEACTION_CAN_NOT_PARSE, ROUTER_DEL_SCENE_NO_GP -> deleteSceneSuccess(
+                                list,
+                                dbScene
+                            )
+                            //该账号该区域下没有路由，无法操作 ROUTER_NO_EXITE= 90004
+                            // 以下路由没有上线，无法删除场景  ROUTER_ALL_OFFLINE= 90005
+                            ROUTER_NO_EXITE -> ToastUtils.showShort(getString(R.string.region_no_router))
+                            ROUTER_ALL_OFFLINE -> ToastUtils.showShort(getString(R.string.router_offline))
+                            else -> ToastUtils.showShort(it.message)
+                        }
+                    }, {
+                        ToastUtils.showShort(it.message)
+                    })
             } else {
                 val opcode = Opcode.SCENE_ADD_OR_DEL
                 Thread.sleep(300)
@@ -246,13 +249,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     private fun startDelSceneTimeOut(it: RouterTimeoutBean?) {
         val i = it?.timeout ?: 0
         disposableRouteTimer?.dispose()
-        disposableRouteTimer = Observable.timer(i.toLong()+2L, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    LogUtils.v("zcl-----------收到路由超时大汗出失败-------$i")
-                    ToastUtils.showShort(getString(R.string.delete_scene_fail))
-                }
+        disposableRouteTimer = Observable.timer(i.toLong() + 2L, TimeUnit.SECONDS)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                LogUtils.v("zcl-----------收到路由超时大汗出失败-------$i")
+                ToastUtils.showShort(getString(R.string.delete_scene_fail))
+            }
     }
 
     private fun deleteSceneSuccess(list: ArrayList<DbSceneActions>, dbScene: DbScene) {
@@ -262,7 +265,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         scenesListData.remove(dbScene)
         adaper?.notifyDataSetChanged()
         //refreshAllData()
-       // refreshView()
+        // refreshView()
     }
 
     @SuppressLint("CheckResult")
@@ -281,13 +284,15 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                 if (!TelinkLightApplication.getApp().offLine) {
                     disposableTimer?.dispose() // rxjava 解除订阅
                     disposableTimer = Observable.timer(7000, TimeUnit.MILLISECONDS)
-                            .subscribeOn(Schedulers.io())
-                            .observeOn(AndroidSchedulers.mainThread()).subscribe {
-                                hideLoadingDialog()
-                                ToastUtils.showShort(getString(R.string.gate_way_offline))
-                            }
-                    val gattPar = byteArrayOf(0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
-                            dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread()).subscribe {
+                            hideLoadingDialog()
+                            ToastUtils.showShort(getString(R.string.gate_way_offline))
+                        }
+                    val gattPar = byteArrayOf(
+                        0x11, 0x11, 0x11, 0, 0, 0xff.toByte(), 0xff.toByte(), Opcode.SCENE_LOAD, 0x11, 0x02,
+                        dbScene.id.toByte(), 0, 0, 0, 0, 0, 0, 0, 0, 0
+                    )
 
                     val gattBody = GwGattBody2()
                     gattBody.ser_id = Constant.SER_ID_SCENE_ON
@@ -367,22 +372,22 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         //设置光标默认在最后
         textGp.setSelection(textGp.text.toString().length)
         AlertDialog.Builder(activity)
-                .setTitle(R.string.create_new_group)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setView(textGp)
+            .setTitle(R.string.create_new_group)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .setView(textGp)
 
-                .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
-                    // 获取输入框的内容
-                    if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
-                        ToastUtils.showLong(getString(R.string.rename_tip_check))
-                    } else {
-                        //往DB里添加组数据
-                        DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
-                        callbackLinkMainActAndFragment?.changeToGroup()
-                        dialog.dismiss()
-                    }
+            .setPositiveButton(getString(android.R.string.ok)) { dialog, _ ->
+                // 获取输入框的内容
+                if (StringUtils.compileExChar(textGp.text.toString().trim { it <= ' ' })) {
+                    ToastUtils.showLong(getString(R.string.rename_tip_check))
+                } else {
+                    //往DB里添加组数据
+                    DBUtils.addNewGroupWithType(textGp.text.toString().trim { it <= ' ' }, Constant.DEVICE_TYPE_DEFAULT_ALL)
+                    callbackLinkMainActAndFragment?.changeToGroup()
+                    dialog.dismiss()
                 }
-                .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
+            }
+            .setNegativeButton(getString(R.string.btn_cancel)) { dialog, _ -> dialog.dismiss() }.show()
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
@@ -392,7 +397,6 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         }, 200)
     }
 
-
     private fun initToolBar(view: View) {
         setHasOptionsMenu(true)
         toolbar = view.findViewById(R.id.toolbar)
@@ -401,14 +405,13 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
         val btnAdd = toolbar?.findViewById<ImageView>(R.id.img_function1)
         val btnDelete = toolbar?.findViewById<ImageView>(R.id.img_function2)
         val orderScene = toolbar?.findViewById<TextView>(R.id.order_scene)
-//        orderScene?.visibility=View.VISIBLE // chown
+        orderScene?.visibility = View.VISIBLE // chown
         btnAdd?.visibility = View.GONE
 
         btnAdd?.setOnClickListener(this)
         btnDelete?.setOnClickListener(this)
         orderScene?.setOnClickListener(this)
     }
-
 
     private fun initOnLayoutListener() {
         if (activity != null) {
@@ -451,7 +454,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
 
 
         val emptyView = View.inflate(context, R.layout.empty_view, null)
-         emptyAdd = emptyView.findViewById(R.id.add_device_btn)
+        emptyAdd = emptyView.findViewById(R.id.add_device_btn)
         emptyAdd?.text = getString(R.string.create_scene)
         emptyAdd?.setOnClickListener(this)
         adaper?.addFooterView(footer)
@@ -538,7 +541,7 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 4) {
-            if (resultCode == Activity.RESULT_OK)  {
+            if (resultCode == Activity.RESULT_OK) {
                 scenesListData.clear()
                 scenesListData = DBUtils.sceneList
                 scenesListData.sortBy {
@@ -684,11 +687,11 @@ class SceneFragment : BaseFragment(), Toolbar.OnMenuItemClickListener, View.OnCl
                             }
                         }
                         R.id.order_scene -> { //chown
-                            val intent = Intent(activity,SceneSortActivity::class.java)
+                            val intent = Intent(activity, SceneSortActivity::class.java)
 
-                            startActivityForResult(intent,4)
+                            startActivityForResult(intent, 4)
                         }
-                        R.id.add_device_btn , R.id.main_add_device -> addNewScenes()
+                        R.id.add_device_btn, R.id.main_add_device -> addNewScenes()
                         R.id.main_go_help -> seeHelpe()
                     }
                 }
