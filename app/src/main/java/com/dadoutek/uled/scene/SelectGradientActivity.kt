@@ -2,9 +2,11 @@ package com.dadoutek.uled.scene
 
 import android.app.Activity
 import android.content.Intent
+import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dadoutek.uled.R
 import com.dadoutek.uled.base.BaseActivity
+import com.dadoutek.uled.base.TelinkBaseActivity
 import com.dadoutek.uled.model.dbModel.DBUtils
 import com.dadoutek.uled.model.dbModel.DbDiyGradient
 import com.dadoutek.uled.model.ItemRgbGradient
@@ -21,25 +23,32 @@ import kotlinx.android.synthetic.main.toolbar.*
  * 更新时间   $
  * 更新描述
  */
-class SelectGradientActivity : BaseActivity() {
+class SelectGradientActivity : TelinkBaseActivity() {
     private lateinit var currentRgbGradient: ItemRgbGradient
     private lateinit var diyGradientList: MutableList<DbDiyGradient>
     private var buildInModeList: ArrayList<ItemRgbGradient> = ArrayList()
     private val rgbSceneModeAdapter: RgbSceneModeAdapter = RgbSceneModeAdapter(R.layout.scene_mode, buildInModeList)
-    override fun initListener() {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_select_gradient)
+        initView()
+        initData()
     }
 
-    override fun initData() {
-        getModeData()
+//    fun initListener() {
+//
+//    }
 
+    fun initData() {
+        getModeData()
     }
 
     private fun getModeData() {
         buildInModeList.clear()
         val presetGradientList = resources.getStringArray(R.array.preset_gradient)
         for (i in 1..11) {
-            var item = ItemRgbGradient()
+            val item = ItemRgbGradient()
             item.id = i
             item.gradientType = 2//渐变类型 1：自定义渐变  2：内置渐变
             item.name = presetGradientList[i - 1]
@@ -48,7 +57,7 @@ class SelectGradientActivity : BaseActivity() {
 
         diyGradientList = DBUtils.diyGradientList
         diyGradientList.forEach {
-            var item = ItemRgbGradient()
+            val item = ItemRgbGradient()
             item.id = it.id.toInt()
             item.name = it.name
             item.isDiy = true
@@ -60,25 +69,24 @@ class SelectGradientActivity : BaseActivity() {
 
     }
 
-    override fun initView() {
+    fun initView() {
         toolbar.setNavigationIcon(R.drawable.icon_return)
         toolbar.setNavigationOnClickListener {
             finish()
         }
         toolbarTv.text = getString(R.string.model_list)
-        template_recycleView.layoutManager = LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.VERTICAL, false)
+        template_recycleView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         template_recycleView.adapter = this.rgbSceneModeAdapter
         rgbSceneModeAdapter.setOnItemClickListener { _, _, position ->
             currentRgbGradient = buildInModeList[position]
-            var intent = Intent()
+            val intent = Intent()
             intent.putExtra("data", currentRgbGradient)
             setResult(Activity.RESULT_OK,intent)
             finish()
         }
     }
 
-    override fun setLayoutID(): Int {
-        return R.layout.activity_select_gradient
-
-    }
+//    fun setLayoutID(): Int {
+//        return R.layout.activity_select_gradient
+//    }
 }

@@ -259,10 +259,10 @@
                             android:layout_marginStart="@dimen/dp_10"
                             android:layout_marginTop="10dp"
                             android:layout_marginEnd="10dp"
-                            android:max="100"
+                            android:max="101"
                             android:min="1"
                             android:padding="5dp"
-                            android:progress="100"
+                            android:progress="1"
                              />
 
                     <LinearLayout
@@ -350,9 +350,9 @@
                             style="@style/SeekBarStyle"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
-                            android:max="100"
+                            android:max="101"
                             android:min="1"
-                            android:progress="100" />
+                            android:progress="1" />
 
                     <LinearLayout
                             android:layout_width="wrap_content"
@@ -472,9 +472,9 @@
                             style="@style/SeekBarStyle"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
-                            android:max="100"
+                            android:max="101"
                             android:min="1"
-                            android:progress="100" />
+                            android:progress="1" />
 
                     <LinearLayout
                             android:layout_width="wrap_content"
@@ -591,11 +591,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:max="100"
+                    android:max="101"
                     android:min="1"
                     android:paddingStart="25dp"
                     android:paddingEnd="28dp"
-                    android:progress="100"
+                    android:progress="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/normal_title_ld_ly" />
@@ -670,11 +670,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:max="100"
+                    android:max="101"
                     android:min="1"
                     android:paddingStart="25dp"
                     android:paddingEnd="28dp"
-                    android:progress="100"
+                    android:progress="1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/normal_title_sw_ly" />
@@ -750,9 +750,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:visibility="gone"
-                    android:progress="100"
+                    android:progress="1"
                     android:min="1"
-                    android:max="100"
+                    android:max="101"
                     app:layout_constraintTop_toBottomOf="@+id/tv_cur_range"
                     />
             <LinearLayout

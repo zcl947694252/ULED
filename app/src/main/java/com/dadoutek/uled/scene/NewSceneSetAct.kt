@@ -893,7 +893,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
         dbScene?.name = name
         dbScene?.imgName = sceneIcon
         dbScene?.belongRegionId = SharedPreferencesUtils.getCurrentUseRegionId()
-        dbScene?.index = getSceneIndex()
+        dbScene?.index = dbScene?.id!!.toInt()
 
         val belongSceneId = dbScene?.id!!
         DBUtils.deleteSceneActionsList(DBUtils.getActionsBySceneId(belongSceneId))
@@ -995,6 +995,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
             sceneActions.brightness = item.brightness
             sceneActions.colorTemperature = item.temperature
             sceneActions.curtainOnOffRange = item.curtainOnOffRange
+            sceneActions.gradientSpeed = item.gradientSpeed
             sceneActions.setColor(item.color)
             LogUtils.v("zcl--白色-${(item.color and 0xff000000.toInt()) shr 24}--亮度${item.brightness}---------色温${item.temperature}----")
 //            LogUtils.v("chown --====================================item.curtainOnOffRange ${item.curtainOnOffRange}")
@@ -1152,7 +1153,7 @@ class NewSceneSetAct : TelinkBaseActivity() {
                 finish()
             }
         }
-//this@NewSceneSetAct.runOnUiThread {  hideLoadingDialog() }
+        //this@NewSceneSetAct.runOnUiThread {  hideLoadingDialog() }
     }
 
     @SuppressLint("CheckResult")

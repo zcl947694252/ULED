@@ -37,6 +37,7 @@ import com.warkiz.widget.IndicatorSeekBar
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_ota.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,8 +58,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
     private var currentPostion: Int = 0
     private var isBrightness: Boolean = false
     private var algText: TextView? = null
-    private var addAlgSpeed: ImageView? = null
-    private var lessAlgSpeed: ImageView? = null
+//    private var addAlgSpeed: ImageView? = null
+//    private var lessAlgSpeed: ImageView? = null
     private var speedSeekbar: SeekBar? = null
     private var algLy: LinearLayout? = null
     private var topRgLy: RadioGroup? = null
@@ -121,8 +122,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
         addWhiteLightRGB = helper.getView(R.id.sb_w_bright_add)
         lessWhiteLightRGB = helper.getView(R.id.sb_w_bright_less)
 
-        addAlgSpeed = helper.getView(R.id.speed_seekbar_alg_add)
-        lessAlgSpeed = helper.getView(R.id.speed_seekbar_alg_less)
+//        addAlgSpeed = helper.getView(R.id.speed_seekbar_alg_add)
+//        lessAlgSpeed = helper.getView(R.id.speed_seekbar_alg_less)
 
         topRgLy = helper.getView(R.id.top_rg_ly)
         algLy = helper.getView(R.id.alg_ly)
@@ -268,16 +269,16 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             lessRGBWhiteLight(event, position)
             true
         }
-        addAlgSpeed?.setOnTouchListener { _, event ->
-            currentPostion = position
-            addAlgSpeedNum(event, position)
-            true
-        }
-        lessAlgSpeed?.setOnTouchListener { _, event ->
-            currentPostion = position
-            lessAlgSpeedNum(event, position)
-            true
-        }
+//        addAlgSpeed?.setOnTouchListener { _, event ->
+//            currentPostion = position
+//            addAlgSpeedNum(event, position)
+//            true
+//        }
+//        lessAlgSpeed?.setOnTouchListener { _, event ->
+//            currentPostion = position
+//            lessAlgSpeedNum(event, position)
+//            true
+//        }
         curtainRangeAdd.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 currentPostion = position
@@ -328,8 +329,8 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 val temperature = if(item.temperature !=50) item.temperature else 50
                 helper.setProgress(R.id.normal_sbBrightness, brightness)
                     .setProgress(R.id.normal_temperature, temperature)
-                    .setText(R.id.cw_brightness_num, sbBrightnessCW!!.progress.toString() + "%")
-                    .setText(R.id.temperature_num, sbtemperature!!.progress.toString() + "%")
+                    .setText(R.id.cw_brightness_num,  "$brightness%")
+                    .setText(R.id.temperature_num, "$temperature%")
                 if (item.isOn) {
                     sbBrightnessCW!!.isEnabled = true
                     sbtemperature!!.isEnabled = true
@@ -366,7 +367,7 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                     .setChecked(R.id.gradient_mode_rb, item.rgbType == 1) // 渐变模式
                     .setOnCheckedChangeListener(R.id.gradient_mode_rb,null)
                     .setText(R.id.sbBrightness_num, "$progress%") // 亮度百分值
-                    .setText(R.id.sb_w_bright_num, sbWhiteLightRGB.progress.toString() + "%") // 白光百分值
+                    .setText(R.id.sb_w_bright_num, "$white%") // 白光百分值
                     .setText(R.id.speed_seekbar_alg_tv, item.gradientSpeed.toString() + "%") // 速度百分值
 
                 when (item.rgbType) {
@@ -1806,8 +1807,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
                 LogUtils.v("zcl--进度条-----position$position----------")
                 val tvBrightness = getViewByPosition(position, R.id.cw_brightness_num) as TextView?
                 if (tvBrightness != null) {
-                    if (progress<=1)
+                    if (seekBar.progress <= 1){
+                        seekBar.progress = 1
                         tvBrightness.text = "1%"
+                    }
                     //  data[position].brightness = progress
                     else
                         tvBrightness.text = "$progress%"
@@ -1816,8 +1819,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             R.id.normal_temperature -> {
                 val tvTemperature = getViewByPosition(position, R.id.temperature_num) as TextView?
                 if (tvTemperature != null) {
-                    if (progress<=1)
+                    if (seekBar.progress <= 1){
+                        seekBar.progress = 1
                         tvTemperature.text = "1%"
+                    }
                     else
                         tvTemperature.text = "$progress%"
                     // data[position].temperature = progress
@@ -1826,8 +1831,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             R.id.rgb_sbBrightness -> {
                 val tvBrightnessRGB = getViewByPosition(position, R.id.sbBrightness_num) as TextView?
                 if (tvBrightnessRGB != null) {
-                    if (progress <= 1)
+                    if (seekBar.progress <= 1){
+                        seekBar.progress = 1
                         tvBrightnessRGB.text = "1%"
+                    }
                     else
                         tvBrightnessRGB.text = "$progress%"
                     data[position].brightness = progress
@@ -1836,8 +1843,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             R.id.rgb_white_seekbar -> {
                 val tvSbWhiteLight = getViewByPosition(position, R.id.sb_w_bright_num) as TextView?
                 if (tvSbWhiteLight != null) {
-                    if (progress <= 1)
+                    if (seekBar.progress <= 1){
+                        seekBar.progress = 1
                         tvSbWhiteLight.text = "1%"
+                    }
                     else
                         tvSbWhiteLight.text = "$progress%"
                     val itemGroup = data[position]
@@ -1851,8 +1860,10 @@ class SceneGroupAdapter(layoutResId: Int, data: List<ItemGroup>) : BaseQuickAdap
             R.id.curtain_seekbar -> {
                 val tvCurtain = getViewByPosition(position, R.id.tv_cur_range) as TextView?
                 if (tvCurtain!=null) {
-                    if (progress <= 1)
+                    if (seekBar.progress <= 1){
+                        seekBar.progress = 1
                         tvCurtain.text = mContext.getString(R.string.curtain_range)+"1%"
+                    }
                     else
                         tvCurtain.text = mContext.getString(R.string.curtain_range)+"$progress%"
                 }
